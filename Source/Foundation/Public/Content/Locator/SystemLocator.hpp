@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Resource.hpp"
+#include "Content/Locator.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -20,25 +20,25 @@
 
 namespace Content
 {
-    // -=(Undocumented)=-
-    class Loader
-    {
-    public:
+	// -=(Undocumented)=-
+	class SystemLocator final : public Locator
+	{
+	public:
 
-        // -=(Undocumented)=-
-        virtual Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) = 0;
-    };
+		// -=(Undocumented)=-
+		SystemLocator(CStr Path);
 
-    // -=(Undocumented)=-
-    template<typename Impl, typename Type>
-    class AbstractLoader : public Loader
-    {
-    public:
+		// -=(Undocumented)=-
+		SystemLocator();
 
-        // -=(Undocumented)=-
-        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) override final
-        {
-            return static_cast<Ptr<Impl>>(this)->Load(Data, eastl::static_shared_pointer_cast<Type>(Asset));
-        }
-    };
+		// -=(Undocumented)=-
+		Chunk Open(CStr Path) override;
+
+	private:
+
+		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+		const SStr mPath;
+	};
 }

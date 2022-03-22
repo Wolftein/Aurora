@@ -353,14 +353,19 @@ namespace Graphic
 
     void D3D11Driver::Initialise(Any Display, UInt Width, UInt Height)
     {
-        decltype(& D3D11CreateDevice) D3DCreateDevice = nullptr;
+        decltype(& D3D11CreateDevice)  D3DCreateDevice   = nullptr;
+        decltype(& CreateDXGIFactory1) DXGICreateFactory = nullptr;
 
         if (auto Dll = ::LoadLibrary("D3D11.DLL"); Dll != nullptr)
         {
             D3DCreateDevice = (decltype(& D3D11CreateDevice)) GetProcAddress(Dll, "D3D11CreateDevice");
         }
+        if (auto Dll = ::LoadLibrary("DXGI.DLL"); Dll != nullptr)
+        {
+            DXGICreateFactory = (decltype(& CreateDXGIFactory1)) GetProcAddress(Dll, "CreateDXGIFactory1");
+        }
 
-        if (D3DCreateDevice)
+        if (D3DCreateDevice && DXGICreateFactory)
         {
             ComPtr<ID3D11Device>        Device;
             ComPtr<ID3D11DeviceContext> DeviceImmediate;
@@ -385,7 +390,7 @@ namespace Graphic
             ThrowIfFail(Device.As<ID3D11Device1>(& mDevice));
             ThrowIfFail(DeviceImmediate.As<ID3D11DeviceContext1>(& mDeviceImmediate));
 
-            ThrowIfFail(CreateDXGIFactory1(IID_PPV_ARGS(& mDisplayFactory)));
+            ThrowIfFail(DXGICreateFactory(IID_PPV_ARGS(& mDisplayFactory)));
 
             if (Display.has_value())
             {
@@ -399,7 +404,7 @@ namespace Graphic
                 Description.SampleDesc        = { 1, 0 };
                 Description.OutputWindow      = eastl::any_cast<HWND>(Display);
                 Description.Windowed          = true;
-                Description.SwapEffect        = DXGI_SWAP_EFFECT_DISCARD;
+                Description.SwapEffect        = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
                 ThrowIfFail(
                     mDisplayFactory->CreateSwapChain(mDevice.Get(), & Description, mDisplay.GetAddressOf()));

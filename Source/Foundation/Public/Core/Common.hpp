@@ -103,12 +103,12 @@ inline namespace Core
     using FPtr   = eastl::function<Type>;
 
     // -=(Undocumented)=-
-    template<typename Type, UInt Capacity>
-    using Bitset = eastl::bitset<Capacity, Type>;
-
-    // -=(Undocumented)=-
     template<typename Value, UInt Capacity>
     using Array  = eastl::fixed_vector<Value, Capacity>;
+
+    // -=(Undocumented)=-
+    template<typename Type, UInt Capacity>
+    using Bitset = eastl::bitset<Capacity, Type>;
 
     // -=(Undocumented)=-
     template<typename Key, typename Value>

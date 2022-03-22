@@ -76,7 +76,7 @@ namespace Content
         UInt GetMemoryUsage(UInt Category);
 
         // -=(Undocumented)=-
-        Reader Find(Ref<const Uri> Key);
+        Chunk Find(Ref<const Uri> Key);
 
         // -=(Undocumented)=-
         template<typename Type>

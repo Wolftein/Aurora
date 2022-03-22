@@ -93,7 +93,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Reader Service::Find(Ref<const Uri> Key)
+    Chunk Service::Find(Ref<const Uri> Key)
     {
         if (const auto It = mLocators.find(Key.GetSchema()); It != mLocators.end())
         {
@@ -102,12 +102,12 @@ namespace Content
 
         for (const auto [Schema, Locator] : mLocators)
         {
-            if (Reader Data = Locator->Open(Key.GetPath()); Data.HasData())
+            if (Chunk Data = Locator->Open(Key.GetPath()); Data.HasData())
             {
                 return eastl::move(Data);
             }
         }
-        return Reader(nullptr, 0);
+        return Chunk();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -215,7 +215,7 @@ namespace Content
         {
             Ref<const SPtr<Loader>> Loader = Iterator->second;
 
-            if (Reader File = Find(Key); File.HasData())
+            if (Chunk File = Find(Key); File.HasData())
             {
                 if (Loader->Load(File, Asset))
                 {

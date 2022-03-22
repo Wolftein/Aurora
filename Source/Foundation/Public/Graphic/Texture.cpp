@@ -36,14 +36,14 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Texture::Load(TextureFormat Format, UInt Width, UInt Height, UInt Layer, CPtr<UInt08> Data)
+    void Texture::Load(TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, Ref<Chunk> Data)
     {
         mFormat = Format;
-        mLayout = TextureLayout::Source;
+        mLayout = Layout;
         mWidth  = Width;
         mHeight = Height;
         mLayer  = Layer;
-        mData.assign(Data.begin(), Data.end());
+        mData   = eastl::move(Data);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -51,11 +51,11 @@ namespace Graphic
 
     Bool Texture::OnLoad(Ref<Subsystem::Context> Context)
     {
-        SetMemory(mData.size());
+        SetMemory(mData.GetSize());
 
         mID = Context.GetSubsystem<Graphic::Service>()->CreateTexture(mFormat, mLayout, mWidth, mHeight, mLayer, mData);
 
-        Clean();
+        mData.Clear();
 
         return (mID > 0);
     }
@@ -71,14 +71,5 @@ namespace Graphic
 
             mID = 0;
         }
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Texture::Clean()
-    {
-        mData.clear();
-        mData.shrink_to_fit();
     }
 }

@@ -10,7 +10,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "RawLocator.hpp"
+#include "SystemLocator.hpp"
 #include <fstream>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -22,7 +22,7 @@ namespace Content
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-	RawLocator::RawLocator(CStr Path)
+	SystemLocator::SystemLocator(CStr Path)
 		: mPath(Path)
 	{
 	}
@@ -30,27 +30,27 @@ namespace Content
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-	RawLocator::RawLocator()
-		: RawLocator("")
+	SystemLocator::SystemLocator()
+		: SystemLocator("")
 	{
 	}
 
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-	Reader RawLocator::Open(CStr Path)
+    Chunk SystemLocator::Open(CStr Path)
 	{
 		std::ifstream File((mPath + Path.data()).c_str(), std::ios::in | std::ios::binary | std::ios::ate);
 
 		if (File)
 		{
-			Reader OutputStream(File.tellg());
+            Chunk OutputStream(File.tellg());
 			{
 				File.seekg(0, std::ios::beg);
-				File.read(reinterpret_cast<char *>(OutputStream.GetData()), OutputStream.GetCapacity());
+				File.read(reinterpret_cast<char *>(OutputStream.GetData()), OutputStream.GetSize());
 			}
 			return OutputStream;
 		}
-		return Reader(0);
+		return Chunk();
 	}
 }

@@ -277,16 +277,16 @@ namespace Graphic
     struct Binding
     {
         // -=(Undocumented)=-
-        UInt Buffer;
+        UInt Buffer = 0;
 
         // -=(Undocumented)=-
-        UInt Length;
+        UInt Length = 0;
 
         // -=(Undocumented)=-
-        UInt Offset;
+        UInt Offset = 0;
 
         // -=(Undocumented)=-
-        UInt Stride;
+        UInt Stride = 0;
     };
 
     // -=(Undocumented)=-
@@ -350,7 +350,7 @@ namespace Graphic
     // -=(Undocumented)=-
     struct Rect
     {
-        UInt16 Left, Top, Right, Bottom;
+        UInt16 Left = 0, Top = 0, Right = UINT16_MAX, Bottom = UINT16_MAX;
     };
 
     // -=(Undocumented)=-
@@ -369,15 +369,15 @@ namespace Graphic
         Rect    Scissor;
 
         // -=(Undocumented)=-
-        UInt    Stencil;
+        UInt    Stencil                = 0;
 
         // -=(Undocumented)=-
-        UInt    Pipeline;
+        UInt    Pipeline               = 0;
 
         // -=(Undocumented)=-
-        UInt    Samplers[k_MaxSources];
+        UInt    Samplers[k_MaxSources] = { 0 };
 
         // -=(Undocumented)=-
-        UInt    Textures[k_MaxSources];
+        UInt    Textures[k_MaxSources] = { 0 };
     };
 }

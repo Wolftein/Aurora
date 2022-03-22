@@ -12,7 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Resource.hpp"
+#include "Content/Loader.hpp"
+#include "Audio/Sound.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,24 +22,11 @@
 namespace Content
 {
     // -=(Undocumented)=-
-    class Loader
+    class MP3Loader final : public AbstractLoader<MP3Loader, Audio::Sound>
     {
     public:
 
-        // -=(Undocumented)=-
-        virtual Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) = 0;
-    };
-
-    // -=(Undocumented)=-
-    template<typename Impl, typename Type>
-    class AbstractLoader : public Loader
-    {
-    public:
-
-        // -=(Undocumented)=-
-        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) override final
-        {
-            return static_cast<Ptr<Impl>>(this)->Load(Data, eastl::static_shared_pointer_cast<Type>(Asset));
-        }
+        // \see AbstractLoader::Load
+        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Audio::Sound>> Asset);
     };
 }

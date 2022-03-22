@@ -30,7 +30,7 @@ namespace Graphic
         Texture(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(TextureFormat Format, UInt Width, UInt Height, UInt Layer, CPtr<UInt08> Data);
+        void Load(TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, Ref<Chunk> Data);
 
         // -=(Undocumented)=-
         UInt GetID() const
@@ -78,11 +78,6 @@ namespace Graphic
 
     private:
 
-        // -=(Undocumented)=-
-        void Clean();
-
-    private:
-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -92,6 +87,6 @@ namespace Graphic
         UInt           mWidth;
         UInt           mHeight;
         UInt           mLayer;
-        Vector<UInt08> mData;       // TODO: Remove memory copy
+        Chunk          mData;
     };
 }

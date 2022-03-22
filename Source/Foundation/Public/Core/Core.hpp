@@ -14,6 +14,7 @@
 
 #include "Trait.hpp"
 
+#include "Allocator/Chunk.hpp"
 #include "Allocator/Handle.hpp"
 
 #include "Math/Vector2.hpp"

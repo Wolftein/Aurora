@@ -10,59 +10,54 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Pipeline.hpp"
-#include "Service.hpp"
+#define DR_WAV_IMPLEMENTATION
+#define DR_WAV_NO_STDIO
+
+#include "Decoder.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Graphic
+namespace Audio
 {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Pipeline::Pipeline(Ref<const Content::Uri> Key)
-        : AbstractResource(Key),
-          mID { 0 }
+    WAVDecoder::WAVDecoder(Ref<Chunk> Chunk)
+        : mFrames     { 0 },
+          mDepth      { 0 },
+          mChannel    { 0 },
+          mFrequency  { 0 }
     {
-    }
+        drwav Wav;
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Pipeline::Load(Ref<Chunk> Vertex, Ref<Chunk> Pixel, Ref<const Descriptor> Properties)
-    {
-        mShaders[0] = eastl::move(Vertex);
-        mShaders[1] = eastl::move(Pixel);
-        mProperties = Properties;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    Bool Pipeline::OnLoad(Ref<Subsystem::Context> Context)
-    {
-        SetMemory(mShaders[0].GetSize() + mShaders[1].GetSize() + sizeof(mProperties));
-
-        mID = Context.GetSubsystem<Graphic::Service>()->CreatePipeline(mShaders[0], mShaders[1], mProperties);
-
-        mShaders[0].Clear();
-        mShaders[1].Clear();
-
-        return (mID > 0);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Pipeline::OnUnload(Ref<Subsystem::Context> Context)
-    {
-        if (mID)
+        if (drwav_init_memory(& Wav, Chunk.GetData(), Chunk.GetSize(), nullptr))
         {
-            Context.GetSubsystem<Graphic::Service>()->DeletePipeline(mID);
+            mFrames     = Wav.totalPCMFrameCount;
+            mDepth      = Wav.bitsPerSample;
+            mChannel    = Wav.channels;
+            mFrequency  = Wav.sampleRate;
+            mData       = eastl::make_unique<UInt08[]>(GetSize()); // TODO: Remove this heap allocation
 
-            mID = 0;
+            drwav_read_pcm_frames(& Wav, mFrames, mData.get());
+            drwav_uninit(& Wav);
         }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void WAVDecoder::Seek(UInt Seconds)
+    {
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool WAVDecoder::Read(Ref<CPtr<UInt08>> Output)
+    {
+        Output = CPtr<UInt08>(mData.get(), GetSize());
+        return false;
     }
 }

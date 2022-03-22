@@ -12,47 +12,62 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Driver.hpp"
-#include "Content/Resource.hpp"
+#include "Audio/Decoder.hpp"
+#include <dr_mp3.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Graphic
+namespace Audio
 {
     // -=(Undocumented)=-
-    class Pipeline final : public Content::AbstractResource<Hash("Pipeline")>
+    class MP3Decoder final : public Decoder
     {
+        constexpr static UInt BUFFER_SIZE = 192000 * 4;
+
     public:
 
         // -=(Undocumented)=-
-        Pipeline(Ref<const Content::Uri> Key);
+        MP3Decoder(Ref<Chunk> Chunk);
+
+        // \see Decoder::Seek
+        void Seek(UInt Seconds) override;
+
+        // \see Decoder::Read
+        Bool Read(Ref<CPtr<UInt08>> Output) override;
 
         // -=(Undocumented)=-
-        void Load(Ref<Chunk> Vertex, Ref<Chunk> Pixel, Ref<const Descriptor> Properties);
-
-        // -=(Undocumented)=-
-        UInt GetID() const
+        UInt GetDepth() const
         {
-            return mID;
+            return sizeof(Real32) * 8;
         }
 
-    public:
+        // -=(Undocumented)=-
+        UInt GetChannel() const
+        {
+            return mDescription.channels;
+        }
 
-        // \see Resource::OnLoad(Ref<Subsystem::Context>)
-        Bool OnLoad(Ref<Subsystem::Context> Context) override;
+        // -=(Undocumented)=-
+        UInt GetFrequency() const
+        {
+            return mDescription.sampleRate;
+        }
 
-        // \see Resource::OnUnload(Ref<Subsystem::Context>)
-        void OnUnload(Ref<Subsystem::Context> Context) override;
+        // -=(Undocumented)=-
+        UInt GetSize() const
+        {
+            return mDescription.memory.dataSize;
+        }
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UInt       mID;
-        Chunk      mShaders[2];
-        Descriptor mProperties;
+        Chunk  mChunk;
+        drmp3  mDescription;
+        Real32 mBuffers[BUFFER_SIZE];
     };
 }

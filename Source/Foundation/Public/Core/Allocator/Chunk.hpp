@@ -12,47 +12,76 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Driver.hpp"
-#include "Content/Resource.hpp"
+#include "Core/Common.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Graphic
+inline namespace Core
 {
     // -=(Undocumented)=-
-    class Pipeline final : public Content::AbstractResource<Hash("Pipeline")>
+    class Chunk final
     {
     public:
 
         // -=(Undocumented)=-
-        Pipeline(Ref<const Content::Uri> Key);
-
-        // -=(Undocumented)=-
-        void Load(Ref<Chunk> Vertex, Ref<Chunk> Pixel, Ref<const Descriptor> Properties);
-
-        // -=(Undocumented)=-
-        UInt GetID() const
+        Chunk() : Chunk(nullptr, 0)
         {
-            return mID;
         }
 
-    public:
+        // -=(Undocumented)=-
+        Chunk(UPtr<UInt08[]> Data, UInt32 Capacity)
+            : mData   { eastl::move(Data) },
+              mLength { Capacity }
+        {
+        }
 
-        // \see Resource::OnLoad(Ref<Subsystem::Context>)
-        Bool OnLoad(Ref<Subsystem::Context> Context) override;
+        // -=(Undocumented)=-
+        Chunk(UInt Capacity)
+            : mData   { eastl::make_unique<UInt08[]>(Capacity) },
+              mLength { Capacity }
+        {
+        }
 
-        // \see Resource::OnUnload(Ref<Subsystem::Context>)
-        void OnUnload(Ref<Subsystem::Context> Context) override;
+        // -=(Undocumented)=-
+        auto GetData()
+        {
+            return mData.get();
+        }
+
+        // -=(Undocumented)=-
+        Bool HasData() const
+        {
+            return GetSize() > 0;
+        }
+
+        // -=(Undocumented)=-
+        UInt GetSize() const
+        {
+            return mLength;
+        }
+
+        // -=(Undocumented)=-
+        void Clear()
+        {
+            mData   = nullptr;
+            mLength = 0;
+        }
+
+        // -=(Undocumented)=-
+        template<typename T>
+        operator CPtr<T>() const
+        {
+            return CPtr<T> { reinterpret_cast<Ptr<T>>(mData.get()), mLength / sizeof(T) };
+        }
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UInt       mID;
-        Chunk      mShaders[2];
-        Descriptor mProperties;
+        UPtr<UInt08[]> mData;
+        UInt           mLength;
     };
 }

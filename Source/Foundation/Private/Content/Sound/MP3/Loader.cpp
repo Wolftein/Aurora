@@ -6,13 +6,12 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#pragma once
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Resource.hpp"
+#include "Loader.hpp"
+#include "Decoder.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -20,25 +19,18 @@
 
 namespace Content
 {
-    // -=(Undocumented)=-
-    class Loader
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool MP3Loader::Load(Ref<Chunk> Data, Ref<const SPtr<Audio::Sound>> Asset)
     {
-    public:
+        UPtr<Audio::MP3Decoder> Decoder = eastl::make_unique<Audio::MP3Decoder>(Data);
 
-        // -=(Undocumented)=-
-        virtual Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) = 0;
-    };
-
-    // -=(Undocumented)=-
-    template<typename Impl, typename Type>
-    class AbstractLoader : public Loader
-    {
-    public:
-
-        // -=(Undocumented)=-
-        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) override final
+        if (Decoder->GetSize() > 0)
         {
-            return static_cast<Ptr<Impl>>(this)->Load(Data, eastl::static_shared_pointer_cast<Type>(Asset));
+            Asset->Load(Decoder->GetSize(), Decoder->GetDepth(), Decoder->GetChannel(), Decoder->GetFrequency(), eastl::move(Decoder));
+            return true;
         }
-    };
+        return false;
+    }
 }

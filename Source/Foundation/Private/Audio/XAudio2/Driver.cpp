@@ -381,26 +381,8 @@ namespace Audio
         {
             WAVEFORMATEX Description { 0 };
 
-            switch (Sound->GetDepth())
-            {
-            case 8:
-                Description.wFormatTag     = WAVE_FORMAT_PCM;
-                Description.wBitsPerSample = 8;
-                break;
-            case 16:
-                Description.wFormatTag     = WAVE_FORMAT_PCM;
-                Description.wBitsPerSample = 16;
-                break;
-            case 24:
-                Description.wFormatTag     = WAVE_FORMAT_PCM;
-                Description.wBitsPerSample = 24;
-                break;
-            case 32:
-                Description.wFormatTag     = WAVE_FORMAT_IEEE_FLOAT;
-                Description.wBitsPerSample = 32;
-                break;
-            }
-
+            Description.wFormatTag      = (Sound->GetDepth() >= 32 ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM);
+            Description.wBitsPerSample  = Sound->GetDepth();
             Description.nChannels       = Sound->GetChannel();
             Description.nSamplesPerSec  = Sound->GetFrequency();
             Description.nBlockAlign     = static_cast<DWORD>(Description.nChannels * (Description.wBitsPerSample / 8));

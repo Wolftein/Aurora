@@ -10,59 +10,48 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Pipeline.hpp"
-#include "Service.hpp"
+#define DR_MP3_IMPLEMENTATION
+#define DR_MP3_NO_STDIO
+
+#include "Decoder.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Graphic
+namespace Audio
 {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Pipeline::Pipeline(Ref<const Content::Uri> Key)
-        : AbstractResource(Key),
-          mID { 0 }
+    MP3Decoder::MP3Decoder(Ref<Chunk> Chunk)
+        : mChunk { eastl::move(Chunk) }
     {
+        drmp3_init_memory(& mDescription, mChunk.GetData(), mChunk.GetSize(), nullptr);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Pipeline::Load(Ref<Chunk> Vertex, Ref<Chunk> Pixel, Ref<const Descriptor> Properties)
+    void MP3Decoder::Seek(UInt Seconds)
     {
-        mShaders[0] = eastl::move(Vertex);
-        mShaders[1] = eastl::move(Pixel);
-        mProperties = Properties;
+        drmp3_seek_to_pcm_frame(& mDescription, Seconds * mDescription.sampleRate);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Pipeline::OnLoad(Ref<Subsystem::Context> Context)
+    Bool MP3Decoder::Read(Ref<CPtr<UInt08>> Output)
     {
-        SetMemory(mShaders[0].GetSize() + mShaders[1].GetSize() + sizeof(mProperties));
+        const UInt Frames = drmp3_read_pcm_frames_f32(& mDescription, mDescription.sampleRate, mBuffers);
 
-        mID = Context.GetSubsystem<Graphic::Service>()->CreatePipeline(mShaders[0], mShaders[1], mProperties);
+        Output = CPtr<UInt08>(reinterpret_cast<UInt08 *>(mBuffers), Frames * mDescription.channels * sizeof(Real32));
 
-        mShaders[0].Clear();
-        mShaders[1].Clear();
-
-        return (mID > 0);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Pipeline::OnUnload(Ref<Subsystem::Context> Context)
-    {
-        if (mID)
+        if (mDescription.atEnd)
         {
-            Context.GetSubsystem<Graphic::Service>()->DeletePipeline(mID);
-
-            mID = 0;
+            drmp3_seek_to_start_of_stream(& mDescription);
+            return false;
         }
+        return true;
     }
 }

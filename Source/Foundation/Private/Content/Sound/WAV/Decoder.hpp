@@ -12,47 +12,62 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Driver.hpp"
-#include "Content/Resource.hpp"
+#include "Audio/Decoder.hpp"
+#include <dr_wav.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Graphic
+namespace Audio
 {
     // -=(Undocumented)=-
-    class Pipeline final : public Content::AbstractResource<Hash("Pipeline")>
+    class WAVDecoder final : public Decoder
     {
     public:
 
         // -=(Undocumented)=-
-        Pipeline(Ref<const Content::Uri> Key);
+        WAVDecoder(Ref<Chunk> Chunk);
+
+        // \see Decoder::Seek
+        void Seek(UInt Seconds) override;
+
+        // \see Decoder::Read
+        Bool Read(Ref<CPtr<UInt08>> Output) override;
 
         // -=(Undocumented)=-
-        void Load(Ref<Chunk> Vertex, Ref<Chunk> Pixel, Ref<const Descriptor> Properties);
-
-        // -=(Undocumented)=-
-        UInt GetID() const
+        UInt GetDepth() const
         {
-            return mID;
+            return mDepth;
         }
 
-    public:
+        // -=(Undocumented)=-
+        UInt GetChannel() const
+        {
+            return mChannel;
+        }
 
-        // \see Resource::OnLoad(Ref<Subsystem::Context>)
-        Bool OnLoad(Ref<Subsystem::Context> Context) override;
+        // -=(Undocumented)=-
+        UInt GetFrequency() const
+        {
+            return mFrequency;
+        }
 
-        // \see Resource::OnUnload(Ref<Subsystem::Context>)
-        void OnUnload(Ref<Subsystem::Context> Context) override;
+        // -=(Undocumented)=-
+        UInt GetSize() const
+        {
+            return mFrames * mChannel * (mDepth / sizeof(UInt08));
+        }
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UInt       mID;
-        Chunk      mShaders[2];
-        Descriptor mProperties;
+        UPtr<UInt08[]> mData;
+        UInt           mFrames;
+        UInt           mDepth;
+        UInt           mChannel;
+        UInt           mFrequency;
     };
 }
