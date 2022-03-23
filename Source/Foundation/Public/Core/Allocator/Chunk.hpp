@@ -63,9 +63,10 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        template<typename T = void>
         auto GetData()
         {
-            return mData.get();
+            return reinterpret_cast<Ptr<T>>(mData.get());
         }
 
         // -=(Undocumented)=-

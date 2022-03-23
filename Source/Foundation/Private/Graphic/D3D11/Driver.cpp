@@ -356,11 +356,11 @@ namespace Graphic
         decltype(& D3D11CreateDevice)  D3DCreateDevice   = nullptr;
         decltype(& CreateDXGIFactory1) DXGICreateFactory = nullptr;
 
-        if (auto Dll = ::LoadLibrary("D3D11.DLL"); Dll != nullptr)
+        if (auto Dll = ::LoadLibraryEx("D3D11.DLL", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32); Dll != nullptr)
         {
             D3DCreateDevice = (decltype(& D3D11CreateDevice)) GetProcAddress(Dll, "D3D11CreateDevice");
         }
-        if (auto Dll = ::LoadLibrary("DXGI.DLL"); Dll != nullptr)
+        if (auto Dll = ::LoadLibraryEx("DXGI.DLL", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32); Dll != nullptr)
         {
             DXGICreateFactory = (decltype(& CreateDXGIFactory1)) GetProcAddress(Dll, "CreateDXGIFactory1");
         }

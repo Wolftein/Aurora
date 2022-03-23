@@ -29,7 +29,7 @@ namespace Content
         SInt32 Width, Height, Channel;
 
         Ptr<stbi_uc> Image = stbi_load_from_memory(
-            reinterpret_cast<Ptr<stbi_uc>>(Data.GetData()), Data.GetSize(), & Width, & Height, & Channel, STBI_rgb_alpha);
+            Data.GetData<stbi_uc>(), Data.GetSize(), & Width, & Height, & Channel, STBI_rgb_alpha);
 
         if (Image)
         {
