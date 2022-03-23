@@ -16,34 +16,11 @@
 
 #include <Content/Sound/WAV/Loader.hpp>
 #include <Content/Sound/MP3/Loader.hpp>
+#include <Content/Image/STB/Loader.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #pragma comment( lib, "d3dcompiler" )
 #include <d3dcompiler.h>
 /*
-class IMGLoader final : public Content::AbstractLoader<IMGLoader, Graphic::Texture>
-{
-public:
-
-    Bool Load(Ref<Chunk> Input, Ref<const SPtr<Graphic::Texture>> Asset)
-    {
-        SInt32 X, Y, Channel;
-
-        Ptr<stbi_uc> Data = stbi_load_from_memory(Input.GetData(), Input.GetSize(), &X, &Y, &Channel, 4);
-        if (Data)
-        {
-            Asset->Load(Graphic::TextureFormat::RGBA8UIntNorm, X, Y, 1, CPtr<UInt08> { Data, static_cast<UInt>(X * Y * 4) });
-
-            stbi_image_free(Data);
-
-            return true;
-        }
-
-        return false;
-    }
-};
-
 class HLSLLoader final : public Content::AbstractLoader<HLSLLoader, Graphic::Pipeline>
     {
 public:
@@ -111,12 +88,12 @@ int main()
     ContentService->AddLoader("wav", eastl::make_shared<Content::WAVLoader>());
     ContentService->AddLoader("mp3", eastl::make_shared<Content::MP3Loader>());
 
-    // auto ImgLoaderPtr = eastl::make_shared<IMGLoader>();
-    // ContentService->AddLoader("png", ImgLoaderPtr);
-    // ContentService->AddLoader("bmp", ImgLoaderPtr);
-    // ContentService->AddLoader("tga", ImgLoaderPtr);
-    //ContentService->AddLoader("psd", ImgLoaderPtr);
-    //ContentService->AddLoader("jpg", ImgLoaderPtr);
+    auto ImgLoaderPtr = eastl::make_shared<Content::STBLoader>();
+    ContentService->AddLoader("png", ImgLoaderPtr);
+    ContentService->AddLoader("bmp", ImgLoaderPtr);
+    ContentService->AddLoader("tga", ImgLoaderPtr);
+    ContentService->AddLoader("psd", ImgLoaderPtr);
+    ContentService->AddLoader("jpg", ImgLoaderPtr);
 
     if (GraphicDriver == Graphic::Backend::Direct3D11)
     {
@@ -147,8 +124,8 @@ int main()
     UInt sMusic = AudioService->Play(SUBMIX_MUSIC, Sound2, Emitter, true);
     AudioService->Start(sMusic);
 
-    // SPtr<Graphic::Texture>  SimpleTexture  = ContentService->Load<Graphic::Texture>("Guerrero.jpg", false);
-    // SPtr<Graphic::Texture>  SimpleTexture2 = ContentService->Load<Graphic::Texture>("Pescador.jpg", false);
+    SPtr<Graphic::Texture>  SimpleTexture  = ContentService->Load<Graphic::Texture>("ImagenCargando.jpg", false);
+    SPtr<Graphic::Texture>  SimpleTexture2 = ContentService->Load<Graphic::Texture>("Pescador.jpg", false);
     // SPtr<Graphic::Pipeline> SimplePipeline = ContentService->Load<Graphic::Pipeline>("basic.sl", false);
 
     printf("Audio: %zukb\n", ContentService->GetMemoryUsage<Audio::Sound>() / 1024);

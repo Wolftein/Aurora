@@ -26,21 +26,39 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        Chunk() : Chunk(nullptr, 0)
+        using Deleter = void(*)(Ptr<void>);
+
+        // -=(Undocumented)=-
+        using Pointer = UPtr<void, Deleter>;
+
+    public:
+
+        // -=(Undocumented)=-
+        Chunk()
+            : mData { nullptr, nullptr },
+              mSize { 0 }
         {
         }
 
         // -=(Undocumented)=-
-        Chunk(UPtr<UInt08[]> Data, UInt32 Capacity)
-            : mData   { eastl::move(Data) },
-              mLength { Capacity }
+        Chunk(UInt Size)
+            : mData { new UInt08[Size], [](auto Data) { delete[] reinterpret_cast<Ptr<UInt08>>(Data); } },
+              mSize { Size }
         {
         }
 
         // -=(Undocumented)=-
-        Chunk(UInt Capacity)
-            : mData   { eastl::make_unique<UInt08[]>(Capacity) },
-              mLength { Capacity }
+        Chunk(Pointer Data, UInt Size)
+            : mData { eastl::move(Data) },
+              mSize { Size }
+        {
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        Chunk(Type Data, UInt Size, Deleter Destructor)
+            : mData { reinterpret_cast<Ptr<UInt08>>(Data), Destructor },
+              mSize { Size }
         {
         }
 
@@ -48,6 +66,13 @@ inline namespace Core
         auto GetData()
         {
             return mData.get();
+        }
+
+        // -=(Undocumented)=-
+        template<typename T>
+        auto GetSpan() const
+        {
+            return CPtr<T> { reinterpret_cast<Ptr<T>>(mData.get()), mSize / sizeof(T) };
         }
 
         // -=(Undocumented)=-
@@ -59,21 +84,21 @@ inline namespace Core
         // -=(Undocumented)=-
         UInt GetSize() const
         {
-            return mLength;
+            return mSize;
         }
 
         // -=(Undocumented)=-
         void Clear()
         {
-            mData   = nullptr;
-            mLength = 0;
+            mData = nullptr;
+            mSize = 0;
         }
 
         // -=(Undocumented)=-
         template<typename T>
         operator CPtr<T>() const
         {
-            return CPtr<T> { reinterpret_cast<Ptr<T>>(mData.get()), mLength / sizeof(T) };
+            return GetSpan<T>();
         }
 
     private:
@@ -81,7 +106,7 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UPtr<UInt08[]> mData;
-        UInt           mLength;
+        Pointer mData;
+        UInt    mSize;
     };
 }

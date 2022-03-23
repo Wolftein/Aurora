@@ -93,6 +93,22 @@ ExternalProject_Get_Property(EP_DRLIBS SOURCE_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR})
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Dependency (STB for reading images)
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+ExternalProject_Add(EP_STB
+        GIT_REPOSITORY https://github.com/nothings/stb
+        GIT_SUBMODULES_RECURSE OFF
+        CMAKE_ARGS
+            -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+            -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        CONFIGURE_COMMAND "" BUILD_COMMAND "" UPDATE_COMMAND "" INSTALL_COMMAND "")
+ExternalProject_Get_Property(EP_STB SOURCE_DIR)
+LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR})
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Library
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

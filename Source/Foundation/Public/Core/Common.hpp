@@ -95,8 +95,8 @@ inline namespace Core
     using SPtr   = eastl::shared_ptr<Type>;
 
     // -=(Undocumented)=-
-    template<typename Type>
-    using UPtr   = eastl::unique_ptr<Type>;
+    template<typename Type, typename Deleter = eastl::default_delete<Type>>
+    using UPtr   = eastl::unique_ptr<Type, Deleter>;
 
     // -=(Undocumented)=-
     template<typename Type>
