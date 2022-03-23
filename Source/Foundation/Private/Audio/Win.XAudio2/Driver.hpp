@@ -176,6 +176,6 @@ namespace Audio
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         X3DAUDIO_HANDLE             m3DAudio;
-        X3DAUDIO_LISTENER           m3DListener;
+        X3DAUDIO_LISTENER           m3DAudioListener;
     };
 }

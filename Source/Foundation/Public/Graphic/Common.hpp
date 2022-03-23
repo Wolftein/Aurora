@@ -60,6 +60,7 @@ namespace Graphic
     // -=(Undocumented)=-
     enum class Backend
     {
+        None,
         Direct3D11,
     };
 

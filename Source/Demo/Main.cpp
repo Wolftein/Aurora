@@ -103,8 +103,9 @@ int main()
     constexpr UInt SUBMIX_MUSIC  = 0;
     constexpr UInt SUBMIX_EFFECT = 1;
 
+    auto AudioDriver  = Audio::Backend::XAudio2; // By default use XAudio2
     auto AudioService = System.AddSubsystem<Audio::Service>();
-    AudioService->Initialise(2);
+    AudioService->Initialise(AudioDriver, 2);
 
     SPtr<Audio::Sound> Sound1 = ContentService->Load<Audio::Sound>("85.wav", false);
     SPtr<Audio::Sound> Sound2 = ContentService->Load<Audio::Sound>("127.mp3", false);

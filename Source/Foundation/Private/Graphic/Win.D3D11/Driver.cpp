@@ -351,21 +351,23 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::Initialise(Any Display, UInt Width, UInt Height)
+    Bool D3D11Driver::Initialise(Any Display, UInt Width, UInt Height)
     {
-        decltype(& D3D11CreateDevice)  D3DCreateDevice   = nullptr;
-        decltype(& CreateDXGIFactory1) DXGICreateFactory = nullptr;
+        decltype(& D3D11CreateDevice)  D3D11CreateDevicePtr = nullptr;
+        decltype(& CreateDXGIFactory1) CreateDXGIFactoryPtr = nullptr;
 
         if (auto Dll = ::LoadLibraryEx("D3D11.DLL", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32); Dll != nullptr)
         {
-            D3DCreateDevice = (decltype(& D3D11CreateDevice)) GetProcAddress(Dll, "D3D11CreateDevice");
+            D3D11CreateDevicePtr = (decltype(& D3D11CreateDevice)) GetProcAddress(Dll, "D3D11CreateDevice");
         }
         if (auto Dll = ::LoadLibraryEx("DXGI.DLL", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32); Dll != nullptr)
         {
-            DXGICreateFactory = (decltype(& CreateDXGIFactory1)) GetProcAddress(Dll, "CreateDXGIFactory1");
+            CreateDXGIFactoryPtr = (decltype(& CreateDXGIFactory1)) GetProcAddress(Dll, "CreateDXGIFactory1");
         }
 
-        if (D3DCreateDevice && DXGICreateFactory)
+        const Bool Successful = (D3D11CreateDevicePtr && CreateDXGIFactoryPtr);
+
+        if (Successful)
         {
             ComPtr<ID3D11Device>        Device;
             ComPtr<ID3D11DeviceContext> DeviceImmediate;
@@ -375,7 +377,7 @@ namespace Graphic
             Flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-            ThrowIfFail(D3DCreateDevice(
+            ThrowIfFail(D3D11CreateDevicePtr(
                 nullptr,
                 D3D_DRIVER_TYPE_HARDWARE,
                 nullptr,
@@ -390,7 +392,7 @@ namespace Graphic
             ThrowIfFail(Device.As<ID3D11Device1>(& mDevice));
             ThrowIfFail(DeviceImmediate.As<ID3D11DeviceContext1>(& mDeviceImmediate));
 
-            ThrowIfFail(DXGICreateFactory(IID_PPV_ARGS(& mDisplayFactory)));
+            ThrowIfFail(CreateDXGIFactoryPtr(IID_PPV_ARGS(& mDisplayFactory)));
 
             if (Display.has_value())
             {
@@ -414,6 +416,7 @@ namespace Graphic
                 CreateSwapchainResources(mPasses[k_Default], Width, Height);
             }
         }
+        return Successful;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

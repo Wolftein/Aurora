@@ -13,8 +13,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Graphic/Driver.hpp"
-#include <d3d11_4.h>
-#include <wrl/client.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -23,12 +21,12 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    class D3D11Driver final : public Driver
+    class NoneDriver final : public Driver
     {
     public:
 
         // \see Driver::Initialise
-        void Initialise(Any Display, UInt Width, UInt Height) override;
+        Bool Initialise(Any Display, UInt Width, UInt Height) override;
 
         // \see Driver::Reset
         void Reset(UInt Width, UInt Height) override;
@@ -77,73 +75,5 @@ namespace Graphic
 
         // \see Driver::Commit
         void Commit(Bool Synchronised) override;
-
-    private:
-
-        // -=(Undocumented)=-
-        template<typename T>
-        using ComPtr = Microsoft::WRL::ComPtr<T>;
-
-        // -=(Undocumented)=-
-        struct D3D11Buffer
-        {
-            ComPtr<ID3D11Buffer> Resource;
-        };
-
-        // -=(Undocumented)=-
-        struct D3D11Pass
-        {
-            ComPtr<ID3D11RenderTargetView> Color[k_MaxAttachments];
-            ComPtr<ID3D11DepthStencilView> Auxiliary;
-        };
-
-        // -=(Undocumented)=-
-        struct D3D11Pipeline
-        {
-            ComPtr<ID3D11VertexShader>      VS;
-            ComPtr<ID3D11PixelShader>       PS;
-            ComPtr<ID3D11BlendState>        BS;
-            ComPtr<ID3D11DepthStencilState> DS;
-            ComPtr<ID3D11RasterizerState>   RS;
-            ComPtr<ID3D11InputLayout>       IL;
-            D3D11_PRIMITIVE_TOPOLOGY        PT;
-        };
-
-        // -=(Undocumented)=-
-        struct D3D11Sampler
-        {
-            ComPtr<ID3D11SamplerState> Resource;
-        };
-
-        // -=(Undocumented)=-
-        struct D3D11Texture
-        {
-            ComPtr<ID3D11Texture2D>          Object;
-            ComPtr<ID3D11ShaderResourceView> Resource;
-        };
-
-    private:
-
-        // -=(Undocumented)=-
-        void CreateSwapchainResources(Ref<D3D11Pass> Pass, UInt Width, UInt Height);
-
-    private:
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        ComPtr<ID3D11Device1>        mDevice;
-        ComPtr<ID3D11DeviceContext1> mDeviceImmediate;
-        ComPtr<IDXGISwapChain>       mDisplay;
-        ComPtr<IDXGIFactory1>        mDisplayFactory;
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        D3D11Buffer                  mBuffers[k_MaxBuffers];
-        D3D11Pass                    mPasses[k_MaxPasses];
-        D3D11Pipeline                mPipelines[k_MaxPipelines];
-        D3D11Sampler                 mSamplers[k_MaxSamplers];
-        D3D11Texture                 mTextures[k_MaxTextures];
     };
 }

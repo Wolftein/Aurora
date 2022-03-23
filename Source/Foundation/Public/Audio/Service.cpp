@@ -11,7 +11,8 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Service.hpp"
-#include <Audio/XAudio2/Driver.hpp>
+#include <Audio/None/Driver.hpp>
+#include <Audio/Win.XAudio2/Driver.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -38,10 +39,29 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Initialise(UInt32 Submixes)
+    Bool Service::Initialise(Backend Backend, UInt32 Submixes)
     {
-        mDriver = eastl::make_unique<XAudio2Driver>();
-        return mDriver->Initialise(Submixes);
+        Bool Successful = true;
+
+        if (!mDriver)
+        {
+            switch (Backend)
+            {
+            case Backend::None:
+                mDriver = eastl::make_unique<NoneDriver>();
+                break;
+            case Backend::XAudio2:
+                mDriver = eastl::make_unique<XAudio2Driver>();
+                break;
+            }
+            Successful = mDriver->Initialise(Submixes);
+
+            if (!Successful)
+            {
+                mDriver = nullptr;
+            }
+        }
+        return Successful;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

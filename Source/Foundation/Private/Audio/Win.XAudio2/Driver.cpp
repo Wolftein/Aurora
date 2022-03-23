@@ -186,11 +186,11 @@ namespace Audio
 
     void XAudio2Driver::SetListener(Ref<const Vector3f> Position, Ref<const Vector4f> Orientation)
     {
-        m3DListener.Position    = X3DAUDIO_VECTOR(Position.GetX(), Position.GetY(), Position.GetZ());
-        m3DListener.Velocity    = X3DAUDIO_VECTOR(0, 0, 0); // TODO For 3D implementation
-        m3DListener.OrientFront = X3DAUDIO_VECTOR(0, 0, 1); // TODO For 3D implementation
-        m3DListener.OrientTop   = X3DAUDIO_VECTOR(0, 1, 0); // TODO For 3D implementation
-        m3DListener.pCone       = nullptr; // TODO For 3D implementation
+        m3DAudioListener.Position    = X3DAUDIO_VECTOR(Position.GetX(), Position.GetY(), Position.GetZ());
+        m3DAudioListener.Velocity    = X3DAUDIO_VECTOR(0, 0, 0); // TODO For 3D implementation
+        m3DAudioListener.OrientFront = X3DAUDIO_VECTOR(0, 0, 1); // TODO For 3D implementation
+        m3DAudioListener.OrientTop   = X3DAUDIO_VECTOR(0, 1, 0); // TODO For 3D implementation
+        m3DAudioListener.pCone       = nullptr; // TODO For 3D implementation
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -454,7 +454,7 @@ namespace Audio
         Settings.DstChannelCount = Details.InputChannels;
         Settings.pMatrixCoefficients = Matrix;
 
-        X3DAudioCalculate(m3DAudio, & m3DListener, & Emitter, Flags, & Settings);
+        X3DAudioCalculate(m3DAudio, & m3DAudioListener, & Emitter, Flags, & Settings);
 
         Instance.Source->SetFrequencyRatio(Instance.Frequency * Settings.DopplerFactor);
         Instance.Source->SetOutputMatrix(Instance.Submix,
