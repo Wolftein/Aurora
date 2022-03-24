@@ -351,7 +351,7 @@ namespace Graphic
     // -=(Undocumented)=-
     struct Rect
     {
-        UInt16 Left = 0, Top = 0, Right = UINT16_MAX, Bottom = UINT16_MAX;
+        UInt16 Left = 0, Top = 0, Right = 0, Bottom = 0;
     };
 
     // -=(Undocumented)=-

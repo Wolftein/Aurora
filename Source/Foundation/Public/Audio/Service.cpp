@@ -12,7 +12,7 @@
 
 #include "Service.hpp"
 #include <Audio/None/Driver.hpp>
-#include <Audio/Win.XAudio2/Driver.hpp>
+#include <Audio/XAudio2/Driver.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -47,11 +47,13 @@ namespace Audio
         {
             switch (Backend)
             {
-            case Backend::None:
-                mDriver = eastl::make_unique<NoneDriver>();
-                break;
+#ifdef     _WIN32
             case Backend::XAudio2:
                 mDriver = eastl::make_unique<XAudio2Driver>();
+                break;
+#endif // _WIN32
+            default:
+                mDriver = eastl::make_unique<NoneDriver>();
                 break;
             }
             Successful = mDriver->Initialise(Submixes);

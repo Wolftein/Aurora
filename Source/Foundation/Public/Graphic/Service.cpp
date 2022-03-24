@@ -12,7 +12,7 @@
 
 #include "Service.hpp"
 #include <Graphic/None/Driver.hpp>
-#include <Graphic/Win.D3D11/Driver.hpp>
+#include <Graphic/D3D11/Driver.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -47,11 +47,13 @@ namespace Graphic
         {
             switch (Backend)
             {
-            case Backend::None:
-                mDriver = eastl::make_unique<NoneDriver>();
-                break;
+#ifdef    _WIN32
             case Backend::Direct3D11:
                 mDriver = eastl::make_unique<D3D11Driver>();
+                break;
+#endif // _WIN32
+            default:
+                mDriver = eastl::make_unique<NoneDriver>();
                 break;
             }
             Successful = mDriver->Initialise(Display, Width, Height);

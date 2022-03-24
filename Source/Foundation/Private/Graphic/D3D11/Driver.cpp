@@ -406,7 +406,7 @@ namespace Graphic
                 Description.SampleDesc        = { 1, 0 };
                 Description.OutputWindow      = eastl::any_cast<HWND>(Display);
                 Description.Windowed          = true;
-                Description.SwapEffect        = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+                Description.SwapEffect        = DXGI_SWAP_EFFECT_DISCARD;
 
                 ThrowIfFail(
                     mDisplayFactory->CreateSwapChain(mDevice.Get(), & Description, mDisplay.GetAddressOf()));
