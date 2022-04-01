@@ -119,6 +119,31 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
+    enum class Cull
+    {
+        None,
+        Back,
+        Front,
+    };
+
+    // -=(Undocumented)=-
+    enum class Language
+    {
+        Version_2_0,
+        Version_3_0,
+        Version_4_0,
+        Version_5_0,
+        Version_6_0,
+    };
+
+    // -=(Undocumented)=-
+    enum class Stage
+    {
+        Vertex,
+        Fragment,
+    };
+
+    // -=(Undocumented)=-
     enum class TestAction
     {
         Keep,
@@ -299,6 +324,12 @@ namespace Graphic
     // -=(Undocumented)=-
     struct Descriptor
     {
+        // -=(Undocumented)=-
+        Cull           Cull                = Cull::Back;
+
+        // -=(Undocumented)=-
+        Bool           Fill                = true;
+
         // -=(Undocumented)=-
         BlendColor     BlendMask           = BlendColor::RGBA;
 

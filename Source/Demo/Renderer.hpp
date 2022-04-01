@@ -44,7 +44,7 @@ namespace Renderer
 		~Batch();
 
 		// (Missing Documentation)
-		void SetData(UInt32 Width, UInt32 Height, Real32 Time);
+		void SetData(Real32 X, Real32 Y, Real32 Width, Real32 Height, Real32 Time);
 
 		// (Missing Documentation)
 		void Draw(
@@ -138,6 +138,6 @@ namespace Renderer
 		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-		Graphic::Submission mSubmission[kMaxBatch];
+		Graphic::Submission * mSubmission;
 	};
 }

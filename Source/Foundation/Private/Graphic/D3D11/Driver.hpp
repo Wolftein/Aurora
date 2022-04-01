@@ -49,7 +49,7 @@ namespace Graphic
         void DeletePass(UInt ID) override;
 
         // \see Driver::CreatePipeline
-        void CreatePipeline(UInt ID, CPtr<UInt08> Vertex, CPtr<UInt08> Pixel, Ref<const Descriptor> Properties) override;
+        void CreatePipeline(UInt ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties) override;
 
         // \see Driver::DeletePipeline
         void DeletePipeline(UInt ID) override;

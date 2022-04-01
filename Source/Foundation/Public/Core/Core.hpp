@@ -21,4 +21,6 @@
 #include "Math/Vector3.hpp"
 #include "Math/Vector4.hpp"
 
+#include "Serialization/TOML/Parser.hpp"
+
 #include "System/Subsystem.hpp"

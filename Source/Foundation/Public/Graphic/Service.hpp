@@ -71,7 +71,7 @@ namespace Graphic
         void DeletePass(UInt ID);
 
         // -=(Undocumented)=-
-        UInt CreatePipeline(CPtr<UInt08> Vertex, CPtr<UInt08> Pixel, const Descriptor & Properties);
+        UInt CreatePipeline(CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, const Descriptor & Properties);
 
         // -=(Undocumented)=-
         void DeletePipeline(UInt ID);

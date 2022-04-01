@@ -75,6 +75,19 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    static auto As(Cull Value)
+    {
+        constexpr static D3D11_CULL_MODE k_Mapping[] = {
+            D3D11_CULL_NONE,                // Cull::None
+            D3D11_CULL_BACK,                // Cull::Back
+            D3D11_CULL_FRONT,               // Cull::Front
+        };
+        return k_Mapping[static_cast<UInt32>(Value)];
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     static auto As(TestAction Value)
     {
         constexpr static D3D11_STENCIL_OP k_Mapping[] = {
@@ -520,12 +533,12 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreatePipeline(UInt ID, CPtr<UInt08> Vertex, CPtr<UInt08> Pixel, const Descriptor & Properties)
+    void D3D11Driver::CreatePipeline(UInt ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, const Descriptor & Properties)
     {
         Ref<D3D11Pipeline> Pipeline = mPipelines[ID];
 
         ThrowIfFail(mDevice->CreateVertexShader(Vertex.data(), Vertex.size(), nullptr, Pipeline.VS.GetAddressOf()));
-        ThrowIfFail(mDevice->CreatePixelShader(Pixel.data(), Pixel.size(), nullptr, Pipeline.PS.GetAddressOf()));
+        ThrowIfFail(mDevice->CreatePixelShader(Fragment.data(), Fragment.size(), nullptr, Pipeline.PS.GetAddressOf()));
 
         {
             D3D11_BLEND_DESC Description = CD3D11_BLEND_DESC(CD3D11_DEFAULT());
@@ -577,9 +590,10 @@ namespace Graphic
         {
             D3D11_RASTERIZER_DESC Description = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
 
-            Description.CullMode		  = D3D11_CULL_NONE; // TODO BACK
+            Description.CullMode		  = As(Properties.Cull);
             Description.ScissorEnable     = TRUE;
             Description.MultisampleEnable = TRUE;
+            Description.FillMode          = Properties.Fill ? D3D11_FILL_SOLID : D3D11_FILL_WIREFRAME;
 
             ThrowIfFail(mDevice->CreateRasterizerState(& Description, Pipeline.RS.GetAddressOf()));
         }
@@ -719,7 +733,6 @@ namespace Graphic
 
                 if (Target != Clear::Auxiliary)
                 {
-                    mDeviceImmediate->DiscardView(View.Get());
                     mDeviceImmediate->ClearRenderTargetView(View.Get(), reinterpret_cast<Real32 *>(& Tint));
                 }
             }
@@ -729,7 +742,6 @@ namespace Graphic
         {
             constexpr UINT Mode = D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL;
 
-            mDeviceImmediate->DiscardView(mPasses[ID].Auxiliary.Get());
             mDeviceImmediate->ClearDepthStencilView(mPasses[ID].Auxiliary.Get(), Mode, Depth, Stencil);
         }
 
@@ -746,7 +758,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::Submit(CPtr<Submission> Submissions) // TODO: Needs Improvement
+    void D3D11Driver::Submit(CPtr<Submission> Submissions)
     {
         Submission      Empty { 0 };
         Ref<Submission> Prev = Empty;

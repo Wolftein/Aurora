@@ -33,6 +33,7 @@ namespace Renderer
 		  mQueueQuantity { 0 },
 		  mSubmission { 0 }
 	{
+        mSubmission = new Graphic::Submission[kMaxBatch];
         Service = Context.GetSubsystem<Graphic::Service>();
         
 		InitResources();
@@ -52,20 +53,37 @@ namespace Renderer
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-	void Batch::SetData(UInt32 Width, UInt32 Height, Real32 Time)
+	void Batch::SetData(Real32 X, Real32 Y, Real32 Width, Real32 Height, Real32 Time)
 	{
         Real32 kNear = 0.0f;
         Real32 kFar  = (1 << 24) - 1;
 
-        Real32 zProjection[4u * 4u + 1] = { // @formatter:off
-            2.0f / Width,     0.0f,           0.0f,  -1.0f,
-            0.0f,            -2.0f / Height,  0.0f,   1.0f,
-            0.0f,             0.0f,           1.0f / (kFar - kNear),   0.0f,
-            0.0f,             0.0f,           kNear / (kNear - kFar),   1.0f,
-        }; // @formatter:on
-        zProjection[16] = Time;
+        struct Data
+        {
+            Real32 Projection[4 * 4];
+            Real32 View[4 * 4];
+            Real32 Time;
+        };
 
-		Service->UpdateBuffer(mBuffer[2], true, 0, { (UInt08 *) zProjection, (4 * 4 + 1) * sizeof(Real32) });
+        // @formatter:off
+        Data Uniform{
+            .Projection = {
+                2.0f / Width,  0.0f,            0.0f,                   -1.0f,
+                0.0f,         -2.0f / Height,   0.0f,                    1.0f,
+                0.0f,          0.0f,            1.0f / (kFar - kNear),   0.0f,
+                0.0f,          0.0f,            kNear / (kNear - kFar),  1.0f,
+            },
+            .View = {
+                1.0f,   0.0f,   0.0f,   X,
+                0.0f,   1.0f,   0.0f,   Y,
+                0.0f,   0.0f,   1.0f,   0.0f,
+                0.0f,   0.0f,   0.0f,   1.0f,
+            },
+            .Time = Time
+        };
+         // @formatter:on
+
+        Service->UpdateBuffer(mBuffer[2], true, 0, { (UInt08 *) & Uniform, sizeof(Data) });
 	}
 
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -81,7 +99,7 @@ namespace Renderer
 			const SPtr<Graphic::Pipeline> & Pipeline,
 			const SPtr<Graphic::Texture> & Texture)
 	{
-		if (!Pipeline->HasLoaded() || !Texture->HasLoaded()) {
+		if (!Pipeline->HasLoaded()) {
 			return;
 		}
 
@@ -170,7 +188,7 @@ namespace Renderer
 	void Batch::InitResources()
 	{
 		mBuffer[0] = Service->CreateBuffer(true, sizeof(Layout)  * 4 * kMaxBatch, {});
-		mBuffer[2] = Service->CreateBuffer(false, sizeof(Real32) * 32 , {});
+		mBuffer[2] = Service->CreateBuffer(false, sizeof(Real32) * 64 , {});
 
 		UPtr<UInt16[]> Memory = eastl::make_unique<UInt16[]>(kMaxBatch * 6u);
 

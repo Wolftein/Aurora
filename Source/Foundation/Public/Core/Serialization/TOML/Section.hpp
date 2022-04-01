@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Common.hpp"
+#include "Array.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,99 +21,63 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    class Chunk final
+    class TOMLSection final
     {
     public:
 
         // -=(Undocumented)=-
-        using Deleter = void(*)(Ptr<void>);
+        TOMLSection(Ptr<toml::table> Table);
 
         // -=(Undocumented)=-
-        using Pointer = UPtr<void, Deleter>;
-
-    public:
+        Bool IsNull() const;
 
         // -=(Undocumented)=-
-        Chunk()
-            : mData { nullptr, nullptr },
-              mSize { 0 }
-        {
-        }
+        Bool IsEmpty() const;
 
         // -=(Undocumented)=-
-        Chunk(UInt Size)
-            : mData { new UInt08[Size], [](auto Data) { delete[] reinterpret_cast<Ptr<UInt08>>(Data); } },
-              mSize { Size }
-        {
-        }
+        UInt GetSize() const;
 
         // -=(Undocumented)=-
-        Chunk(Pointer Data, UInt Size)
-            : mData { eastl::move(Data) },
-              mSize { Size }
-        {
-        }
+        TOMLSection GetSection(CStr Key, Bool CreateIfNeeded = true) const;
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Chunk(Type Data, UInt Size, Deleter Destructor)
-            : mData { reinterpret_cast<Ptr<UInt08>>(Data), Destructor },
-              mSize { Size }
-        {
-        }
+        TOMLSection SetSection(CStr Key);
 
         // -=(Undocumented)=-
-        template<typename T = void>
-        auto GetData()
-        {
-            return reinterpret_cast<Ptr<T>>(mData.get());
-        }
+        TOMLArray GetArray(CStr Key, Bool CreateIfNeeded = true) const;
 
         // -=(Undocumented)=-
-        template<typename T>
-        auto GetSpan() const
-        {
-            return CPtr<T> { reinterpret_cast<Ptr<T>>(mData.get()), mSize / sizeof(T) };
-        }
+        TOMLArray SetArray(CStr Key);
 
         // -=(Undocumented)=-
-        auto GetText() const
-        {
-            return CStr { reinterpret_cast<CStr::pointer>(mData.get()), mSize };
-        }
+        void SetBool(CStr Key, Bool Value);
 
         // -=(Undocumented)=-
-        Bool HasData() const
-        {
-            return GetSize() > 0;
-        }
+        Bool GetBool(CStr Key, Bool Default = false) const;
 
         // -=(Undocumented)=-
-        UInt GetSize() const
-        {
-            return mSize;
-        }
+        void SetString(CStr Key, CStr Value);
 
         // -=(Undocumented)=-
-        void Clear()
-        {
-            mData = nullptr;
-            mSize = 0;
-        }
+        CStr GetString(CStr Key, CStr Default = "") const;
 
         // -=(Undocumented)=-
-        template<typename T>
-        operator CPtr<T>() const
-        {
-            return GetSpan<T>();
-        }
+        void SetNumber(CStr Key, SInt Value);
+
+        // -=(Undocumented)=-
+        SInt GetNumber(CStr Key, SInt Default = 0) const;
+
+        // -=(Undocumented)=-
+        void SetReal(CStr Key, Real Value);
+
+        // -=(Undocumented)=-
+        Real GetReal(CStr Key, Real Default = 0) const;
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Pointer mData;
-        UInt    mSize;
+        Ptr<toml::table> mTable;
     };
 }

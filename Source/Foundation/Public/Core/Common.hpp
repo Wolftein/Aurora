@@ -64,6 +64,9 @@ inline namespace Core
     using UInt64 = uint64_t;
 
     // -=(Undocumented)=-
+    using Real   = double_t;
+
+    // -=(Undocumented)=-
     using Real32 = float_t;
 
     // -=(Undocumented)=-
