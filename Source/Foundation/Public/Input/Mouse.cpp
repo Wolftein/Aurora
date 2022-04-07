@@ -71,8 +71,8 @@ namespace Input
 
     void Mouse::OnDevicePoll(Ref<const Buffer> Events)
     {
+        mThisMouseScroll.Set(0, 0);
         mLastMousePosition = mThisMousePosition;
-        mLastMouseScroll   = mThisMouseScroll;
         mLastButtons       = mThisButtons;
 
         for (Ref<const Event> Event : Events)
@@ -104,7 +104,6 @@ namespace Input
     {
         mLastMousePosition.Set(0, 0);
         mThisMousePosition.Set(0, 0);
-        mLastMouseScroll.Set(0, 0);
         mThisMouseScroll.Set(0, 0);
         mLastButtons.reset();
         mThisButtons.reset();

@@ -26,7 +26,7 @@ namespace Input
     public:
 
         // -=(Undocumented)=-
-        using Buffer = Array<Event, 32>;
+        using Buffer = Stack<Event, 32>;
 
     public:
 
@@ -40,7 +40,7 @@ namespace Input
         }
 
         // -=(Undocumented)=-
-        void Poll(Ref<Vector<Event>> Collector)
+        void Poll(Ref<Array<Event>> Collector)
         {
             OnDevicePoll(mBuffer);
 

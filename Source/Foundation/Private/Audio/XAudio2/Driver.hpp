@@ -97,10 +97,10 @@ namespace Audio
         using XAudioPool     = Table<UInt32, Ptr<IXAudio2SourceVoice>>;
 
         // -=(Undocumented)=-
-        using XAudioMixes    = Array<XAudioInstance, k_MaxMixes>;
+        using XAudioMixes    = Stack<XAudioInstance, k_MaxMixes>;
 
         // -=(Undocumented)=-
-        using XAudioSubmixes = Array<Ptr<IXAudio2SubmixVoice>, k_MaxSubmixes>;
+        using XAudioSubmixes = Stack<Ptr<IXAudio2SubmixVoice>, k_MaxSubmixes>;
 
     private:
 

@@ -246,15 +246,14 @@ namespace Content
         Description.InputTopology = ParseVertexTopology(Layout.GetString("Topology", "Triangle"));
 
         // TODO: Load code from separate file with defines and includes, etc.
-        const CStr Code     = Program.GetString("Code");
-        Chunk      Chunk_1;
-        Chunk      Chunk_2;
+        Chunk Chunk_1;
+        Chunk Chunk_2;
 
-        switch (mBackend) // TODO: Cross Compilation
+        switch (mBackend)
         {
         case Graphic::Backend::Direct3D11:
-            Chunk_1 = CompileDXBC(Code, Graphic::Stage::Vertex);
-            Chunk_2 = CompileDXBC(Code, Graphic::Stage::Fragment);
+            Chunk_1 = CompileDXBC(Program.GetString("Code"), Graphic::Stage::Vertex);
+            Chunk_2 = CompileDXBC(Program.GetString("Code"), Graphic::Stage::Fragment);
             break;
         default:
             break;
@@ -314,7 +313,7 @@ namespace Content
 
         if (FAILED(Result))
         {
-            printf("%s\n", (char *) Error->GetBufferPointer()); // TODO: Replace with Logging
+            OutputDebugStringA(reinterpret_cast<Ptr<Char>>(Error->GetBufferPointer())); // TODO: Replace with Logging
             return Chunk();
         }
 

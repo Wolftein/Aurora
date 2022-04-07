@@ -33,13 +33,9 @@ void printFPS() {
     }
 }
 
-// TODO: [Support Content Dependencies]
-// TODO: [Cross Compilation]
-// TODO: New Batch System
-// TODO: New Font System
-// TODO: New Camera System
-// TODO: New UI System
-// TODO: VB6 Proxy
+Real32 DegToRad(Real32 Degrees) {
+    return ( Degrees * 3.14 ) / 180;
+}
 
 int main()
 {
@@ -72,11 +68,7 @@ int main()
     ContentService->AddLoader("psd", ImgLoaderPtr);
     ContentService->AddLoader("jpg", ImgLoaderPtr);
 
-    //ContentService->AddLoader("hlsl", eastl::make_shared<HLSLLoader>());
     ContentService->AddLoader("pl", eastl::make_shared<Content::PipelineLoader>(Graphic::Backend::Direct3D11, Graphic::Language::Version_4_0));
-
-   //     ContentService->AddLoader("hlsl", eastl::make_shared<HLSLLoader2>());
-
 
     constexpr UInt SUBMIX_MUSIC  = 0;
     constexpr UInt SUBMIX_EFFECT = 1;
@@ -113,8 +105,11 @@ int main()
 
     SPtr<Renderer::Batch> Batcher = System.AddSubsystem<Renderer::Batch>();
 
-    Real32 OffsetX = 0;
-    Real32 OffsetY = 0;
+    Graphic::Camera Camera;
+    Camera.SetOrthographic(Size.GetX(), Size.GetY(), 1000, 0);
+
+    Real32 Scaling = 1;
+    Real32 Rotation = 0;
 
     while (Window->Poll())
     {
@@ -142,29 +137,44 @@ int main()
 
         if (InputService->IsKeyHeld(Input::Key::Left))
         {
-            OffsetX += 1;
+            Camera.Translate(Vector2f { 0.001, 0.0 });
         }
         if (InputService->IsKeyHeld(Input::Key::Right))
         {
-            OffsetX -= 1;
+            Camera.Translate(Vector2f { -0.001, 0.0 });
         }
         if (InputService->IsKeyHeld(Input::Key::Up))
         {
-            OffsetY += 1;
+            Camera.Translate(Vector2f { 0, -0.001 });
         }
         if (InputService->IsKeyHeld(Input::Key::Down))
         {
-            OffsetY -= 1;
+            Camera.Translate(Vector2f { 0, +0.001 });
         }
+        if (InputService->IsKeyHeld(Input::Key::A))
+        {
+            Rotation+= 0.01;
+        }
+        if (InputService->IsKeyHeld(Input::Key::S))
+        {
+            Rotation-= 0.01;
+        }
+
+        Scaling += InputService->GetMouseScroll().GetY() * 0.01;
+        Camera.SetScale(Scaling, Scaling);
+        Camera.SetRotation(Rotation, Vector3f(0, 0, 1));
+        Camera.Compute();
 
         GraphicService->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, { 0.0f }, 1.0f, 0);
         {
             Renderer::Batch::Rectangle Destination { 0 }, Source { 0, 0, 1, 1 };
 
-            Batcher->SetData(OffsetX, OffsetY, Size.GetX(), Size.GetY(), PlatformService->GetTime());
+            Batcher->SetData(Camera, PlatformService->GetTime());
 
             const UInt StepX = SimpleTexture->GetWidth() / 2;
             const UInt StepY = SimpleTexture->GetHeight() / 2;
+
+            UInt Index = 0;
 
             for (SInt X = 0; X < 4096; X += StepX)
             {
@@ -174,7 +184,7 @@ int main()
                     Destination.Top    = Y;
                     Destination.Right  = Destination.Left + StepX;
                     Destination.Bottom = Destination.Top  + StepY;
-                    Batcher->Draw(Destination, Source, false, 1, 0, 0xFFFFFFFF, SimplePipeline, SimpleTexture);
+                    Batcher->Draw(Destination, Source, false, Index++, 0, 0xFFFFFFFF, SimplePipeline, SimpleTexture);
                 }
             }
 

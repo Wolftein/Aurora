@@ -34,9 +34,29 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Vector2(Ref<const Vector2> Other)
+            : mX { Other.GetX() },
+              mY { Other.GetY() }
+        {
+        }
+
+        // -=(Undocumented)=-
         Bool IsZero() const
         {
             return mX == 0 && mY == 0;
+        }
+
+        // -=(Undocumented)=-
+        void Set(Base X, Base Y)
+        {
+            mX = X;
+            mY = Y;
+        }
+
+        // -=(Undocumented)=-
+        void SetX(Base Value)
+        {
+            mX = Value;
         }
 
         // -=(Undocumented)=-
@@ -46,29 +66,109 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        void SetY(Base Value)
+        {
+            mY = Value;
+        }
+
+        // -=(Undocumented)=-
         Base GetY() const
         {
             return mY;
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void Set(Type X, Type Y)
+        Real32 GetAngle(Ref<const Vector2<Base>> Other) const
         {
-            mX = X;
-            mY = Y;
+            const Real32 Divisor = (GetLength() * Other.GetLength());
+
+            if (Divisor != 0)
+            {
+                const Real32 Cosine = Dot(Other) / Divisor;
+
+                return (Cosine <= 1.0f ? acos(Cosine) : 0.0f);
+            }
+            return 0.0f;
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator+(Ref<const Vector2<Base>> Value) const
+        Real32 GetDistance(Ref<const Vector2<Base>> Other) const
         {
-            return Vector2<Base>(mX + Value.mX, mY + Value.mY);
+            const Vector2<Base> Result = (* this) - Other;
+
+            return Result.GetLength();
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator-(Ref<const Vector2<Base>> Value) const
+        Real32 GetLength() const
         {
-            return Vector2<Base>(mX - Value.mX, mY - Value.mY);
+            return sqrt(GetLengthSquared());
+        }
+
+        // -=(Undocumented)=-
+        Real32 GetLengthSquared() const
+        {
+            return (mX * mX + mY * mY);
+        }
+
+        // -=(Undocumented)=-
+        Real32 Dot(Ref<const Vector2<Base>> Other) const
+        {
+            return (mX * Other.GetX()) + (mY * Other.GetY());
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> operator+(Ref<const Vector2<Base>> Vector) const
+        {
+            return Vector2<Base>(mX + Vector.mX, mY + Vector.mY);
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> operator+(Base Scalar) const
+        {
+            return Vector2<Base>(mX + Scalar, mY + Scalar);
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> operator-() const
+        {
+            return Vector2<Base>(-mX, -mY);
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> operator-(Ref<const Vector2<Base>> Vector) const
+        {
+            return Vector2<Base>(mX - Vector.mX, mY - Vector.mY);
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> operator-(Base Scalar) const
+        {
+            return Vector2<Base>(mX - Scalar, mY - Scalar);
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> operator*(Ref<const Vector2<Base>> Vector) const
+        {
+            return Vector2<Base>(mX * Vector.mX, mY * Vector.mY);
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> operator*(Base Scalar) const
+        {
+            return Vector2<Base>(mX * Scalar, mY * Scalar);
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> operator/(Ref<const Vector2<Base>> Vector) const
+        {
+            return Vector2<Base>(mX / Vector.mX, mY / Vector.mY);
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> operator/(Base Scalar) const
+        {
+            return Vector2<Base>(mX / Scalar, mY / Scalar);
         }
 
         // -=(Undocumented)=-
@@ -76,7 +176,7 @@ inline namespace Core
         {
             ++mX;
             ++mY;
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
@@ -84,23 +184,103 @@ inline namespace Core
         {
             --mX;
             --mY;
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator+=(Ref<const Vector2<Base>> Value)
+        Ref<Vector2<Base>> operator+=(Ref<const Vector2<Base>> Vector)
         {
-            mX += Value.mX;
-            mY += Value.mY;
-            return * this;
+            mX += Vector.mX;
+            mY += Vector.mY;
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator-=(Ref<const Vector2<Base>> Value)
+        Ref<Vector2<Base>> operator+=(Base Scalar)
         {
-            mX -= Value.mX;
-            mY -= Value.mY;
-            return * this;
+            mX += Scalar;
+            mY += Scalar;
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Vector2<Base>> operator-=(Ref<const Vector2<Base>> Vector)
+        {
+            mX -= Vector.mX;
+            mY -= Vector.mY;
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Vector2<Base>> operator-=(Base Scalar)
+        {
+            mX -= Scalar;
+            mY -= Scalar;
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Vector2<Base>> operator*=(Ref<const Vector2<Base>> Vector)
+        {
+            mX *= Vector.mX;
+            mY *= Vector.mY;
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Vector2<Base>> operator*=(Base Scalar)
+        {
+            mX *= Scalar;
+            mY *= Scalar;
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Vector2<Base>> operator/=(Ref<const Vector2<Base>> Vector)
+        {
+            mX /= Vector.mX;
+            mY /= Vector.mY;
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Vector2<Base>> operator/=(Base Scalar)
+        {
+            mX /= Scalar;
+            mY /= Scalar;
+            return (* this);
+        }
+
+    public:
+
+        // -=(Undocumented)=-
+        static Vector2<Base> Normalize(Ref<const Vector2<Base>> Vector)
+        {
+            const Real32 Length = Vector.GetLength();
+
+            if (Length > 0)
+            {
+                const Real32 InvLength = 1.0f / Length;
+
+                return Vector * Length;
+            }
+            return Vector;
+        }
+
+        // -=(Undocumented)=-
+        static Vector2<Base> Min(Ref<const Vector2<Base>> Lhs, Ref<const Vector2<Base>> Rhs)
+        {
+            const Base X = (Lhs.GetX() < Rhs.GetX() ? Lhs.GetX() : Rhs.GetX());
+            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Lhs.GetY() : Rhs.GetY());
+            return Vector2<Base>(X, Y);
+        }
+
+        // -=(Undocumented)=-
+        static Vector2<Base> Max(Ref<const Vector2<Base>> Lhs, Ref<const Vector2<Base>> Rhs)
+        {
+            const Base X = (Lhs.GetX() < Rhs.GetX() ? Rhs.GetX() : Lhs.GetX());
+            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Rhs.GetY() : Lhs.GetY());
+            return Vector2<Base>(X, Y);
         }
 
     private:

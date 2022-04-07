@@ -35,9 +35,43 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Vector3(Ref<const Vector3> Other)
+            : mX { Other.GetX() },
+              mY { Other.GetY() },
+              mZ { Other.GetZ() }
+        {
+        }
+
+        // -=(Undocumented)=-
+        Bool IsZero() const
+        {
+            return mX == 0 && mY == 0 && mZ == 0;
+        }
+
+        // -=(Undocumented)=-
+        void Set(Base X, Base Y, Base Z)
+        {
+            mX = X;
+            mY = Y;
+            mZ = Z;
+        }
+
+        // -=(Undocumented)=-
+        void SetX(Base Value)
+        {
+            mX = Value;
+        }
+
+        // -=(Undocumented)=-
         Base GetX() const
         {
             return mX;
+        }
+
+        // -=(Undocumented)=-
+        void SetY(Base Value)
+        {
+            mY = Value;
         }
 
         // -=(Undocumented)=-
@@ -47,147 +81,243 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        void SetZ(Base Value)
+        {
+            mZ = Value;
+        }
+
+        // -=(Undocumented)=-
         Base GetZ() const
         {
             return mZ;
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void Set(Type X, Type Y, Type Z)
+        Real32 GetAngle(Ref<const Vector3<Base>> Other) const
         {
-            mX = X;
-            mY = Y;
-            mZ = Z;
+            const Real32 Divisor = (GetLength() * Other.GetLength());
+
+            if (Divisor != 0)
+            {
+                const Real32 Cosine = Dot(Other) / Divisor;
+
+                return (Cosine <= 1.0f ? acos(Cosine) : 0.0f);
+            }
+            return 0.0f;
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Vector3<Base> operator+(Ref<const Vector3<Type>> Value) const
+        Real32 GetDistance(Ref<const Vector3<Base>> Other) const
         {
-            return Vector3<Base>(mX + Value.mX, mY + Value.mY, mZ + Value.mZ);
+            const Vector3<Base> Result = (* this) - Other;
+
+            return Result.GetLength();
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Vector3<Base> operator+(Type Value) const
+        Real32 GetLength() const
         {
-            return Vector3<Base>(mX + Value, mY + Value, mZ + Value);
+            return sqrt(GetLengthSquared());
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Vector3<Base> operator-(Ref<const Vector3<Type>> Value) const
+        Real32 GetLengthSquared() const
         {
-            return Vector3<Base>(mX - Value.mX, mY - Value.mY, mZ - Value.mZ);
+            return (mX * mX + mY * mY + mZ * mZ);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Vector3<Base> operator-(Type Value) const
+        Real32 Dot(Ref<const Vector3<Base>> Other) const
         {
-            return Vector3<Base>(mX + Value, mY + Value, mZ - Value);
+            return (mX * Other.GetX()) + (mY * Other.GetY()) + (mZ * Other.GetZ());
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Vector3<Base> operator*(Type Value) const
+        Vector3<Base> operator+(Ref<const Vector3<Base>> Vector) const
         {
-            return Vector3<Base>(mX * Value, mY * Value, mZ * Value);
+            return Vector3<Base>(mX + Vector.mX, mY + Vector.mY, mZ + Vector.mZ);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Vector3<Base> operator/(Type Value) const
+        Vector3<Base> operator+(Base Scalar) const
         {
-            return Vector3<Base>(mX / Value, mY / Value, mZ / Value);
+            return Vector3<Base>(mX + Scalar, mY + Scalar, mZ + Scalar);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Vector3<Base> operator%(Type Value) const
+        Vector3<Base> operator-() const
         {
-            return Vector3<Base>(mX % Value, mY % Value, mZ % Value);
+            return Vector3<Base>(-mX, -mY, -mZ);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
+        Vector3<Base> operator-(Ref<const Vector3<Base>> Vector) const
+        {
+            return Vector3<Base>(mX - Vector.mX, mY - Vector.mY, mZ - Vector.mZ);
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> operator-(Base Scalar) const
+        {
+            return Vector3<Base>(mX - Scalar, mY - Scalar, mZ - Scalar);
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> operator*(Ref<const Vector3<Base>> Vector) const
+        {
+            return Vector3<Base>(mX * Vector.mX, mY * Vector.mY, mZ * Vector.mZ);
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> operator*(Base Scalar) const
+        {
+            return Vector3<Base>(mX * Scalar, mY * Scalar, mZ * Scalar);
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> operator/(Ref<const Vector3<Base>> Vector) const
+        {
+            return Vector3<Base>(mX / Vector.mX, mY / Vector.mY, mZ / Vector.mZ);
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> operator/(Base Scalar) const
+        {
+            return Vector3<Base>(mX / Scalar, mY / Scalar, mZ / Scalar);
+        }
+
+        // -=(Undocumented)=-
         Ref<Vector3<Base>> operator++()
         {
             ++mX;
             ++mY;
             ++mZ;
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
         Ref<Vector3<Base>> operator--()
         {
             --mX;
             --mY;
             --mZ;
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Ref<Vector3<Base>> operator+=(Ref<const Vector3<Type>> Value)
+        Ref<Vector3<Base>> operator+=(Ref<const Vector3<Base>> Vector)
         {
-            mX += Value.mX;
-            mY += Value.mY;
-            mZ += Value.mZ;
-            return * this;
+            mX += Vector.mX;
+            mY += Vector.mY;
+            mZ += Vector.mZ;
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Ref<Vector3<Base>> operator+=(Type Value)
+        Ref<Vector3<Base>> operator+=(Base Scalar)
         {
-            mX += Value;
-            mY += Value;
-            mZ += Value;
-            return * this;
+            mX += Scalar;
+            mY += Scalar;
+            mZ += Scalar;
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Ref<Vector3<Base>> operator-=(Ref<const Vector3<Type>> Value)
+        Ref<Vector3<Base>> operator-=(Ref<const Vector3<Base>> Vector)
         {
-            mX -= Value.mX;
-            mY -= Value.mY;
-            mZ -= Value.mZ;
-            return * this;
+            mX -= Vector.mX;
+            mY -= Vector.mY;
+            mZ -= Vector.mZ;
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Ref<Vector3<Base>> operator-=(Type Value)
+        Ref<Vector3<Base>> operator-=(Base Scalar)
         {
-            mX -= Value;
-            mY -= Value;
-            mZ -= Value;
-            return * this;
+            mX -= Scalar;
+            mY -= Scalar;
+            mZ -= Scalar;
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Ref<Vector3<Base>> operator*=(Type Value)
+        Ref<Vector3<Base>> operator*=(Ref<const Vector3<Base>> Vector)
         {
-            mX *= Value;
-            mY *= Value;
-            mZ *= Value;
-            return * this;
+            mX *= Vector.mX;
+            mY *= Vector.mY;
+            mZ *= Vector.mZ;
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Ref<Vector3<Base>> operator/=(Type Value)
+        Ref<Vector3<Base>> operator*=(Base Scalar)
         {
-            mX /= Value;
-            mY /= Value;
-            mZ /= Value;
-            return * this;
+            mX *= Scalar;
+            mY *= Scalar;
+            mZ *= Scalar;
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Vector3<Base>> operator/=(Ref<const Vector3<Base>> Vector)
+        {
+            mX /= Vector.mX;
+            mY /= Vector.mY;
+            mZ /= Vector.mZ;
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Vector3<Base>> operator/=(Base Scalar)
+        {
+            mX /= Scalar;
+            mY /= Scalar;
+            mZ /= Scalar;
+            return (* this);
+        }
+
+    public:
+
+        // -=(Undocumented)=-
+        static Vector3<Base> Normalize(Ref<const Vector3<Base>> Vector)
+        {
+            const Real32 Length = Vector.GetLength();
+
+            if (Length > 0)
+            {
+                const Real32 InvLength = 1.0f / Length;
+
+                return Vector * Length;
+            }
+            return Vector;
+        }
+
+        // -=(Undocumented)=-
+        static Vector3<Base> Cross(Ref<const Vector3<Base>> Lhs, Ref<const Vector3<Base>> Rhs)
+        {
+            const Base X = Lhs.GetY() * Rhs.GetZ() - Lhs.GetZ() * Rhs.GetY();
+            const Base Y = Lhs.GetZ() * Rhs.GetX() - Lhs.GetX() * Rhs.GetZ();
+            const Base Z = Lhs.GetX() * Rhs.GetY() - Lhs.GetY() * Rhs.GetX();
+
+            return Vector3<Base>(X, Y, Z);
+        }
+
+        // -=(Undocumented)=-
+        static Vector3<Base> Min(Ref<const Vector3<Base>> Lhs, Ref<const Vector3<Base>> Rhs)
+        {
+            const Base X = (Lhs.GetX() < Rhs.GetX() ? Lhs.GetX() : Rhs.GetX());
+            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Lhs.GetY() : Rhs.GetY());
+            const Base Z = (Lhs.GetZ() < Rhs.GetZ() ? Lhs.GetZ() : Rhs.GetZ());
+            return Vector3<Base>(X, Y, Z);
+        }
+
+        // -=(Undocumented)=-
+        static Vector3<Base> Max(Ref<const Vector3<Base>> Lhs, Ref<const Vector3<Base>> Rhs)
+        {
+            const Base X = (Lhs.GetX() < Rhs.GetX() ? Rhs.GetX() : Lhs.GetX());
+            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Rhs.GetY() : Lhs.GetY());
+            const Base Z = (Lhs.GetZ() < Rhs.GetZ() ? Rhs.GetZ() : Lhs.GetZ());
+            return Vector3<Base>(X, Y, Z);
         }
 
     private:
@@ -204,5 +334,5 @@ inline namespace Core
     using Vector3f = Vector3<Real32>;
 
     // -=(Undocumented)=-
-    using Vector3i = Vector3<UInt32>;
+    using Vector3i = Vector3<SInt32>;
 }

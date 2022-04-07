@@ -184,7 +184,7 @@ namespace Content
 
     void Service::Prune(UInt Category, Bool Force)
     {
-        const Vector<SPtr<Resource>> Assets = GetFactory(Category)->Prune(Force);
+        const Array<SPtr<Resource>> Assets = GetFactory(Category)->Prune(Force);
 
         for (Ref<const SPtr<Resource>> Asset : Assets)
         {

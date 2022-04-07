@@ -53,32 +53,20 @@ namespace Renderer
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-	void Batch::SetData(Real32 X, Real32 Y, Real32 Width, Real32 Height, Real32 Time)
+	void Batch::SetData(Ref<const Graphic::Camera> Camera, Real32 Time)
 	{
         Real32 kNear = 0.0f;
         Real32 kFar  = (1 << 24) - 1;
 
         struct Data
         {
-            Real32 Projection[4 * 4];
-            Real32 View[4 * 4];
+            Matrix4f ProjectionViewMatrix;
             Real32 Time;
         };
 
         // @formatter:off
         Data Uniform{
-            .Projection = {
-                2.0f / Width,  0.0f,            0.0f,                   -1.0f,
-                0.0f,         -2.0f / Height,   0.0f,                    1.0f,
-                0.0f,          0.0f,            1.0f / (kFar - kNear),   0.0f,
-                0.0f,          0.0f,            kNear / (kNear - kFar),  1.0f,
-            },
-            .View = {
-                1.0f,   0.0f,   0.0f,   X,
-                0.0f,   1.0f,   0.0f,   Y,
-                0.0f,   0.0f,   1.0f,   0.0f,
-                0.0f,   0.0f,   0.0f,   1.0f,
-            },
+            .ProjectionViewMatrix = Camera.GetView() * Camera.GetProjection(),
             .Time = Time
         };
          // @formatter:on

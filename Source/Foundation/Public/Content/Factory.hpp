@@ -66,7 +66,7 @@ namespace Content
         Bool Unload(Ref<const Uri> Key);
 
         // -=(Undocumented)=-
-        Vector<SPtr<Resource>> Prune(Bool Force);
+        Array<SPtr<Resource>> Prune(Bool Force);
 
     private:
 

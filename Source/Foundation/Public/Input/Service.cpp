@@ -31,7 +31,7 @@ namespace Input
 
     void Service::OnTick()
     {
-        Vector<Event> Collector;
+        Array<Event> Collector;
 
         for(Ref<const SPtr<Device>> Device : mDevices)
         {

@@ -15,6 +15,7 @@
 #include <Graphic/Service.hpp>
 #include <Graphic/Pipeline.hpp>
 #include <Graphic/Texture.hpp>
+#include <Graphic/Camera.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -44,7 +45,7 @@ namespace Renderer
 		~Batch();
 
 		// (Missing Documentation)
-		void SetData(Real32 X, Real32 Y, Real32 Width, Real32 Height, Real32 Time);
+		void SetData(Ref<const Graphic::Camera> Camera, Real32 Time);
 
 		// (Missing Documentation)
 		void Draw(

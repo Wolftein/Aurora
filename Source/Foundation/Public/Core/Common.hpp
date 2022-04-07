@@ -106,18 +106,18 @@ inline namespace Core
     using FPtr   = eastl::function<Type>;
 
     // -=(Undocumented)=-
-    template<typename Value, UInt Capacity>
-    using Array  = eastl::fixed_vector<Value, Capacity>;
+    template<typename Value>
+    using Array  = eastl::vector<Value>;
 
     // -=(Undocumented)=-
     template<typename Type, UInt Capacity>
     using Bitset = eastl::bitset<Capacity, Type>;
 
     // -=(Undocumented)=-
-    template<typename Key, typename Value>
-    using Table  = eastl::unordered_map<Key, Value>;
+    template<typename Value, UInt Capacity>
+    using Stack  = eastl::fixed_vector<Value, Capacity>;
 
     // -=(Undocumented)=-
-    template<typename Value>
-    using Vector = eastl::vector<Value>;
+    template<typename Key, typename Value>
+    using Table  = eastl::unordered_map<Key, Value>;
 }

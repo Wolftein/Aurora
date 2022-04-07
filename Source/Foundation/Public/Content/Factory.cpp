@@ -88,9 +88,9 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Vector<SPtr<Resource>> Factory::Prune(Bool Force)
+    Array<SPtr<Resource>> Factory::Prune(Bool Force)
     {
-        Vector<SPtr<Resource>> Removed;
+        Array<SPtr<Resource>> Removed;
 
         for (auto Iterator = mAssets.begin(); Iterator != mAssets.end();)
         {

@@ -723,7 +723,7 @@ namespace Graphic
 
     void D3D11Driver::Prepare(UInt ID, Rect Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil)
     {
-        Array<Ptr<ID3D11RenderTargetView>, k_MaxAttachments> Attachments;
+        Stack<Ptr<ID3D11RenderTargetView>, k_MaxAttachments> Attachments;
 
         for (Ref<const ComPtr<ID3D11RenderTargetView>> View : mPasses[ID].Color)
         {

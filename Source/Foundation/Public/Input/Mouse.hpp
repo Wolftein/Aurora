@@ -58,7 +58,6 @@ namespace Input
 
         Vector2i        mLastMousePosition;
         Vector2i        mThisMousePosition;
-        Vector2i        mLastMouseScroll;
         Vector2i        mThisMouseScroll;
         Bitset<UInt, 8> mLastButtons;
         Bitset<UInt, 8> mThisButtons;
