@@ -37,6 +37,43 @@ Real32 DegToRad(Real32 Degrees) {
     return ( Degrees * 3.14 ) / 180;
 }
 
+Bool IsInsideTriangle(Ref<const Vector2f> A, Ref<const Vector2f> B, Ref<const Vector2f> C, Ref<const Vector2f> P)
+{
+    // Compute vectors
+    Vector2f v0 = C - A;
+    Vector2f v1 = B - A;
+    Vector2f v2 = P - A;
+
+    // Compute dot products
+    Real32 dot00 = v0.Dot(v0);
+    Real32 dot01 = v0.Dot(v1);
+    Real32 dot02 = v0.Dot(v2);
+    Real32 dot11 = v1.Dot(v1);
+    Real32 dot12 = v1.Dot(v2);
+
+    // Compute barycentric coordinates
+    Real32 invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+    Real32 u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+    Real32 v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+    // Check if point is in triangle
+    return (u >= 0 && v >= 0 && (u + v) < 1);
+}
+
+Bool IsInside(Ref<const Graphic::Camera> Camera, Ref<const Graphic::Rect> Viewport, Ref<const Vector2i> Mouse, Ref<const Renderer::Batch::Rectangle> Position)
+{
+    const Vector2f V1 = Camera.GetScreenCoordinates(Vector2f(Position.Left,  Position.Top), Viewport);
+    const Vector2f V2 = Camera.GetScreenCoordinates(Vector2f(Position.Right, Position.Top), Viewport);
+    const Vector2f V3 = Camera.GetScreenCoordinates(Vector2f(Position.Right, Position.Bottom), Viewport);
+    const Vector2f V4 = Camera.GetScreenCoordinates(Vector2f(Position.Left,  Position.Bottom), Viewport);
+
+    Vector2f Mousef(Mouse.GetX(), Mouse.GetY());
+
+    if(IsInsideTriangle(V1,V2,V3,Mousef)) return true;
+    if(IsInsideTriangle(V1,V3,V4,Mousef)) return true;
+    return false;
+}
+
 int main()
 {
     if (FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)))
@@ -153,17 +190,39 @@ int main()
         }
         if (InputService->IsKeyHeld(Input::Key::A))
         {
-            Rotation+= 0.01;
+            Camera.SetRotation(DegToRad(180), Vector3f(0, 0, 1));
         }
         if (InputService->IsKeyHeld(Input::Key::S))
         {
-            Rotation-= 0.01;
+            Camera.SetRotation(DegToRad(90), Vector3f(0, 0, 1));
+        }
+        if (InputService->IsKeyHeld(Input::Key::D))
+        {
+            Camera.SetRotation(DegToRad(45), Vector3f(1, 1, 1));
+        }
+        if (InputService->IsKeyPressed(Input::Key::F1)) {
+
+            auto Pos = Camera.GetScreenCoordinates(Vector3f(0, 0, 1), Viewport);
+            printf("Screen %f %f %f\n", Pos.GetX(), Pos.GetY(), Pos.GetZ());
+            Pos = Camera.GetScreenCoordinates(Vector3f(256, 0, 1), Viewport);
+            printf("Screen %f %f %f\n", Pos.GetX(), Pos.GetY(), Pos.GetZ());
+            Pos = Camera.GetScreenCoordinates(Vector3f(256, 256, 1), Viewport);
+            printf("Screen %f %f %f\n", Pos.GetX(), Pos.GetY(), Pos.GetZ());
+            Pos = Camera.GetScreenCoordinates(Vector3f(0, 256, 1), Viewport);
+            printf("Screen %f %f %f\n", Pos.GetX(), Pos.GetY(), Pos.GetZ());
+
+           // auto MousePos = InputService->GetMousePosition();
+           // auto MousePosf = Vector3f(MousePos.GetX(), MousePos.GetY(), 0);
+            //Pos = Camera.GetWorldCoordinates(MousePosf, Viewport);
+            //printf("World %f %f %f\n", Pos.GetX(), Pos.GetY(), Pos.GetZ());
+
         }
 
         Scaling += InputService->GetMouseScroll().GetY() * 0.01;
         Camera.SetScale(Scaling, Scaling);
-        Camera.SetRotation(Rotation, Vector3f(0, 0, 1));
         Camera.Compute();
+
+        auto MousePos = InputService->GetMousePosition();
 
         GraphicService->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, { 0.0f }, 1.0f, 0);
         {
@@ -171,20 +230,27 @@ int main()
 
             Batcher->SetData(Camera, PlatformService->GetTime());
 
-            const UInt StepX = SimpleTexture->GetWidth() / 2;
-            const UInt StepY = SimpleTexture->GetHeight() / 2;
+            const UInt StepX = SimpleTexture->GetWidth();
+            const UInt StepY = SimpleTexture->GetHeight();
 
             UInt Index = 0;
 
-            for (SInt X = 0; X < 4096; X += StepX)
+            for (SInt X = -4096; X < 16096; X += StepX)
             {
-                for (SInt Y = 0; Y < 4096; Y += StepY)
+                for (SInt Y = -4096; Y < 16096; Y += StepY)
                 {
+                    UInt32 Color = 0xFFFFFFFF;
                     Destination.Left   = X;
                     Destination.Top    = Y;
                     Destination.Right  = Destination.Left + StepX;
                     Destination.Bottom = Destination.Top  + StepY;
-                    Batcher->Draw(Destination, Source, false, Index++, 0, 0xFFFFFFFF, SimplePipeline, SimpleTexture);
+
+                    if (IsInside(Camera, Viewport, MousePos, Destination))
+                    {
+                        Color = 0xFF0000FF;
+                    }
+
+                    Batcher->Draw(Destination, Source, false, 0, 0, Color, SimplePipeline, SimpleTexture);
                 }
             }
 

@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Common.hpp"
 #include "Core/Math/Transform.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -26,10 +27,7 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        void Compute()
-        {
-            mView = mTransformation;
-        }
+        void Compute();
 
         // -=(Undocumented)=-
         Ref<const Matrix4f> GetProjection() const
@@ -41,6 +39,12 @@ namespace Graphic
         Ref<const Matrix4f> GetView() const
         {
             return mView;
+        }
+
+        // -=(Undocumented)=-
+        Ref<const Matrix4f> GetWorld() const
+        {
+            return mWorld;
         }
 
         // TODO Vector3f GetRight() const;
@@ -204,11 +208,17 @@ namespace Graphic
             mTransformation.Rotate(Angles);
         }
 
+        // -=(Undocumented)=-
+        Vector3f GetWorldCoordinates(Ref<const Vector3f> Position, Ref<const Rect> Viewport) const;
 
-        // TODO Vector3f GetWorldCoordinates(Ref<Vector3f> Position, Ref<Rect> Viewport) const;
-        // TODO Vector3f GetWorldCoordinates(Ref<Vector2f> Position, Ref<Rect> Viewport) const;
-        // TODO Vector3f GetScreenCoordinates(Ref<Vector3f> Position, Ref<Rect> Viewport) const;
-        // TODO Vector3f GetScreenCoordinates(Ref<Vector2f> Position, Ref<Rect> Viewport) const;
+        // -=(Undocumented)=-
+        Vector2f GetWorldCoordinates(Ref<const Vector2f> Position, Ref<const Rect> Viewport) const;
+
+        // -=(Undocumented)=-
+        Vector3f GetScreenCoordinates(Ref<const Vector3f> Position, Ref<const Rect> Viewport) const;
+
+        // -=(Undocumented)=-
+        Vector2f GetScreenCoordinates(Ref<const Vector2f> Position, Ref<const Rect> Viewport) const;
 
     private:
 
@@ -217,6 +227,8 @@ namespace Graphic
 
         Matrix4f   mProjection;
         Matrix4f   mView;
+        Matrix4f   mWorld;
+
         Transformf mTransformation;
     };
 }

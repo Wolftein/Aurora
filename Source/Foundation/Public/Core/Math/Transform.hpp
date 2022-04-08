@@ -176,8 +176,8 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Vector3<Base>    mPosition;
-        Quaternion<Base> mRotation;
         Vector3<Base>    mScale;
+        Quaternion<Base> mRotation;
     };
 
     // -=(Undocumented)=-
