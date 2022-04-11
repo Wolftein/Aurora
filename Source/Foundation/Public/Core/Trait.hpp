@@ -21,6 +21,13 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
+    template<UInt Alignment>
+    inline constexpr UInt Align(UInt Value)
+    {
+        return (Value + Alignment) & ~Alignment;
+    }
+
+    // -=(Undocumented)=-
     inline constexpr UInt Hash(auto String, UInt Length = UINT_MAX)
     {
         return (Length && (* String)) ? (Hash(String + 1u, Length - 1u) * 33u) ^ (* String & ~32u) : 5381u;

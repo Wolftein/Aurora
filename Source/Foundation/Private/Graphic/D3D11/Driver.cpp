@@ -458,7 +458,7 @@ namespace Graphic
     void D3D11Driver::CreateBuffer(UInt ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data)
     {
         const D3D11_BUFFER_DESC Descriptor = CD3D11_BUFFER_DESC(
-            Capacity,
+            Geometry     ? Capacity : Align<16>(Capacity),
             Geometry     ? D3D11_BIND_INDEX_BUFFER | D3D11_BIND_VERTEX_BUFFER : D3D11_BIND_CONSTANT_BUFFER,
             Data.empty() ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_IMMUTABLE,
             Data.empty() ? D3D11_CPU_ACCESS_WRITE : 0);
