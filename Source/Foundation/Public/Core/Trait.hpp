@@ -24,7 +24,7 @@ inline namespace Core
     template<UInt Alignment>
     inline constexpr UInt Align(UInt Value)
     {
-        return (Value + Alignment) & ~Alignment;
+        return (Value + (Alignment - 1)) & ~(Alignment - 1);
     }
 
     // -=(Undocumented)=-

@@ -63,6 +63,13 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Chunk(Chunk && Other)
+            : mData { eastl::move(Other.mData) },
+              mSize { eastl::exchange(Other.mSize, 0) }
+        {
+        }
+
+        // -=(Undocumented)=-
         template<typename T = void>
         auto GetData()
         {
@@ -99,6 +106,15 @@ inline namespace Core
         {
             mData = nullptr;
             mSize = 0;
+        }
+
+        // -=(Undocumented)=-
+        Ref<Chunk> operator=(Chunk && Other)
+        {
+            mData = eastl::move(Other.mData);
+            mSize = eastl::exchange(Other.mSize, 0);
+
+            return (* this);
         }
 
         // -=(Undocumented)=-

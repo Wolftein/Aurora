@@ -36,6 +36,9 @@ namespace Graphic
         k_MaxBuffers     = 0x0080,
 
         // -=(Undocumented)=-
+        k_MaxMaterials   = 0x2000,
+
+        // -=(Undocumented)=-
         k_MaxMipmap      = 0x0010,
 
         // -=(Undocumented)=-

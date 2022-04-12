@@ -62,9 +62,9 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Factory::Insert(Ref<const SPtr<Resource>> Resource)
+    Bool Factory::Insert(Ref<const SPtr<Resource>> Resource)
     {
-        mAssets.try_emplace(Resource->GetKey().GetPath(), Resource);
+        return mAssets.try_emplace(Resource->GetKey().GetPath(), Resource).second;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -88,9 +88,9 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Array<SPtr<Resource>> Factory::Prune(Bool Force)
+    Vector<SPtr<Resource>> Factory::Prune(Bool Force)
     {
-        Array<SPtr<Resource>> Removed;
+        Vector<SPtr<Resource>> Removed;
 
         for (auto Iterator = mAssets.begin(); Iterator != mAssets.end();)
         {

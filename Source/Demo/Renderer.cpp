@@ -27,6 +27,7 @@ namespace Renderer
         : Subsystem(Context),
           mBuffer { 0 },
 		  mBufferLocation { 0 },
+          mUniformLocation { 0 },
 		  mSampler { 0 },
 		  mQueue { 0 },
 		  mQueueTemp { 0 },
@@ -85,7 +86,7 @@ namespace Renderer
 			UInt32 Angle,
 			UInt32 Color,
 			const SPtr<Graphic::Pipeline> & Pipeline,
-			const SPtr<Graphic::Texture> & Texture)
+            const SPtr<Graphic::Material> & Material)
 	{
 		if (!Pipeline->HasLoaded()) {
 			return;
@@ -102,14 +103,14 @@ namespace Renderer
 		{
 			ID.Transparent.bType     = 0;
 			ID.Transparent.bTechnique = Pipeline->GetID();
-			ID.Transparent.bMaterial = Texture->GetID();
+			ID.Transparent.bMaterial = Material->GetID();
 			ID.Transparent.bDepth    = 16777215 - Depth;
 		}
 		else
 		{
 			ID.Opaque.bType     = 1;
 			ID.Opaque.bTechnique = Pipeline->GetID();
-			ID.Opaque.bMaterial = Texture->GetID();
+			ID.Opaque.bMaterial =  Material->GetID();
 			ID.Opaque.bDepth    = Depth;
 		}
 
@@ -122,8 +123,8 @@ namespace Renderer
 		Drawable->Depth       = Depth;
 		Drawable->Rotation    = Angle;
 		Drawable->Color       = Color;
-		Drawable->Texture     = Texture->GetID();
-		Drawable->Pipeline    = Pipeline->GetID();
+		Drawable->Material    = Material;
+		Drawable->Pipeline    = Pipeline;
 	}
 
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -141,25 +142,35 @@ namespace Renderer
 			return p_1st->ID.Value > p_2nd->ID.Value;
 		});
 
-		static Layout sLayout[kMaxBatch * 4u];
-		static UInt32 sQueue[kMaxBatch], sQueueCapacity = 0u;
+        static Vector4f sData[kMaxUniforms];
+        static UInt32  sDataOffset = 0;
+        static Layout  sLayout[kMaxBatch * 4u];
+		static UInt32  sQueue[kMaxBatch], sQueueCapacity = 0u;
+
+        sDataOffset = 0;
 
 		for (auto zBegin = 0u, zEnd = 1u; zBegin < mQueueQuantity; zBegin = zEnd, ++sQueueCapacity)
 		{
-			const auto Texture  = mQueueTemp[zBegin]->Texture;
+			const auto Material  = mQueueTemp[zBegin]->Material;
 			const auto Pipeline = mQueueTemp[zBegin]->Pipeline;
 
-			for (; zEnd < mQueueQuantity && mQueueTemp[zEnd]->Texture == Texture && mQueueTemp[zEnd]->Pipeline == Pipeline; ++zEnd);
+			for (; zEnd < mQueueQuantity && mQueueTemp[zEnd]->Material == Material && mQueueTemp[zEnd]->Pipeline == Pipeline; ++zEnd);
 
 			WriteBatch(& sLayout[zBegin * 4], & mQueueTemp[zBegin], (sQueue[sQueueCapacity] = zEnd - zBegin));
+            WriteUniforms(& sData[sDataOffset], Material);
+            sDataOffset += Material->GetParameters().size();
 		}
 
 		UInt32 Offset = UpdateBatch(sLayout, mQueueQuantity); // Update Buffer
+        UInt32 Uniforms = UpdateUniforms(sData, sDataOffset);
 
 		for (UInt32 ID = 0u, Address = 0u; ID < sQueueCapacity; Address += sQueue[ID], ++ID)
 		{
 			DrawBatch(& mSubmission[ID], Offset + Address, sQueue[ID],
-					mQueueTemp[Address]->Texture, mQueueTemp[Address]->Pipeline);
+                    Uniforms ,
+					mQueueTemp[Address]->Material, mQueueTemp[Address]->Pipeline);
+
+            Uniforms += mQueueTemp[Address]->Material->GetParameters().size();
 		}
 
 		if (sQueueCapacity > 0)
@@ -177,6 +188,7 @@ namespace Renderer
 	{
 		mBuffer[0] = Service->CreateBuffer(true, sizeof(Layout)  * 4 * kMaxBatch, {});
 		mBuffer[2] = Service->CreateBuffer(false, sizeof(Real32) * 64 , {});
+        mBuffer[3] = Service->CreateBuffer(false, sizeof(Vector4f) * kMaxUniforms , {});
 
 		UPtr<UInt16[]> Memory = eastl::make_unique<UInt16[]>(kMaxBatch * 6u);
 
@@ -201,7 +213,7 @@ namespace Renderer
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-	void Batch::DrawBatch(Graphic::Submission * Call, UInt32 Offset, UInt32 Count, UInt Texture, UInt Pipeline)
+	void Batch::DrawBatch(Graphic::Submission * Call, UInt32 Offset, UInt32 Count, UInt32 Uniforms, Ref<const SPtr<Graphic::Material>> Material, Ref<const SPtr<Graphic::Pipeline>> Pipeline)
 	{
         memset(Call, 0, sizeof(Graphic::Submission));
 
@@ -215,12 +227,22 @@ namespace Renderer
         Call->Indices.Stride     = sizeof(UInt16);
 		Call->Uniforms[0].Buffer  = mBuffer[2];
 		Call->Uniforms[0].Offset  = 0;
-		Call->Uniforms[0].Length  = sizeof(Real32) * (4 * 4);
-		//Call->Uniforms[1]       = mData;
+		Call->Uniforms[0].Length  = 16;
+        Call->Uniforms[1].Buffer  = mBuffer[3];
+        Call->Uniforms[1].Offset  = Uniforms;
+        Call->Uniforms[1].Length  = Material->GetParameters().size();
 		Call->Scissor             = { 0, 0, UINT16_MAX, UINT16_MAX };
-		Call->Pipeline            = Pipeline;
-		Call->Samplers[0]         = mSampler;
-		Call->Textures[0]         = Texture;
+		Call->Pipeline            = Pipeline->GetID();
+
+        for (int i = 0; i < Graphic::k_MaxSources; ++i)
+        {
+            if (auto Texture = Material->GetTexture(i))
+            {
+                Call->Textures[i] = Texture->GetID();
+            }
+        }
+
+        Call->Samplers[0] = mSampler;
 	}
 
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -327,6 +349,16 @@ namespace Renderer
 		}
 	}
 
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Batch::WriteUniforms(Vector4f * Buffer, Ref<const SPtr<Graphic::Material>> Material)
+    {
+        CPtr<const Vector4f> Data = Material->GetParameters();
+
+        memcpy(Buffer, Data.data(), Data.size_bytes());
+    }
+
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -342,4 +374,21 @@ namespace Renderer
 		mBufferLocation = Position + Length;
 		return Position;
 	}
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    UInt32 Batch::UpdateUniforms(Vector4f * Buffer, UInt32 Length)
+    {
+        const UInt32 Position = mUniformLocation + Length > kMaxUniforms ? 0 : mUniformLocation;
+        const UInt32 Count    = Length * sizeof(Vector4f);
+
+        Service->UpdateBuffer(mBuffer[3], (Position == 0), Position * sizeof(Vector4f), {
+            reinterpret_cast<UInt08 *>(Buffer), Count
+        });
+
+        mUniformLocation = Position + Length;
+        return Position;
+    }
+
 }

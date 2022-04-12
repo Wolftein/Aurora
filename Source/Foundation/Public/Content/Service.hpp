@@ -79,6 +79,22 @@ namespace Content
         Chunk Find(Ref<const Uri> Key);
 
         // -=(Undocumented)=-
+        void Register(Ref<const SPtr<Resource>> Asset)
+        {
+            Register(Asset, false);
+        }
+
+        // -=(Undocumented)=-
+        void Register(Ref<const SPtr<Resource>> Asset, Bool Async);
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        SPtr<Type> Load(Ref<const Uri> Key)
+        {
+            return Load<Type>(Key, false);
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         SPtr<Type> Load(Ref<const Uri> Key, Bool Async)
         {
@@ -90,16 +106,34 @@ namespace Content
         }
 
         // -=(Undocumented)=-
+        void Load(Ref<const SPtr<Resource>> Asset)
+        {
+            Load(Asset, false);
+        }
+
+        // -=(Undocumented)=-
         void Load(Ref<const SPtr<Resource>> Asset, Bool Async);
 
         // -=(Undocumented)=-
-        void Register(Ref<const SPtr<Resource>> Asset, Bool Async);
+        void Reload(Ref<const SPtr<Resource>> Asset)
+        {
+            Reload(Asset, false);
+        }
 
         // -=(Undocumented)=-
         void Reload(Ref<const SPtr<Resource>> Asset, Bool Async);
 
         // -=(Undocumented)=-
         void Unload(Ref<const SPtr<Resource>> Asset);
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        Bool Exist(Ref<const Uri> Key)
+        {
+            Ref<const SPtr<Type>> Asset = GetFactory(Type::RTTI_CATEGORY)->template GetOrCreate<Type>(Key, false);
+
+            return (Asset != nullptr);
+        }
 
         // -=(Undocumented)=-
         template<typename Type>

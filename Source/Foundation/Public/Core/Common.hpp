@@ -106,8 +106,8 @@ inline namespace Core
     using FPtr   = eastl::function<Type>;
 
     // -=(Undocumented)=-
-    template<typename Value>
-    using Array  = eastl::vector<Value>;
+    template<typename Value, UInt Capacity>
+    using Array  = eastl::array<Value, Capacity>;
 
     // -=(Undocumented)=-
     template<typename Type, UInt Capacity>
@@ -116,6 +116,10 @@ inline namespace Core
     // -=(Undocumented)=-
     template<typename Value, UInt Capacity>
     using Stack  = eastl::fixed_vector<Value, Capacity>;
+
+    // -=(Undocumented)=-
+    template<typename Value>
+    using Vector = eastl::vector<Value>;
 
     // -=(Undocumented)=-
     template<typename Key, typename Value>

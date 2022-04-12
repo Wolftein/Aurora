@@ -65,6 +65,12 @@ namespace Graphic
         void DeleteBuffer(UInt ID);
 
         // -=(Undocumented)=-
+        UInt CreateMaterial();
+
+        // -=(Undocumented)=-
+        void DeleteMaterial(UInt ID);
+
+        // -=(Undocumented)=-
         UInt CreatePass(CPtr<UInt> Colors, UInt Auxiliary);
 
         // -=(Undocumented)=-
@@ -129,6 +135,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Handle<k_MaxBuffers>   mBuffers;
+        Handle<k_MaxMaterials> mMaterials;
         Handle<k_MaxPasses>    mPasses;
         Handle<k_MaxPipelines> mPipelines;
         Handle<k_MaxSamplers>  mSamplers;

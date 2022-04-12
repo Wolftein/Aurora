@@ -40,7 +40,7 @@ namespace Input
         }
 
         // -=(Undocumented)=-
-        void Poll(Ref<Array<Event>> Collector)
+        void Poll(Ref<Vector<Event>> Collector)
         {
             OnDevicePoll(mBuffer);
 

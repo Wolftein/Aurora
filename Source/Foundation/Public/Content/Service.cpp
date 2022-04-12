@@ -113,6 +113,29 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    void Service::Register(Ref<const SPtr<Resource>> Asset, Bool Async)
+    {
+        if (Asset)
+        {
+            const Bool Inserted = GetFactory(Asset->GetCategory())->Insert(Asset);
+
+            if (Inserted)
+            {
+                if (Async)
+                {
+                    // TODO: Async
+                }
+                else
+                {
+                    Process(Asset, true);
+                }
+            }
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void Service::Load(Ref<const SPtr<Resource>> Asset, Bool Async)
     {
         if (Asset && Asset->HasCreated())
@@ -126,26 +149,6 @@ namespace Content
             else
             {
                 Process(Asset, Parse(Asset));
-            }
-        }
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Service::Register(Ref<const SPtr<Resource>> Asset, Bool Async)
-    {
-        if (Asset)
-        {
-            GetFactory(Asset->GetCategory())->Insert(Asset);
-
-            if (Async)
-            {
-                // TODO: Async
-            }
-            else
-            {
-                Process(Asset, true);
             }
         }
     }
@@ -184,7 +187,7 @@ namespace Content
 
     void Service::Prune(UInt Category, Bool Force)
     {
-        const Array<SPtr<Resource>> Assets = GetFactory(Category)->Prune(Force);
+        const Vector<SPtr<Resource>> Assets = GetFactory(Category)->Prune(Force);
 
         for (Ref<const SPtr<Resource>> Asset : Assets)
         {

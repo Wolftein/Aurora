@@ -60,13 +60,13 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        void Insert(Ref<const SPtr<Resource>> Resource);
+        Bool Insert(Ref<const SPtr<Resource>> Resource);
 
         // -=(Undocumented)=-
         Bool Unload(Ref<const Uri> Key);
 
         // -=(Undocumented)=-
-        Array<SPtr<Resource>> Prune(Bool Force);
+        Vector<SPtr<Resource>> Prune(Bool Force);
 
     private:
 

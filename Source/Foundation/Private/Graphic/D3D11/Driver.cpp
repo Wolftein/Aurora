@@ -458,7 +458,7 @@ namespace Graphic
     void D3D11Driver::CreateBuffer(UInt ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data)
     {
         const D3D11_BUFFER_DESC Descriptor = CD3D11_BUFFER_DESC(
-            Geometry     ? Capacity : Align<16>(Capacity),
+            Geometry     ? Capacity : Align<256>(Capacity),
             Geometry     ? D3D11_BIND_INDEX_BUFFER | D3D11_BIND_VERTEX_BUFFER : D3D11_BIND_CONSTANT_BUFFER,
             Data.empty() ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_IMMUTABLE,
             Data.empty() ? D3D11_CPU_ACCESS_WRITE : 0);
@@ -790,8 +790,8 @@ namespace Graphic
                 if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Length != New.Length)
                 {
                     Ref<const D3D11Buffer> Buffer = mBuffers[New.Buffer];
-                    const UINT             Offset = New.Offset;
-                    const UINT             Length = New.Length;
+                    const UINT             Offset = Align<16>(New.Offset);
+                    const UINT             Length = Align<16>(New.Length);
 
                     mDeviceImmediate->VSSetConstantBuffers1(
                         Register, 1, Buffer.Resource.GetAddressOf(), & Offset, & Length);

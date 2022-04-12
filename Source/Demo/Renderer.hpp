@@ -15,6 +15,7 @@
 #include <Graphic/Service.hpp>
 #include <Graphic/Pipeline.hpp>
 #include <Graphic/Texture.hpp>
+#include <Graphic/Material.hpp>
 #include <Graphic/Camera.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -27,7 +28,8 @@ namespace Renderer
 	{
 	public:
 
-		static constexpr UInt32 kMaxBatch = 0x00004000;
+		static constexpr UInt32 kMaxBatch    = 0x00004000;
+        static constexpr UInt32 kMaxUniforms = 0x00001000;
 
 	public:
 
@@ -56,7 +58,7 @@ namespace Renderer
 				UInt32 Angle,
 				UInt32 Color,
 				const SPtr<Graphic::Pipeline> & Pipeline,
-				const SPtr<Graphic::Texture> & Texture);
+				const SPtr<Graphic::Material> & Material);
 
 		// (Missing Documentation)
 		void Flush();
@@ -99,8 +101,8 @@ namespace Renderer
 			UInt32    Depth;
 			UInt32 	  Rotation;
 			UInt32    Color;
-			UInt      Texture;
-            UInt      Pipeline;
+            SPtr<Graphic::Material> Material;
+            SPtr<Graphic::Pipeline> Pipeline;
 		};
 
 	private:
@@ -109,13 +111,19 @@ namespace Renderer
 		void InitResources();
 
 		// (Missing Documentation)
-		void DrawBatch(Graphic::Submission * Call, UInt32 Offset, UInt32 Count, UInt Texture, UInt Pipeline);
+		void DrawBatch(Graphic::Submission * Call, UInt32 Offset, UInt32 Count, UInt32 Uniforms, Ref<const SPtr<Graphic::Material>> Material, Ref<const SPtr<Graphic::Pipeline>> Pipeline);
 
 		// (Missing Documentation)
 		void WriteBatch(Layout * Layout, Drawable ** List, UInt32 Length);
 
+        // (Missing Documentation)
+        void WriteUniforms(Vector4f * Buffer, Ref<const SPtr<Graphic::Material>> Material);
+
 		// (Missing Documentation)
 		UInt32 UpdateBatch(Layout * Layout, UInt32 Length);
+
+        // (Missing Documentation)
+        UInt32 UpdateUniforms(Vector4f * Buffer, UInt32 Length);
 
 	private:
 
@@ -124,8 +132,9 @@ namespace Renderer
 		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UInt       mBuffer[3];
+        UInt       mBuffer[4];
 		UInt32     mBufferLocation;
+        UInt32     mUniformLocation;
         UInt       mSampler;
 		Graphic::Binding mData;
 

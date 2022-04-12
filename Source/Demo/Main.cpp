@@ -105,7 +105,7 @@ int main()
     ContentService->AddLoader("psd", ImgLoaderPtr);
     ContentService->AddLoader("jpg", ImgLoaderPtr);
 
-    ContentService->AddLoader("pl", eastl::make_shared<Content::PipelineLoader>(Graphic::Backend::Direct3D11, Graphic::Language::Version_4_0));
+    ContentService->AddLoader("effect", eastl::make_shared<Content::PipelineLoader>(Graphic::Backend::Direct3D11, Graphic::Language::Version_4_0));
 
     constexpr UInt SUBMIX_MUSIC  = 0;
     constexpr UInt SUBMIX_EFFECT = 1;
@@ -115,7 +115,7 @@ int main()
     AudioService->Initialise(AudioDriver, 2);
 
     //SPtr<Audio::Sound> Sound1 = ContentService->Load<Audio::Sound>("85.wav", false);
-    //SPtr<Audio::Sound> Sound2 = ContentService->Load<Audio::Sound>("127.mp3", false);
+    SPtr<Audio::Sound> Music = ContentService->Load<Audio::Sound>("127.mp3");
 
     AudioService->SetMasterVolume(1.0f);
     AudioService->SetSubmixVolume(SUBMIX_MUSIC, 1.0f);
@@ -129,16 +129,11 @@ int main()
     Emitter->SetAttenuation(2.0f);
     Emitter->SetPosition(NODE_POS);
 
-    //UInt sMusic = AudioService->Play(SUBMIX_MUSIC, Sound2, Emitter, true);
-    //AudioService->Start(sMusic);
+    UInt MusicCue = AudioService->Play(SUBMIX_MUSIC, Music, Emitter, true);
+    AudioService->Start(MusicCue);
 
-    SPtr<Graphic::Texture>  SimpleTexture  = ContentService->Load<Graphic::Texture>("rpgTile029.png", false);
-    SPtr<Graphic::Pipeline> SimplePipeline;
-    SimplePipeline = ContentService->Load<Graphic::Pipeline>("Water.pl", false);
-
-    printf("Audio: %zukb\n", ContentService->GetMemoryUsage<Audio::Sound>() / 1024);
-    printf("Texture: %zukb\n", ContentService->GetMemoryUsage<Graphic::Texture>() / 1024);
-    printf("Pipeline: %zukb\n", ContentService->GetMemoryUsage<Graphic::Pipeline>() / 1024);
+    SPtr<Graphic::Texture>  SimpleTexture  = ContentService->Load<Graphic::Texture>("rpgTile029.png");
+    SPtr<Graphic::Pipeline> SimplePipeline = ContentService->Load<Graphic::Pipeline>("Water.effect");
 
     SPtr<Renderer::Batch> Batcher = System.AddSubsystem<Renderer::Batch>();
 
@@ -147,6 +142,25 @@ int main()
 
     Real32 Scaling = 1;
     Real32 Rotation = 0;
+
+    SPtr<Graphic::Material> Material = eastl::make_shared<Graphic::Material>(Content::Uri { "Test"} );
+    Material->SetTexture(0, SimpleTexture);
+    Material->SetParameter(0, Vector4f(1, 1, 0, 1));
+
+    printf("%d\n", ContentService->Exist<Graphic::Material>({ "Test" }));
+    ContentService->Register(Material);
+    printf("%d\n", ContentService->Exist<Graphic::Material>({ "Test" }));
+
+    SPtr<Graphic::Material> Material2 = eastl::make_shared<Graphic::Material>(Content::Uri { "Test_2" });
+    Material2->SetTexture(0, SimpleTexture);
+    Material2->SetParameter(0, Vector4f(1, 0, 0, 1));
+
+    ContentService->Register(Material2);
+
+    printf("Audio: %zu bytes\n", ContentService->GetMemoryUsage<Audio::Sound>());
+    printf("Texture: %zu bytes\n", ContentService->GetMemoryUsage<Graphic::Texture>());
+    printf("Pipeline: %zu bytes\n", ContentService->GetMemoryUsage<Graphic::Pipeline>());
+    printf("Material: %zu bytes\n", ContentService->GetMemoryUsage<Graphic::Material>());
 
     while (Window->Poll())
     {
@@ -224,14 +238,15 @@ int main()
 
         auto MousePos = InputService->GetMousePosition();
 
+
         GraphicService->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, { 0.0f }, 1.0f, 0);
         {
             Renderer::Batch::Rectangle Destination { 0 }, Source { 0, 0, 1, 1 };
 
             Batcher->SetData(Camera, PlatformService->GetTime());
 
-            const UInt StepX = SimpleTexture->GetWidth();
-            const UInt StepY = SimpleTexture->GetHeight();
+            const UInt StepX = SimpleTexture->GetWidth() / 2;
+            const UInt StepY = SimpleTexture->GetHeight() / 2;
 
             UInt Index = 0;
 
@@ -247,10 +262,13 @@ int main()
 
                     if (IsInside(Camera, Viewport, MousePos, Destination))
                     {
-                        Color = 0xFF0000FF;
+                        Color = 0x30303030;
                     }
 
-                    Batcher->Draw(Destination, Source, false, 0, 0, Color, SimplePipeline, SimpleTexture);
+                    auto MaterialToUse = Index % 2 == 0 ? Material : Material2;
+
+                    Batcher->Draw(Destination, Source, false, 0, 0, Color, SimplePipeline, MaterialToUse);
+                    ++Index;
                 }
             }
 
