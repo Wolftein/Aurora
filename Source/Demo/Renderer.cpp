@@ -79,8 +79,8 @@ namespace Renderer
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 	void Batch::Draw(
-			const Rectangle & Destination,
-			const Rectangle & Source,
+			const Rectf & Destination,
+			const Rectf & Source,
 			Bool   Alpha,
             Real32 Depth,
 			UInt32 Angle,
@@ -262,15 +262,15 @@ namespace Renderer
 			//
 			// Calculate \ref Drawable's vertices (rotation)
 			//
-			Real32 DestinationX1 = Sprite->Destination.Left;
-			Real32 DestinationX2 = Sprite->Destination.Left;
-			Real32 DestinationX3 = Sprite->Destination.Right;
-			Real32 DestinationX4 = Sprite->Destination.Right;
+			Real32 DestinationX1 = Sprite->Destination.GetLeft();
+			Real32 DestinationX2 = Sprite->Destination.GetLeft();
+			Real32 DestinationX3 = Sprite->Destination.GetRight();
+			Real32 DestinationX4 = Sprite->Destination.GetRight();
 
-			Real32 DestinationY1 = Sprite->Destination.Top;
-			Real32 DestinationY2 = Sprite->Destination.Bottom;
-			Real32 DestinationY3 = Sprite->Destination.Bottom;
-			Real32 DestinationY4 = Sprite->Destination.Top;
+			Real32 DestinationY1 = Sprite->Destination.GetTop();
+			Real32 DestinationY2 = Sprite->Destination.GetBottom();
+			Real32 DestinationY3 = Sprite->Destination.GetBottom();
+			Real32 DestinationY4 = Sprite->Destination.GetTop();
 
 			if (Sprite->Rotation != 0.0f && Sprite->Rotation != 360)
 			{
@@ -278,8 +278,8 @@ namespace Renderer
 				const Real32 Cos    = cosf(Angles);
 				const Real32 Sin    = sinf(Angles);
 
-				const Real32 DimX   = (Sprite->Destination.Right  - Sprite->Destination.Left);
-				const Real32 DimY   = (Sprite->Destination.Bottom - Sprite->Destination.Top);
+				const Real32 DimX   = (Sprite->Destination.GetWidth());
+				const Real32 DimY   = (Sprite->Destination.GetHeight());
 				const Real32 WorldX = (DimX * 0.5f);
 				const Real32 WorldY = (DimY * 0.5f);
 
@@ -319,32 +319,32 @@ namespace Renderer
 			Layout->Y     = DestinationY1;
 			Layout->Z     = Depth;
 			Layout->Color = Sprite->Color;
-			Layout->U     = Sprite->Source.Left;
-			Layout->V     = Sprite->Source.Top;
+			Layout->U     = Sprite->Source.GetLeft();
+			Layout->V     = Sprite->Source.GetTop();
 			++Layout;
 
 			Layout->X     = DestinationX2;
 			Layout->Y     = DestinationY2;
 			Layout->Z     = Depth;
 			Layout->Color = Sprite->Color;
-			Layout->U     = Sprite->Source.Left;
-			Layout->V     = Sprite->Source.Bottom;
+			Layout->U     = Sprite->Source.GetLeft();
+			Layout->V     = Sprite->Source.GetBottom();
 			++Layout;
 
 			Layout->X     = DestinationX3;
 			Layout->Y     = DestinationY3;
 			Layout->Z     = Depth;
 			Layout->Color = Sprite->Color;
-			Layout->U     = Sprite->Source.Right;
-			Layout->V     = Sprite->Source.Bottom;
+			Layout->U     = Sprite->Source.GetRight();
+			Layout->V     = Sprite->Source.GetBottom();
 			++Layout;
 
 			Layout->X     = DestinationX4;
 			Layout->Y     = DestinationY4;
 			Layout->Z     = Depth;
 			Layout->Color = Sprite->Color;
-			Layout->U     = Sprite->Source.Right;
-			Layout->V     = Sprite->Source.Top;
+			Layout->U     = Sprite->Source.GetRight();
+			Layout->V     = Sprite->Source.GetTop();
 			++Layout;
 		}
 	}

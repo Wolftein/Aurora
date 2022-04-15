@@ -149,7 +149,7 @@ namespace Audio
 
             if (InstanceRef.Finished && State.BuffersQueued == 0)
             {
-                mVoices.emplace(GetKey(InstanceRef.Sound), InstanceRef.Source);
+                mVoices.push_back(XAudioSource { GetKey(InstanceRef.Sound), InstanceRef.Source });
 
                 Iterator = mMixes.erase(Iterator);
             }
@@ -369,11 +369,16 @@ namespace Audio
 
     Ptr<IXAudio2SourceVoice> XAudio2Driver::GetOrCreateMix(Ref<const SPtr<Sound>> Sound)
     {
+        const auto FindByKey = [Key = GetKey(Sound)](Ref<const XAudioSource> InstanceRef)
+        {
+            return InstanceRef.Key == Key;
+        };
+
         Ptr<IXAudio2SourceVoice> Mixer = nullptr;
 
-        if (const auto Iterator = mVoices.find(GetKey(Sound)); Iterator != mVoices.end())
+        if (const auto Iterator = eastl::find_if(mVoices.begin(), mVoices.end(), FindByKey); Iterator != mVoices.end())
         {
-            Mixer = Iterator->second;
+            Mixer = Iterator->Source;
 
             mVoices.erase(Iterator);
         }

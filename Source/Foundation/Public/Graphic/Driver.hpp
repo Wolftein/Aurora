@@ -65,13 +65,13 @@ namespace Graphic
         virtual void CreateTexture(UInt ID, TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-
-        virtual void UpdateTexture(UInt ID, UInt Level, Rect Offset, UInt Pitch, CPtr<UInt08> Data) = 0;
+        virtual void UpdateTexture(UInt ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-
         virtual void DeleteTexture(UInt ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void Prepare(UInt ID, Rect Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil) = 0;
+        virtual void Prepare(UInt ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil) = 0;
 
         // -=(Undocumented)=-
         virtual void Submit(CPtr<Submission> Submissions) = 0;

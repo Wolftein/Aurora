@@ -209,16 +209,16 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        Vector3f GetWorldCoordinates(Ref<const Vector3f> Position, Ref<const Rect> Viewport) const;
+        Vector3f GetWorldCoordinates(Ref<const Vector3f> Position, Ref<const Rectf> Viewport) const;
 
         // -=(Undocumented)=-
-        Vector2f GetWorldCoordinates(Ref<const Vector2f> Position, Ref<const Rect> Viewport) const;
+        Vector2f GetWorldCoordinates(Ref<const Vector2f> Position, Ref<const Rectf> Viewport) const;
 
         // -=(Undocumented)=-
-        Vector3f GetScreenCoordinates(Ref<const Vector3f> Position, Ref<const Rect> Viewport) const;
+        Vector3f GetScreenCoordinates(Ref<const Vector3f> Position, Ref<const Rectf> Viewport) const;
 
         // -=(Undocumented)=-
-        Vector2f GetScreenCoordinates(Ref<const Vector2f> Position, Ref<const Rect> Viewport) const;
+        Vector2f GetScreenCoordinates(Ref<const Vector2f> Position, Ref<const Rectf> Viewport) const;
 
     private:
 

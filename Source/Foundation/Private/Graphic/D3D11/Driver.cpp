@@ -697,14 +697,14 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::UpdateTexture(UInt ID, UInt Level, Rect Offset, UInt Pitch, CPtr<UInt08> Data)
+    void D3D11Driver::UpdateTexture(UInt ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data)
     {
         const D3D11_BOX Rect {
-            static_cast<UINT>(Offset.Left),
-            static_cast<UINT>(Offset.Top),
+            static_cast<UINT>(Offset.GetLeft()),
+            static_cast<UINT>(Offset.GetTop()),
             0,
-            static_cast<UINT>(Offset.Right),
-            static_cast<UINT>(Offset.Bottom),
+            static_cast<UINT>(Offset.GetRight()),
+            static_cast<UINT>(Offset.GetBottom()),
             0
         };
         mDeviceImmediate->UpdateSubresource(mTextures[ID].Object.Get(), Level, & Rect, Data.data(), Pitch, 0);
@@ -721,7 +721,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::Prepare(UInt ID, Rect Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil)
+    void D3D11Driver::Prepare(UInt ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil)
     {
         Stack<Ptr<ID3D11RenderTargetView>, k_MaxAttachments> Attachments;
 
@@ -748,10 +748,10 @@ namespace Graphic
         mDeviceImmediate->OMSetRenderTargets(Attachments.size(), Attachments.data(), mPasses[ID].Auxiliary.Get());
 
         const CD3D11_VIEWPORT Rect(
-            static_cast<FLOAT>(Viewport.Left),
-            static_cast<FLOAT>(Viewport.Top),
-            static_cast<FLOAT>(Viewport.Right  - Viewport.Left),
-            static_cast<FLOAT>(Viewport.Bottom - Viewport.Top));
+            Viewport.GetX(),
+            Viewport.GetY(),
+            Viewport.GetWidth(),
+            Viewport.GetHeight());
         mDeviceImmediate->RSSetViewports(1, & Rect);
     }
 
@@ -800,14 +800,11 @@ namespace Graphic
                 }
             }
 
-            if (   Prev.Scissor.Left   != Next.Scissor.Left
-                || Prev.Scissor.Top    != Next.Scissor.Top
-                || Prev.Scissor.Right  != Next.Scissor.Right
-                || Prev.Scissor.Bottom != Next.Scissor.Bottom)
+            if ( Prev.Scissor != Next.Scissor)
             {
                 const RECT Rect {
-                    Next.Scissor.Left,  Next.Scissor.Top,
-                    Next.Scissor.Right, Next.Scissor.Bottom
+                    Next.Scissor.GetLeft(),  Next.Scissor.GetTop(),
+                    Next.Scissor.GetRight(), Next.Scissor.GetBottom()
                 };
                 mDeviceImmediate->RSSetScissorRects(1, & Rect);
             }

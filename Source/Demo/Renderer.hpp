@@ -33,13 +33,6 @@ namespace Renderer
 
 	public:
 
-		struct Rectangle
-		{
-			Real32 Left, Top, Right, Bottom;
-		};
-
-	public:
-
 		// (Missing Documentation)
 		explicit Batch(Ref<Core::Subsystem::Context> Context);
 
@@ -51,8 +44,8 @@ namespace Renderer
 
 		// (Missing Documentation)
 		void Draw(
-				const Rectangle & Destination,
-				const Rectangle & Source,
+				const Rectf & Destination,
+				const Rectf & Source,
 				Bool   Alpha,
 				Real32 Depth,
 				UInt32 Angle,
@@ -96,8 +89,8 @@ namespace Renderer
 		struct Drawable
 		{
 			Key	      ID;
-			Rectangle Destination;
-			Rectangle Source;
+            Rectf Destination;
+            Rectf Source;
 			UInt32    Depth;
 			UInt32 	  Rotation;
 			UInt32    Color;
@@ -136,7 +129,6 @@ namespace Renderer
 		UInt32     mBufferLocation;
         UInt32     mUniformLocation;
         UInt       mSampler;
-		Graphic::Binding mData;
 
 		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

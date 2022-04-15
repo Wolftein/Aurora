@@ -60,12 +60,12 @@ Bool IsInsideTriangle(Ref<const Vector2f> A, Ref<const Vector2f> B, Ref<const Ve
     return (u >= 0 && v >= 0 && (u + v) < 1);
 }
 
-Bool IsInside(Ref<const Graphic::Camera> Camera, Ref<const Graphic::Rect> Viewport, Ref<const Vector2i> Mouse, Ref<const Renderer::Batch::Rectangle> Position)
+Bool IsInside(Ref<const Graphic::Camera> Camera, Ref<const Rectf> Viewport, Ref<const Vector2i> Mouse, Ref<const Rectf> Position)
 {
-    const Vector2f V1 = Camera.GetScreenCoordinates(Vector2f(Position.Left,  Position.Top), Viewport);
-    const Vector2f V2 = Camera.GetScreenCoordinates(Vector2f(Position.Right, Position.Top), Viewport);
-    const Vector2f V3 = Camera.GetScreenCoordinates(Vector2f(Position.Right, Position.Bottom), Viewport);
-    const Vector2f V4 = Camera.GetScreenCoordinates(Vector2f(Position.Left,  Position.Bottom), Viewport);
+    const Vector2f V1 = Camera.GetScreenCoordinates(Vector2f(Position.GetLeft(),  Position.GetTop()), Viewport);
+    const Vector2f V2 = Camera.GetScreenCoordinates(Vector2f(Position.GetRight(), Position.GetTop()), Viewport);
+    const Vector2f V3 = Camera.GetScreenCoordinates(Vector2f(Position.GetRight(), Position.GetBottom()), Viewport);
+    const Vector2f V4 = Camera.GetScreenCoordinates(Vector2f(Position.GetLeft(),  Position.GetBottom()), Viewport);
 
     Vector2f Mousef(Mouse.GetX(), Mouse.GetY());
 
@@ -169,11 +169,11 @@ int main()
             Service.OnTick();
         });
 
-        Graphic::Rect Viewport {
+        Rectf Viewport {
             0,
             0,
-            static_cast<UInt16>(Size.GetX()),
-            static_cast<UInt16>(Size.GetY())
+            static_cast<Real32>(Size.GetX()),
+            static_cast<Real32>(Size.GetY())
         };
 
         if (InputService->IsKeyPressed(Input::Key::Escape))
@@ -241,31 +241,29 @@ int main()
 
         GraphicService->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, { 0.0f }, 1.0f, 0);
         {
-            Renderer::Batch::Rectangle Destination { 0 }, Source { 0, 0, 1, 1 };
+            Rectf Destination, Source { 0, 0, 1, 1 };
 
             Batcher->SetData(Camera, PlatformService->GetTime());
 
-            const UInt StepX = SimpleTexture->GetWidth() / 2;
-            const UInt StepY = SimpleTexture->GetHeight() / 2;
+            const SInt StepX = SimpleTexture->GetWidth() / 2;
+            const SInt StepY = SimpleTexture->GetHeight() / 2;
 
             UInt Index = 0;
 
-            for (SInt X = -4096; X < 16096; X += StepX)
+            for (SInt X = -4096; X < 16000; X += StepX)
             {
-                for (SInt Y = -4096; Y < 16096; Y += StepY)
+                for (SInt Y = -4096; Y < 16000; Y += StepY)
                 {
                     UInt32 Color = 0xFFFFFFFF;
-                    Destination.Left   = X;
-                    Destination.Top    = Y;
-                    Destination.Right  = Destination.Left + StepX;
-                    Destination.Bottom = Destination.Top  + StepY;
+
+                    Destination.Set(X, Y, X + StepX, Y + StepY);
 
                     if (IsInside(Camera, Viewport, MousePos, Destination))
                     {
                         Color = 0x30303030;
                     }
 
-                    auto MaterialToUse = Index % 2 == 0 ? Material : Material2;
+                    auto MaterialToUse = Index % 2 == 0 ? Material : Material;
 
                     Batcher->Draw(Destination, Source, false, 0, 0, Color, SimplePipeline, MaterialToUse);
                     ++Index;

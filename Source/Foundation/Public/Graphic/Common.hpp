@@ -383,12 +383,6 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    struct Rect
-    {
-        UInt16 Left = 0, Top = 0, Right = 0, Bottom = 0;
-    };
-
-    // -=(Undocumented)=-
     struct Submission
     {
         // -=(Undocumented)=-
@@ -401,7 +395,7 @@ namespace Graphic
         Binding Uniforms[k_MaxUniforms];
 
         // -=(Undocumented)=-
-        Rect    Scissor;
+        Recti   Scissor                = { 0, 0, INT32_MAX, INT32_MAX };
 
         // -=(Undocumented)=-
         UInt    Stencil                = 0;

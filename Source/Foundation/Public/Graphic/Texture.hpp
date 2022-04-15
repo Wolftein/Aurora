@@ -81,12 +81,12 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UInt           mID;
-        TextureFormat  mFormat;
-        TextureLayout  mLayout;
-        UInt           mWidth;
-        UInt           mHeight;
-        UInt           mLayer;
-        Chunk          mData;
+        UInt          mID;
+        TextureFormat mFormat;
+        TextureLayout mLayout;
+        UInt          mWidth;
+        UInt          mHeight;
+        UInt          mLayer;
+        Chunk         mData;
     };
 }

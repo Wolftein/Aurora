@@ -102,7 +102,7 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename T>
-        void UpdateTexture(UInt ID, UInt Level, Rect Offset, UInt Pitch, CPtr<T> Data)
+        void UpdateTexture(UInt ID, UInt Level, Recti Offset, UInt Pitch, CPtr<T> Data)
         {
             const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<UInt08 *>(Data.data()), Data.size_bytes());
 
@@ -110,13 +110,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void UpdateTexture(UInt ID, UInt Level, Rect Offset, UInt Pitch, CPtr<UInt08> Data);
+        void UpdateTexture(UInt ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data);
 
         // -=(Undocumented)=-
         void DeleteTexture(UInt ID);
 
         // -=(Undocumented)=-
-        void Prepare(UInt ID, Rect Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil);
+        void Prepare(UInt ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil);
 
         // -=(Undocumented)=-
         void Submit(CPtr<Submission> Submissions);

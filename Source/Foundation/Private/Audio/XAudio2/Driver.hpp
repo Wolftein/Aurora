@@ -82,6 +82,13 @@ namespace Audio
     private:
 
         // -=(Undocumented)=-
+        struct XAudioSource
+        {
+            UInt                     Key;
+            Ptr<IXAudio2SourceVoice> Source;
+        };
+
+        // -=(Undocumented)=-
         struct XAudioInstance
         {
             Bool                     Finished;
@@ -94,7 +101,7 @@ namespace Audio
         };
 
         // -=(Undocumented)=-
-        using XAudioPool     = Table<UInt32, Ptr<IXAudio2SourceVoice>>;
+        using XAudioPool     = Stack<XAudioSource, k_MaxMixes>;
 
         // -=(Undocumented)=-
         using XAudioMixes    = Stack<XAudioInstance, k_MaxMixes>;

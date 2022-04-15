@@ -62,13 +62,13 @@ namespace Graphic
         void CreateTexture(UInt ID, TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<UInt08> Data) override;
 
         // \see Driver::UpdateTexture
-        void UpdateTexture(UInt ID, UInt Level, Rect Offset, UInt Pitch, CPtr<UInt08> Data) override;
+        void UpdateTexture(UInt ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data) override;
 
         // \see Driver::DeleteTexture
         void DeleteTexture(UInt ID) override;
 
         // \see Driver::Prepare
-        void Prepare(UInt ID, Rect Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil) override;
+        void Prepare(UInt ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil) override;
 
         // \see Driver::Submit
         void Submit(CPtr<Submission> Submissions) override;
