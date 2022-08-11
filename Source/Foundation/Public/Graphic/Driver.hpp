@@ -38,7 +38,10 @@ namespace Graphic
         virtual void CreateBuffer(UInt ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-
-        virtual void UpdateBuffer(UInt ID, Bool Discard, UInt Offset, CPtr<UInt08> Data) = 0;
+        virtual Ptr<void> Map(UInt ID, Bool Discard, UInt Offset, UInt Length) = 0;
+
+        // -=(Undocumented)=-
+        virtual void Unmap(UInt ID) = 0;
 
         // -=(Undocumented)=-
         virtual void DeleteBuffer(UInt ID) = 0;
@@ -56,7 +59,7 @@ namespace Graphic
         virtual void DeletePipeline(UInt ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateSampler(UInt ID, TextureEdge EdgeX, TextureEdge EdgeY, TextureFilter Filter) = 0;
+        virtual void CreateSampler(UInt ID, TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter) = 0;
 
         // -=(Undocumented)=-
         virtual void DeleteSampler(UInt ID) = 0;

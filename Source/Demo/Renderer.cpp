@@ -11,384 +11,291 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Renderer.hpp"
-#include "Graphic/Service.hpp"
-#include <algorithm>
+#include <EASTL/sort.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Renderer
+namespace Graphic
 {
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-	Batch::Batch(Ref<Core::Subsystem::Context> Context)
-        : Subsystem(Context),
-          mBuffer { 0 },
-		  mBufferLocation { 0 },
-          mUniformLocation { 0 },
-		  mSampler { 0 },
-		  mQueue { 0 },
-		  mQueueTemp { 0 },
-		  mQueueQuantity { 0 },
-		  mSubmission { 0 }
-	{
-        mSubmission = new Graphic::Submission[kMaxBatch];
-        Service = Context.GetSubsystem<Graphic::Service>();
-        
-		InitResources();
-	}
-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-	Batch::~Batch()
-	{
-        Service->DeleteBuffer(mBuffer[0]);
-        Service->DeleteBuffer(mBuffer[1]);
-        Service->DeleteBuffer(mBuffer[2]);
-        Service->DeleteSampler(mSampler);
-	}
-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-	void Batch::SetData(Ref<const Graphic::Camera> Camera, Real32 Time)
-	{
-        Real32 kNear = 0.0f;
-        Real32 kFar  = (1 << 24) - 1;
-
-        struct Data
-        {
-            Matrix4f ProjectionViewMatrix;
-            Real32 Time;
-        };
-
-        // @formatter:off
-        Data Uniform{
-            .ProjectionViewMatrix = Camera.GetView() * Camera.GetProjection(),
-            .Time = Time
-        };
-         // @formatter:on
-
-        Service->UpdateBuffer(mBuffer[2], true, 0, { (UInt08 *) & Uniform, sizeof(Data) });
-	}
-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-	void Batch::Draw(
-			const Rectf & Destination,
-			const Rectf & Source,
-			Bool   Alpha,
-            Real32 Depth,
-			UInt32 Angle,
-			UInt32 Color,
-			const SPtr<Graphic::Pipeline> & Pipeline,
-            const SPtr<Graphic::Material> & Material)
-	{
-		if (!Pipeline->HasLoaded()) {
-			return;
-		}
-
-		if (mQueueQuantity == kMaxBatch)
-		{
-			Flush();
-		}
-
-		Key ID;
-
-		if (Alpha)
-		{
-			ID.Transparent.bType     = 0;
-			ID.Transparent.bTechnique = Pipeline->GetID();
-			ID.Transparent.bMaterial = Material->GetID();
-			ID.Transparent.bDepth    = 16777215 - Depth;
-		}
-		else
-		{
-			ID.Opaque.bType     = 1;
-			ID.Opaque.bTechnique = Pipeline->GetID();
-			ID.Opaque.bMaterial =  Material->GetID();
-			ID.Opaque.bDepth    = Depth;
-		}
-
-		Drawable * Drawable = (mQueueTemp[mQueueQuantity] = & mQueue[mQueueQuantity]);
-		++mQueueQuantity;
-
-		Drawable->ID          = ID;
-		Drawable->Destination = Destination;
-		Drawable->Source      = Source;
-		Drawable->Depth       = Depth;
-		Drawable->Rotation    = Angle;
-		Drawable->Color       = Color;
-		Drawable->Material    = Material;
-		Drawable->Pipeline    = Pipeline;
-	}
-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-	void Batch::Flush()
-	{
-		if (mQueueQuantity == 0u)
-		{
-			return;
-		}
-
-		std::sort(std::begin(mQueueTemp), std::begin(mQueueTemp) + mQueueQuantity, [] (Drawable * p_1st, Drawable * p_2nd)
-		{
-			return p_1st->ID.Value > p_2nd->ID.Value;
-		});
-
-        static Vector4f sData[kMaxUniforms];
-        static UInt32  sDataOffset = 0;
-        static Layout  sLayout[kMaxBatch * 4u];
-		static UInt32  sQueue[kMaxBatch], sQueueCapacity = 0u;
-
-        sDataOffset = 0;
-
-		for (auto zBegin = 0u, zEnd = 1u; zBegin < mQueueQuantity; zBegin = zEnd, ++sQueueCapacity)
-		{
-			const auto Material  = mQueueTemp[zBegin]->Material;
-			const auto Pipeline = mQueueTemp[zBegin]->Pipeline;
-
-			for (; zEnd < mQueueQuantity && mQueueTemp[zEnd]->Material == Material && mQueueTemp[zEnd]->Pipeline == Pipeline; ++zEnd);
-
-			WriteBatch(& sLayout[zBegin * 4], & mQueueTemp[zBegin], (sQueue[sQueueCapacity] = zEnd - zBegin));
-            WriteUniforms(& sData[sDataOffset], Material);
-            sDataOffset += Material->GetParameters().size();
-		}
-
-		UInt32 Offset = UpdateBatch(sLayout, mQueueQuantity); // Update Buffer
-        UInt32 Uniforms = UpdateUniforms(sData, sDataOffset);
-
-		for (UInt32 ID = 0u, Address = 0u; ID < sQueueCapacity; Address += sQueue[ID], ++ID)
-		{
-			DrawBatch(& mSubmission[ID], Offset + Address, sQueue[ID],
-                    Uniforms ,
-					mQueueTemp[Address]->Material, mQueueTemp[Address]->Pipeline);
-
-            Uniforms += mQueueTemp[Address]->Material->GetParameters().size();
-		}
-
-		if (sQueueCapacity > 0)
-		{
-            Service->Submit({ mSubmission, sQueueCapacity });   // Draw Calls
-		}
-
-		mQueueQuantity = sQueueCapacity = 0u;
-	}
-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-	void Batch::InitResources()
-	{
-		mBuffer[0] = Service->CreateBuffer(true, sizeof(Layout)  * 4 * kMaxBatch, {});
-		mBuffer[2] = Service->CreateBuffer(false, sizeof(Real32) * 64 , {});
-        mBuffer[3] = Service->CreateBuffer(false, sizeof(Vector4f) * kMaxUniforms , {});
-
-		UPtr<UInt16[]> Memory = eastl::make_unique<UInt16[]>(kMaxBatch * 6u);
-
-		for (UInt32 Position = 0u, Index = 0u, max = kMaxBatch * 6u; Position < max; Index += 4u)
-		{
-			Memory[Position++] = static_cast<UInt16>(Index);
-			Memory[Position++] = static_cast<UInt16>(Index + 1);
-			Memory[Position++] = static_cast<UInt16>(Index + 2);
-			Memory[Position++] = static_cast<UInt16>(Index + 0);
-			Memory[Position++] = static_cast<UInt16>(Index + 2);
-			Memory[Position++] = static_cast<UInt16>(Index + 3);
-		}
-
-		mBuffer[1] = Service->CreateBuffer(true, 6 * kMaxBatch * sizeof(UInt16), {
-				reinterpret_cast<UInt08 *>(Memory.get()), 6 * kMaxBatch * sizeof(UInt16)
-		});
-
-		mSampler = Service->CreateSampler(
-				Graphic::TextureEdge::Repeat, Graphic::TextureEdge::Repeat, Graphic::TextureFilter::Trilinear);
-	}
-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-	void Batch::DrawBatch(Graphic::Submission * Call, UInt32 Offset, UInt32 Count, UInt32 Uniforms, Ref<const SPtr<Graphic::Material>> Material, Ref<const SPtr<Graphic::Pipeline>> Pipeline)
-	{
-        memset(Call, 0, sizeof(Graphic::Submission));
+    Renderer::Renderer(Ref<Core::Subsystem::Context> Context)
+    {
+        mService = Context.GetSubsystem<Graphic::Service>();
 
-		Call->Vertices.Buffer    = mBuffer[0];
-		Call->Vertices.Offset    = 0;
-		Call->Vertices.Length    = 0;
-        Call->Vertices.Stride    = 24;
-		Call->Indices.Buffer     = mBuffer[1];
-		Call->Indices.Offset     = Offset * 6;
-		Call->Indices.Length     = 6 * Count;
-        Call->Indices.Stride     = sizeof(UInt16);
-		Call->Uniforms[0].Buffer  = mBuffer[2];
-		Call->Uniforms[0].Offset  = 0;
-		Call->Uniforms[0].Length  = 16;
-        Call->Uniforms[1].Buffer  = mBuffer[3];
-        Call->Uniforms[1].Offset  = Uniforms;
-        Call->Uniforms[1].Length  = Material->GetParameters().size();
-		Call->Scissor             = { 0, 0, UINT16_MAX, UINT16_MAX };
-		Call->Pipeline            = Pipeline->GetID();
+        mVertexBuffer = mService->CreateBuffer(true, sizeof(Quad)  * 4 * k_MaxDrawables, {});
+        mVertexBufferOffset = 0;
 
-        for (int i = 0; i < Graphic::k_MaxSources; ++i)
+        UPtr<UInt16[]> Memory = eastl::make_unique<UInt16[]>(k_MaxDrawables * 6u);
+
+        for (UInt32 Position = 0u, Index = 0u, max = k_MaxDrawables * 6u; Position < max; Index += 4u)
         {
-            if (auto Texture = Material->GetTexture(i))
-            {
-                Call->Textures[i] = Texture->GetID();
-            }
+            Memory[Position++] = static_cast<UInt16>(Index);
+            Memory[Position++] = static_cast<UInt16>(Index + 1);
+            Memory[Position++] = static_cast<UInt16>(Index + 2);
+            Memory[Position++] = static_cast<UInt16>(Index + 1);
+            Memory[Position++] = static_cast<UInt16>(Index + 3);
+            Memory[Position++] = static_cast<UInt16>(Index + 2);
         }
 
-        Call->Samplers[0] = mSampler;
-	}
-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-	void Batch::WriteBatch(Layout * Layout, Drawable ** List, UInt32 Length)
-	{
-		for (UInt32 zID = 0u; zID < Length; ++zID)
-		{
-			const Drawable * Sprite = List[zID];
-
-			//
-			// Calculate Depth (We're using 24-bit depth)
-			//
-			Real32 Depth = static_cast<Real32>(Sprite ->Depth);
-
-			//
-			// Calculate \ref Drawable's vertices (rotation)
-			//
-			Real32 DestinationX1 = Sprite->Destination.GetLeft();
-			Real32 DestinationX2 = Sprite->Destination.GetLeft();
-			Real32 DestinationX3 = Sprite->Destination.GetRight();
-			Real32 DestinationX4 = Sprite->Destination.GetRight();
-
-			Real32 DestinationY1 = Sprite->Destination.GetTop();
-			Real32 DestinationY2 = Sprite->Destination.GetBottom();
-			Real32 DestinationY3 = Sprite->Destination.GetBottom();
-			Real32 DestinationY4 = Sprite->Destination.GetTop();
-
-			if (Sprite->Rotation != 0.0f && Sprite->Rotation != 360)
-			{
-				const Real32 Angles = (Sprite->Rotation * 3.141592654f) / 180.0f;
-				const Real32 Cos    = cosf(Angles);
-				const Real32 Sin    = sinf(Angles);
-
-				const Real32 DimX   = (Sprite->Destination.GetWidth());
-				const Real32 DimY   = (Sprite->Destination.GetHeight());
-				const Real32 WorldX = (DimX * 0.5f);
-				const Real32 WorldY = (DimY * 0.5f);
-
-				const Real32 LocalX1 = -WorldX;
-				const Real32 LocalY1 = -WorldY;
-				const Real32 LocalX2 = LocalX1 + DimX;
-				const Real32 LocalY2 =  LocalY1 + DimY;
-
-				const Real32 LocalXCos  = LocalX1 * Cos;
-				const Real32 LocalXSin  = LocalX1 * Sin;
-				const Real32 LocalYCos  = LocalY1 * Cos;
-				const Real32 LocalYSin  = LocalY1 * Sin;
-				const Real32 LocalX2Cos = LocalX2 * Cos;
-				const Real32 LocalY2Cos = LocalY2 * Cos;
-				const Real32 LocalY2Sin = LocalY2 * Sin;
-
-				const auto X1  = LocalXCos - LocalYSin;
-				const auto Y1  = LocalYCos + LocalXSin;
-				DestinationX1 = X1 + WorldX;
-				DestinationY1 = Y1 + WorldY;
-
-				const auto X4  = LocalXCos - LocalY2Sin;
-				const auto Y4  = LocalY2Cos + LocalXSin;
-				DestinationX4 = X4 + WorldX;
-				DestinationY4 = Y4 + WorldY;
-
-				const auto X3  = LocalX2Cos - LocalY2Sin;
-				const auto Y3  = LocalY2Cos + LocalY2Sin;
-				DestinationX3 = X3 + WorldX;
-				DestinationY3 = Y3 + WorldY;
-
-				DestinationX2 = DestinationX1 + (DestinationX3 - DestinationX4);
-				DestinationY2 = DestinationY3 - (DestinationY4 - DestinationY1);
-			}
-
-			Layout->X     = DestinationX1;
-			Layout->Y     = DestinationY1;
-			Layout->Z     = Depth;
-			Layout->Color = Sprite->Color;
-			Layout->U     = Sprite->Source.GetLeft();
-			Layout->V     = Sprite->Source.GetTop();
-			++Layout;
-
-			Layout->X     = DestinationX2;
-			Layout->Y     = DestinationY2;
-			Layout->Z     = Depth;
-			Layout->Color = Sprite->Color;
-			Layout->U     = Sprite->Source.GetLeft();
-			Layout->V     = Sprite->Source.GetBottom();
-			++Layout;
-
-			Layout->X     = DestinationX3;
-			Layout->Y     = DestinationY3;
-			Layout->Z     = Depth;
-			Layout->Color = Sprite->Color;
-			Layout->U     = Sprite->Source.GetRight();
-			Layout->V     = Sprite->Source.GetBottom();
-			++Layout;
-
-			Layout->X     = DestinationX4;
-			Layout->Y     = DestinationY4;
-			Layout->Z     = Depth;
-			Layout->Color = Sprite->Color;
-			Layout->U     = Sprite->Source.GetRight();
-			Layout->V     = Sprite->Source.GetTop();
-			++Layout;
-		}
-	}
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Batch::WriteUniforms(Vector4f * Buffer, Ref<const SPtr<Graphic::Material>> Material)
-    {
-        CPtr<const Vector4f> Data = Material->GetParameters();
-
-        memcpy(Buffer, Data.data(), Data.size_bytes());
-    }
-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-	UInt32 Batch::UpdateBatch(Layout * Layout, UInt32 Length)
-	{
-		const UInt32 Position = mBufferLocation + Length > kMaxBatch ? 0 : mBufferLocation;
-		const UInt32 Count    = Length * sizeof(struct Layout) * 4;
-
-		Service->UpdateBuffer(mBuffer[0], (Position == 0), Position * sizeof(struct Layout) * 4, {
-				reinterpret_cast<UInt08 *>(Layout), Count
-		});
-
-		mBufferLocation = Position + Length;
-		return Position;
-	}
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    UInt32 Batch::UpdateUniforms(Vector4f * Buffer, UInt32 Length)
-    {
-        const UInt32 Position = mUniformLocation + Length > kMaxUniforms ? 0 : mUniformLocation;
-        const UInt32 Count    = Length * sizeof(Vector4f);
-
-        Service->UpdateBuffer(mBuffer[3], (Position == 0), Position * sizeof(Vector4f), {
-            reinterpret_cast<UInt08 *>(Buffer), Count
+        mIndexBuffer = mService->CreateBuffer(true, 6 * k_MaxDrawables * sizeof(UInt16), {
+            reinterpret_cast<UInt08 *>(Memory.get()), 6 * k_MaxDrawables * sizeof(UInt16)
         });
 
-        mUniformLocation = Position + Length;
-        return Position;
+        mUniformBuffer = mService->CreateBuffer(false, k_MaxUniforms * sizeof(Vector4f), {});
+        mUniformBufferOffset = 0;
     }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Renderer::~Renderer()
+    {
+
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::Begin(Ref<const Camera> Camera, Real32 Time)
+    {
+        mScene.ProjectionViewMatrix = Camera.GetView() * Camera.GetProjection();
+        mScene.Time = Time;
+        // TODO: Set Uniform....
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::Draw(
+        Ref<const Rectf> Destination,
+        Ref<const Rectf> Source,
+        Real32 Depth,
+        Real32 Angle,
+        UInt32 Color,
+        Ref<const SPtr<Pipeline>> Pipeline,
+        Ref<const SPtr<Material>> Material)
+    {
+        if (mDrawables.full())
+        {
+            Flush();
+        }
+
+        Ref<Drawable> Drawable = mDrawables.push_back();
+        Drawable.ID          = Material->GetID(); // TODO (Unique ID for Opaque/Translucid)
+        Drawable.Destination = Destination;
+        Drawable.Source      = Source;
+        Drawable.Depth       = Depth;
+        Drawable.Angle       = Angle;
+        Drawable.Color       = Color;
+        Drawable.Pipeline    = Pipeline;
+        Drawable.Material    = Material;
+
+        mDrawablesPtr.push_back(& Drawable);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::End()
+    {
+        if (!mDrawables.empty())
+        {
+            Flush();
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::Flush()
+    {
+        eastl::sort(mDrawablesPtr.begin(), mDrawablesPtr.end(), [](Ptr<const Drawable> Left, Ptr<const Drawable> Right)
+        {
+            return Left->ID > Right->ID;
+        });
+
+        Ptr<Quad> Vertices = MapVertexBuffer(mDrawablesPtr.size());
+        UInt VertexOffset = (mVertexBufferOffset - mDrawablesPtr.size());
+        UInt Count        = 0;
+
+        UInt UniformSize = 0;
+        SPtr<const Pipeline> PipelineLast = mDrawablesPtr[0]->Pipeline;
+        SPtr<const Material> MaterialLast = mDrawablesPtr[0]->Material;
+
+        for (Ptr<Drawable> Drawable : mDrawablesPtr)
+        {
+            WriteVertexBuffer(Drawable, Vertices);
+            ++Vertices;
+
+            if (MaterialLast != Drawable->Material || PipelineLast != Drawable->Pipeline)
+            {
+                if (MaterialLast != Drawable->Material)
+                {
+                    UniformSize += MaterialLast->GetParameters().size();
+                    mMaterialsPtr.push_back(MaterialLast.get());
+                }
+
+                Ref<Submission> Submission = mSubmissions.push_back();
+                Submission.Vertices.Buffer    = mVertexBuffer;
+                Submission.Vertices.Offset    = 0;
+                Submission.Vertices.Length    = 0;
+                Submission.Vertices.Stride    = 24;
+                Submission.Indices.Buffer     = mIndexBuffer;
+                Submission.Indices.Offset     = VertexOffset * 6;
+                Submission.Indices.Length     = 6 * Count;
+                Submission.Indices.Stride     = sizeof(UInt16);
+                Submission.Pipeline            = PipelineLast->GetID();
+                Submission.Textures[0]         = MaterialLast->GetTexture(0)->GetID();
+
+                VertexOffset += Count;
+                Count = 0;
+
+                MaterialLast = Drawable->Material;
+                PipelineLast = Drawable->Pipeline;
+            }
+
+            ++Count;
+        }
+
+        // Add Last
+        if (Count > 0)
+        {
+            UniformSize += MaterialLast->GetParameters().size();
+            mMaterialsPtr.push_back(MaterialLast.get());
+
+            Ref<Submission> Submission = mSubmissions.push_back();
+
+            Submission.Vertices.Buffer    = mVertexBuffer;
+            Submission.Vertices.Offset    = 0;
+            Submission.Vertices.Length    = 0;
+            Submission.Vertices.Stride    = 24;
+            Submission.Indices.Buffer     = mIndexBuffer;
+            Submission.Indices.Offset     = VertexOffset * 6;
+            Submission.Indices.Length     = 6 * Count;
+            Submission.Indices.Stride     = sizeof(UInt16);
+            Submission.Pipeline            = PipelineLast->GetID();
+            Submission.Textures[0]         = MaterialLast->GetTexture(0)->GetID();
+        }
+
+
+        UnmapVertexBuffer();
+
+
+        Ptr<Vector4f> Uniforms = MapUniformBuffer(16 + UniformSize);
+
+        UInt Index  = 0;
+        UInt BaseOffset = (mUniformBufferOffset - (16 + UniformSize));
+        UInt MaterialOffset = BaseOffset + 16;
+
+        * reinterpret_cast<Ptr<Scene>>(Uniforms) = mScene;
+        Uniforms += 16;
+
+        for (Ptr<const Material> MaterialPtr : mMaterialsPtr)
+        {
+            WriteUniformBuffer(MaterialPtr->GetParameters(), Uniforms);
+
+            mSubmissions[Index].Uniforms[0].Buffer  = mUniformBuffer;
+            mSubmissions[Index].Uniforms[0].Offset  = BaseOffset;
+            mSubmissions[Index].Uniforms[0].Length  = 16;
+
+            mSubmissions[Index].Uniforms[1].Buffer  = mUniformBuffer;
+            mSubmissions[Index].Uniforms[1].Offset  = MaterialOffset;
+            mSubmissions[Index].Uniforms[1].Length  = MaterialPtr->GetParameters().size();
+
+            Uniforms += MaterialPtr->GetParameters().size();
+            MaterialOffset += (MaterialPtr->GetParameters().size());
+
+            ++Index;
+        }
+
+        UnmapUniformBuffer();
+
+
+        mService->Submit(mSubmissions);
+
+        mDrawables.reset_lose_memory();
+        mDrawablesPtr.reset_lose_memory();
+        mSubmissions.reset_lose_memory();
+        mMaterialsPtr.reset_lose_memory();
+    }
+
+    Ptr<Renderer::Quad> Renderer::MapVertexBuffer(UInt Count)
+    {
+        const UInt Offset   = mVertexBufferOffset + Count > k_MaxDrawables ? 0 : mVertexBufferOffset;
+        const UInt Size     = Count * sizeof(Quad);
+        mVertexBufferOffset = (Offset + Count);
+
+        return static_cast<Ptr<Quad>>(mService->Map(mVertexBuffer, Offset == 0, Offset * sizeof(Quad), Size));
+    }
+
+    void Renderer::WriteVertexBuffer(Ptr<Drawable> Drawable, Ptr<Quad> Buffer)
+    {
+        Real32 DestinationX1 = Drawable->Destination.GetLeft();
+        Real32 DestinationX2 = Drawable->Destination.GetRight();
+        Real32 DestinationX3 = Drawable->Destination.GetLeft();
+        Real32 DestinationX4 = Drawable->Destination.GetRight();
+
+        Real32 DestinationY1 = Drawable->Destination.GetTop();
+        Real32 DestinationY2 = Drawable->Destination.GetTop();
+        Real32 DestinationY3 = Drawable->Destination.GetBottom();
+        Real32 DestinationY4 = Drawable->Destination.GetBottom();
+
+        Buffer->V1.X    = DestinationX1;
+        Buffer->V1.Y    = DestinationY1;
+        Buffer->V1.Z    = Drawable->Depth;
+        Buffer->V1.RGBA = Drawable->Color;
+        Buffer->V1.U    = Drawable->Source.GetLeft();
+        Buffer->V1.V    = Drawable->Source.GetTop();
+
+        Buffer->V2.X    = DestinationX2;
+        Buffer->V2.Y    = DestinationY2;
+        Buffer->V2.Z    = Drawable->Depth;
+        Buffer->V2.RGBA = Drawable->Color;
+        Buffer->V2.U    = Drawable->Source.GetRight();
+        Buffer->V2.V    = Drawable->Source.GetTop();
+
+        Buffer->V3.X    = DestinationX3;
+        Buffer->V3.Y    = DestinationY3;
+        Buffer->V3.Z    = Drawable->Depth;
+        Buffer->V3.RGBA = Drawable->Color;
+        Buffer->V3.U    = Drawable->Source.GetLeft();
+        Buffer->V3.V    = Drawable->Source.GetBottom();
+
+        Buffer->V4.X    = DestinationX4;
+        Buffer->V4.Y    = DestinationY4;
+        Buffer->V4.Z    = Drawable->Depth;
+        Buffer->V4.RGBA = Drawable->Color;
+        Buffer->V4.U    = Drawable->Source.GetRight();
+        Buffer->V4.V    = Drawable->Source.GetBottom();
+    }
+
+    void Renderer::UnmapVertexBuffer()
+    {
+        mService->Unmap(mVertexBuffer);
+    }
+
+    Ptr<Vector4f> Renderer::MapUniformBuffer(UInt Count)
+    {
+        const UInt Offset   = mUniformBufferOffset + Count > k_MaxUniforms ? 0 : mUniformBufferOffset;
+        const UInt Size     = Count * sizeof(Vector4f);
+        mUniformBufferOffset = (Offset + Count);
+
+        return static_cast<Ptr<Vector4f>>(mService->Map(mUniformBuffer, Offset == 0, Offset * sizeof(Vector4f), Size));
+    }
+
+    void Renderer::WriteUniformBuffer(CPtr<const Vector4f> Uniform, Ptr<Vector4f> Buffer)
+    {
+        memcpy(Buffer, Uniform.data(), Uniform.size_bytes());
+    }
+
+    void Renderer::UnmapUniformBuffer()
+    {
+        mService->Unmap(mUniformBuffer);
+    }
+
 
 }

@@ -474,19 +474,23 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::UpdateBuffer(UInt ID, Bool Discard, UInt Offset, CPtr<UInt08> Data)
+    Ptr<void> D3D11Driver::Map(UInt ID, Bool Discard, UInt Offset, UInt Length)
     {
         const D3D11_MAP          Mode = (Discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE);
         D3D11_MAPPED_SUBRESOURCE Memory;
 
         if (FAILED(mDeviceImmediate->Map(mBuffers[ID].Resource.Get(), 0, Mode, 0, & Memory)))
         {
-            return;
+            return nullptr;
         }
-        else
-        {
-            eastl::copy(Data.data(), Data.data() + Data.size(), static_cast<UInt08 *>(Memory.pData) + Offset);
-        }
+        return static_cast<Ptr<UInt08>>(Memory.pData) + Offset;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::Unmap(UInt ID)
+    {
         mDeviceImmediate->Unmap(mBuffers[ID].Resource.Get(), 0);
     }
 
@@ -533,7 +537,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreatePipeline(UInt ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, const Descriptor & Properties)
+    void D3D11Driver::CreatePipeline(UInt ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties)
     {
         Ref<D3D11Pipeline> Pipeline = mPipelines[ID];
 
@@ -632,12 +636,12 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreateSampler(UInt ID, TextureEdge EdgeX, TextureEdge EdgeY, TextureFilter Filter)
+    void D3D11Driver::CreateSampler(UInt ID, TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter)
     {
         const CD3D11_SAMPLER_DESC Descriptor(
             As(Filter),
-            As(EdgeX),
-            As(EdgeY),
+            As(EdgeU),
+            As(EdgeV),
             D3D11_TEXTURE_ADDRESS_CLAMP,
             0,
             0,
@@ -760,7 +764,9 @@ namespace Graphic
 
     void D3D11Driver::Submit(CPtr<Submission> Submissions)
     {
-        Submission      Empty { 0 };
+        Submission      Empty {
+            .Scissor = { 0, 0, 0, 0 }
+        };
         Ref<Submission> Prev = Empty;
 
         for (Ref<const Submission> Next : Submissions)

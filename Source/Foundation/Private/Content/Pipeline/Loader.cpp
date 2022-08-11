@@ -281,19 +281,19 @@ namespace Content
 
         switch (mTarget)
         {
-        case Graphic::Language::Version_2_0:
+        case Graphic::Language::Version_2:
             Target = (Stage == Graphic::Stage::Vertex ? "vs_4_0_level_9_1" : "ps_4_0_level_9_1");
             break;
-        case Graphic::Language::Version_3_0:
+        case Graphic::Language::Version_3:
             Target = (Stage == Graphic::Stage::Vertex ? "vs_4_0_level_9_3" : "ps_4_0_level_9_3");
             break;
-        case Graphic::Language::Version_4_0:
+        case Graphic::Language::Version_4:
             Target = (Stage == Graphic::Stage::Vertex ? "vs_4_0" : "ps_4_0");
             break;
-        case Graphic::Language::Version_5_0:
+        case Graphic::Language::Version_5:
             Target = (Stage == Graphic::Stage::Vertex ? "vs_5_0" : "ps_5_0");
             break;
-        case Graphic::Language::Version_6_0:
+        case Graphic::Language::Version_6:
             Target = (Stage == Graphic::Stage::Vertex ? "vs_6_0" : "ps_6_0");
             break;
         }

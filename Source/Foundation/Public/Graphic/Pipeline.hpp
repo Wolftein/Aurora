@@ -38,6 +38,12 @@ namespace Graphic
             return mID;
         }
 
+        // -=(Undocumented)=-
+        Ref<const Descriptor> GetProperties() const
+        {
+            return mProperties;
+        }
+
     public:
 
         // \see Resource::OnLoad(Ref<Subsystem::Context>)

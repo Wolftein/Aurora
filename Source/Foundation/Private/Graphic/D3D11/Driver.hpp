@@ -36,8 +36,11 @@ namespace Graphic
         // \see Driver::CreateBuffer
         void CreateBuffer(UInt ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data) override;
 
-        // \see Driver::UpdateBuffer
-        void UpdateBuffer(UInt ID, Bool Discard, UInt Offset, CPtr<UInt08> Data) override;
+        // \see Driver::Map
+        Ptr<void> Map(UInt ID, Bool Discard, UInt Offset, UInt Length) override;
+
+        // \see Driver::Unmap
+        void Unmap(UInt ID) override;
 
         // \see Driver::DeleteBuffer
         void DeleteBuffer(UInt ID) override;
@@ -55,7 +58,7 @@ namespace Graphic
         void DeletePipeline(UInt ID) override;
 
         // \see Driver::CreateSampler
-        void CreateSampler(UInt ID, TextureEdge EdgeX, TextureEdge EdgeY, TextureFilter Filter) override;
+        void CreateSampler(UInt ID, TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter) override;
 
         // \see Driver::DeleteSampler
         void DeleteSampler(UInt ID) override;

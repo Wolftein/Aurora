@@ -48,18 +48,12 @@ namespace Graphic
 
         // -=(Undocumented)=-
         UInt CreateBuffer(Bool Geometry, UInt Capacity, CPtr<UInt08> Data = CPtr<UInt08>());
+  
+        // -=(Undocumented)=-
+        Ptr<void> Map(UInt ID, Bool Discard, UInt Offset, UInt Length);
 
         // -=(Undocumented)=-
-        template<typename T>
-        void UpdateBuffer(UInt ID, Bool Discard, UInt Offset, CPtr<T> Data)
-        {
-            const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<UInt08 *>(Data.data()), Data.size_bytes());
-
-            UpdateBuffer(ID, Discard, Offset, Bytes);
-        }
-
-        // -=(Undocumented)=-
-        void UpdateBuffer(UInt ID, Bool Discard, UInt Offset, CPtr<UInt08> Data);
+        void Unmap(UInt ID);
 
         // -=(Undocumented)=-
         void DeleteBuffer(UInt ID);
@@ -77,13 +71,13 @@ namespace Graphic
         void DeletePass(UInt ID);
 
         // -=(Undocumented)=-
-        UInt CreatePipeline(CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, const Descriptor & Properties);
+        UInt CreatePipeline(CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties);
 
         // -=(Undocumented)=-
         void DeletePipeline(UInt ID);
 
         // -=(Undocumented)=-
-        UInt CreateSampler(TextureEdge EdgeX, TextureEdge EdgeY, TextureFilter Filter);
+        UInt CreateSampler(TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter);
 
         // -=(Undocumented)=-
         void DeleteSampler(UInt ID);
@@ -92,7 +86,7 @@ namespace Graphic
         template<typename T>
         UInt CreateTexture(TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<T> Data)
         {
-            const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<UInt08 *>(Data.data()), Data.size_bytes());
+            const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(Data.data()), Data.size_bytes());
 
             return CreateTexture(Format, Layout, Width, Height, Layer, Bytes);
         }
@@ -104,9 +98,9 @@ namespace Graphic
         template<typename T>
         void UpdateTexture(UInt ID, UInt Level, Recti Offset, UInt Pitch, CPtr<T> Data)
         {
-            const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<UInt08 *>(Data.data()), Data.size_bytes());
+            const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(Data.data()), Data.size_bytes());
 
-            mDriver->UpdateTexture(ID, Level, Offset, Pitch, Bytes);
+            UpdateTexture(ID, Level, Offset, Pitch, Bytes);
         }
 
         // -=(Undocumented)=-

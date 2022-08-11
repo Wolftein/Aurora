@@ -36,7 +36,7 @@ namespace Graphic
         k_MaxBuffers     = 0x0080,
 
         // -=(Undocumented)=-
-        k_MaxMaterials   = 0x2000,
+        k_MaxMaterials   = 0x1000,
 
         // -=(Undocumented)=-
         k_MaxMipmap      = 0x0010,
@@ -132,11 +132,11 @@ namespace Graphic
     // -=(Undocumented)=-
     enum class Language
     {
-        Version_2_0,
-        Version_3_0,
-        Version_4_0,
-        Version_5_0,
-        Version_6_0,
+        Version_2,
+        Version_3,
+        Version_4,
+        Version_5,
+        Version_6,
     };
 
     // -=(Undocumented)=-

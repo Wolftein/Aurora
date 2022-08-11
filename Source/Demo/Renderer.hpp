@@ -12,134 +12,110 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Graphic/Service.hpp>
-#include <Graphic/Pipeline.hpp>
-#include <Graphic/Texture.hpp>
-#include <Graphic/Material.hpp>
 #include <Graphic/Camera.hpp>
+#include <Graphic/Material.hpp>
+#include <Graphic/Pipeline.hpp>
+#include <Graphic/Service.hpp>
+#include <Graphic/Texture.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Renderer
+namespace Graphic
 {
-	class Batch : public Subsystem
-	{
-	public:
+    // -=(Undocumented)=-
+    class Renderer
+    {
+    public:
 
-		static constexpr UInt32 kMaxBatch    = 0x00004000;
-        static constexpr UInt32 kMaxUniforms = 0x00001000;
+        // -=(Undocumented)=-
+        explicit Renderer(Ref<Core::Subsystem::Context> Context);
 
-	public:
+        // -=(Undocumented)=-
+        ~Renderer();
 
-		// (Missing Documentation)
-		explicit Batch(Ref<Core::Subsystem::Context> Context);
+        // -=(Undocumented)=-
+        void Begin(Ref<const Camera> Camera, Real32 Time);
 
-		// (Missing Documentation)
-		~Batch();
+        // -=(Undocumented)=-
+        void Draw(
+            Ref<const Rectf> Destination,
+            Ref<const Rectf> Source,
+            Real32 Depth,
+            Real32 Angle,
+            UInt32 Color,
+            Ref<const SPtr<Pipeline>> Pipeline,
+            Ref<const SPtr<Material>> Material);
 
-		// (Missing Documentation)
-		void SetData(Ref<const Graphic::Camera> Camera, Real32 Time);
+        // -=(Undocumented)=-
+        void End();
 
-		// (Missing Documentation)
-		void Draw(
-				const Rectf & Destination,
-				const Rectf & Source,
-				Bool   Alpha,
-				Real32 Depth,
-				UInt32 Angle,
-				UInt32 Color,
-				const SPtr<Graphic::Pipeline> & Pipeline,
-				const SPtr<Graphic::Material> & Material);
+    private:
 
-		// (Missing Documentation)
-		void Flush();
+        inline constexpr static UInt k_MaxDrawables = 4096;
+        inline constexpr static UInt k_MaxUniforms  = 4096;
 
-	private:
+        struct Layout
+        {
+            Real32 X, Y, Z;
+            UInt32 RGBA;
+            Real32 U, V;
+        };
+        struct Quad
+        {
+            Layout V1;
+            Layout V2;
+            Layout V3;
+            Layout V4;
+        };
 
-		union  Key
-		{
-			UInt64 Value;
+        struct Scene
+        {
+            Matrix4f ProjectionViewMatrix;
+            Real32 Time;
+        };
+        struct Drawable
+        {
+            UInt64         ID;
+            Rectf          Destination;
+            Rectf          Source;
+            Real32         Angle;
+            Real32         Depth;
+            UInt32         Color;
+            SPtr<Pipeline> Pipeline;
+            SPtr<Material> Material;
+        };
 
-			struct
-			{
-				UInt64 bDepth     : 32;
-				UInt64 bTechnique : 8;
-				UInt64 bMaterial  : 16;
-				UInt64 bType      : 8;
-			} Opaque;
+        // -=(Undocumented)=-
+        void Flush();
 
-			struct
-			{
-				UInt64 bTechnique : 8;
-				UInt64 bMaterial  : 16;
-				UInt64 bDepth     : 32;
-				UInt64 bType      : 8;
-			} Transparent;
-		};
+        Ptr<Quad> MapVertexBuffer(UInt Count);
+        void WriteVertexBuffer(Ptr<Drawable> Drawable, Ptr<Quad> Buffer);
+        void UnmapVertexBuffer();
 
-		struct Layout
-		{
-			Real32 X, Y, Z;
-			UInt32 Color;
-			Real32 U, V;
-		};
+        Ptr<Vector4f> MapUniformBuffer(UInt Count);
+        void WriteUniformBuffer(CPtr<const Vector4f> Uniform, Ptr<Vector4f> Buffer);
+        void UnmapUniformBuffer();
 
-		struct Drawable
-		{
-			Key	      ID;
-            Rectf Destination;
-            Rectf Source;
-			UInt32    Depth;
-			UInt32 	  Rotation;
-			UInt32    Color;
-            SPtr<Graphic::Material> Material;
-            SPtr<Graphic::Pipeline> Pipeline;
-		};
+    private:
 
-	private:
 
-		// (Missing Documentation)
-		void InitResources();
+        SPtr<Graphic::Service> mService;
 
-		// (Missing Documentation)
-		void DrawBatch(Graphic::Submission * Call, UInt32 Offset, UInt32 Count, UInt32 Uniforms, Ref<const SPtr<Graphic::Material>> Material, Ref<const SPtr<Graphic::Pipeline>> Pipeline);
+        UInt mVertexBuffer;
+        UInt mVertexBufferOffset;
+        UInt mUniformBuffer;
+        UInt mUniformBufferOffset;
+        UInt mIndexBuffer;
 
-		// (Missing Documentation)
-		void WriteBatch(Layout * Layout, Drawable ** List, UInt32 Length);
+        //Array<UInt,          3>              mSamplers;
 
-        // (Missing Documentation)
-        void WriteUniforms(Vector4f * Buffer, Ref<const SPtr<Graphic::Material>> Material);
+        Scene                                      mScene;
 
-		// (Missing Documentation)
-		UInt32 UpdateBatch(Layout * Layout, UInt32 Length);
-
-        // (Missing Documentation)
-        UInt32 UpdateUniforms(Vector4f * Buffer, UInt32 Length);
-
-	private:
-
-        SPtr<Graphic::Service> Service;
-
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        UInt       mBuffer[4];
-		UInt32     mBufferLocation;
-        UInt32     mUniformLocation;
-        UInt       mSampler;
-
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-		Drawable   mQueue[kMaxBatch];
-		Drawable * mQueueTemp[kMaxBatch];
-		UInt32     mQueueQuantity;
-
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-		Graphic::Submission * mSubmission;
-	};
+        Stack<Drawable,      k_MaxDrawables>       mDrawables;
+        Stack<Ptr<Drawable>, k_MaxDrawables>       mDrawablesPtr;
+        Stack<Submission,    k_MaxDrawables>       mSubmissions;
+        Stack<Ptr<const Material>, k_MaxDrawables> mMaterialsPtr;
+    };
 }
