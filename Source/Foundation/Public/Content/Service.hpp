@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -34,10 +34,19 @@ namespace Content
         void OnTick() override;
 
         // -=(Undocumented)=-
-        void AddLoader(CStr Extension, Ref<const SPtr<Loader>> Loader);
+        void AddLoader(Ref<const SPtr<Loader>> Loader);
 
         // -=(Undocumented)=-
         void RemoveLoader(CStr Extension);
+
+        // -=(Undocumented)=-
+        void RemoveLoader(List<CStr> Extensions)
+        {
+            for (const CStr Extension : Extensions)
+            {
+                RemoveLoader(Extension);
+            }
+        }
 
         // -=(Undocumented)=-
         void AddLocator(CStr Schema, Ref<const SPtr<Locator>> Locator);
@@ -130,9 +139,7 @@ namespace Content
         template<typename Type>
         Bool Exist(Ref<const Uri> Key)
         {
-            Ref<const SPtr<Type>> Asset = GetFactory(Type::RTTI_CATEGORY)->template GetOrCreate<Type>(Key, false);
-
-            return (Asset != nullptr);
+            return (GetFactory(Type::RTTI_CATEGORY)->template GetOrCreate<Type>(Key, false) != nullptr);
         }
 
         // -=(Undocumented)=-
@@ -146,6 +153,9 @@ namespace Content
         void Prune(UInt Category, Bool Force);
 
     private:
+
+        // -=(Undocumented)=-
+        void RegisterDefaultResources();
 
         // -=(Undocumented)=-
         Ref<const SPtr<Factory>> GetFactory(UInt Category);

@@ -1,5 +1,5 @@
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+## Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 ##
 ## This work is licensed under the terms of the MIT license.
 ##
@@ -123,6 +123,16 @@ ExternalProject_Add(EP_TOML
 ExternalProject_Get_Property(EP_TOML SOURCE_DIR)
 ExternalProject_Get_Property(EP_TOML BINARY_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR})
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Configuration
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+ADD_DEFINITIONS(-DAE_CONTENT_LOCATOR_DEFAULT)
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MP3)
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_WAV)
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_STB)
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_EFFECT)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Library

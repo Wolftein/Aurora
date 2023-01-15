@@ -10,48 +10,56 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#define DR_MP3_IMPLEMENTATION
-#define DR_MP3_NO_STDIO
-
-#include "Decoder.hpp"
+#include "Kernel.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Audio
+namespace Engine
 {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    MP3Decoder::MP3Decoder(Ref<Chunk> Chunk)
-        : mChunk { eastl::move(Chunk) }
+    void Kernel::Initialize(Ref<const Properties> Properties)
     {
-        drmp3_init_memory(& mDescription, mChunk.GetData(), mChunk.GetSize(), nullptr);
+        // Initialize underlying platform service to handle
+        // any OS related events
+        auto PlatformService = AddSubsystem<Platform::Service>();
+
+        // Initialize input service
+        AddSubsystem<Input::Service>();
+
+        // Create the game's window
+        mDisplay = PlatformService->Initialise(
+            Properties.GetWindowTitle(),
+            Properties.GetWindowWidth(),
+            Properties.GetWindowHeight());
+
+        // Initialize graphic service
+        auto GraphicService = AddSubsystem<Graphic::Service>();
+        GraphicService->Initialise(
+            Graphic::Backend::Direct3D11, mDisplay->GetHandle(), Properties.GetWindowWidth(), Properties.GetWindowHeight());
+
+        // Initialize audio service
+        auto AudioService = AddSubsystem<Audio::Service>();
+        AudioService->Initialise(Audio::Backend::XAudio2, Audio::Driver::k_MaxSubmixes);
+
+        // Initialize content service
+        AddSubsystem<Content::Service>();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void MP3Decoder::Seek(UInt Seconds)
+    void Kernel::Run()
     {
-        drmp3_seek_to_pcm_frame(& mDescription, Seconds * mDescription.sampleRate);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    Bool MP3Decoder::Read(Ref<CPtr<UInt08>> Output)
-    {
-        const UInt Frames = drmp3_read_pcm_frames_f32(& mDescription, mDescription.sampleRate, mBuffers);
-
-        Output = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(mBuffers), Frames * mDescription.channels * sizeof(Real32));
-
-        if (mDescription.atEnd)
+        while (mDisplay->Poll())
         {
-            drmp3_seek_to_start_of_stream(& mDescription);
-            return false;
+            Execute([](Ref<Core::Subsystem> Service)
+            {
+                Service.OnTick();
+            });
         }
-        return true;
     }
 }

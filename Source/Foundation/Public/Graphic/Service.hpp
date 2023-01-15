@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -38,19 +38,46 @@ namespace Graphic
         void Reset(UInt Width, UInt Height);
 
         // -=(Undocumented)=-
+        Ref<const Capabilities> GetCapabilities() const
+        {
+            return mDriver->GetCapabilities();
+        }
+
+        // -=(Undocumented)=-
         template<typename T>
         UInt CreateBuffer(Bool Geometry, UInt Capacity, CPtr<T> Data = CPtr<T>())
         {
-            const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<UInt08 *>(Data.data()), Data.size_bytes());
+            const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(Data.data()), Data.size_bytes());
 
             return CreateBuffer(Geometry, Capacity * sizeof(T), Bytes);
         }
 
         // -=(Undocumented)=-
         UInt CreateBuffer(Bool Geometry, UInt Capacity, CPtr<UInt08> Data = CPtr<UInt08>());
-  
+
+        // -=(Undocumented)=-
+        Ptr<void> Map(UInt ID, Ref<UInt> Offset, UInt Length);
+
         // -=(Undocumented)=-
         Ptr<void> Map(UInt ID, Bool Discard, UInt Offset, UInt Length);
+
+        // -=(Undocumented)=-
+        template<typename T>
+        Ptr<T> Map(UInt ID, Ref<UInt> Offset, UInt Length)
+        {
+            Ptr<T> Mapping = static_cast<Ptr<T>>(Map(ID, Offset, Length * sizeof(T)));
+
+            Offset /= sizeof(T);
+
+            return Mapping;
+        }
+
+        // -=(Undocumented)=-
+        template<typename T>
+        Ptr<T> Map(UInt ID, Bool Discard, UInt Offset, UInt Length)
+        {
+            return static_cast<Ptr<T>>(Map(ID, Discard, Offset, Length * sizeof(T)));
+        }
 
         // -=(Undocumented)=-
         void Unmap(UInt ID);

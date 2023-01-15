@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -281,6 +281,7 @@ namespace Content
 
         switch (mTarget)
         {
+        case Graphic::Language::Version_1:
         case Graphic::Language::Version_2:
             Target = (Stage == Graphic::Stage::Vertex ? "vs_4_0_level_9_1" : "ps_4_0_level_9_1");
             break;

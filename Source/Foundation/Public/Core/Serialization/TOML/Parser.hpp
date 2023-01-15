@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -26,13 +26,16 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        TOMLParser();
+
+        // -=(Undocumented)=-
         TOMLParser(CStr Text);
 
         // -=(Undocumented)=-
         TOMLSection GetRoot();
 
         // -=(Undocumented)=-
-        TOMLSection GetSection(CStr Key);
+        TOMLSection GetSection(CStr Key, Bool CreateIfNeeded = true);
 
     private:
 

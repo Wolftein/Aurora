@@ -10,66 +10,39 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Texture.hpp"
-#include "Service.hpp"
+#include "Properties.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Graphic
+namespace Engine
 {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Texture::Texture(Ref<const Content::Uri> Key)
-        : AbstractResource(Key),
-          mID     { 0 },
-          mFormat { TextureFormat::RGBA8UInt },
-          mLayout { TextureLayout::Dual },
-          mWidth  { 0 },
-          mHeight { 0 },
-          mLayer  { 0 }
+    constexpr CStr DEFAULT_TITLE  = "Aurora Engine";
+    constexpr UInt DEFAULT_WIDTH  = 800;
+    constexpr UInt DEFAULT_HEIGHT = 600;
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Properties::Properties()
+        : mWindowTitle  { DEFAULT_TITLE },
+          mWindowWidth  { DEFAULT_WIDTH },
+          mWindowHeight { DEFAULT_HEIGHT }
     {
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Texture::Load(TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, Ref<Chunk> Data)
+    void Properties::Load(Ref<TOMLParser> Parser)
     {
-        mFormat = Format;
-        mLayout = Layout;
-        mWidth  = Width;
-        mHeight = Height;
-        mLayer  = Layer;
-        mData   = eastl::move(Data);
-    }
+        const TOMLSection Root = Parser.GetRoot();
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    Bool Texture::OnLoad(Ref<Subsystem::Context> Context)
-    {
-        SetMemory(mData.GetSize());
-
-        mID = Context.GetSubsystem<Graphic::Service>()->CreateTexture(mFormat, mLayout, mWidth, mHeight, mLayer, mData);
-
-        mData.Clear();
-
-        return (mID > 0);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Texture::OnUnload(Ref<Subsystem::Context> Context)
-    {
-        if (mID)
-        {
-            Context.GetSubsystem<Graphic::Service>()->DeleteTexture(mID);
-
-            mID = 0;
-        }
+        mWindowWidth  = Root.GetNumber("Width",  DEFAULT_WIDTH);
+        mWindowHeight = Root.GetNumber("Height", DEFAULT_HEIGHT);
     }
 }

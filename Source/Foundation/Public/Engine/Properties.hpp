@@ -12,65 +12,68 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Common.hpp"
+#include "Core/Serialization/TOML/Parser.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Input
+namespace Engine
 {
     // -=(Undocumented)=-
-    class Device
+    class Properties final
     {
     public:
 
         // -=(Undocumented)=-
-        using Buffer = Stack<Event, 32>;
-
-    public:
+        Properties();
 
         // -=(Undocumented)=-
-        virtual ~Device() = default;
+        void Load(Ref<TOMLParser> Parser);
 
         // -=(Undocumented)=-
-        void Invoke(Ref<const Event> Event)
+        void SetWindowTitle(CStr Title)
         {
-            mBuffer.push_back(Event);
+            mWindowTitle = Title;
         }
 
         // -=(Undocumented)=-
-        void Poll(Ref<Vector<Event>> Collector)
+        CStr GetWindowTitle() const
         {
-            OnDevicePoll(mBuffer);
-
-            for (Ref<const Event> Event : mBuffer)
-            {
-                Collector.push_back(Event);
-            }
-
-            mBuffer.clear();
+            return mWindowTitle;
         }
 
         // -=(Undocumented)=-
-        void Reset()
+        void SetWindowWidth(UInt Width)
         {
-            OnDeviceReset();
+            mWindowWidth = Width;
         }
 
-    private:
+        // -=(Undocumented)=-
+        UInt GetWindowWidth() const
+        {
+            return mWindowWidth;
+        }
 
         // -=(Undocumented)=-
-        virtual void OnDevicePoll(Ref<const Buffer> Events) = 0;
+        void SetWindowHeight(UInt Height)
+        {
+            mWindowHeight = Height;
+        }
 
         // -=(Undocumented)=-
-        virtual void OnDeviceReset() = 0;
+        UInt GetWindowHeight() const
+        {
+            return mWindowHeight;
+        }
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Buffer mBuffer;
+        SStr mWindowTitle;
+        UInt mWindowWidth;
+        UInt mWindowHeight;
     };
 }

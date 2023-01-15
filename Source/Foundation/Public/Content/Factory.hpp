@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -48,11 +48,11 @@ namespace Content
 
             if (const auto Iterator = mAssets.find(Key.GetPath()); Iterator != mAssets.end())
             {
-                Result = eastl::static_shared_pointer_cast<Type>(Iterator->second);
+                Result = CastPtr<Type>(Iterator->second);
             }
             else if (CreateIfNeeded)
             {
-                Result = eastl::make_shared<Type>(Key);
+                Result = NewPtr<Type>(Key);
 
                 mAssets.try_emplace(Key.GetPath(), Result);
             }

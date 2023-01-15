@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -26,6 +26,9 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
+        virtual List<CStr> GetExtensions() const = 0;
+
+        // -=(Undocumented)=-
         virtual Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) = 0;
     };
 
@@ -38,7 +41,7 @@ namespace Content
         // -=(Undocumented)=-
         Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) override final
         {
-            return static_cast<Ptr<Impl>>(this)->Load(Data, eastl::static_shared_pointer_cast<Type>(Asset));
+            return static_cast<Ptr<Impl>>(this)->Load(Data, CastPtr<Type>(Asset));
         }
     };
 }

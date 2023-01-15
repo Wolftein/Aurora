@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -28,6 +28,13 @@ namespace Content
 
         // -=(Undocumented)=-
         PipelineLoader(Graphic::Backend Backend, Graphic::Language Target);
+
+        // \see Loader::GetExtensions
+        List<CStr> GetExtensions() const override
+        {
+            static List<CStr> EXTENSION_LIST = { "effect" };
+            return EXTENSION_LIST;
+        }
 
         // \see AbstractLoader::Load
         Bool Load(Ref<Chunk> Data, Ref<const SPtr<Graphic::Pipeline>> Asset);

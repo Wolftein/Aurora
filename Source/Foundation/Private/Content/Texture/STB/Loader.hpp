@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -25,6 +25,13 @@ namespace Content
     class STBLoader final : public AbstractLoader<STBLoader, Graphic::Texture>
     {
     public:
+
+        // \see Loader::GetExtensions
+        List<CStr> GetExtensions() const override
+        {
+            static List<CStr> EXTENSION_LIST = { "png", "bmp", "psd", "jpg" };
+            return EXTENSION_LIST;
+        }
 
         // \see AbstractLoader::Load
         Bool Load(Ref<Chunk> Data, Ref<const SPtr<Graphic::Texture>> Asset);

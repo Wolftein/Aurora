@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -31,5 +31,26 @@ inline namespace Core
     inline constexpr UInt Hash(auto String, UInt Length = UINT_MAX)
     {
         return (Length && (* String)) ? (Hash(String + 1u, Length - 1u) * 33u) ^ (* String & ~32u) : 5381u;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type, typename... Args>
+    inline SPtr<Type> NewPtr(Args && ... Arguments)
+    {
+        return eastl::make_shared<Type>(Arguments...);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type, typename... Args>
+    inline UPtr<Type> NewUniquePtr(Args && ... Arguments)
+    {
+        return eastl::make_unique<Type>(Arguments...);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Destination, typename Source>
+    inline SPtr<Destination> CastPtr(SPtr<Source> Pointer)
+    {
+        return eastl::static_shared_pointer_cast<Destination>(Pointer);
     }
 }

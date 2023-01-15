@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -35,7 +35,13 @@ namespace Graphic
         virtual void Reset(UInt Width, UInt Height) = 0;
 
         // -=(Undocumented)=-
+        virtual Ref<const Capabilities> GetCapabilities() const = 0;
+
+        // -=(Undocumented)=-
         virtual void CreateBuffer(UInt ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data) = 0;
+
+        // -=(Undocumented)=-
+        virtual Ptr<void> Map(UInt ID, Ref<UInt> Offset, UInt Length) = 0;
 
         // -=(Undocumented)=-
         virtual Ptr<void> Map(UInt ID, Bool Discard, UInt Offset, UInt Length) = 0;

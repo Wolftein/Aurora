@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -11,6 +11,23 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Service.hpp"
+
+#ifdef    AE_CONTENT_LOCATOR_DEFAULT
+    #include "Locator/SystemLocator.hpp"
+#endif // AE_CONTENT_LOCATOR_DEFAULT
+#ifdef    AE_CONTENT_LOADER_MP3
+    #include "Content/Sound/MP3/Loader.hpp"
+#endif // AE_CONTENT_LOADER_MP3
+#ifdef    AE_CONTENT_LOADER_WAV
+    #include "Content/Sound/WAV/Loader.hpp"
+#endif // AE_CONTENT_LOADER_WAV
+#ifdef    AE_CONTENT_LOADER_STB
+    #include "Content/Texture/STB/Loader.hpp"
+#endif // AE_CONTENT_LOADER_STB
+#ifdef    AE_CONTENT_LOADER_EFFECT
+    #include "Graphic/Service.hpp"
+    #include "Content/Pipeline/Loader.hpp"
+#endif // AE_CONTENT_LOADER_EFFECT
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -24,6 +41,7 @@ namespace Content
     Service::Service(Ref<Context> Context)
         : Subsystem { Context }
     {
+        RegisterDefaultResources();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -37,9 +55,12 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::AddLoader(CStr Extension, Ref<const SPtr<Loader>> Loader)
+    void Service::AddLoader(Ref<const SPtr<Loader>> Loader)
     {
-        mLoaders.try_emplace(Extension, Loader);
+        for (const CStr Extension : Loader->GetExtensions())
+        {
+            mLoaders.try_emplace(Extension, Loader);
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -198,13 +219,41 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    void Service::RegisterDefaultResources()
+    {
+#ifdef    AE_CONTENT_LOCATOR_DEFAULT
+        AddLocator("file://", NewPtr<Content::SystemLocator>());
+#endif // AE_CONTENT_LOCATOR_DEFAULT
+
+#ifdef    AE_CONTENT_LOADER_MP3
+        AddLoader(NewPtr<Content::MP3Loader>());
+#endif // AE_CONTENT_LOADER_MP3
+
+#ifdef    AE_CONTENT_LOADER_WAV
+        AddLoader(NewPtr<Content::WAVLoader>());
+#endif // AE_CONTENT_LOADER_WAV
+
+#ifdef    AE_CONTENT_LOADER_STB
+        AddLoader(NewPtr<Content::STBLoader>());
+#endif // AE_CONTENT_LOADER_STB
+
+#ifdef    AE_CONTENT_LOADER_EFFECT
+        const auto GraphicDriverCapabilities = GetSubsystem<Graphic::Service>()->GetCapabilities();
+        AddLoader(NewPtr<Content::PipelineLoader>(
+            GraphicDriverCapabilities.Backend, GraphicDriverCapabilities.Language));
+#endif // AE_CONTENT_LOADER_EFFECT
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     Ref<const SPtr<Factory>> Service::GetFactory(UInt Category)
     {
         if (auto Iterator = mFactories.find(Category); Iterator != mFactories.end())
         {
             return Iterator->second;
         }
-        return mFactories.try_emplace(Category, eastl::make_shared<Factory>()).first->second;
+        return mFactories.try_emplace(Category, NewPtr<Factory>()).first->second;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

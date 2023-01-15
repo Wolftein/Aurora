@@ -12,29 +12,46 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Input/Keyboard.hpp"
-#include <GLFW/glfw3.h>
+#include "Audio/Service.hpp"
+
+#include "Content/Service.hpp"
+
+#include "Properties.hpp"
+
+#include "Graphic/Service.hpp"
+
+#include "Input/Service.hpp"
+
+#include "Platform/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Platform
+namespace Engine
 {
     // -=(Undocumented)=-
-    class GLFWKeyboard final : public Input::Keyboard
+    class Kernel final : public Core::Subsystem::Context
     {
     public:
 
         // -=(Undocumented)=-
-        void OnKeyType(UInt Codepoint);
+        void Initialize(Ref<const Properties> Properties);
 
         // -=(Undocumented)=-
-        void OnKeyAction(SInt Key, SInt Scancode, SInt Action, SInt Mods);
+        void Run();
+
+        // -=(Undocumented)=-
+        SPtr<Platform::Window> GetDisplay() const
+        {
+            return mDisplay;
+        }
 
     private:
 
-        // -=(Undocumented)=-
-        Input::Key Translate(SInt Key) const;
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        SPtr<Platform::Window> mDisplay;
     };
 }

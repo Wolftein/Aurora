@@ -58,10 +58,11 @@ namespace Graphic
 
         struct Layout
         {
-            Real32 X, Y, Z;
-            UInt32 RGBA;
-            Real32 U, V;
+            Vector3f Position;
+            UInt32   Color;
+            Vector2f Texture;
         };
+
         struct Quad
         {
             Layout V1;
@@ -73,8 +74,9 @@ namespace Graphic
         struct Scene
         {
             Matrix4f ProjectionViewMatrix;
-            Real32 Time;
+            Real32   Time;
         };
+
         struct Drawable
         {
             UInt64         ID;
@@ -87,14 +89,11 @@ namespace Graphic
             SPtr<Material> Material;
         };
 
-        // -=(Undocumented)=-
         void Flush();
-
-        Ptr<Quad> MapVertexBuffer(UInt Count);
+        Ptr<Quad> MapVertexBuffer(UInt Count, Ref<UInt> Offset);
         void WriteVertexBuffer(Ptr<Drawable> Drawable, Ptr<Quad> Buffer);
         void UnmapVertexBuffer();
-
-        Ptr<Vector4f> MapUniformBuffer(UInt Count);
+        Ptr<Vector4f> MapUniformBuffer(UInt Count, Ref<UInt> Offset);
         void WriteUniformBuffer(CPtr<const Vector4f> Uniform, Ptr<Vector4f> Buffer);
         void UnmapUniformBuffer();
 
@@ -103,11 +102,7 @@ namespace Graphic
 
         SPtr<Graphic::Service> mService;
 
-        UInt mVertexBuffer;
-        UInt mVertexBufferOffset;
-        UInt mUniformBuffer;
-        UInt mUniformBufferOffset;
-        UInt mIndexBuffer;
+        Array<UInt, 3>         mBuffers;
 
         //Array<UInt,          3>              mSamplers;
 

@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -12,7 +12,10 @@
 
 #include "Service.hpp"
 #include <Audio/None/Driver.hpp>
-#include <Audio/XAudio2/Driver.hpp>
+
+#ifdef    EA_PLATFORM_WINDOWS
+    #include <Audio/XAudio2/Driver.hpp>
+#endif // EA_PLATFORM_WINDOWS
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -47,13 +50,13 @@ namespace Audio
         {
             switch (Backend)
             {
-#ifdef     _WIN32
+#ifdef    EA_PLATFORM_WINDOWS
             case Backend::XAudio2:
-                mDriver = eastl::make_unique<XAudio2Driver>();
+                mDriver = NewUniquePtr<XAudio2Driver>();
                 break;
-#endif // _WIN32
+#endif // EA_PLATFORM_WINDOWS
             default:
-                mDriver = eastl::make_unique<NoneDriver>();
+                mDriver = NewUniquePtr<NoneDriver>();
                 break;
             }
             Successful = mDriver->Initialise(Submixes);

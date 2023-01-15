@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -14,6 +14,7 @@
 
 #include <EASTL/bitset.h>
 #include <EASTL/fixed_vector.h>
+#include <EASTL/initializer_list.h>
 #include <EASTL/shared_ptr.h>
 #include <EASTL/span.h>
 #include <EASTL/string.h>
@@ -112,6 +113,10 @@ inline namespace Core
     // -=(Undocumented)=-
     template<typename Type, UInt Capacity>
     using Bitset = eastl::bitset<Capacity, Type>;
+
+    // -=(Undocumented)=-
+    template<typename Value>
+    using List   = std::initializer_list<Value>;
 
     // -=(Undocumented)=-
     template<typename Value, UInt Capacity>

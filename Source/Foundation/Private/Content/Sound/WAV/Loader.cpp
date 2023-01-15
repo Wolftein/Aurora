@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -24,7 +24,7 @@ namespace Content
 
     Bool WAVLoader::Load(Ref<Chunk> Data, Ref<const SPtr<Audio::Sound>> Asset)
     {
-        UPtr<Audio::WAVDecoder> Decoder = eastl::make_unique<Audio::WAVDecoder>(Data);
+        UPtr<Audio::WAVDecoder> Decoder = NewUniquePtr<Audio::WAVDecoder>(Data);
 
         if (Decoder->GetSize() > 0)
         {

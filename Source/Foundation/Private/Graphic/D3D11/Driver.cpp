@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -407,6 +407,8 @@ namespace Graphic
 
             ThrowIfFail(CreateDXGIFactoryPtr(IID_PPV_ARGS(& mDisplayFactory)));
 
+            LoadCapabilities();
+
             if (Display.has_value())
             {
                 DXGI_SWAP_CHAIN_DESC Description { 0 };
@@ -455,6 +457,14 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    Ref<const Capabilities> D3D11Driver::GetCapabilities() const
+    {
+        return mCapabilities;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void D3D11Driver::CreateBuffer(UInt ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data)
     {
         const D3D11_BUFFER_DESC Descriptor = CD3D11_BUFFER_DESC(
@@ -468,7 +478,25 @@ namespace Graphic
         };
         Ptr<D3D11_SUBRESOURCE_DATA> Pointer = (Data.empty() ? nullptr : & Content);
 
-        ThrowIfFail(mDevice->CreateBuffer(& Descriptor, Pointer, mBuffers[ID].Resource.GetAddressOf()));
+        Ref<D3D11Buffer> Buffer = mBuffers[ID];
+        Buffer.Offset   = 0;
+        Buffer.Capacity = Capacity;
+
+        ThrowIfFail(mDevice->CreateBuffer(& Descriptor, Pointer, Buffer.Resource.GetAddressOf()));
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Ptr<void> D3D11Driver::Map(UInt ID, Ref<UInt> Offset, UInt Length)
+    {
+        Ref<D3D11Buffer> Buffer = mBuffers[ID];
+
+        Offset = (Buffer.Offset + Length > Buffer.Capacity ? 0u : Buffer.Offset);
+
+        Buffer.Offset = Offset + Length;
+
+        return Map(ID, !Offset, Offset, Length);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -921,6 +949,41 @@ namespace Graphic
     void D3D11Driver::Commit(Bool Synchronised)
     {
         mDisplay->Present(Synchronised ? 1 : 0, 0);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::LoadCapabilities()
+    {
+        mCapabilities.Backend = Backend::Direct3D11;
+
+        switch (mDevice->GetFeatureLevel())
+        {
+        case D3D_FEATURE_LEVEL_12_1:
+        case D3D_FEATURE_LEVEL_12_0:
+            mCapabilities.Language = Language::Version_6;
+            break;
+        case D3D_FEATURE_LEVEL_11_1:
+        case D3D_FEATURE_LEVEL_11_0:
+            mCapabilities.Language = Language::Version_5;
+            break;
+        case D3D_FEATURE_LEVEL_10_1:
+        case D3D_FEATURE_LEVEL_10_0:
+            mCapabilities.Language = Language::Version_4;
+            break;
+        case D3D_FEATURE_LEVEL_9_3:
+            mCapabilities.Language = Language::Version_3;
+            break;
+        case D3D_FEATURE_LEVEL_9_2:
+            mCapabilities.Language = Language::Version_2;
+            break;
+        case D3D_FEATURE_LEVEL_9_1:
+            mCapabilities.Language = Language::Version_1;
+            break;
+        default:
+            break;
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

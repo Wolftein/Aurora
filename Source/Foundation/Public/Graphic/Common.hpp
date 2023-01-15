@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -132,6 +132,7 @@ namespace Graphic
     // -=(Undocumented)=-
     enum class Language
     {
+        Version_1,
         Version_2,
         Version_3,
         Version_4,
@@ -316,6 +317,16 @@ namespace Graphic
 
         // -=(Undocumented)=-
         UInt Stride = 0;
+    };
+
+    // -=(Undocumented)=-
+    struct Capabilities
+    {
+        // -=(Undocumented)=-
+        Backend  Backend  = Backend::None;
+
+        // -=(Undocumented)=-
+        Language Language = Language::Version_1;
     };
 
     // -=(Undocumented)=-

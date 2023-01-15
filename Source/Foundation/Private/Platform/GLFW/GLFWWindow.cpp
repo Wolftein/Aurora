@@ -25,8 +25,8 @@ namespace Platform
 
     GLFWWindow::GLFWWindow(Ref<Subsystem::Context> System)
          : mHandle   { nullptr },
-           mKeyboard { eastl::make_shared<GLFWKeyboard>() },
-           mMouse    { eastl::make_shared<GLFWMouse>() }
+           mKeyboard { NewPtr<GLFWKeyboard>() },
+           mMouse    { NewPtr<GLFWMouse>() }
     {
         SPtr<Input::Service> Input = System.GetSubsystem<Input::Service>();
         Input->Register<Input::Keyboard>(mKeyboard);

@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -38,7 +38,7 @@ namespace Audio
             mDepth      = Wav.bitsPerSample;
             mChannel    = Wav.channels;
             mFrequency  = Wav.sampleRate;
-            mData       = eastl::make_unique<UInt08[]>(GetSize()); // TODO: Remove this heap allocation
+            mData       = NewUniquePtr<UInt08[]>(GetSize()); // TODO: Remove this heap allocation
 
             drwav_read_pcm_frames(& Wav, mFrames, mData.get());
             drwav_uninit(& Wav);

@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -28,7 +28,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename T>
-        void Run(T Functor)
+        void Execute(T Functor)
         {
             for (Ref<const SPtr<Subsystem>> SubsystemPtr : mSubsystems)
             {
@@ -40,8 +40,8 @@ inline namespace Core
         template<typename T, typename ... Args>
         SPtr<T> AddSubsystem(Args && ... Arguments)
         {
-            return eastl::static_shared_pointer_cast<T>(
-                mSubsystems.emplace_back(eastl::make_shared<T>(* this, Arguments...)));
+            return CastPtr<T>(
+                mSubsystems.emplace_back(NewPtr<T>(* this, Arguments...)));
         }
 
         // -=(Undocumented)=-
@@ -52,7 +52,7 @@ inline namespace Core
             {
                 if (typeid(T) == typeid(* SubsystemPtr))
                 {
-                    return eastl::static_shared_pointer_cast<T>(SubsystemPtr);
+                    return CastPtr<T>(SubsystemPtr);
                 }
             }
             return nullptr;

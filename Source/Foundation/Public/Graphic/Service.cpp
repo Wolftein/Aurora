@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -12,7 +12,10 @@
 
 #include "Service.hpp"
 #include <Graphic/None/Driver.hpp>
-#include <Graphic/D3D11/Driver.hpp>
+
+#ifdef    EA_PLATFORM_WINDOWS
+    #include <Graphic/D3D11/Driver.hpp>
+#endif // EA_PLATFORM_WINDOWS
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -47,13 +50,13 @@ namespace Graphic
         {
             switch (Backend)
             {
-#ifdef    _WIN32
+#ifdef    EA_PLATFORM_WINDOWS
             case Backend::Direct3D11:
-                mDriver = eastl::make_unique<D3D11Driver>();
+                mDriver = NewUniquePtr<D3D11Driver>();
                 break;
-#endif // _WIN32
+#endif // EA_PLATFORM_WINDOWS
             default:
-                mDriver = eastl::make_unique<NoneDriver>();
+                mDriver = NewUniquePtr<NoneDriver>();
                 break;
             }
             Successful = mDriver->Initialise(Display, Width, Height);
@@ -86,6 +89,14 @@ namespace Graphic
             mDriver->CreateBuffer(ID, Geometry, Capacity, Data);
         }
         return ID;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Ptr<void> Service::Map(UInt ID, Ref<UInt> Offset, UInt Length)
+    {
+        return mDriver->Map(ID, Offset, Length);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

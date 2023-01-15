@@ -26,8 +26,7 @@ namespace Graphic
     {
         mService = Context.GetSubsystem<Graphic::Service>();
 
-        mVertexBuffer = mService->CreateBuffer(true, sizeof(Quad)  * 4 * k_MaxDrawables, {});
-        mVertexBufferOffset = 0;
+        mBuffers[0] = mService->CreateBuffer(true, sizeof(Quad) * k_MaxDrawables, {});
 
         UPtr<UInt16[]> Memory = eastl::make_unique<UInt16[]>(k_MaxDrawables * 6u);
 
@@ -41,12 +40,11 @@ namespace Graphic
             Memory[Position++] = static_cast<UInt16>(Index + 2);
         }
 
-        mIndexBuffer = mService->CreateBuffer(true, 6 * k_MaxDrawables * sizeof(UInt16), {
+        mBuffers[1] = mService->CreateBuffer(true, 6 * k_MaxDrawables * sizeof(UInt16), {
             reinterpret_cast<UInt08 *>(Memory.get()), 6 * k_MaxDrawables * sizeof(UInt16)
         });
 
-        mUniformBuffer = mService->CreateBuffer(false, k_MaxUniforms * sizeof(Vector4f), {});
-        mUniformBufferOffset = 0;
+        mBuffers[2] = mService->CreateBuffer(false, k_MaxUniforms * sizeof(Vector4f), {});
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -118,9 +116,12 @@ namespace Graphic
             return Left->ID > Right->ID;
         });
 
-        Ptr<Quad> Vertices = MapVertexBuffer(mDrawablesPtr.size());
-        UInt VertexOffset = (mVertexBufferOffset - mDrawablesPtr.size());
+        UInt VBOffset = 0, UBOffset = 0;
+
+        Ptr<Quad> Vertices = MapVertexBuffer(mDrawablesPtr.size(), VBOffset);
+        UInt VertexOffset = (VBOffset - mDrawablesPtr.size());
         UInt Count        = 0;
+        printf("V Offset: %d %d - ", mDrawablesPtr.size(), VertexOffset);
 
         UInt UniformSize = 0;
         SPtr<const Pipeline> PipelineLast = mDrawablesPtr[0]->Pipeline;
@@ -140,11 +141,11 @@ namespace Graphic
                 }
 
                 Ref<Submission> Submission = mSubmissions.push_back();
-                Submission.Vertices.Buffer    = mVertexBuffer;
+                Submission.Vertices.Buffer    = mBuffers[0];
                 Submission.Vertices.Offset    = 0;
                 Submission.Vertices.Length    = 0;
                 Submission.Vertices.Stride    = 24;
-                Submission.Indices.Buffer     = mIndexBuffer;
+                Submission.Indices.Buffer     = mBuffers[1];
                 Submission.Indices.Offset     = VertexOffset * 6;
                 Submission.Indices.Length     = 6 * Count;
                 Submission.Indices.Stride     = sizeof(UInt16);
@@ -169,11 +170,11 @@ namespace Graphic
 
             Ref<Submission> Submission = mSubmissions.push_back();
 
-            Submission.Vertices.Buffer    = mVertexBuffer;
+            Submission.Vertices.Buffer    = mBuffers[0];
             Submission.Vertices.Offset    = 0;
             Submission.Vertices.Length    = 0;
             Submission.Vertices.Stride    = 24;
-            Submission.Indices.Buffer     = mIndexBuffer;
+            Submission.Indices.Buffer     = mBuffers[1];
             Submission.Indices.Offset     = VertexOffset * 6;
             Submission.Indices.Length     = 6 * Count;
             Submission.Indices.Stride     = sizeof(UInt16);
@@ -185,11 +186,12 @@ namespace Graphic
         UnmapVertexBuffer();
 
 
-        Ptr<Vector4f> Uniforms = MapUniformBuffer(16 + UniformSize);
+        Ptr<Vector4f> Uniforms = MapUniformBuffer(16 + UniformSize, UBOffset);
 
         UInt Index  = 0;
-        UInt BaseOffset = (mUniformBufferOffset - (16 + UniformSize));
+        UInt BaseOffset = (UBOffset - (16 + UniformSize));
         UInt MaterialOffset = BaseOffset + 16;
+        printf("U Offset: %d\n", UBOffset);
 
         * reinterpret_cast<Ptr<Scene>>(Uniforms) = mScene;
         Uniforms += 16;
@@ -198,11 +200,11 @@ namespace Graphic
         {
             WriteUniformBuffer(MaterialPtr->GetParameters(), Uniforms);
 
-            mSubmissions[Index].Uniforms[0].Buffer  = mUniformBuffer;
+            mSubmissions[Index].Uniforms[0].Buffer  = mBuffers[2];
             mSubmissions[Index].Uniforms[0].Offset  = BaseOffset;
             mSubmissions[Index].Uniforms[0].Length  = 16;
 
-            mSubmissions[Index].Uniforms[1].Buffer  = mUniformBuffer;
+            mSubmissions[Index].Uniforms[1].Buffer  = mBuffers[2];
             mSubmissions[Index].Uniforms[1].Offset  = MaterialOffset;
             mSubmissions[Index].Uniforms[1].Length  = MaterialPtr->GetParameters().size();
 
@@ -223,13 +225,13 @@ namespace Graphic
         mMaterialsPtr.reset_lose_memory();
     }
 
-    Ptr<Renderer::Quad> Renderer::MapVertexBuffer(UInt Count)
+    Ptr<Renderer::Quad> Renderer::MapVertexBuffer(UInt Count, Ref<UInt> Offset)
     {
-        const UInt Offset   = mVertexBufferOffset + Count > k_MaxDrawables ? 0 : mVertexBufferOffset;
-        const UInt Size     = Count * sizeof(Quad);
-        mVertexBufferOffset = (Offset + Count);
+        Ptr<Renderer::Quad> Buff = mService->Map<Renderer::Quad>(mBuffers[0], Offset, Count);
 
-        return static_cast<Ptr<Quad>>(mService->Map(mVertexBuffer, Offset == 0, Offset * sizeof(Quad), Size));
+        Offset += Count;
+
+        return Buff;
     }
 
     void Renderer::WriteVertexBuffer(Ptr<Drawable> Drawable, Ptr<Quad> Buffer)
@@ -244,47 +246,35 @@ namespace Graphic
         Real32 DestinationY3 = Drawable->Destination.GetBottom();
         Real32 DestinationY4 = Drawable->Destination.GetBottom();
 
-        Buffer->V1.X    = DestinationX1;
-        Buffer->V1.Y    = DestinationY1;
-        Buffer->V1.Z    = Drawable->Depth;
-        Buffer->V1.RGBA = Drawable->Color;
-        Buffer->V1.U    = Drawable->Source.GetLeft();
-        Buffer->V1.V    = Drawable->Source.GetTop();
+        Buffer->V1.Position.Set(DestinationX1, DestinationY1, Drawable->Depth);
+        Buffer->V1.Color = Drawable->Color;
+        Buffer->V1.Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetTop());
 
-        Buffer->V2.X    = DestinationX2;
-        Buffer->V2.Y    = DestinationY2;
-        Buffer->V2.Z    = Drawable->Depth;
-        Buffer->V2.RGBA = Drawable->Color;
-        Buffer->V2.U    = Drawable->Source.GetRight();
-        Buffer->V2.V    = Drawable->Source.GetTop();
+        Buffer->V2.Position.Set(DestinationX2, DestinationY2, Drawable->Depth);
+        Buffer->V2.Color = Drawable->Color;
+        Buffer->V2.Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetTop());
 
-        Buffer->V3.X    = DestinationX3;
-        Buffer->V3.Y    = DestinationY3;
-        Buffer->V3.Z    = Drawable->Depth;
-        Buffer->V3.RGBA = Drawable->Color;
-        Buffer->V3.U    = Drawable->Source.GetLeft();
-        Buffer->V3.V    = Drawable->Source.GetBottom();
+        Buffer->V3.Position.Set(DestinationX3, DestinationY3, Drawable->Depth);
+        Buffer->V3.Color = Drawable->Color;
+        Buffer->V3.Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetBottom());
 
-        Buffer->V4.X    = DestinationX4;
-        Buffer->V4.Y    = DestinationY4;
-        Buffer->V4.Z    = Drawable->Depth;
-        Buffer->V4.RGBA = Drawable->Color;
-        Buffer->V4.U    = Drawable->Source.GetRight();
-        Buffer->V4.V    = Drawable->Source.GetBottom();
+        Buffer->V4.Position.Set(DestinationX4, DestinationY4, Drawable->Depth);
+        Buffer->V4.Color = Drawable->Color;
+        Buffer->V4.Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetBottom());
     }
 
     void Renderer::UnmapVertexBuffer()
     {
-        mService->Unmap(mVertexBuffer);
+        mService->Unmap(mBuffers[0]);
     }
 
-    Ptr<Vector4f> Renderer::MapUniformBuffer(UInt Count)
+    Ptr<Vector4f> Renderer::MapUniformBuffer(UInt Count, Ref<UInt> Offset)
     {
-        const UInt Offset   = mUniformBufferOffset + Count > k_MaxUniforms ? 0 : mUniformBufferOffset;
-        const UInt Size     = Count * sizeof(Vector4f);
-        mUniformBufferOffset = (Offset + Count);
+        Ptr<Vector4f> Buff = mService->Map<Vector4f>(mBuffers[2], true, Offset, Count);
 
-        return static_cast<Ptr<Vector4f>>(mService->Map(mUniformBuffer, Offset == 0, Offset * sizeof(Vector4f), Size));
+        Offset += Count;
+
+        return Buff;
     }
 
     void Renderer::WriteUniformBuffer(CPtr<const Vector4f> Uniform, Ptr<Vector4f> Buffer)
@@ -294,7 +284,7 @@ namespace Graphic
 
     void Renderer::UnmapUniformBuffer()
     {
-        mService->Unmap(mUniformBuffer);
+        mService->Unmap(mBuffers[2]);
     }
 
 

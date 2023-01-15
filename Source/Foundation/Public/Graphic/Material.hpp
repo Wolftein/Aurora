@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -44,34 +44,6 @@ namespace Graphic
         Ref<const SPtr<Texture>> GetTexture(UInt Slot) const
         {
             return mTextures[Slot];
-        }
-
-        // -=(Undocumented)=-
-        template<typename Base>
-        void SetParameter(UInt Offset, Ref<const Matrix4<Base>> Parameter)
-        {
-            SetParameter<Matrix4<Base>>(Offset, Parameter);
-        }
-
-        // -=(Undocumented)=-
-        template<typename Base>
-        void SetParameter(UInt Offset, Ref<const Vector4<Base>> Parameter)
-        {
-            SetParameter<Vector4<Base>>(Offset, Parameter);
-        }
-
-        // -=(Undocumented)=-
-        template<typename Base>
-        void SetParameter(UInt Offset, Ref<const Vector3<Base>> Parameter)
-        {
-            SetParameter<Vector3<Base>>(Offset, Parameter);
-        }
-
-        // -=(Undocumented)=-
-        template<typename Base>
-        void SetParameter(UInt Offset, Ref<const Vector2<Base>> Parameter)
-        {
-            SetParameter<Vector2<Base>>(Offset, Parameter);
         }
 
         // -=(Undocumented)=-

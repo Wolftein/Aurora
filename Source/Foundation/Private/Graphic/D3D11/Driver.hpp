@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -33,8 +33,14 @@ namespace Graphic
         // \see Driver::Reset
         void Reset(UInt Width, UInt Height) override;
 
+        // \see Driver::GetCapabilities
+        Ref<const Capabilities> GetCapabilities() const override;
+
         // \see Driver::CreateBuffer
         void CreateBuffer(UInt ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data) override;
+
+        // \see Driver::Map
+        Ptr<void> Map(UInt ID, Ref<UInt> Offset, UInt Length) override;
 
         // \see Driver::Map
         Ptr<void> Map(UInt ID, Bool Discard, UInt Offset, UInt Length) override;
@@ -91,6 +97,8 @@ namespace Graphic
         struct D3D11Buffer
         {
             ComPtr<ID3D11Buffer> Resource;
+            UInt                 Offset;
+            UInt                 Capacity;
         };
 
         // -=(Undocumented)=-
@@ -128,6 +136,9 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
+        void LoadCapabilities();
+
+        // -=(Undocumented)=-
         void CreateSwapchainResources(Ref<D3D11Pass> Pass, UInt Width, UInt Height);
 
     private:
@@ -139,6 +150,7 @@ namespace Graphic
         ComPtr<ID3D11DeviceContext1> mDeviceImmediate;
         ComPtr<IDXGISwapChain>       mDisplay;
         ComPtr<IDXGIFactory1>        mDisplayFactory;
+        Capabilities                 mCapabilities;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
