@@ -30,6 +30,17 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxBuckets   = 2048;
+
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxDrawables = 16384;
+
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxUniforms  = 16384;
+
+    public:
+
+        // -=(Undocumented)=-
         explicit Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
@@ -53,30 +64,36 @@ namespace Graphic
 
     private:
 
-        inline constexpr static UInt k_MaxDrawables = 4096;
-        inline constexpr static UInt k_MaxUniforms  = 4096;
+        // -=(Undocumented)=-
+        void Flush();
 
-        struct Layout
+    private:
+
+        // -=(Undocumented)=-
+        struct VertexShaderLayout
         {
             Vector3f Position;
             UInt32   Color;
             Vector2f Texture;
         };
 
-        struct Quad
+        // -=(Undocumented)=-
+        struct VertexShaderGeometry
         {
-            Layout V1;
-            Layout V2;
-            Layout V3;
-            Layout V4;
+            VertexShaderLayout V1;
+            VertexShaderLayout V2;
+            VertexShaderLayout V3;
+            VertexShaderLayout V4;
         };
 
-        struct Scene
+        // -=(Undocumented)=-
+        struct VertexShaderData
         {
-            Matrix4f ProjectionViewMatrix;
+            Matrix4f Camera;
             Real32   Time;
         };
 
+        // -=(Undocumented)=-
         struct Drawable
         {
             UInt64         ID;
@@ -89,28 +106,46 @@ namespace Graphic
             SPtr<Material> Material;
         };
 
-        void Flush();
-        Ptr<Quad> MapVertexBuffer(UInt Count, Ref<UInt> Offset);
-        void WriteVertexBuffer(Ptr<Drawable> Drawable, Ptr<Quad> Buffer);
-        void UnmapVertexBuffer();
-        Ptr<Vector4f> MapUniformBuffer(UInt Count, Ref<UInt> Offset);
-        void WriteUniformBuffer(CPtr<const Vector4f> Uniform, Ptr<Vector4f> Buffer);
-        void UnmapUniformBuffer();
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_IndicesPerQuad = 6;
+
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_SceneSize = Align<16>(sizeof(VertexShaderData) / sizeof(Vector4f));
 
     private:
 
+        // -=(Undocumented)=-
+        void CreateResources();
 
-        SPtr<Graphic::Service> mService;
+        // -=(Undocumented)=-
+        void DeleteResources();
 
-        Array<UInt, 3>         mBuffers;
+        // -=(Undocumented)=-
+        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<VertexShaderGeometry> Buffer);
 
-        //Array<UInt,          3>              mSamplers;
+    private:
 
-        Scene                                      mScene;
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Stack<Drawable,      k_MaxDrawables>       mDrawables;
-        Stack<Ptr<Drawable>, k_MaxDrawables>       mDrawablesPtr;
-        Stack<Submission,    k_MaxDrawables>       mSubmissions;
-        Stack<Ptr<const Material>, k_MaxDrawables> mMaterialsPtr;
+        SPtr<Graphic::Service>               mService;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Graphic::Object                      mArrayBuffer;
+        Graphic::Object                      mIndexBuffer;
+        Graphic::Object                      mSceneBuffer;
+        VertexShaderData                     mSceneData;
+
+        Graphic::Object                      mSampler;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Stack<Submission,    k_MaxBuckets>   mSubmissions;
+        Stack<Drawable,      k_MaxDrawables> mDrawablesRef;
+        Stack<Ptr<Drawable>, k_MaxDrawables> mDrawablesPtr;
+        Stack<Ptr<Material>, k_MaxBuckets>   mMaterialsPtr;
     };
 }

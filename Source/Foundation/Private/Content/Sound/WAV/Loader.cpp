@@ -28,7 +28,7 @@ namespace Content
 
         if (Decoder->GetSize() > 0)
         {
-            Asset->Load(Decoder->GetSize(), Decoder->GetDepth(), Decoder->GetChannel(), Decoder->GetFrequency(), eastl::move(Decoder));
+            Asset->Load(Decoder->GetSize(), Decoder->GetDepth(), Decoder->GetChannel(), Decoder->GetFrequency(), Move(Decoder));
             return true;
         }
         return false;

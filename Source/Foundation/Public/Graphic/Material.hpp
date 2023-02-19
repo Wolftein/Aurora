@@ -29,7 +29,7 @@ namespace Graphic
         Material(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
-        UInt GetID() const
+        Object GetID() const
         {
             return mID;
         }
@@ -79,7 +79,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UInt                               mID;
+        Object                             mID;
         Array<SPtr<Texture>, k_MaxSources> mTextures;
         Vector<Vector4f>                   mParameters; // TODO: Replace with pre allocated chunked memory
     };

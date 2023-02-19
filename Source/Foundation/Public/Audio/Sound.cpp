@@ -32,7 +32,7 @@ namespace Audio
     void Sound::Load(UInt Size, UInt Depth, UInt Channel, UInt Frequency, UPtr<Decoder> Decoder)
     {
         mSize       = Size;
-        mDecoder    = eastl::move(Decoder);
+        mDecoder    = Move(Decoder);
         mDepth      = Depth;
         mChannel    = Channel;
         mFrequency  = Frequency;

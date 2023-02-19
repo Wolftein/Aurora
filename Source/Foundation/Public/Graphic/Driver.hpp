@@ -38,54 +38,57 @@ namespace Graphic
         virtual Ref<const Capabilities> GetCapabilities() const = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateBuffer(UInt ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data) = 0;
+        virtual void CreateBuffer(Object ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-
-        virtual Ptr<void> Map(UInt ID, Ref<UInt> Offset, UInt Length) = 0;
+        virtual Ptr<void> Map(Object ID, Ref<UInt> Offset, UInt Length) = 0;
 
         // -=(Undocumented)=-
-        virtual Ptr<void> Map(UInt ID, Bool Discard, UInt Offset, UInt Length) = 0;
+        virtual Ptr<void> Map(Object ID, Bool Discard, UInt Offset, UInt Length) = 0;
 
         // -=(Undocumented)=-
-        virtual void Unmap(UInt ID) = 0;
+        virtual void Unmap(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void DeleteBuffer(UInt ID) = 0;
+        virtual void DeleteBuffer(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreatePass(UInt ID, CPtr<UInt> Colors, UInt Auxiliary) = 0;
+        virtual void CreatePass(Object ID, Any Display, UInt Width, UInt Height) = 0;
 
         // -=(Undocumented)=-
-        virtual void DeletePass(UInt ID) = 0;
+        virtual void CreatePass(Object ID, CPtr<UInt> Colors, UInt Auxiliary) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreatePipeline(UInt ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties) = 0;
+        virtual void DeletePass(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void DeletePipeline(UInt ID) = 0;
+        virtual void CreatePipeline(Object ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateSampler(UInt ID, TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter) = 0;
+        virtual void DeletePipeline(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void DeleteSampler(UInt ID) = 0;
+        virtual void CreateSampler(Object ID, TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateTexture(UInt ID, TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<UInt08> Data) = 0;
+        virtual void DeleteSampler(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void UpdateTexture(UInt ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data) = 0;
+        virtual void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-
-        virtual void DeleteTexture(UInt ID) = 0;
+        virtual void UpdateTexture(Object ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-
-        virtual void Prepare(UInt ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil) = 0;
+        virtual void DeleteTexture(Object ID) = 0;
+
+        // -=(Undocumented)=-
+        virtual void Prepare(Object ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil) = 0;
 
         // -=(Undocumented)=-
         virtual void Submit(CPtr<Submission> Submissions) = 0;
 
         // -=(Undocumented)=-
-        virtual void Commit(Bool Synchronised) = 0;
+        virtual void Commit(Object ID, Bool Synchronised) = 0;
     };
 }

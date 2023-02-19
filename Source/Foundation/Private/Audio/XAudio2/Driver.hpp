@@ -62,24 +62,35 @@ namespace Audio
         Real32 GetSubmixVolume(UInt Submix) override;
 
         // \see Driver::Play
-        UInt Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat) override;
+        Object Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat) override;
 
         // \see Driver::SetGain
-        void SetGain(UInt Instance, Real32 Gain) override;
+        void SetGain(Object Instance, Real32 Gain) override;
 
         // \see Driver::SetPitch
-        void SetPitch(UInt Instance, Real32 Pitch) override;
+        void SetPitch(Object Instance, Real32 Pitch) override;
 
         // \see Driver::Start
-        void Start(UInt Instance) override;
+        void Start(Object Instance) override;
 
         // \see Driver::Stop
-        void Stop(UInt Instance, Bool Immediately) override;
+        void Stop(Object Instance, Bool Immediately) override;
 
         // \see Driver::Halt
         void Halt(UInt Submix) override;
 
     private:
+
+        // -=(Undocumented)=-
+        struct XAudioLibrary
+        {
+            HRESULT (STDAPICALLTYPE  * XAudio2Create)(IXAudio2 **, UINT32, XAUDIO2_PROCESSOR);
+            HRESULT (STDAPIVCALLTYPE * X3DAudioInitialize)(UINT32, FLOAT32, X3DAUDIO_HANDLE);
+            HRESULT (STDAPIVCALLTYPE * X3DAudioCalculate)(
+                const X3DAUDIO_HANDLE,
+                const X3DAUDIO_LISTENER *,
+                const X3DAUDIO_EMITTER *, UINT32, X3DAUDIO_DSP_SETTINGS *);
+        };
 
         // -=(Undocumented)=-
         struct XAudioSource
@@ -150,6 +161,9 @@ namespace Audio
     private:
 
         // -=(Undocumented)=-
+        Bool InitialiseLibrary();
+
+        // -=(Undocumented)=-
         Ptr<XAudioInstance> GetInstance(UInt ID)
         {
             const auto FindByID = [ID](Ref<const XAudioInstance> InstanceRef)
@@ -173,6 +187,7 @@ namespace Audio
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        XAudioLibrary               mLibrary;
         Ptr<IXAudio2>               mDevice;
         Ptr<IXAudio2MasteringVoice> mMaster;
         XAudioPool                  mVoices;

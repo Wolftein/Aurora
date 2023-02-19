@@ -16,6 +16,7 @@
 #include <EASTL/fixed_vector.h>
 #include <EASTL/initializer_list.h>
 #include <EASTL/shared_ptr.h>
+#include <EASTL/sort.h>
 #include <EASTL/span.h>
 #include <EASTL/string.h>
 #include <EASTL/unordered_map.h>

@@ -33,7 +33,7 @@ namespace Graphic
         void Load(TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, Ref<Chunk> Data);
 
         // -=(Undocumented)=-
-        UInt GetID() const
+        Object GetID() const
         {
             return mID;
         }
@@ -81,7 +81,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UInt          mID;
+        Object        mID;
         TextureFormat mFormat;
         TextureLayout mLayout;
         UInt          mWidth;

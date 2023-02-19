@@ -31,10 +31,10 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Pipeline::Load(Ref<Chunk> Vertex, Ref<Chunk> Pixel, Ref<const Descriptor> Properties)
+    void Pipeline::Load(Ref<Chunk> Vertex, Ref<Chunk> Fragment, Ref<const Descriptor> Properties)
     {
-        mShaders[0] = eastl::move(Vertex);
-        mShaders[1] = eastl::move(Pixel);
+        mShaders[0] = Move(Vertex);
+        mShaders[1] = Move(Fragment);
         mProperties = Properties;
     }
 

@@ -56,19 +56,19 @@ namespace Audio
         Real32 GetSubmixVolume(UInt Submix);
 
         // -=(Undocumented)=-
-        UInt Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat);
+        Object Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat);
 
         // -=(Undocumented)=-
-        void SetGain(UInt Instance, Real32 Gain);
+        void SetGain(Object Instance, Real32 Gain);
 
         // -=(Undocumented)=-
-        void SetPitch(UInt Instance, Real32 Pitch);
+        void SetPitch(Object Instance, Real32 Pitch);
 
         // -=(Undocumented)=-
-        void Start(UInt Instance);
+        void Start(Object Instance);
 
         // -=(Undocumented)=-
-        void Stop(UInt Instance, Bool Immediately);
+        void Stop(Object Instance, Bool Immediately);
 
         // -=(Undocumented)=-
         void Halt(UInt Submix);

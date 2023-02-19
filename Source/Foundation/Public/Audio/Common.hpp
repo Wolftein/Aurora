@@ -26,4 +26,7 @@ namespace Audio
         None,
         XAudio2,
     };
+
+    // -=(Undocumented)=-
+    using Object = UInt;
 }

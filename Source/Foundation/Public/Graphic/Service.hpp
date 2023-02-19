@@ -56,14 +56,14 @@ namespace Graphic
         UInt CreateBuffer(Bool Geometry, UInt Capacity, CPtr<UInt08> Data = CPtr<UInt08>());
 
         // -=(Undocumented)=-
-        Ptr<void> Map(UInt ID, Ref<UInt> Offset, UInt Length);
+        Ptr<void> Map(Object ID, Ref<UInt> Offset, UInt Length);
 
         // -=(Undocumented)=-
-        Ptr<void> Map(UInt ID, Bool Discard, UInt Offset, UInt Length);
+        Ptr<void> Map(Object ID, Bool Discard, UInt Offset, UInt Length);
 
         // -=(Undocumented)=-
         template<typename T>
-        Ptr<T> Map(UInt ID, Ref<UInt> Offset, UInt Length)
+        Ptr<T> Map(Object ID, Ref<UInt> Offset, UInt Length)
         {
             Ptr<T> Mapping = static_cast<Ptr<T>>(Map(ID, Offset, Length * sizeof(T)));
 
@@ -74,40 +74,43 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename T>
-        Ptr<T> Map(UInt ID, Bool Discard, UInt Offset, UInt Length)
+        Ptr<T> Map(Object ID, Bool Discard, UInt Offset, UInt Length)
         {
             return static_cast<Ptr<T>>(Map(ID, Discard, Offset, Length * sizeof(T)));
         }
 
         // -=(Undocumented)=-
-        void Unmap(UInt ID);
+        void Unmap(Object ID);
 
         // -=(Undocumented)=-
-        void DeleteBuffer(UInt ID);
+        void DeleteBuffer(Object ID);
 
         // -=(Undocumented)=-
         UInt CreateMaterial();
 
         // -=(Undocumented)=-
-        void DeleteMaterial(UInt ID);
+        void DeleteMaterial(Object ID);
+
+        // -=(Undocumented)=-
+        UInt CreatePass(Any Display, UInt Width, UInt Height);
 
         // -=(Undocumented)=-
         UInt CreatePass(CPtr<UInt> Colors, UInt Auxiliary);
 
         // -=(Undocumented)=-
-        void DeletePass(UInt ID);
+        void DeletePass(Object ID);
 
         // -=(Undocumented)=-
         UInt CreatePipeline(CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties);
 
         // -=(Undocumented)=-
-        void DeletePipeline(UInt ID);
+        void DeletePipeline(Object ID);
 
         // -=(Undocumented)=-
         UInt CreateSampler(TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter);
 
         // -=(Undocumented)=-
-        void DeleteSampler(UInt ID);
+        void DeleteSampler(Object ID);
 
         // -=(Undocumented)=-
         template<typename T>
@@ -123,7 +126,7 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename T>
-        void UpdateTexture(UInt ID, UInt Level, Recti Offset, UInt Pitch, CPtr<T> Data)
+        void UpdateTexture(Object ID, UInt Level, Recti Offset, UInt Pitch, CPtr<T> Data)
         {
             const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(Data.data()), Data.size_bytes());
 
@@ -131,19 +134,19 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void UpdateTexture(UInt ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data);
+        void UpdateTexture(Object ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data);
 
         // -=(Undocumented)=-
-        void DeleteTexture(UInt ID);
+        void DeleteTexture(Object ID);
 
         // -=(Undocumented)=-
-        void Prepare(UInt ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil);
+        void Prepare(Object ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt08 Stencil);
 
         // -=(Undocumented)=-
         void Submit(CPtr<Submission> Submissions);
 
         // -=(Undocumented)=-
-        void Commit(Bool Synchronised);
+        void Commit(Object ID, Bool Synchronised);
 
     private:
 

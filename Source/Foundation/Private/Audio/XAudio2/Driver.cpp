@@ -108,7 +108,12 @@ namespace Audio
 
     Bool XAudio2Driver::Initialise(UInt32 Submixes)
     {
-        if (FAILED(XAudio2Create(& mDevice, 0, XAUDIO2_DEFAULT_PROCESSOR)))
+        if (!InitialiseLibrary())
+        {
+            return false;
+        }
+
+        if (FAILED(mLibrary.XAudio2Create(& mDevice, 0, XAUDIO2_DEFAULT_PROCESSOR)))
         {
             return false; // TODO_LOG: Cannot initialize XAudio2
         }
@@ -130,7 +135,7 @@ namespace Audio
         // Initialise X3D audio for positional 3D voices
         DWORD Mask;
         mMaster->GetChannelMask(& Mask);
-        X3DAudioInitialize(Mask, X3DAUDIO_SPEED_OF_SOUND, m3DAudio);
+        mLibrary.X3DAudioInitialize(Mask, X3DAUDIO_SPEED_OF_SOUND, m3DAudio);
 
         return true;
     }
@@ -233,7 +238,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    UInt XAudio2Driver::Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat)
+    Object XAudio2Driver::Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat)
     {
         if (mMixes.full())
         {
@@ -287,7 +292,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void XAudio2Driver::SetGain(UInt Instance, Real32 Gain)
+    void XAudio2Driver::SetGain(Object Instance, Real32 Gain)
     {
         const Ptr<XAudioInstance> InstancePtr = GetInstance(Instance);
 
@@ -300,7 +305,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void XAudio2Driver::SetPitch(UInt Instance, Real32 Pitch)
+    void XAudio2Driver::SetPitch(Object Instance, Real32 Pitch)
     {
         const Ptr<XAudioInstance> InstancePtr = GetInstance(Instance);
 
@@ -315,7 +320,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void XAudio2Driver::Start(UInt Instance)
+    void XAudio2Driver::Start(Object Instance)
     {
         const Ptr<XAudioInstance> InstancePtr = GetInstance(Instance);
 
@@ -328,7 +333,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void XAudio2Driver::Stop(UInt Instance, Bool Immediately)
+    void XAudio2Driver::Stop(Object Instance, Bool Immediately)
     {
         const Ptr<XAudioInstance> InstancePtr = GetInstance(Instance);
 
@@ -459,12 +464,40 @@ namespace Audio
         Settings.DstChannelCount = Details.InputChannels;
         Settings.pMatrixCoefficients = Matrix;
 
-        X3DAudioCalculate(m3DAudio, & m3DAudioListener, & Emitter, Flags, & Settings);
+        mLibrary.X3DAudioCalculate(m3DAudio, & m3DAudioListener, & Emitter, Flags, & Settings);
 
         Instance.Source->SetFrequencyRatio(Instance.Frequency * Settings.DopplerFactor);
         Instance.Source->SetOutputMatrix(Instance.Submix,
             Settings.SrcChannelCount,
             Settings.DstChannelCount,
             Settings.pMatrixCoefficients);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool XAudio2Driver::InitialiseLibrary()
+    {
+        HMODULE Dll = ::LoadLibrary("XAUDIO2_9.DLL");
+
+        if (Dll == nullptr)
+        {
+            Dll = ::LoadLibrary("XAUDIO2_9REDIST.DLL");
+        }
+        if (Dll == nullptr)
+        {
+            Dll = ::LoadLibrary("XAUDIO2_8.DLL");
+        }
+
+        if (Dll != nullptr)
+        {
+            mLibrary.XAudio2Create
+                = (decltype(mLibrary.XAudio2Create)) GetProcAddress(Dll, "XAudio2Create");
+            mLibrary.X3DAudioInitialize
+                = (decltype(mLibrary.X3DAudioInitialize)) GetProcAddress(Dll, "X3DAudioInitialize");
+            mLibrary.X3DAudioCalculate
+                = (decltype(mLibrary.X3DAudioCalculate)) GetProcAddress(Dll, "X3DAudioCalculate");
+        }
+        return (mLibrary.XAudio2Create && mLibrary.X3DAudioInitialize && mLibrary.X3DAudioCalculate);
     }
 }

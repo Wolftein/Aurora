@@ -9,6 +9,18 @@
 // TODO: Font System
 // TODO: UI System
 // TODO: VB6 Proxy
+void printFPS() {
+    static std::chrono::time_point<std::chrono::steady_clock> oldTime = std::chrono::high_resolution_clock::now();
+    static int fps; fps++;
+
+    if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - oldTime) >= std::chrono::seconds{ 1 }) {
+        oldTime = std::chrono::high_resolution_clock::now();
+        printf("FPS: %d\n", fps);
+        fps = 0;
+    }
+}
+static constexpr auto GAME_WINDOW_WIDTH  = 1280;
+static constexpr auto GAME_WINDOW_HEIGHT = 1024;
 
 class Factory : public Core::Subsystem
 {
@@ -21,13 +33,17 @@ public:
         SimplePipeline = ContentService->Load<Graphic::Pipeline>("Water.effect");
         Renderer = NewPtr<Graphic::Renderer>(Context);
 
-        Camera.SetOrthographic(800, 600, 1000, 0);
+        Camera.SetOrthographic(GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT, 1000, 0);
 
-        SimpleMaterial = eastl::make_shared<Graphic::Material>(Content::Uri { "Test"} ); // TODO: Loader
+        SimpleMaterial = NewPtr<Graphic::Material>(Content::Uri { "Test"} ); // TODO: Loader
         SimpleMaterial->SetTexture(0, SimpleTexture);
         SimpleMaterial->SetParameter(0, Vector4f(1, 1, 0, 1));
         ContentService->Register(SimpleMaterial);
 
+        SimpleMaterial2 = NewPtr<Graphic::Material>(Content::Uri { "Test #2"} ); // TODO: Loader
+        SimpleMaterial2->SetTexture(0, SimpleTexture);
+        SimpleMaterial2->SetParameter(0, Vector4f(1, 0, 0, 1));
+        ContentService->Register(SimpleMaterial2);
     }
 
     void OnTick() override
@@ -36,8 +52,8 @@ public:
         Rectf Viewport {
             0,
             0,
-            800.0f,
-            600.0f
+            GAME_WINDOW_WIDTH,
+            GAME_WINDOW_HEIGHT
         };
 
         auto GraphicService = GetSubsystem<Graphic::Service>();
@@ -52,16 +68,16 @@ public:
         {
             Renderer->Begin(Camera, PlatformService->GetTime());
 
-            const SInt StepX = SimpleTexture->GetWidth() / 2;
-            const SInt StepY = SimpleTexture->GetHeight() / 2;
+            const SInt StepX = SimpleTexture->GetWidth();
+            const SInt StepY = SimpleTexture->GetHeight();
 
             UInt Index = 0;
 
             Rectf Destination, Source { 0, 0, 1, 1 };
 
-            for (SInt X = -4096; X < 8192; X += StepX)
+            for (SInt X = -4096; X < 4096; X += StepX)
             {
-                for (SInt Y = -4096; Y < 8192; Y += StepY)
+                for (SInt Y = -4096; Y < 4096; Y += StepY)
                 {
                     UInt32 Color = 0xFFFFFFFF;
 
@@ -74,19 +90,20 @@ public:
                         0,
                         Color,
                         SimplePipeline,
-                        SimpleMaterial);
+                        Index % 2 ? SimpleMaterial : SimpleMaterial2);
                     ++Index;
                 }
             }
             Renderer->End();
         }
-        GraphicService->Commit(false);
+        GraphicService->Commit(Graphic::k_Default, false);
     }
 
 private:
     SPtr<Graphic::Texture>  SimpleTexture;
     SPtr<Graphic::Pipeline> SimplePipeline;
     SPtr<Graphic::Material> SimpleMaterial;
+    SPtr<Graphic::Material> SimpleMaterial2;
     SPtr<Graphic::Renderer> Renderer;
     Graphic::Camera         Camera;
     Real32 Scaling = 1;
@@ -96,8 +113,8 @@ int main()
 {
     Engine::Properties Properties;
     Properties.SetWindowTitle("Argentum Online v1.0");
-    Properties.SetWindowWidth(800);
-    Properties.SetWindowHeight(600);
+    Properties.SetWindowWidth(GAME_WINDOW_WIDTH);
+    Properties.SetWindowHeight(GAME_WINDOW_HEIGHT);
 
     Engine::Kernel Kernel;
     Kernel.Initialize(Properties);

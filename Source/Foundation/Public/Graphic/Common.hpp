@@ -291,6 +291,9 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
+    using  Object = UInt;
+
+    // -=(Undocumented)=-
     struct Attribute
     {
         // -=(Undocumented)=-
@@ -307,16 +310,16 @@ namespace Graphic
     struct Binding
     {
         // -=(Undocumented)=-
-        UInt Buffer = 0;
+        Object Buffer = 0;
 
         // -=(Undocumented)=-
-        UInt Length = 0;
+        UInt   Length = 0;
 
         // -=(Undocumented)=-
-        UInt Offset = 0;
+        UInt   Offset = 0;
 
         // -=(Undocumented)=-
-        UInt Stride = 0;
+        UInt   Stride = 0;
     };
 
     // -=(Undocumented)=-
@@ -412,12 +415,12 @@ namespace Graphic
         UInt    Stencil                = 0;
 
         // -=(Undocumented)=-
-        UInt    Pipeline               = 0;
+        Object  Pipeline               = 0;
 
         // -=(Undocumented)=-
-        UInt    Samplers[k_MaxSources] = { 0 };
+        Object  Samplers[k_MaxSources] = { 0 };
 
         // -=(Undocumented)=-
-        UInt    Textures[k_MaxSources] = { 0 };
+        Object  Textures[k_MaxSources] = { 0 };
     };
 }

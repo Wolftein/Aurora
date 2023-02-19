@@ -11,7 +11,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Renderer.hpp"
-#include <EASTL/sort.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -23,28 +22,9 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Renderer::Renderer(Ref<Core::Subsystem::Context> Context)
+        : mService { Context.GetSubsystem<Graphic::Service>() }
     {
-        mService = Context.GetSubsystem<Graphic::Service>();
-
-        mBuffers[0] = mService->CreateBuffer(true, sizeof(Quad) * k_MaxDrawables, {});
-
-        UPtr<UInt16[]> Memory = eastl::make_unique<UInt16[]>(k_MaxDrawables * 6u);
-
-        for (UInt32 Position = 0u, Index = 0u, max = k_MaxDrawables * 6u; Position < max; Index += 4u)
-        {
-            Memory[Position++] = static_cast<UInt16>(Index);
-            Memory[Position++] = static_cast<UInt16>(Index + 1);
-            Memory[Position++] = static_cast<UInt16>(Index + 2);
-            Memory[Position++] = static_cast<UInt16>(Index + 1);
-            Memory[Position++] = static_cast<UInt16>(Index + 3);
-            Memory[Position++] = static_cast<UInt16>(Index + 2);
-        }
-
-        mBuffers[1] = mService->CreateBuffer(true, 6 * k_MaxDrawables * sizeof(UInt16), {
-            reinterpret_cast<UInt08 *>(Memory.get()), 6 * k_MaxDrawables * sizeof(UInt16)
-        });
-
-        mBuffers[2] = mService->CreateBuffer(false, k_MaxUniforms * sizeof(Vector4f), {});
+        CreateResources();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -52,7 +32,7 @@ namespace Graphic
 
     Renderer::~Renderer()
     {
-
+        DeleteResources();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -60,9 +40,8 @@ namespace Graphic
 
     void Renderer::Begin(Ref<const Camera> Camera, Real32 Time)
     {
-        mScene.ProjectionViewMatrix = Camera.GetView() * Camera.GetProjection();
-        mScene.Time = Time;
-        // TODO: Set Uniform....
+        mSceneData.Camera = Camera.GetView() * Camera.GetProjection();
+        mSceneData.Time   = Time;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -77,13 +56,13 @@ namespace Graphic
         Ref<const SPtr<Pipeline>> Pipeline,
         Ref<const SPtr<Material>> Material)
     {
-        if (mDrawables.full())
+        if (mDrawablesRef.full())
         {
             Flush();
         }
 
-        Ref<Drawable> Drawable = mDrawables.push_back();
-        Drawable.ID          = Material->GetID(); // TODO (Unique ID for Opaque/Translucid)
+        Ref<Drawable> Drawable = mDrawablesRef.push_back();
+        Drawable.ID          = Material->GetID(); // TODO (Unique ID for Opaque/Translucid and Depth)
         Drawable.Destination = Destination;
         Drawable.Source      = Source;
         Drawable.Depth       = Depth;
@@ -100,7 +79,7 @@ namespace Graphic
 
     void Renderer::End()
     {
-        if (!mDrawables.empty())
+        if (!mDrawablesRef.empty())
         {
             Flush();
         }
@@ -111,140 +90,177 @@ namespace Graphic
 
     void Renderer::Flush()
     {
+        // Sort all sprites back to front and by material/pipeline
         eastl::sort(mDrawablesPtr.begin(), mDrawablesPtr.end(), [](Ptr<const Drawable> Left, Ptr<const Drawable> Right)
         {
             return Left->ID > Right->ID;
         });
 
-        UInt VBOffset = 0, UBOffset = 0;
-
-        Ptr<Quad> Vertices = MapVertexBuffer(mDrawablesPtr.size(), VBOffset);
-        UInt VertexOffset = (VBOffset - mDrawablesPtr.size());
-        UInt Count        = 0;
-        printf("V Offset: %d %d - ", mDrawablesPtr.size(), VertexOffset);
-
+        // Writes all drawables into the vertex buffer
         UInt UniformSize = 0;
-        SPtr<const Pipeline> PipelineLast = mDrawablesPtr[0]->Pipeline;
-        SPtr<const Material> MaterialLast = mDrawablesPtr[0]->Material;
+        UInt IndexBufferOffset = 0;
+        UInt ArrayBufferOffset;
+        UInt ArrayBufferBatch = 0;
+        Ptr<VertexShaderGeometry> ArrayBlockPtr
+            = mService->Map<VertexShaderGeometry>(mArrayBuffer, ArrayBufferOffset, mDrawablesPtr.size());
 
-        for (Ptr<Drawable> Drawable : mDrawablesPtr)
+        IndexBufferOffset = ArrayBufferOffset;
+
+        for (UInt Index = 0, Max = mDrawablesPtr.size() - 1; Index <= Max; ++Index)
         {
-            WriteVertexBuffer(Drawable, Vertices);
-            ++Vertices;
+            const Ptr<const Drawable> ThisDrawable = mDrawablesPtr[Index];
+            const Ptr<const Drawable> NextDrawable = (Index == Max ? ThisDrawable : mDrawablesPtr[Index + 1]);
 
-            if (MaterialLast != Drawable->Material || PipelineLast != Drawable->Pipeline)
+            WriteGeometry(ThisDrawable, ArrayBlockPtr);
+            ++ArrayBlockPtr;
+            ++ArrayBufferBatch;
+
+            const Bool HasMaterialChanged = (ThisDrawable->Material != NextDrawable->Material || ThisDrawable == NextDrawable);
+            const Bool HasPipelineChanged = (ThisDrawable->Pipeline != NextDrawable->Pipeline);
+
+            if (HasMaterialChanged || HasPipelineChanged)
             {
-                if (MaterialLast != Drawable->Material)
+                if (HasMaterialChanged)
                 {
-                    UniformSize += MaterialLast->GetParameters().size();
-                    mMaterialsPtr.push_back(MaterialLast.get());
+                    UniformSize += ThisDrawable->Material->GetParameters().size();
+                    mMaterialsPtr.push_back(ThisDrawable->Material.get());
                 }
 
                 Ref<Submission> Submission = mSubmissions.push_back();
-                Submission.Vertices.Buffer    = mBuffers[0];
-                Submission.Vertices.Offset    = 0;
-                Submission.Vertices.Length    = 0;
-                Submission.Vertices.Stride    = 24;
-                Submission.Indices.Buffer     = mBuffers[1];
-                Submission.Indices.Offset     = VertexOffset * 6;
-                Submission.Indices.Length     = 6 * Count;
-                Submission.Indices.Stride     = sizeof(UInt16);
-                Submission.Pipeline            = PipelineLast->GetID();
-                Submission.Textures[0]         = MaterialLast->GetTexture(0)->GetID();
+                Submission.Vertices.Buffer = mArrayBuffer;
+                Submission.Vertices.Stride = sizeof(VertexShaderLayout);
 
-                VertexOffset += Count;
-                Count = 0;
+                Submission.Indices.Buffer = mIndexBuffer;
+                Submission.Indices.Length = k_IndicesPerQuad * ArrayBufferBatch;
+                Submission.Indices.Offset = IndexBufferOffset * k_IndicesPerQuad;
+                Submission.Indices.Stride = sizeof(UInt16);
 
-                MaterialLast = Drawable->Material;
-                PipelineLast = Drawable->Pipeline;
+                Submission.Pipeline = ThisDrawable->Pipeline->GetID();
+
+                for (SInt SourceIndex = 0; SourceIndex < k_MaxSources; ++SourceIndex)
+                {
+                    if (const SPtr<const Texture> Texture = ThisDrawable->Material->GetTexture(SourceIndex))
+                    {
+                        Submission.Textures[SourceIndex] = Texture->GetID();
+                        Submission.Samplers[SourceIndex] = mSampler;
+                    }
+                }
+
+                IndexBufferOffset += ArrayBufferBatch;
+                ArrayBufferBatch  = 0;
+            }
+        }
+
+        mService->Unmap(mArrayBuffer);
+
+        {
+            UInt UniformBufferSize = k_SceneSize + UniformSize;
+            UInt UniformBufferOffset;
+            UInt Index = 0;
+            Ptr<Vector4f> UniformBlockPtr = mService->Map<Vector4f>(mSceneBuffer, UniformBufferOffset, UniformBufferSize);
+
+            UInt BaseUniformOffset = UniformBufferOffset;
+            UInt ElseUniformOffset = (BaseUniformOffset + k_SceneSize);
+
+            * reinterpret_cast<Ptr<VertexShaderData>>(UniformBlockPtr) = mSceneData;
+            UniformBlockPtr += k_SceneSize;
+
+
+            for (Ptr<const Material> MaterialPtr : mMaterialsPtr)
+            {
+                const CPtr<const Vector4f> Parameters = MaterialPtr->GetParameters();
+
+                mSubmissions[Index].Uniforms[0].Buffer  = mSceneBuffer;
+                mSubmissions[Index].Uniforms[0].Offset  = BaseUniformOffset;
+                mSubmissions[Index].Uniforms[0].Length  = k_SceneSize;
+
+                if (! Parameters.empty())
+                {
+                    memcpy(UniformBlockPtr, Parameters.data(), Parameters.size_bytes());
+
+                    mSubmissions[Index].Uniforms[1].Buffer  = mSceneBuffer;
+                    mSubmissions[Index].Uniforms[1].Offset  = ElseUniformOffset;
+                    mSubmissions[Index].Uniforms[1].Length  = Parameters.size();
+
+                    UniformBlockPtr   += Parameters.size();
+                    ElseUniformOffset += Parameters.size();
+                }
+
+                ++Index;
             }
 
-            ++Count;
+            mService->Unmap(mSceneBuffer);
         }
 
-        // Add Last
-        if (Count > 0)
-        {
-            UniformSize += MaterialLast->GetParameters().size();
-            mMaterialsPtr.push_back(MaterialLast.get());
-
-            Ref<Submission> Submission = mSubmissions.push_back();
-
-            Submission.Vertices.Buffer    = mBuffers[0];
-            Submission.Vertices.Offset    = 0;
-            Submission.Vertices.Length    = 0;
-            Submission.Vertices.Stride    = 24;
-            Submission.Indices.Buffer     = mBuffers[1];
-            Submission.Indices.Offset     = VertexOffset * 6;
-            Submission.Indices.Length     = 6 * Count;
-            Submission.Indices.Stride     = sizeof(UInt16);
-            Submission.Pipeline            = PipelineLast->GetID();
-            Submission.Textures[0]         = MaterialLast->GetTexture(0)->GetID();
-        }
-
-
-        UnmapVertexBuffer();
-
-
-        Ptr<Vector4f> Uniforms = MapUniformBuffer(16 + UniformSize, UBOffset);
-
-        UInt Index  = 0;
-        UInt BaseOffset = (UBOffset - (16 + UniformSize));
-        UInt MaterialOffset = BaseOffset + 16;
-        printf("U Offset: %d\n", UBOffset);
-
-        * reinterpret_cast<Ptr<Scene>>(Uniforms) = mScene;
-        Uniforms += 16;
-
-        for (Ptr<const Material> MaterialPtr : mMaterialsPtr)
-        {
-            WriteUniformBuffer(MaterialPtr->GetParameters(), Uniforms);
-
-            mSubmissions[Index].Uniforms[0].Buffer  = mBuffers[2];
-            mSubmissions[Index].Uniforms[0].Offset  = BaseOffset;
-            mSubmissions[Index].Uniforms[0].Length  = 16;
-
-            mSubmissions[Index].Uniforms[1].Buffer  = mBuffers[2];
-            mSubmissions[Index].Uniforms[1].Offset  = MaterialOffset;
-            mSubmissions[Index].Uniforms[1].Length  = MaterialPtr->GetParameters().size();
-
-            Uniforms += MaterialPtr->GetParameters().size();
-            MaterialOffset += (MaterialPtr->GetParameters().size());
-
-            ++Index;
-        }
-
-        UnmapUniformBuffer();
-
-
+        // Submit all command(s) to the gpu
         mService->Submit(mSubmissions);
 
-        mDrawables.reset_lose_memory();
-        mDrawablesPtr.reset_lose_memory();
+        // Reset all stack(s) back to original states
         mSubmissions.reset_lose_memory();
+        mDrawablesRef.reset_lose_memory();
+        mDrawablesPtr.reset_lose_memory();
         mMaterialsPtr.reset_lose_memory();
     }
 
-    Ptr<Renderer::Quad> Renderer::MapVertexBuffer(UInt Count, Ref<UInt> Offset)
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::CreateResources()
     {
-        Ptr<Renderer::Quad> Buff = mService->Map<Renderer::Quad>(mBuffers[0], Offset, Count);
+        // Create array buffer
+        mArrayBuffer = mService->CreateBuffer<VertexShaderGeometry>(true, k_MaxDrawables);
 
-        Offset += Count;
+        // Create index buffer
+        UInt           IndexSize   = k_MaxDrawables * k_IndicesPerQuad;
+        UPtr<UInt16[]> IndexMemory = NewUniquePtr<UInt16[]>(IndexSize);
 
-        return Buff;
+        for (UInt Position = 0, Index = 0, Max = k_MaxDrawables * k_IndicesPerQuad; Position < Max; Index += 4)
+        {
+            IndexMemory[Position++] = Index;
+            IndexMemory[Position++] = Index + 1;
+            IndexMemory[Position++] = Index + 2;
+            IndexMemory[Position++] = Index + 1;
+            IndexMemory[Position++] = Index + 3;
+            IndexMemory[Position++] = Index + 2;
+        }
+
+        mIndexBuffer = mService->CreateBuffer<UInt16>(true, IndexSize, {
+            reinterpret_cast<Ptr<UInt16>>(IndexMemory.get()), IndexSize
+        });
+
+        // Create scene buffer
+        mSceneBuffer = mService->CreateBuffer<Vector4f>(false, k_MaxUniforms);
+
+        // Create samplers
+        mSampler = mService->CreateSampler(TextureEdge::Clamp, TextureEdge::Clamp, TextureFilter::Trilinear);
     }
 
-    void Renderer::WriteVertexBuffer(Ptr<Drawable> Drawable, Ptr<Quad> Buffer)
-    {
-        Real32 DestinationX1 = Drawable->Destination.GetLeft();
-        Real32 DestinationX2 = Drawable->Destination.GetRight();
-        Real32 DestinationX3 = Drawable->Destination.GetLeft();
-        Real32 DestinationX4 = Drawable->Destination.GetRight();
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Real32 DestinationY1 = Drawable->Destination.GetTop();
-        Real32 DestinationY2 = Drawable->Destination.GetTop();
-        Real32 DestinationY3 = Drawable->Destination.GetBottom();
-        Real32 DestinationY4 = Drawable->Destination.GetBottom();
+    void Renderer::DeleteResources()
+    {
+        mService->DeleteBuffer(mArrayBuffer);
+        mService->DeleteBuffer(mIndexBuffer);
+        mService->DeleteBuffer(mSceneBuffer);
+
+        mService->DeleteSampler(mSampler);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::WriteGeometry(Ptr<const Drawable> Drawable, Ptr<VertexShaderGeometry> Buffer)
+    {
+        const Real32 DestinationX1 = Drawable->Destination.GetLeft();
+        const Real32 DestinationX2 = Drawable->Destination.GetRight();
+        const Real32 DestinationX3 = Drawable->Destination.GetLeft();
+        const Real32 DestinationX4 = Drawable->Destination.GetRight();
+
+        const Real32 DestinationY1 = Drawable->Destination.GetTop();
+        const Real32 DestinationY2 = Drawable->Destination.GetTop();
+        const Real32 DestinationY3 = Drawable->Destination.GetBottom();
+        const Real32 DestinationY4 = Drawable->Destination.GetBottom();
 
         Buffer->V1.Position.Set(DestinationX1, DestinationY1, Drawable->Depth);
         Buffer->V1.Color = Drawable->Color;
@@ -262,30 +278,4 @@ namespace Graphic
         Buffer->V4.Color = Drawable->Color;
         Buffer->V4.Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetBottom());
     }
-
-    void Renderer::UnmapVertexBuffer()
-    {
-        mService->Unmap(mBuffers[0]);
-    }
-
-    Ptr<Vector4f> Renderer::MapUniformBuffer(UInt Count, Ref<UInt> Offset)
-    {
-        Ptr<Vector4f> Buff = mService->Map<Vector4f>(mBuffers[2], true, Offset, Count);
-
-        Offset += Count;
-
-        return Buff;
-    }
-
-    void Renderer::WriteUniformBuffer(CPtr<const Vector4f> Uniform, Ptr<Vector4f> Buffer)
-    {
-        memcpy(Buffer, Uniform.data(), Uniform.size_bytes());
-    }
-
-    void Renderer::UnmapUniformBuffer()
-    {
-        mService->Unmap(mBuffers[2]);
-    }
-
-
 }

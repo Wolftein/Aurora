@@ -53,4 +53,18 @@ inline namespace Core
     {
         return eastl::static_shared_pointer_cast<Destination>(Pointer);
     }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    inline auto Move(Type && Object)
+    {
+        return eastl::move(Object);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type, typename Primitive = Type>
+    inline auto Exchange(Type & Object, Primitive && Value)
+    {
+        return eastl::exchange(Object, Value);
+    }
 }

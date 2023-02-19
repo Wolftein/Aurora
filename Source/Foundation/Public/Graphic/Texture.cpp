@@ -43,7 +43,7 @@ namespace Graphic
         mWidth  = Width;
         mHeight = Height;
         mLayer  = Layer;
-        mData   = eastl::move(Data);
+        mData   = Move(Data);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

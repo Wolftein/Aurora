@@ -25,7 +25,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     MP3Decoder::MP3Decoder(Ref<Chunk> Chunk)
-        : mChunk { eastl::move(Chunk) }
+        : mChunk { Move(Chunk) }
     {
         drmp3_init_memory(& mDescription, mChunk.GetData(), mChunk.GetSize(), nullptr);
     }

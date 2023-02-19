@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Common.hpp"
+#include "Core/Trait.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -49,7 +49,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         Chunk(Pointer Data, UInt Size)
-            : mData { eastl::move(Data) },
+            : mData { Move(Data) },
               mSize { Size }
         {
         }
@@ -64,8 +64,8 @@ inline namespace Core
 
         // -=(Undocumented)=-
         Chunk(Chunk && Other)
-            : mData { eastl::move(Other.mData) },
-              mSize { eastl::exchange(Other.mSize, 0) }
+            : mData { Move(Other.mData) },
+              mSize { Exchange(Other.mSize, 0) }
         {
         }
 
@@ -111,8 +111,8 @@ inline namespace Core
         // -=(Undocumented)=-
         Ref<Chunk> operator=(Chunk && Other)
         {
-            mData = eastl::move(Other.mData);
-            mSize = eastl::exchange(Other.mSize, 0);
+            mData = Move(Other.mData);
+            mSize = Exchange(Other.mSize, 0);
 
             return (* this);
         }

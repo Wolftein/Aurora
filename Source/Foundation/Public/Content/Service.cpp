@@ -125,7 +125,7 @@ namespace Content
         {
             if (Chunk Data = Locator->Open(Key.GetPath()); Data.HasData())
             {
-                return eastl::move(Data);
+                return Move(Data);
             }
         }
         return Chunk();
@@ -238,9 +238,9 @@ namespace Content
 #endif // AE_CONTENT_LOADER_STB
 
 #ifdef    AE_CONTENT_LOADER_EFFECT
-        const auto GraphicDriverCapabilities = GetSubsystem<Graphic::Service>()->GetCapabilities();
+        Ref<const Graphic::Capabilities> GraphicCapabilities = GetSubsystem<Graphic::Service>()->GetCapabilities();
         AddLoader(NewPtr<Content::PipelineLoader>(
-            GraphicDriverCapabilities.Backend, GraphicDriverCapabilities.Language));
+            GraphicCapabilities.Backend, GraphicCapabilities.Language));
 #endif // AE_CONTENT_LOADER_EFFECT
     }
 
