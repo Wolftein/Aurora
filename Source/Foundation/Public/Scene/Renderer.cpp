@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2020 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -16,7 +16,7 @@
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Graphic
+namespace Scene
 {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -38,10 +38,9 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Begin(Ref<const Camera> Camera, Real32 Time)
+    void Renderer::Begin(Ref<const Graphic::Camera> Camera)
     {
         mSceneData.Camera = Camera.GetView() * Camera.GetProjection();
-        mSceneData.Time   = Time;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -53,8 +52,8 @@ namespace Graphic
         Real32 Depth,
         Real32 Angle,
         UInt32 Color,
-        Ref<const SPtr<Pipeline>> Pipeline,
-        Ref<const SPtr<Material>> Material)
+        Ref<const SPtr<Graphic::Pipeline>> Pipeline,
+        Ref<const SPtr<Graphic::Material>> Material)
     {
         if (mDrawablesRef.full())
         {
@@ -66,7 +65,7 @@ namespace Graphic
         Drawable.Destination = Destination;
         Drawable.Source      = Source;
         Drawable.Depth       = Depth;
-        Drawable.Angle       = Angle;
+        Drawable.Angle       = (Angle * 3.141592654f) / 180;
         Drawable.Color       = Color;
         Drawable.Pipeline    = Pipeline;
         Drawable.Material    = Material;
@@ -88,7 +87,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Flush()
+    void Renderer::Flush() // TODO: Clean version
     {
         // Sort all sprites back to front and by material/pipeline
         eastl::sort(mDrawablesPtr.begin(), mDrawablesPtr.end(), [](Ptr<const Drawable> Left, Ptr<const Drawable> Right)
@@ -96,7 +95,7 @@ namespace Graphic
             return Left->ID > Right->ID;
         });
 
-        // Writes all drawables into the vertex buffer
+        // Fill geometry's submission
         UInt UniformSize = 0;
         UInt IndexBufferOffset = 0;
         UInt ArrayBufferOffset;
@@ -126,23 +125,22 @@ namespace Graphic
                     mMaterialsPtr.push_back(ThisDrawable->Material.get());
                 }
 
-                Ref<Submission> Submission = mSubmissions.push_back();
+                Ref<Graphic::Submission> Submission = mSubmissions.push_back();
                 Submission.Vertices.Buffer = mArrayBuffer;
                 Submission.Vertices.Stride = sizeof(VertexShaderLayout);
-
                 Submission.Indices.Buffer = mIndexBuffer;
-                Submission.Indices.Length = k_IndicesPerQuad * ArrayBufferBatch;
+                Submission.Indices.Length = k_IndicesPerQuad
+                    * ArrayBufferBatch;
                 Submission.Indices.Offset = IndexBufferOffset * k_IndicesPerQuad;
                 Submission.Indices.Stride = sizeof(UInt16);
 
                 Submission.Pipeline = ThisDrawable->Pipeline->GetID();
 
-                for (SInt SourceIndex = 0; SourceIndex < k_MaxSources; ++SourceIndex)
+                for (SInt SourceIndex = 0; SourceIndex < Graphic::k_MaxSources; ++SourceIndex)
                 {
-                    if (const SPtr<const Texture> Texture = ThisDrawable->Material->GetTexture(SourceIndex))
+                    if (const SPtr<const Graphic::Texture> Texture = ThisDrawable->Material->GetTexture(SourceIndex))
                     {
                         Submission.Textures[SourceIndex] = Texture->GetID();
-                        Submission.Samplers[SourceIndex] = mSampler;
                     }
                 }
 
@@ -165,8 +163,7 @@ namespace Graphic
             * reinterpret_cast<Ptr<VertexShaderData>>(UniformBlockPtr) = mSceneData;
             UniformBlockPtr += k_SceneSize;
 
-
-            for (Ptr<const Material> MaterialPtr : mMaterialsPtr)
+            for (Ptr<const Graphic::Material> MaterialPtr : mMaterialsPtr)
             {
                 const CPtr<const Vector4f> Parameters = MaterialPtr->GetParameters();
 
@@ -230,9 +227,6 @@ namespace Graphic
 
         // Create scene buffer
         mSceneBuffer = mService->CreateBuffer<Vector4f>(false, k_MaxUniforms);
-
-        // Create samplers
-        mSampler = mService->CreateSampler(TextureEdge::Clamp, TextureEdge::Clamp, TextureFilter::Trilinear);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -243,8 +237,6 @@ namespace Graphic
         mService->DeleteBuffer(mArrayBuffer);
         mService->DeleteBuffer(mIndexBuffer);
         mService->DeleteBuffer(mSceneBuffer);
-
-        mService->DeleteSampler(mSampler);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -262,19 +254,36 @@ namespace Graphic
         const Real32 DestinationY3 = Drawable->Destination.GetBottom();
         const Real32 DestinationY4 = Drawable->Destination.GetBottom();
 
-        Buffer->V1.Position.Set(DestinationX1, DestinationY1, Drawable->Depth);
+        if (Drawable->Angle != 0.0f)
+        {
+            const Vector3f    Position(Drawable->Destination.GetX(), Drawable->Destination.GetY(), Drawable->Depth);
+            const Vector3f    Size(Drawable->Destination.GetWidth(), Drawable->Destination.GetHeight(), 1.0f);
+            const Quaternionf Rotation = Quaternionf::FromAngles(Drawable->Angle, Vector3f(0.0f, 0.0f, 1.0f));
+
+            const Matrix4f Transformation = Matrix4f::CreateTransform(Position, Rotation, Size);
+
+            Buffer->V1.Position = Transformation * Vector3f(-0.5f, -0.5f, 0.0f);
+            Buffer->V2.Position = Transformation * Vector3f( 0.5f, -0.5f, 0.0f);
+            Buffer->V3.Position = Transformation * Vector3f(-0.5f,  0.5f, 0.0f);
+            Buffer->V4.Position = Transformation * Vector3f( 0.5f,  0.5f, 0.0f);
+        }
+        else
+        {
+            Buffer->V1.Position.Set(DestinationX1, DestinationY1, Drawable->Depth);
+            Buffer->V2.Position.Set(DestinationX2, DestinationY2, Drawable->Depth);
+            Buffer->V3.Position.Set(DestinationX3, DestinationY3, Drawable->Depth);
+            Buffer->V4.Position.Set(DestinationX4, DestinationY4, Drawable->Depth);
+        }
+
         Buffer->V1.Color = Drawable->Color;
         Buffer->V1.Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetTop());
 
-        Buffer->V2.Position.Set(DestinationX2, DestinationY2, Drawable->Depth);
         Buffer->V2.Color = Drawable->Color;
         Buffer->V2.Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetTop());
 
-        Buffer->V3.Position.Set(DestinationX3, DestinationY3, Drawable->Depth);
         Buffer->V3.Color = Drawable->Color;
         Buffer->V3.Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetBottom());
 
-        Buffer->V4.Position.Set(DestinationX4, DestinationY4, Drawable->Depth);
         Buffer->V4.Color = Drawable->Color;
         Buffer->V4.Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetBottom());
     }

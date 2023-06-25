@@ -144,7 +144,7 @@ inline namespace Core
         // -=(Undocumented)=-
         Real32 Dot(Ref<const Vector4<Base>> Other) const
         {
-            return (mX * Other.GetX()) + (mY * Other.GetY()) + (mZ * Other.GetZ()) + (mW * Other.GetW());
+            return (mX * Other.mX) + (mY * Other.mY) + (mZ * Other.mZ) + (mW * Other.mW);
         }
 
         // -=(Undocumented)=-

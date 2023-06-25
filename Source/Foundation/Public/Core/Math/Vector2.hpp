@@ -114,7 +114,7 @@ inline namespace Core
         // -=(Undocumented)=-
         Real32 Dot(Ref<const Vector2<Base>> Other) const
         {
-            return (mX * Other.GetX()) + (mY * Other.GetY());
+            return (mX * Other.mX) + (mY * Other.mY);
         }
 
         // -=(Undocumented)=-
@@ -281,6 +281,23 @@ inline namespace Core
             const Base X = (Lhs.GetX() < Rhs.GetX() ? Rhs.GetX() : Lhs.GetX());
             const Base Y = (Lhs.GetY() < Rhs.GetY() ? Rhs.GetY() : Lhs.GetY());
             return Vector2<Base>(X, Y);
+        }
+
+        // -=(Undocumented)=-
+        static Vector2<Base> Lerp(Ref<const Vector2<Base>> Start, Ref<const Vector2<Base>> End, Real32 Percentage)
+        {
+            return (Start + Percentage * (End - Start));
+        }
+
+        // -=(Undocumented)=-
+        static Vector2<Base> Slerp(Ref<const Vector2<Base>> Start, Ref<const Vector2<Base>> End, Real32 Percentage)
+        {
+            const Real32 Dot   = eastl::clamp(Start.Dot(End), -1.0f, +1.0f);
+            const Real32 Theta = std::acos(Dot) * Percentage;
+
+            const Vector2<Base> Relative = Normalize(End - Start * Dot);
+
+            return (Start * std::cos(Theta)) + (Relative * std::sin(Theta));
         }
 
     private:

@@ -80,6 +80,9 @@ namespace Graphic
         virtual void UpdateTexture(Object ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-
+        virtual void CopyTexture(Object Destination, UInt DstLevel, Vector3f DstOffset, Object Source, UInt SrcLevel, Recti SrcOffset) = 0;
+
+        // -=(Undocumented)=-
         virtual void DeleteTexture(Object ID) = 0;
 
         // -=(Undocumented)=-

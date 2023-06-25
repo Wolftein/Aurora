@@ -34,11 +34,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 ## Compiler (Flag)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-STRING(REPLACE "/MD" "/MDd" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-
-ADD_COMPILE_OPTIONS($<$<CONFIG:Release>:/MDd>)
-
-#SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MDd")
+SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Gw /GS- /O2")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Compiler (Properties)
@@ -51,4 +47,4 @@ ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/Source/Foundation)
-ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/Source/Demo)
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/Source/Proxy)

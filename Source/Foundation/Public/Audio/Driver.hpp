@@ -80,6 +80,9 @@ namespace Audio
         virtual void Stop(Object Instance, Bool Immediately) = 0;
 
         // -=(Undocumented)=-
+        virtual void Stop(Ref<const SPtr<Emitter>> Emitter, Bool Immediately) = 0;
+
+        // -=(Undocumented)=-
         virtual void Halt(UInt Submix) = 0;
     };
 }

@@ -71,6 +71,9 @@ namespace Audio
         void Stop(Object Instance, Bool Immediately);
 
         // -=(Undocumented)=-
+        void Stop(Ref<const SPtr<Emitter>> Emitter, Bool Immediately);
+
+        // -=(Undocumented)=-
         void Halt(UInt Submix);
 
     private:

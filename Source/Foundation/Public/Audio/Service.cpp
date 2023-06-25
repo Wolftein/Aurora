@@ -46,10 +46,8 @@ namespace Audio
     {
         Bool Successful = true;
 
-        if (!mDriver)
-        {
-            switch (Backend)
-            {
+        if (!mDriver) {
+            switch (Backend) {
 #ifdef    EA_PLATFORM_WINDOWS
             case Backend::XAudio2:
                 mDriver = NewUniquePtr<XAudio2Driver>();
@@ -61,8 +59,7 @@ namespace Audio
             }
             Successful = mDriver->Initialise(Submixes);
 
-            if (!Successful)
-            {
+            if (!Successful) {
                 mDriver = nullptr;
             }
         }
@@ -163,6 +160,14 @@ namespace Audio
     void Service::Stop(UInt Instance, Bool Immediately)
     {
         mDriver->Stop(Instance, Immediately);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Service::Stop(Ref<const SPtr<Emitter>> Emitter, Bool Immediately)
+    {
+        mDriver->Stop(Emitter, Immediately);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

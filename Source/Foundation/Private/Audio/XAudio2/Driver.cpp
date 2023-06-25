@@ -357,6 +357,33 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    void XAudio2Driver::Stop(Ref<const SPtr<Emitter>> Emitter, Bool Immediately)
+    {
+        for (auto It = mMixes.begin(); It != mMixes.end(); ++It)
+        {
+            Ref<XAudioInstance> InstanceRef = (* It);
+
+            if (InstanceRef.Emitter == Emitter)
+            {
+                InstanceRef.Finished = true;
+
+                if (Immediately)
+                {
+                    InstanceRef.Source->Stop();
+                    InstanceRef.Source->FlushSourceBuffers();
+                }
+
+                if (InstanceRef.Repeat)
+                {
+                    InstanceRef.Source->ExitLoop();
+                }
+            }
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void XAudio2Driver::Halt(UInt Submix)
     {
         for (Ref<XAudioInstance> InstanceRef : mMixes)

@@ -137,6 +137,9 @@ namespace Graphic
         void UpdateTexture(Object ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data);
 
         // -=(Undocumented)=-
+        void CopyTexture(Object Destination, UInt DstLevel, Vector3f DstOffset, Object Source, UInt SrcLevel, Recti SrcOffset);
+
+        // -=(Undocumented)=-
         void DeleteTexture(Object ID);
 
         // -=(Undocumented)=-

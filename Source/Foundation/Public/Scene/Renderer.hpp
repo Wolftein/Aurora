@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2020 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -12,17 +12,17 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Graphic/Camera.hpp>
-#include <Graphic/Material.hpp>
-#include <Graphic/Pipeline.hpp>
-#include <Graphic/Service.hpp>
-#include <Graphic/Texture.hpp>
+#include "Graphic/Camera.hpp"
+#include "Graphic/Material.hpp"
+#include "Graphic/Pipeline.hpp"
+#include "Graphic/Service.hpp"
+#include "Graphic/Texture.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Graphic
+namespace Scene
 {
     // -=(Undocumented)=-
     class Renderer
@@ -47,7 +47,7 @@ namespace Graphic
         ~Renderer();
 
         // -=(Undocumented)=-
-        void Begin(Ref<const Camera> Camera, Real32 Time);
+        void Begin(Ref<const Graphic::Camera> Camera);
 
         // -=(Undocumented)=-
         void Draw(
@@ -56,8 +56,8 @@ namespace Graphic
             Real32 Depth,
             Real32 Angle,
             UInt32 Color,
-            Ref<const SPtr<Pipeline>> Pipeline,
-            Ref<const SPtr<Material>> Material);
+            Ref<const SPtr<Graphic::Pipeline>> Pipeline,
+            Ref<const SPtr<Graphic::Material>> Material);
 
         // -=(Undocumented)=-
         void End();
@@ -90,20 +90,19 @@ namespace Graphic
         struct VertexShaderData
         {
             Matrix4f Camera;
-            Real32   Time;
         };
 
         // -=(Undocumented)=-
         struct Drawable
         {
-            UInt64         ID;
-            Rectf          Destination;
-            Rectf          Source;
-            Real32         Angle;
-            Real32         Depth;
-            UInt32         Color;
-            SPtr<Pipeline> Pipeline;
-            SPtr<Material> Material;
+            UInt64                  ID;
+            Rectf                   Destination;
+            Rectf                   Source;
+            Real32                  Angle;
+            Real32                  Depth;
+            UInt32                  Color;
+            SPtr<Graphic::Pipeline> Pipeline;
+            SPtr<Graphic::Material> Material;
         };
 
         // -=(Undocumented)=-
@@ -138,14 +137,12 @@ namespace Graphic
         Graphic::Object                      mSceneBuffer;
         VertexShaderData                     mSceneData;
 
-        Graphic::Object                      mSampler;
-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Stack<Submission,    k_MaxBuckets>   mSubmissions;
-        Stack<Drawable,      k_MaxDrawables> mDrawablesRef;
-        Stack<Ptr<Drawable>, k_MaxDrawables> mDrawablesPtr;
-        Stack<Ptr<Material>, k_MaxBuckets>   mMaterialsPtr;
+        Stack<Graphic::Submission,    k_MaxBuckets>   mSubmissions;
+        Stack<Drawable,               k_MaxDrawables> mDrawablesRef;
+        Stack<Ptr<Drawable>,          k_MaxDrawables> mDrawablesPtr;
+        Stack<Ptr<Graphic::Material>, k_MaxBuckets>   mMaterialsPtr;
     };
 }

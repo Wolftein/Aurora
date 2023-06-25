@@ -28,7 +28,8 @@ inline namespace Core
     }
 
     // -=(Undocumented)=-
-    inline constexpr UInt Hash(auto String, UInt Length = UINT_MAX)
+    template<typename Type>
+    inline constexpr UInt Hash(Type String, UInt Length = UINT_MAX)
     {
         return (Length && (* String)) ? (Hash(String + 1u, Length - 1u) * 33u) ^ (* String & ~32u) : 5381u;
     }

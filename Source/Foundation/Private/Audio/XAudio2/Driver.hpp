@@ -76,6 +76,9 @@ namespace Audio
         // \see Driver::Stop
         void Stop(Object Instance, Bool Immediately) override;
 
+        // \see Driver::Stop
+        void Stop(Ref<const SPtr<Emitter>> Emitter, Bool Immediately) override;
+
         // \see Driver::Halt
         void Halt(UInt Submix) override;
 
@@ -170,7 +173,7 @@ namespace Audio
             {
                 return reinterpret_cast<UInt>(InstanceRef.Source) == ID;
             };
-            return eastl::find_if(mMixes.begin(), mMixes.end(), FindByID);
+            return ID > 0 ? eastl::find_if(mMixes.begin(), mMixes.end(), FindByID) : nullptr;
         }
 
         // -=(Undocumented)=-

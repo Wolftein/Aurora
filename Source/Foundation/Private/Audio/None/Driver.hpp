@@ -67,6 +67,9 @@ namespace Audio
         // \see Driver::Stop
         void Stop(Object Instance, Bool Immediately) override;
 
+        // \see Driver::Stop
+        void Stop(Ref<const SPtr<Emitter>> Emitter, Bool Immediately) override;
+
         // \see Driver::Halt
         void Halt(UInt Submix) override;
     };

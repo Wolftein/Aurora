@@ -33,16 +33,18 @@ inline namespace Core
 
         // -=(Undocumented)=-
         explicit Handle()
+            : mHead { 0 }
         {
-            for (UInt Handle = T - 1; Handle > 0; --Handle)
-            {
-                mPool.emplace_back(Handle);
-            }
         }
 
         // -=(Undocumented)=-
         UInt Allocate()
         {
+            if (mPool.empty())
+            {
+                return (mHead >= T ? k_Invalid : ++mHead);
+            }
+
             const UInt Handle = (mPool.empty() ? k_Invalid : mPool.back());
 
             if (Handle != k_Invalid)
@@ -65,5 +67,6 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Stack<UInt, T> mPool;
+        UInt           mHead;
     };
 }

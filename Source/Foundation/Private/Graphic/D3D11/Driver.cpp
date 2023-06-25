@@ -532,6 +532,7 @@ namespace Graphic
 
         ThrowIfFail(
             mDisplayFactory->CreateSwapChain(mDevice.Get(), & Description, mPasses[ID].Display.GetAddressOf()));
+
         ThrowIfFail(
             mDisplayFactory->MakeWindowAssociation(eastl::any_cast<HWND>(Display), DXGI_MWA_NO_WINDOW_CHANGES));
 
@@ -729,9 +730,12 @@ namespace Graphic
         Ptr<const D3D11_SUBRESOURCE_DATA> Memory = Fill(Data.data(), Layer, Width, Height, Format);
         ThrowIfFail(mDevice->CreateTexture2D(& Description, Memory, & mTextures[ID].Object));
 
-        const CD3D11_SHADER_RESOURCE_VIEW_DESC Type(D3D11_SRV_DIMENSION_TEXTURE2D, As<true>(Format), 0, Layer);
-        ThrowIfFail(mDevice->CreateShaderResourceView(
-            mTextures[ID].Object.Get(), & Type, mTextures[ID].Resource.GetAddressOf()));
+        if (Layout != TextureLayout::Destination)
+        {
+            const CD3D11_SHADER_RESOURCE_VIEW_DESC Type(D3D11_SRV_DIMENSION_TEXTURE2D, As<true>(Format), 0, Layer);
+            ThrowIfFail(mDevice->CreateShaderResourceView(
+                mTextures[ID].Object.Get(), & Type, mTextures[ID].Resource.GetAddressOf()));
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -748,6 +752,21 @@ namespace Graphic
             0
         };
         mDeviceImmediate->UpdateSubresource(mTextures[ID].Object.Get(), Level, & Rect, Data.data(), Pitch, 0);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::CopyTexture(Object Destination, UInt DstLevel, Vector3f DstOffset, Object Source, UInt SrcLevel, Recti SrcOffset)
+    {
+        const D3D11_BOX SrcData = CD3D11_BOX(
+            SrcOffset.GetLeft(), SrcOffset.GetTop(), 0, SrcOffset.GetRight(), SrcOffset.GetBottom(), 1);
+
+        const Ptr<ID3D11Texture2D> DstTexture = mTextures[Destination].Object.Get();
+        const Ptr<ID3D11Texture2D> SrcTexture = mTextures[Source].Object.Get();
+
+        mDeviceImmediate->CopySubresourceRegion(
+            DstTexture, DstLevel, DstOffset.GetX(), DstOffset.GetY(), DstOffset.GetZ(), SrcTexture, SrcLevel, & SrcData);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
