@@ -50,9 +50,9 @@ namespace Graphic
         template<typename Type>
         void SetParameter(UInt Offset, Type Parameter)
         {
-            constexpr UInt Size = sizeof(Type) / sizeof(Vector4f);
+            constexpr UInt Size = sizeof(Type) / sizeof(Vector4f) + 1;
 
-            if (Offset + Size >= mParameters.size())
+            if (Offset + Size > mParameters.size())
             {
                 mParameters.resize(mParameters.size() + Align<16>(Size));
             }

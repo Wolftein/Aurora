@@ -78,9 +78,9 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename T>
-        auto GetSpan() const
+        auto GetSpan(UInt Offset = 0) const
         {
-            return CPtr<T> { reinterpret_cast<Ptr<T>>(mData.get()), mSize / sizeof(T) };
+            return CPtr<T> { reinterpret_cast<Ptr<T>>(mData.get()) + Offset, mSize / sizeof(T) };
         }
 
         // -=(Undocumented)=-

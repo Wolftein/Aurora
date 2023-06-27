@@ -28,6 +28,9 @@
     #include "Graphic/Service.hpp"
     #include "Content/Pipeline/Loader.hpp"
 #endif // AE_CONTENT_LOADER_EFFECT
+#ifdef    AE_CONTENT_LOADER_ARTERY
+    #include "Content/Font/Artery/Loader.hpp"
+#endif // AE_CONTENT_LOADER_ARTERY
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -242,6 +245,10 @@ namespace Content
         AddLoader(NewPtr<Content::PipelineLoader>(
             GraphicCapabilities.Backend, GraphicCapabilities.Language));
 #endif // AE_CONTENT_LOADER_EFFECT
+
+#ifdef    AE_CONTENT_LOADER_ARTERY
+        AddLoader(NewPtr<Content::ArteryFontLoader>());
+#endif // AE_CONTENT_LOADER_ARTERY
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

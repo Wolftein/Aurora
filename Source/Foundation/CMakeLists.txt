@@ -144,10 +144,11 @@ LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR})
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ADD_DEFINITIONS(-DAE_CONTENT_LOCATOR_DEFAULT)
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MP3)
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_WAV)
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_STB)
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_EFFECT)
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MP3)        # Sound
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_WAV)        # Sound
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_STB)        # Image
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_EFFECT)     # Pipeline
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_ARTERY)     # Font
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Library
