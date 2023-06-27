@@ -140,6 +140,9 @@ namespace Graphic
         void CopyTexture(Object Destination, UInt DstLevel, Vector3f DstOffset, Object Source, UInt SrcLevel, Recti SrcOffset);
 
         // -=(Undocumented)=-
+        UPtr<UInt08[]> ReadTexture(Object ID, UInt Level, Recti Offset);
+
+        // -=(Undocumented)=-
         void DeleteTexture(Object ID);
 
         // -=(Undocumented)=-

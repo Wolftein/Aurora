@@ -772,6 +772,42 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    UPtr<UInt08[]> D3D11Driver::ReadTexture(Object ID, UInt Level, Recti Offset)
+    {
+        D3D11_TEXTURE2D_DESC Description;
+        mTextures[ID].Object->GetDesc(& Description);
+
+        // Create a staging texture to be able to read the texture back.
+        ComPtr<ID3D11Texture2D> Buffer;
+
+        Description.BindFlags      = 0;
+        Description.Usage          = D3D11_USAGE_STAGING;
+        Description.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        ThrowIfFail(mDevice->CreateTexture2D(& Description, nullptr, Buffer.GetAddressOf()));
+
+        // Copy the resource between GPU -> CPU.
+        const D3D11_BOX SrcData = CD3D11_BOX(
+            Offset.GetLeft(), Offset.GetTop(), 0, Offset.GetRight(), Offset.GetBottom(), 1);
+        mDeviceImmediate->CopySubresourceRegion(Buffer.Get(), 0, 0, 0, 0, mTextures[ID].Object.Get(), Level, & SrcData);
+
+        // Map the staging texture and copy into a new buffer.
+        UPtr<UInt08[]>           Bytes;
+        D3D11_MAPPED_SUBRESOURCE Memory;
+
+        if (SUCCEEDED(mDeviceImmediate->Map(Buffer.Get(), 0, D3D11_MAP_READ, 0, & Memory)))
+        {
+            Bytes = NewUniquePtr<UInt08[]>(Description.Height * Memory.RowPitch);
+
+            memcpy(Bytes.get(), Memory.pData, Description.Height * Memory.RowPitch);
+
+            mDeviceImmediate->Unmap(Buffer.Get(), 0);
+        }
+        return Move(Bytes);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void D3D11Driver::DeleteTexture(Object ID)
     {
         mTextures[ID].~D3D11Texture();

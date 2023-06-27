@@ -81,6 +81,9 @@ namespace Graphic
         // \see Driver::CopyTexture
         void CopyTexture(Object Destination, UInt DstLevel, Vector3f DstOffset, Object Source, UInt SrcLevel, Recti SrcOffset) override;
 
+        // \see Driver::ReadTexture
+        UPtr<UInt08[]> ReadTexture(Object ID, UInt Level, Recti Offset) override;
+
         // \see Driver::DeleteTexture
         void DeleteTexture(Object ID) override;
 
