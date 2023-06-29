@@ -66,12 +66,6 @@ namespace Graphic
         // \see Driver::DeletePipeline
         void DeletePipeline(Object ID) override;
 
-        // \see Driver::CreateSampler
-        void CreateSampler(Object ID, TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter) override;
-
-        // \see Driver::DeleteSampler
-        void DeleteSampler(Object ID) override;
-
         // \see Driver::CreateTexture
         void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<UInt08> Data) override;
 
@@ -150,6 +144,9 @@ namespace Graphic
 
         // -=(Undocumented)=-
         void CreateSwapchainResources(Ref<D3D11Pass> Pass, UInt Width, UInt Height);
+
+        // -=(Undocumented)=-
+        Ref<D3D11Sampler> GetOrCreateSampler(Ref<const Sampler> Descriptor);
 
     private:
 

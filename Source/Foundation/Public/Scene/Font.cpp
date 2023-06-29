@@ -29,10 +29,10 @@ namespace Scene
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Font::Load(Ref<Metrics> Metrics, Ref<Atlas> Atlas, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning)
+    void Font::Load(Ref<Metrics> Metrics, Ref<Atlas> Image, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning)
     {
         mMetrics = Move(Metrics);
-        mAtlas   = Move(Atlas);
+        mImage   = Move(Image);
         mGlyphs  = Move(Glyphs);
         mKerning = Move(Kerning);
     }
@@ -42,18 +42,22 @@ namespace Scene
 
     Bool Font::OnLoad(Ref<Subsystem::Context> Context)
     {
-        SetMemory(mGlyphs.size() * sizeof(Glyph) + mKerning.size() * sizeof(Real32) + mAtlas.Data.GetSize());
-
-        const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>("FontInternalAtlas");
+        const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>("_Private");
         Texture->Load(
             Graphic::TextureFormat::RGBA8UIntNorm,
-            Graphic::TextureLayout::Source, mAtlas.Width, mAtlas.Height, 1, mAtlas.Data);
+            Graphic::TextureLayout::Source, mImage.Width, mImage.Height, 1, mImage.Data);
 
-        mMaterial = NewPtr<Graphic::Material>("FontInternalMaterial");
+        mMaterial = NewPtr<Graphic::Material>("_Private");
         mMaterial->SetTexture(0, Texture);
         mMaterial->SetParameter(0, Vector2f(Texture->GetWidth(), Texture->GetHeight()));
 
-        return mMaterial->OnLoad(Context) && Texture->OnLoad(Context);
+        if (! mMaterial->OnLoad(Context) || ! Texture->OnLoad(Context))
+        {
+            return false;
+        }
+
+        SetMemory(mGlyphs.size() * sizeof(Glyph) + mMaterial->GetMemory() + Texture->GetMemory());
+        return true;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -63,10 +67,11 @@ namespace Scene
     {
         if (mMaterial)
         {
-            if (const SPtr<Graphic::Texture> Atlas = mMaterial->GetTexture(0))
+            if (Ref<const SPtr<Graphic::Texture>> Texture = mMaterial->GetTexture(0))
             {
-                Atlas->OnUnload(Context);
+                Texture->OnUnload(Context);
             }
+
             mMaterial->OnUnload(Context);
         }
     }

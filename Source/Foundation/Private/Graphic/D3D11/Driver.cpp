@@ -673,34 +673,6 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreateSampler(Object ID, TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter)
-    {
-        const CD3D11_SAMPLER_DESC Descriptor(
-            As(Filter),
-            As(EdgeU),
-            As(EdgeV),
-            D3D11_TEXTURE_ADDRESS_CLAMP,
-            0,
-            0,
-            D3D11_COMPARISON_NEVER,
-            nullptr,
-            0,
-            D3D11_FLOAT32_MAX);
-
-        ThrowIfFail(mDevice->CreateSamplerState(& Descriptor, mSamplers[ID].Resource.GetAddressOf()));
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void D3D11Driver::DeleteSampler(Object ID)
-    {
-        mSamplers[ID].~D3D11Sampler();
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
     void D3D11Driver::CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<UInt08> Data)
     {
         CD3D11_TEXTURE2D_DESC Description(As<false>(Format), Width, Height, 1, Layer);
@@ -855,30 +827,33 @@ namespace Graphic
 
     void D3D11Driver::Submit(CPtr<Submission> Submissions)
     {
-        Submission      Empty {
-            .Scissor = { 0, 0, 0, 0 }
-        };
-        Ref<Submission> Prev = Empty;
+        Submission EmptyDummySubmission;
 
-        for (Ref<const Submission> Next : Submissions)
+        for (UInt Index = 0; Index < Submissions.size(); ++Index)
         {
-            if (Prev.Vertices.Buffer != Next.Vertices.Buffer)
+            Ref<const Submission> NewestSubmission = Submissions[Index];
+            Ref<const Submission> OldestSubmission = (Index > 0 ? Submissions[Index - 1] : EmptyDummySubmission);
+
+            // Apply vertices when it has changed
+            if (OldestSubmission.Vertices.Buffer != NewestSubmission.Vertices.Buffer)
             {
-                Ref<const D3D11Buffer> Buffer = mBuffers[Next.Vertices.Buffer];
-                const UINT Stride = Next.Vertices.Stride;
+                Ref<const D3D11Buffer> Buffer = mBuffers[NewestSubmission.Vertices.Buffer];
+                const UINT Stride = NewestSubmission.Vertices.Stride;
                 const UINT Offset = 0;
                 mDeviceImmediate->IASetVertexBuffers(0, 1, Buffer.Resource.GetAddressOf(), & Stride, & Offset);
             }
 
-            if (Prev.Indices.Buffer != Next.Indices.Buffer)
+            // Apply indices when it has changed
+            if (OldestSubmission.Indices.Buffer != NewestSubmission.Indices.Buffer)
             {
-                Ref<const D3D11Buffer> Buffer = mBuffers[Next.Indices.Buffer];
-                const DXGI_FORMAT      Format = (Next.Indices.Stride == sizeof(UInt16)
-                    ? DXGI_FORMAT_R16_UINT
-                    : DXGI_FORMAT_R32_UINT);
+                Ref<const D3D11Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
+                const DXGI_FORMAT      Format = (NewestSubmission.Indices.Stride == sizeof(UInt16)
+                                                 ? DXGI_FORMAT_R16_UINT
+                                                 : DXGI_FORMAT_R32_UINT);
                 mDeviceImmediate->IASetIndexBuffer(Buffer.Resource.Get(), Format, 0);
             }
 
+            // Apply uniforms when it has changed
             {
                 Ptr<ID3D11Buffer> Array[k_MaxUniforms];
                 UINT   ArrayOffset[k_MaxUniforms];
@@ -886,44 +861,48 @@ namespace Graphic
                 UInt32 Min = k_MaxUniforms;
                 UInt32 Max = 0u;
 
-                for (UInt32 Index = 0; Index < k_MaxUniforms; ++Index)
+                for (UInt32 Element = 0; Element < k_MaxUniforms; ++Element)
                 {
-                    Ref<const Binding> Old = Prev.Uniforms[Index];
-                    Ref<const Binding> New = Next.Uniforms[Index];
+                    Ref<const Binding> Old = OldestSubmission.Uniforms[Element];
+                    Ref<const Binding> New = NewestSubmission.Uniforms[Element];
 
                     if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Length != New.Length)
                     {
-                        Min = min(Index, Min);
-                        Max = max(Index + 1, Max);
+                        Min = min(Element, Min);
+                        Max = max(Element + 1, Max);
                     }
 
-                    Array[Index]       = mBuffers[New.Buffer].Resource.Get();
-                    ArrayOffset[Index] = Align<16>(New.Offset);
-                    ArrayLength[Index] = Align<16>(New.Length);
+                    Array[Element]       = mBuffers[New.Buffer].Resource.Get();
+                    ArrayOffset[Element] = Align<16>(New.Offset);
+                    ArrayLength[Element] = Align<16>(New.Length);
                 }
 
                 if (Min != k_MaxUniforms && Max != 0u)
                 {
                     const UInt32 Count = Max - Min;
 
-                    mDeviceImmediate->VSSetConstantBuffers1(Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
-                    mDeviceImmediate->PSSetConstantBuffers1(Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
+                    mDeviceImmediate->VSSetConstantBuffers1(
+                        Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
+                    mDeviceImmediate->PSSetConstantBuffers1(
+                        Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
                 }
             }
 
-            if ( Prev.Scissor != Next.Scissor)
+            // Apply the scissor test when it has changed, or it's the first batch
+            if (Index == 0 || OldestSubmission.Scissor != NewestSubmission.Scissor)
             {
                 const RECT Rect {
-                    Next.Scissor.GetLeft(),  Next.Scissor.GetTop(),
-                    Next.Scissor.GetRight(), Next.Scissor.GetBottom()
+                    NewestSubmission.Scissor.GetLeft(),  NewestSubmission.Scissor.GetTop(),
+                    NewestSubmission.Scissor.GetRight(), NewestSubmission.Scissor.GetBottom()
                 };
                 mDeviceImmediate->RSSetScissorRects(1, & Rect);
             }
 
-            if (Prev.Pipeline != Next.Pipeline)
+            // Apply pipeline when it has changed
+            if (OldestSubmission.Pipeline != NewestSubmission.Pipeline)
             {
-                Ref<const D3D11Pipeline> Old = mPipelines[Prev.Pipeline];
-                Ref<const D3D11Pipeline> New = mPipelines[Next.Pipeline];
+                Ref<const D3D11Pipeline> Old = mPipelines[OldestSubmission.Pipeline];
+                Ref<const D3D11Pipeline> New = mPipelines[NewestSubmission.Pipeline];
 
                 if (Old.VS != New.VS)
                 {
@@ -937,9 +916,9 @@ namespace Graphic
                 {
                     mDeviceImmediate->OMSetBlendState(New.BS.Get(), nullptr, D3D11_DEFAULT_SAMPLE_MASK);
                 }
-                if (Old.DS != New.DS || Prev.Stencil != Next.Stencil)
+                if (Old.DS != New.DS || OldestSubmission.Stencil != NewestSubmission.Stencil)
                 {
-                    mDeviceImmediate->OMSetDepthStencilState(New.DS.Get(), Next.Stencil);
+                    mDeviceImmediate->OMSetDepthStencilState(New.DS.Get(), NewestSubmission.Stencil);
                 }
                 if (Old.RS != New.RS)
                 {
@@ -954,48 +933,30 @@ namespace Graphic
                     mDeviceImmediate->IASetPrimitiveTopology(New.PT);
                 }
             }
-            else if (Prev.Stencil != Next.Stencil)
+            else if (OldestSubmission.Stencil != NewestSubmission.Stencil)
             {
-                mDeviceImmediate->OMSetDepthStencilState(mPipelines[Next.Pipeline].DS.Get(), Next.Stencil);
+                mDeviceImmediate->OMSetDepthStencilState(
+                    mPipelines[NewestSubmission.Pipeline].DS.Get(), NewestSubmission.Stencil);
             }
 
-            {
-                Ptr<ID3D11SamplerState> Array[k_MaxSources];
-                UInt32 Min = k_MaxSources;
-                UInt32 Max = 0u;
-
-                for (UInt32 Index = 0; Index < k_MaxSources && Next.Samplers[Index] != 0; ++Index)
-                {
-                    if (Prev.Samplers[Index] != Next.Samplers[Index])
-                    {
-                        Min = min(Index, Min);
-                        Max = max(Index + 1, Max);
-                    }
-                    Array[Index] = mSamplers[Next.Samplers[Index]].Resource.Get();
-                }
-
-                if (Min != k_MaxSources && Max != 0u)
-                {
-                    const UInt32 Count = Max - Min;
-
-                    mDeviceImmediate->VSSetSamplers(Min, Count, & Array[Min]);
-                    mDeviceImmediate->PSSetSamplers(Min, Count, & Array[Min]);
-                }
-            }
+            // Apply textures when it has changed
+            UInt Sources = 0;
 
             {
                 Ptr<ID3D11ShaderResourceView> Array[k_MaxSources];
                 UInt32 Min = k_MaxSources;
                 UInt32 Max = 0u;
 
-                for (UInt32 Index = 0; Index < k_MaxSources && Next.Textures[Index] != 0; ++Index)
+                for (UInt32 Element = 0; Element < k_MaxSources && NewestSubmission.Textures[Element] != 0; ++Element)
                 {
-                    if (Prev.Textures[Index] != Next.Textures[Index])
+                    ++Sources;
+
+                    if (OldestSubmission.Textures[Element] != NewestSubmission.Textures[Element])
                     {
-                        Min = min(Index, Min);
-                        Max = max(Index + 1, Max);
+                        Min = min(Element, Min);
+                        Max = max(Element + 1, Max);
                     }
-                    Array[Index] = mTextures[Next.Textures[Index]].Resource.Get();
+                    Array[Element] = mTextures[NewestSubmission.Textures[Element]].Resource.Get();
                 }
 
                 if (Min != k_MaxSources && Max != 0u)
@@ -1007,16 +968,44 @@ namespace Graphic
                 }
             }
 
-            if (Next.Indices.Buffer != 0)
+            // Apply samplers when it has changed, or it's the first batch
             {
-                mDeviceImmediate->DrawIndexed(Next.Indices.Length, Next.Indices.Offset, Next.Vertices.Offset);
+                Ptr<ID3D11SamplerState> Array[k_MaxSources];
+                UInt32 Min = Sources;
+                UInt32 Max = 0u;
+
+                for (UInt32 Element = 0; Element < Sources; ++Element)
+                {
+                    Ref<D3D11Sampler> PrevSampler = GetOrCreateSampler(OldestSubmission.Samplers[Element]);
+                    Ref<D3D11Sampler> NextSampler = GetOrCreateSampler(NewestSubmission.Samplers[Element]);
+
+                    if (Index == 0 || PrevSampler.Resource != NextSampler.Resource)
+                    {
+                        Min = min(Element, Min);
+                        Max = max(Element + 1, Max);
+                    }
+                    Array[Element] = NextSampler.Resource.Get();
+                }
+
+                if (Min != Sources && Max != 0u)
+                {
+                    const UInt32 Count = Max - Min;
+
+                    mDeviceImmediate->VSSetSamplers(Min, Count, & Array[Min]);
+                    mDeviceImmediate->PSSetSamplers(Min, Count, & Array[Min]);
+                }
+            }
+
+            // Draw!
+            if (NewestSubmission.Indices.Buffer != 0)
+            {
+                mDeviceImmediate->DrawIndexed(
+                    NewestSubmission.Indices.Length, NewestSubmission.Indices.Offset, NewestSubmission.Vertices.Offset);
             }
             else
             {
-                mDeviceImmediate->Draw(Next.Vertices.Length, Next.Vertices.Offset);
+                mDeviceImmediate->Draw(NewestSubmission.Vertices.Length, NewestSubmission.Vertices.Offset);
             }
-
-            Prev = Next;
         }
     }
 
@@ -1085,6 +1074,35 @@ namespace Graphic
         ComPtr<ID3D11Texture2D> Depth;
         ThrowIfFail(mDevice->CreateTexture2D(& Description, nullptr, Depth.GetAddressOf()));
         ThrowIfFail(mDevice->CreateDepthStencilView(Depth.Get(), nullptr, Pass.Auxiliary.GetAddressOf()));
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Ref<D3D11Driver::D3D11Sampler> D3D11Driver::GetOrCreateSampler(Ref<const Sampler> Descriptor)
+    {
+        Ref<D3D11Sampler> Sampler = mSamplers[
+            static_cast<UInt>(Descriptor.EdgeU)       |
+            static_cast<UInt>(Descriptor.EdgeV)  << 3 |
+            static_cast<UInt>(Descriptor.Filter) << 6];
+
+        if (!Sampler.Resource)
+        {
+            const CD3D11_SAMPLER_DESC SamplerDescriptor(
+                As(Descriptor.Filter),
+                As(Descriptor.EdgeU),
+                As(Descriptor.EdgeV),
+                D3D11_TEXTURE_ADDRESS_CLAMP,
+                0,
+                0,
+                D3D11_COMPARISON_NEVER,
+                nullptr,
+                0,
+                D3D11_FLOAT32_MAX);
+
+            ThrowIfFail(mDevice->CreateSamplerState(& SamplerDescriptor, Sampler.Resource.GetAddressOf()));
+        }
+        return Sampler;
     }
 }
 

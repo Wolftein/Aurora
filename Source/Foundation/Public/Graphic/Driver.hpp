@@ -68,12 +68,6 @@ namespace Graphic
         virtual void DeletePipeline(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateSampler(Object ID, TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter) = 0;
-
-        // -=(Undocumented)=-
-        virtual void DeleteSampler(Object ID) = 0;
-
-        // -=(Undocumented)=-
         virtual void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-

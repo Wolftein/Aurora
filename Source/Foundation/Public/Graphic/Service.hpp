@@ -107,12 +107,6 @@ namespace Graphic
         void DeletePipeline(Object ID);
 
         // -=(Undocumented)=-
-        UInt CreateSampler(TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter);
-
-        // -=(Undocumented)=-
-        void DeleteSampler(Object ID);
-
-        // -=(Undocumented)=-
         template<typename T>
         UInt CreateTexture(TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<T> Data)
         {
@@ -168,7 +162,6 @@ namespace Graphic
         Handle<k_MaxMaterials> mMaterials;
         Handle<k_MaxPasses>    mPasses;
         Handle<k_MaxPipelines> mPipelines;
-        Handle<k_MaxSamplers>  mSamplers;
         Handle<k_MaxTextures>  mTextures;
     };
 }

@@ -90,7 +90,7 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
-    using Ref    = typename eastl::add_reference<Type>::type;
+    using Ref    = typename eastl::add_lvalue_reference<Type>::type;
 
     // -=(Undocumented)=-
     template<typename Type>

@@ -397,6 +397,19 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
+    struct Sampler
+    {
+        // -=(Undocumented)=-
+        TextureEdge   EdgeU  = TextureEdge::Clamp;
+
+        // -=(Undocumented)=-
+        TextureEdge   EdgeV  = TextureEdge::Clamp;
+
+        // -=(Undocumented)=-
+        TextureFilter Filter = TextureFilter::Nearest;
+    };
+
+    // -=(Undocumented)=-
     struct Submission
     {
         // -=(Undocumented)=-
@@ -418,7 +431,7 @@ namespace Graphic
         Object  Pipeline               = 0;
 
         // -=(Undocumented)=-
-        Object  Samplers[k_MaxSources] = { 0 };
+        Sampler Samplers[k_MaxSources];
 
         // -=(Undocumented)=-
         Object  Textures[k_MaxSources] = { 0 };
