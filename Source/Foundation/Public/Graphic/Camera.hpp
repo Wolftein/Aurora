@@ -22,7 +22,7 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    class Camera
+    class Camera final
     {
     public:
 

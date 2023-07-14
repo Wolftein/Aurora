@@ -87,7 +87,7 @@ namespace Content
         CStr GetFilename() const
 		{
 			const SInt32 Offset = mUrl.rfind("/");
-			return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : "");
+			return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : GetPath());
 		}
 
 		// -=(Undocumented)=-

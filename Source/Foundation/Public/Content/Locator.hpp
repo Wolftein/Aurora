@@ -25,6 +25,9 @@ namespace Content
 	{
 	public:
 
+        // -=(Undocumented)=-
+        virtual ~Locator() = default;
+
 		// -=(Undocumented)=-
 		virtual Chunk Open(CStr Path) = 0;
 	};

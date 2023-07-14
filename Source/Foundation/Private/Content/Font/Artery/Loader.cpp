@@ -132,7 +132,7 @@ namespace Content
             FontAtlas.Height = ImageHeader.Height;
 
             FontAtlas.Data   = Chunk(ImageHeader.DataLength);
-            memcpy(FontAtlas.Data.GetData(), ImageData, ImageHeader.DataLength);
+            FastCopyMemory(FontAtlas.Data.GetData(), ImageData, ImageHeader.DataLength);
         }
 
         // Normalize Glyphs coordinates to use Y-TopLeft instead of Y-BottomLeft

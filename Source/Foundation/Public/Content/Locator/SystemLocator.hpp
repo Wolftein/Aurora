@@ -31,6 +31,9 @@ namespace Content
 		// -=(Undocumented)=-
 		SystemLocator();
 
+        // -=(Undocumented)=-
+        ~SystemLocator() override = default;
+
 		// -=(Undocumented)=-
 		Chunk Open(CStr Path) override;
 

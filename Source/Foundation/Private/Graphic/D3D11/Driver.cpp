@@ -21,11 +21,14 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    inline void ThrowIfFail(HRESULT Result)
+    inline void ThrowIfFail(HRESULT Result) // TODO: Improve
     {
         if (FAILED(Result))
         {
-            throw std::runtime_error("D3D11 - ThrowIfFail"); // TODO Placeholder....
+            TCHAR Buffer[1024];
+            ::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, Result, 0, Buffer, 1024, NULL);
+
+            LOG_CRITICAL("{}'", Buffer);
         }
     }
 
@@ -528,7 +531,11 @@ namespace Graphic
         Description.SampleDesc        = { 1, 0 };
         Description.OutputWindow      = eastl::any_cast<HWND>(Display);
         Description.Windowed          = true;
-        Description.SwapEffect        = DXGI_SWAP_EFFECT_DISCARD;
+
+        ComPtr<IDXGIFactory4> Factory;
+        Description.SwapEffect        = FAILED(mDisplayFactory.As(& Factory))
+            ? DXGI_SWAP_EFFECT_DISCARD
+            : DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
         ThrowIfFail(
             mDisplayFactory->CreateSwapChain(mDevice.Get(), & Description, mPasses[ID].Display.GetAddressOf()));
@@ -770,7 +777,7 @@ namespace Graphic
         {
             Bytes = NewUniquePtr<UInt08[]>(Description.Height * Memory.RowPitch);
 
-            memcpy(Bytes.get(), Memory.pData, Description.Height * Memory.RowPitch);
+            FastCopyMemory<false>(Bytes.get(), Memory.pData, Description.Height * Memory.RowPitch);
 
             mDeviceImmediate->Unmap(Buffer.Get(), 0);
         }
@@ -800,7 +807,10 @@ namespace Graphic
 
                 if (Target != Clear::Auxiliary)
                 {
-                    mDeviceImmediate->ClearRenderTargetView(View.Get(), reinterpret_cast<Real32 *>(& Tint));
+                    const Array<FLOAT, 4> Color {
+                        Tint.GetRed(), Tint.GetGreen(), Tint.GetBlue(), Tint.GetAlpha()
+                    };
+                    mDeviceImmediate->ClearRenderTargetView(View.Get(), Color.data());
                 }
             }
         }
@@ -939,9 +949,35 @@ namespace Graphic
                     mPipelines[NewestSubmission.Pipeline].DS.Get(), NewestSubmission.Stencil);
             }
 
-            // Apply textures when it has changed
-            UInt Sources = 0;
+            // Apply samplers when it has changed, or it's the first batch
+            {
+                Ptr<ID3D11SamplerState> Array[k_MaxSources];
+                UInt32 Min = k_MaxSources;
+                UInt32 Max = 0u;
 
+                for (UInt32 Element = 0; Element < k_MaxSources; ++Element)
+                {
+                    Ref<D3D11Sampler> PrevSampler = GetOrCreateSampler(OldestSubmission.Samplers[Element]);
+                    Ref<D3D11Sampler> NextSampler = GetOrCreateSampler(NewestSubmission.Samplers[Element]);
+
+                    if (Index == 0 || PrevSampler.Resource != NextSampler.Resource)
+                    {
+                        Min = min(Element, Min);
+                        Max = max(Element + 1, Max);
+                    }
+                    Array[Element] = NextSampler.Resource.Get();
+                }
+
+                if (Min != k_MaxSources && Max != 0u)
+                {
+                    const UInt32 Count = Max - Min;
+
+                    mDeviceImmediate->VSSetSamplers(Min, Count, & Array[Min]);
+                    mDeviceImmediate->PSSetSamplers(Min, Count, & Array[Min]);
+                }
+            }
+
+            // Apply textures when it has changed
             {
                 Ptr<ID3D11ShaderResourceView> Array[k_MaxSources];
                 UInt32 Min = k_MaxSources;
@@ -949,8 +985,6 @@ namespace Graphic
 
                 for (UInt32 Element = 0; Element < k_MaxSources && NewestSubmission.Textures[Element] != 0; ++Element)
                 {
-                    ++Sources;
-
                     if (OldestSubmission.Textures[Element] != NewestSubmission.Textures[Element])
                     {
                         Min = min(Element, Min);
@@ -965,34 +999,6 @@ namespace Graphic
 
                     mDeviceImmediate->VSSetShaderResources(Min, Count, & Array[Min]);
                     mDeviceImmediate->PSSetShaderResources(Min, Count, & Array[Min]);
-                }
-            }
-
-            // Apply samplers when it has changed, or it's the first batch
-            {
-                Ptr<ID3D11SamplerState> Array[k_MaxSources];
-                UInt32 Min = Sources;
-                UInt32 Max = 0u;
-
-                for (UInt32 Element = 0; Element < Sources; ++Element)
-                {
-                    Ref<D3D11Sampler> PrevSampler = GetOrCreateSampler(OldestSubmission.Samplers[Element]);
-                    Ref<D3D11Sampler> NextSampler = GetOrCreateSampler(NewestSubmission.Samplers[Element]);
-
-                    if (Index == 0 || PrevSampler.Resource != NextSampler.Resource)
-                    {
-                        Min = min(Element, Min);
-                        Max = max(Element + 1, Max);
-                    }
-                    Array[Element] = NextSampler.Resource.Get();
-                }
-
-                if (Min != Sources && Max != 0u)
-                {
-                    const UInt32 Count = Max - Min;
-
-                    mDeviceImmediate->VSSetSamplers(Min, Count, & Array[Min]);
-                    mDeviceImmediate->PSSetSamplers(Min, Count, & Array[Min]);
                 }
             }
 

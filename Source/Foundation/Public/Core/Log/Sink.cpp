@@ -6,26 +6,8 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#pragma once
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Allocator/Chunk.hpp"
-#include "Allocator/Handle.hpp"
-
-#include "Core/Trait.hpp"
-
-#include "Log/Service.hpp"
-
-#include "Math/Color.hpp"
-#include "Math/Matrix4.hpp"
-#include "Math/Rect.hpp"
-#include "Math/Vector2.hpp"
-#include "Math/Vector3.hpp"
-#include "Math/Vector4.hpp"
-
-#include "Serialization/TOML/Parser.hpp"
-
-#include "System/Subsystem.hpp"
+#include "Sink.hpp"

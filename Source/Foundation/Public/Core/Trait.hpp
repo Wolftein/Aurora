@@ -14,6 +14,8 @@
 
 #include "Core/Common.hpp"
 
+#include <EAStdC/EAMemory.h>
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -67,5 +69,19 @@ inline namespace Core
     inline auto Exchange(Type & Object, Primitive && Value)
     {
         return eastl::exchange(Object, Value);
+    }
+
+    // -=(Undocumented)=-
+    template<Bool Cacheable = true>
+    inline auto FastCopyMemory(Ptr<void> Destination, Ptr<const void> Source, UInt Size)
+    {
+        if constexpr (Cacheable)
+        {
+            EA::StdC::MemcpyC(Destination, Source, Size);
+        }
+        else
+        {
+            EA::StdC::MemcpyS(Destination, Source, Size);
+        }
     }
 }

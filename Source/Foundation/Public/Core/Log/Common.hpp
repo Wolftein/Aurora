@@ -12,39 +12,19 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Resource.hpp"
+#include "Core/Common.hpp"
+
+#define QUILL_DISABLE_NON_PREFIXED_MACROS
+#define QUILL_ROOT_LOGGER_ONLY
+#include <quill/Quill.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Content
+Ref<std::ostream> operator<<(Ref<std::ostream> Output, Ref<const CStr> Value);
+
+template <>
+struct fmtquill::formatter<CStr> : ostream_formatter
 {
-    // -=(Undocumented)=-
-    class Loader
-    {
-    public:
-
-        // -=(Undocumented)=-
-        virtual ~Loader() = default;
-
-        // -=(Undocumented)=-
-        virtual List<CStr> GetExtensions() const = 0;
-
-        // -=(Undocumented)=-
-        virtual Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) = 0;
-    };
-
-    // -=(Undocumented)=-
-    template<typename Impl, typename Type>
-    class AbstractLoader : public Loader
-    {
-    public:
-
-        // -=(Undocumented)=-
-        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) override final
-        {
-            return static_cast<Ptr<Impl>>(this)->Load(Data, CastPtr<Type>(Asset));
-        }
-    };
-}
+};

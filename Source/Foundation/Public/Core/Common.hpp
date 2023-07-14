@@ -12,7 +12,6 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <cmath>
 #include <EASTL/bitset.h>
 #include <EASTL/fixed_vector.h>
 #include <EASTL/initializer_list.h>
@@ -130,5 +129,5 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Key, typename Value, typename Hash = eastl::hash<Key>, typename Predicate = eastl::equal_to<>>
-    using Table  = eastl::unordered_map<Key, Value, Hash, Predicate>; // TODO: Fix CStr lookup :-(
+    using Table  = eastl::hash_map<Key, Value, Hash, Predicate>; // TODO: fix homogenous lookup :-(
 }

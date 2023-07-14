@@ -18,55 +18,20 @@
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Core
+namespace Log
 {
     // -=(Undocumented)=-
-    template<UInt T>
-    class Handle final
+    class Sink
     {
     public:
 
         // -=(Undocumented)=-
-        constexpr static inline UInt k_Invalid = 0;
-
-    public:
+        virtual ~Sink() = default;
 
         // -=(Undocumented)=-
-        explicit Handle()
-            : mHead { 0 }
-        {
-        }
+        virtual void Write(CStr Message) = 0;
 
         // -=(Undocumented)=-
-        UInt Allocate()
-        {
-            if (mPool.empty())
-            {
-                return (mHead >= T ? k_Invalid : ++mHead);
-            }
-
-            const UInt Handle = (mPool.empty() ? k_Invalid : mPool.back());
-
-            if (Handle != k_Invalid)
-            {
-                mPool.pop_back();
-            }
-            return Handle;
-        }
-
-        // -=(Undocumented)=-
-        UInt Free(UInt Handle)
-        {
-            mPool.emplace_back(Handle);
-            return Handle;
-        }
-
-    private:
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        Stack<UInt, T> mPool;
-        UInt           mHead;
+        virtual void Flush() = 0;
     };
 }

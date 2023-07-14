@@ -312,18 +312,20 @@ namespace Content
             & Bytecode,
             & Error);
 
-        if (FAILED(Result))
+        Chunk Compilation;
+
+        if (SUCCEEDED(Result))
         {
-            OutputDebugStringA(reinterpret_cast<Ptr<Char>>(Error->GetBufferPointer())); // TODO: Replace with Logging
-            return Chunk();
+            Compilation = Chunk(Bytecode->GetBufferSize());
+            FastCopyMemory(Compilation.GetData(), Bytecode->GetBufferPointer(), Bytecode->GetBufferSize());
+            Bytecode->Release();
+        }
+        else
+        {
+            LOG_ERROR("Failed to compile shader: {}", reinterpret_cast<Ptr<Char>>(Error->GetBufferPointer()));
         }
 
-        // TODO: Zero Copy memory
-        Chunk Chunk(Bytecode->GetBufferSize());
-        memcpy(Chunk.GetData(), Bytecode->GetBufferPointer(), Bytecode->GetBufferSize());
-        Bytecode->Release();
-
-        return Chunk;
+        return Compilation;
 #else  // EA_PLATFORM_WINDOWS
         return Chunk();
 #endif // EA_PLATFORM_WINDOWS

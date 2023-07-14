@@ -21,7 +21,7 @@
 namespace Scene
 {
     // -=(Undocumented)=-
-    class Font : public Content::AbstractResource<Hash("Font")>
+    class Font final : public Content::AbstractResource<Hash("Font")>
     {
     public:
 

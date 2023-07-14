@@ -21,7 +21,7 @@
 namespace Content
 {
     // -=(Undocumented)=-
-    class Factory
+    class Factory final
     {
     public:
 

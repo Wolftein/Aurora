@@ -333,12 +333,6 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    struct Color
-    {
-        Real32 R = 0.0f, G = 0.0f, B = 0.0f, A = 1.0f;
-    };
-
-    // -=(Undocumented)=-
     struct Descriptor
     {
         // -=(Undocumented)=-

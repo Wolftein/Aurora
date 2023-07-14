@@ -140,6 +140,24 @@ ExternalProject_Get_Property(EP_TOML BINARY_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR})
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Dependency (QUILL)
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+ExternalProject_Add(EP_QUILL
+        GIT_REPOSITORY https://github.com/odygrd/quill
+        GIT_SUBMODULES_RECURSE OFF
+        CMAKE_ARGS
+            -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+            -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        UPDATE_COMMAND "" INSTALL_COMMAND "")
+ExternalProject_Get_Property(EP_QUILL SOURCE_DIR)
+ExternalProject_Get_Property(EP_QUILL BINARY_DIR)
+LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR}/quill/include)
+LIST(APPEND PROJECT_LIBRARY ${BINARY_DIR}/quill/quill.lib)
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Configuration
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

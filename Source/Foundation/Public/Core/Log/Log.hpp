@@ -12,39 +12,22 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Resource.hpp"
+#include "Core/Common.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Content
+namespace Log
 {
     // -=(Undocumented)=-
-    class Loader
+    enum class Verbosity
     {
-    public:
-
-        // -=(Undocumented)=-
-        virtual ~Loader() = default;
-
-        // -=(Undocumented)=-
-        virtual List<CStr> GetExtensions() const = 0;
-
-        // -=(Undocumented)=-
-        virtual Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) = 0;
-    };
-
-    // -=(Undocumented)=-
-    template<typename Impl, typename Type>
-    class AbstractLoader : public Loader
-    {
-    public:
-
-        // -=(Undocumented)=-
-        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Resource>> Asset) override final
-        {
-            return static_cast<Ptr<Impl>>(this)->Load(Data, CastPtr<Type>(Asset));
-        }
+        None,
+        Debug,
+        Information,
+        Warning,
+        Error,
+        Critical,
     };
 }

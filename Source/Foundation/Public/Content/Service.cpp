@@ -124,9 +124,9 @@ namespace Content
             return It->second->Open(Key.GetPath());
         }
 
-        for (const auto [Schema, Locator] : mLocators)
+        for (const auto Iterator : mLocators)
         {
-            if (Chunk Data = Locator->Open(Key.GetPath()); Data.HasData())
+            if (Chunk Data = Iterator.second->Open(Key.GetPath()); Data.HasData())
             {
                 return Move(Data);
             }
@@ -282,17 +282,17 @@ namespace Content
                 }
                 else
                 {
-                    // TODO: Log(ERROR_INVALID_CONTENT)
+                    LOG_WARNING("Failed to parse '{}'", Key.GetUrl());
                 }
             }
             else
             {
-                // TODO: Log(ERROR_FILE_NOT_FOUND)
+                LOG_WARNING("Resource '{}' not found.", Key.GetUrl());
             }
         }
         else
         {
-            // TODO: Log(ERROR_UNKNOWN_FILE_FORMAT)
+            LOG_WARNING("Unknown file format '{}'", Key.GetExtension());
         }
         return false;
     }
@@ -307,6 +307,8 @@ namespace Content
 
         if (Loaded)
         {
+            LOG_DEBUG("Loading resource '{}'", Asset->GetKey().GetUrl());
+
             const UInt64 LastMemoryUsage = Asset->GetMemory();
 
             // if the asset is being reloaded, then unload previous data from it
@@ -329,10 +331,12 @@ namespace Content
         }
         else
         {
+            LOG_DEBUG("Unloading resource '{}'", Asset->GetKey().GetUrl());
+
             Factory->SetMemoryUsage(Factory->GetMemoryUsage() - Asset->GetMemory());
 
             Asset->OnUnload(Context);
-            Asset->SetCondition(Resource::Condition::Failed);
+            Asset->SetCondition(Resource::Condition::Unloaded);
         }
     }
 }

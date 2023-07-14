@@ -11,7 +11,10 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "SystemLocator.hpp"
-#include <fstream>  // TODO: Replace with OS mapped functions
+
+#ifdef EA_PLATFORM_WINDOWS
+    #include <windows.h>
+#endif // EA_PLATFORM_WINDOWS
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -40,17 +43,24 @@ namespace Content
 
     Chunk SystemLocator::Open(CStr Path)
 	{
-		std::ifstream File((mPath + Path.data()).c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+        Chunk Output;
 
-		if (File)
-		{
-            Chunk OutputStream(File.tellg());
-			{
-				File.seekg(0, std::ios::beg);
-				File.read(reinterpret_cast<char *>(OutputStream.GetData()), OutputStream.GetSize());
-			}
-			return OutputStream;
-		}
-		return Chunk();
+#ifdef EA_PLATFORM_WINDOWS
+        constexpr UInt Access     = GENERIC_READ;
+        constexpr UInt Attributes = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN;
+
+        const HANDLE Handle = ::CreateFile((mPath + Path.data()).c_str(), Access, 0, 0, OPEN_EXISTING, Attributes, 0);
+
+        if (Handle)
+        {
+            Output = Chunk(::GetFileSize(Handle, nullptr));
+
+            ::ReadFile(Handle, Output.GetData(), Output.GetSize(), nullptr, 0);
+
+            ::CloseHandle(Handle);
+        }
+#endif // EA_PLATFORM_WINDOWS
+
+		return Output;
 	}
 }
