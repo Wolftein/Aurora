@@ -65,6 +65,11 @@ namespace Graphic
             {
                 mDriver = nullptr;
             }
+            else
+            {
+                Ref<const Capabilities> Capabilities = mDriver->GetCapabilities();
+                LOG_INFO("D3D11: Detected shader model {}", static_cast<UInt>(Capabilities.Language) + 1);
+            }
         }
         return Successful;
     }
@@ -80,13 +85,13 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    UInt Service::CreateBuffer(Bool Geometry, UInt Capacity, CPtr<UInt08> Data)
+    UInt Service::CreateBuffer(Usage Type, UInt Capacity, CPtr<UInt08> Data)
     {
         const Object ID = mBuffers.Allocate();
 
         if (ID > 0)
         {
-            mDriver->CreateBuffer(ID, Geometry, Capacity, Data);
+            mDriver->CreateBuffer(ID, Type, Capacity, Data);
         }
         return ID;
     }

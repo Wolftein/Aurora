@@ -45,7 +45,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void NoneDriver::CreateBuffer(Object ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data)
+    void NoneDriver::CreateBuffer(Object ID, Usage Type, UInt Capacity, CPtr<UInt08> Data)
     {
     }
 

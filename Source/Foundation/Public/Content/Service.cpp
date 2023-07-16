@@ -52,7 +52,7 @@ namespace Content
 
     void Service::OnTick()
     {
-        // TODO: Async
+        // TODO: async operation
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -147,7 +147,7 @@ namespace Content
             {
                 if (Async)
                 {
-                    // TODO: Async
+                    LOG_ERROR("Resources: Async operation is not yet supported, please use sync mode"); // TODO: async operation
                 }
                 else
                 {
@@ -168,7 +168,7 @@ namespace Content
 
             if (Async)
             {
-                // TODO: Async
+                LOG_ERROR("Resources: Async operation is not yet supported, please use sync mode"); // TODO: async operation
             }
             else
             {
@@ -186,7 +186,7 @@ namespace Content
         {
             if (Async)
             {
-                // TODO: Async
+                LOG_ERROR("Resources: Async operation is not yet supported, please use sync mode"); // TODO: async operation
             }
             else
             {
@@ -202,7 +202,7 @@ namespace Content
     {
         if (Asset && GetFactory(Asset->GetCategory())->Unload(Asset->GetKey()))
         {
-            Process(Asset, false);  // TODO: Async
+            Process(Asset, false);  // TODO: async operation
         }
     }
 
@@ -215,7 +215,7 @@ namespace Content
 
         for (Ref<const SPtr<Resource>> Asset : Assets)
         {
-            Process(Asset, false);  // TODO: Async
+            Process(Asset, false);  // TODO: async operation
         }
     }
 
@@ -282,17 +282,17 @@ namespace Content
                 }
                 else
                 {
-                    LOG_WARNING("Failed to parse '{}'", Key.GetUrl());
+                    LOG_WARNING("Resources: Failed to parse '{}'", Key.GetUrl());
                 }
             }
             else
             {
-                LOG_WARNING("Resource '{}' not found.", Key.GetUrl());
+                LOG_WARNING("Resources: '{}' not found.", Key.GetUrl());
             }
         }
         else
         {
-            LOG_WARNING("Unknown file format '{}'", Key.GetExtension());
+            LOG_WARNING("Resources: Unknown file format '{}'", Key.GetExtension());
         }
         return false;
     }
@@ -307,7 +307,7 @@ namespace Content
 
         if (Loaded)
         {
-            LOG_DEBUG("Loading resource '{}'", Asset->GetKey().GetUrl());
+            LOG_DEBUG("Resources: Loading '{}'", Asset->GetKey().GetUrl());
 
             const UInt64 LastMemoryUsage = Asset->GetMemory();
 
@@ -331,7 +331,7 @@ namespace Content
         }
         else
         {
-            LOG_DEBUG("Unloading resource '{}'", Asset->GetKey().GetUrl());
+            LOG_DEBUG("Resources: Unloading '{}'", Asset->GetKey().GetUrl());
 
             Factory->SetMemoryUsage(Factory->GetMemoryUsage() - Asset->GetMemory());
 

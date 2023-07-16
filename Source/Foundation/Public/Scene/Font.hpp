@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Graphic/Image.hpp"
 #include "Graphic/Material.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -24,19 +25,6 @@ namespace Scene
     class Font final : public Content::AbstractResource<Hash("Font")>
     {
     public:
-
-        // -=(Undocumented)=-
-        struct Atlas
-        {
-            // -=(Undocumented)=-
-            Chunk Data;
-
-            // -=(Undocumented)=-
-            UInt32 Width;
-
-            // -=(Undocumented)=-
-            UInt32 Height;
-        };
 
         // -=(Undocumented)=-
         struct Glyph
@@ -76,7 +64,7 @@ namespace Scene
         Font(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(Ref<Metrics> Metrics, Ref<Atlas> Image, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning);
+        void Load(Ref<Metrics> Metrics, Ref<Graphic::Image> Atlas, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning);
 
         // -=(Undocumented)=-
         Ref<const Metrics> GetMetrics() const
@@ -118,13 +106,13 @@ namespace Scene
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Metrics                 mMetrics;
-        Atlas                   mImage;
         Table<UInt32, Glyph>    mGlyphs;
         Table<UInt64, Real32>   mKerning;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        Graphic::Image          mAtlas;
         SPtr<Graphic::Material> mMaterial;
     };
 }

@@ -35,7 +35,7 @@ namespace Graphic
         Ref<const Capabilities> GetCapabilities() const override;
 
         // \see Driver::CreateBuffer
-        void CreateBuffer(Object ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data) override;
+        void CreateBuffer(Object ID, Usage Type, UInt Capacity, CPtr<UInt08> Data) override;
 
         // \see Driver::Map
         Ptr<void> Map(Object ID, Ref<UInt> Offset, UInt Length) override;

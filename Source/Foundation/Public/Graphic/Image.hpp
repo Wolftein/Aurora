@@ -12,31 +12,59 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Core.hpp"
+#include "Core/Allocator/Chunk.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Audio
+namespace Graphic
 {
     // -=(Undocumented)=-
-    enum
+    class Image final
     {
-        // -=(Undocumented)=-
-        k_MaxMixes    = 128,
+    public:
 
         // -=(Undocumented)=-
-        k_MaxSubmixes = 16,
-    };
+        Image()
+            : mWidth  { 0 },
+              mHeight { 0 }
+        {
+        }
 
-    // -=(Undocumented)=-
-    enum class Backend
-    {
-        None,
-        XAudio2,
-    };
+        // -=(Undocumented)=-
+        void Load(Ref<Chunk> Bytes, UInt Width, UInt Height)
+        {
+            mBytes  = Move(Bytes);
+            mWidth  = Width;
+            mHeight = Height;
+        }
 
-    // -=(Undocumented)=-
-    using Object = UInt;
+        // -=(Undocumented)=-
+        Ref<Chunk> GetBytes()
+        {
+            return mBytes;
+        }
+
+        // -=(Undocumented)=-
+        UInt GetWidth() const
+        {
+            return mWidth;
+        }
+
+        // -=(Undocumented)=-
+        UInt GetHeight() const
+        {
+            return mWidth;
+        }
+
+    private:
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Chunk mBytes;
+        UInt  mWidth;
+        UInt  mHeight;
+    };
 }

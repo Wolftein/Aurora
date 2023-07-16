@@ -326,6 +326,19 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    static auto As(Usage Value)
+    {
+        constexpr static D3D11_BIND_FLAG k_Mapping[] = {
+            D3D11_BIND_CONSTANT_BUFFER,        // Usage::Uniform
+            D3D11_BIND_INDEX_BUFFER,           // Usage::Indices
+            D3D11_BIND_VERTEX_BUFFER,          // Usage::Vertices
+        };
+        return k_Mapping[static_cast<UInt32>(Value)];
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     static auto As(VertexFormat Value)
     {
         constexpr static DXGI_FORMAT k_Mapping[] = {
@@ -451,11 +464,12 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreateBuffer(Object ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data)
+    void D3D11Driver::CreateBuffer(Object ID, Usage Type, UInt Capacity, CPtr<UInt08> Data)
     {
+        const D3D11_BIND_FLAG   Binding    = As(Type);
         const D3D11_BUFFER_DESC Descriptor = CD3D11_BUFFER_DESC(
-            Geometry     ? Capacity : Align<256>(Capacity),
-            Geometry     ? D3D11_BIND_INDEX_BUFFER | D3D11_BIND_VERTEX_BUFFER : D3D11_BIND_CONSTANT_BUFFER,
+            Binding != D3D11_BIND_CONSTANT_BUFFER ? Capacity : Align<256>(Capacity),
+            Binding,
             Data.empty() ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_IMMUTABLE,
             Data.empty() ? D3D11_CPU_ACCESS_WRITE : 0);
 
@@ -467,8 +481,7 @@ namespace Graphic
         Ref<D3D11Buffer> Buffer = mBuffers[ID];
         Buffer.Offset   = 0;
         Buffer.Capacity = Capacity;
-
-        ThrowIfFail(mDevice->CreateBuffer(& Descriptor, Pointer, Buffer.Resource.GetAddressOf()));
+        ThrowIfFail(mDevice->CreateBuffer(& Descriptor, Pointer, Buffer.Object.GetAddressOf()));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -493,7 +506,7 @@ namespace Graphic
         const D3D11_MAP          Mode = (Discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE);
         D3D11_MAPPED_SUBRESOURCE Memory;
 
-        if (FAILED(mDeviceImmediate->Map(mBuffers[ID].Resource.Get(), 0, Mode, 0, & Memory)))
+        if (FAILED(mDeviceImmediate->Map(mBuffers[ID].Object.Get(), 0, Mode, 0, & Memory)))
         {
             return nullptr;
         }
@@ -505,7 +518,7 @@ namespace Graphic
 
     void D3D11Driver::Unmap(Object ID)
     {
-        mDeviceImmediate->Unmap(mBuffers[ID].Resource.Get(), 0);
+        mDeviceImmediate->Unmap(mBuffers[ID].Object.Get(), 0);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -850,7 +863,7 @@ namespace Graphic
                 Ref<const D3D11Buffer> Buffer = mBuffers[NewestSubmission.Vertices.Buffer];
                 const UINT Stride = NewestSubmission.Vertices.Stride;
                 const UINT Offset = 0;
-                mDeviceImmediate->IASetVertexBuffers(0, 1, Buffer.Resource.GetAddressOf(), & Stride, & Offset);
+                mDeviceImmediate->IASetVertexBuffers(0, 1, Buffer.Object.GetAddressOf(), & Stride, & Offset);
             }
 
             // Apply indices when it has changed
@@ -860,7 +873,7 @@ namespace Graphic
                 const DXGI_FORMAT      Format = (NewestSubmission.Indices.Stride == sizeof(UInt16)
                                                  ? DXGI_FORMAT_R16_UINT
                                                  : DXGI_FORMAT_R32_UINT);
-                mDeviceImmediate->IASetIndexBuffer(Buffer.Resource.Get(), Format, 0);
+                mDeviceImmediate->IASetIndexBuffer(Buffer.Object.Get(), Format, 0);
             }
 
             // Apply uniforms when it has changed
@@ -882,7 +895,7 @@ namespace Graphic
                         Max = max(Element + 1, Max);
                     }
 
-                    Array[Element]       = mBuffers[New.Buffer].Resource.Get();
+                    Array[Element]       = mBuffers[New.Buffer].Object.Get();
                     ArrayOffset[Element] = Align<16>(New.Offset);
                     ArrayLength[Element] = Align<16>(New.Length);
                 }

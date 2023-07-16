@@ -46,7 +46,7 @@ namespace Content
 
         // Font Data
         Scene::Font::Metrics              FontMetrics;
-        Scene::Font::Atlas                FontAtlas;
+        Graphic::Image                    FontAtlas;
         Table<UInt32, Scene::Font::Glyph> FontGlyphs;
         Table<UInt64, Real32>             FontKerning;
 
@@ -56,17 +56,20 @@ namespace Content
 
         if (memcmp(FontHeader.Tag, "ARTERY/FONT\0\0\0\0\0", sizeof(FontHeader.Tag)))
         {
+            LOG_WARNING("Artery Font: Invalid header detected.");
             return false;
         }
         if (FontHeader.Magic != 0x4D276A5C || FontHeader.RealType != 0x14)
         {
-            return false; // Only 32-bit float is supported
+            LOG_WARNING("Artery Font: Non 32-bit float font.");
+            return false;
         }
 
         ARTERY_FONT_DECODE_READ_STRING(nullptr /* Metadata */, FontHeader.MetadataLength);
 
         if (FontHeader.VariantCount > 1) // TODO: Support more than 1?
         {
+            LOG_WARNING("Artery Font: Invalid font with more than 1 font-face.");
             return false;
         }
 
@@ -125,18 +128,18 @@ namespace Content
 
             if (ImageHeader.Encoding != 0x01)
             {
+                LOG_WARNING("Artery Font: Invalid font image.");
                 return false; // Only support binary mode & top down orientation
             }
 
-            FontAtlas.Width  = ImageHeader.Width;
-            FontAtlas.Height = ImageHeader.Height;
+            Chunk FontAtlasData(ImageHeader.DataLength);
+            FastCopyMemory(FontAtlasData.GetData(), ImageData, ImageHeader.DataLength);
 
-            FontAtlas.Data   = Chunk(ImageHeader.DataLength);
-            FastCopyMemory(FontAtlas.Data.GetData(), ImageData, ImageHeader.DataLength);
+            FontAtlas.Load(FontAtlasData, ImageHeader.Width, ImageHeader.Height);
         }
 
         // Normalize Glyphs coordinates to use Y-TopLeft instead of Y-BottomLeft
-        const Vector2f AtlasCoordNormalized(1.0f / FontAtlas.Width, 1.0f / FontAtlas.Height);
+        const Vector2f AtlasCoordNormalized(1.0f / FontAtlas.GetWidth(), 1.0f / FontAtlas.GetHeight());
 
         for (auto & Iterator : FontGlyphs)
         {

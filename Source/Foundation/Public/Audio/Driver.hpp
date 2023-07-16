@@ -27,14 +27,6 @@ namespace Audio
     public:
 
         // -=(Undocumented)=-
-        static constexpr inline UInt k_MaxMixes    = 128;
-
-        // -=(Undocumented)=-
-        static constexpr inline UInt k_MaxSubmixes = 16;
-
-    public:
-
-        // -=(Undocumented)=-
         virtual ~Driver() = default;
 
         // -=(Undocumented)=-

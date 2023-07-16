@@ -45,15 +45,15 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename T>
-        UInt CreateBuffer(Bool Geometry, UInt Capacity, CPtr<T> Data = CPtr<T>())
+        UInt CreateBuffer(Usage Type, UInt Capacity, CPtr<T> Data = CPtr<T>())
         {
             const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(Data.data()), Data.size_bytes());
 
-            return CreateBuffer(Geometry, Capacity * sizeof(T), Bytes);
+            return CreateBuffer(Type, Capacity * sizeof(T), Bytes);
         }
 
         // -=(Undocumented)=-
-        UInt CreateBuffer(Bool Geometry, UInt Capacity, CPtr<UInt08> Data = CPtr<UInt08>());
+        UInt CreateBuffer(Usage Type, UInt Capacity, CPtr<UInt08> Data = CPtr<UInt08>());
 
         // -=(Undocumented)=-
         Ptr<void> Map(Object ID, Ref<UInt> Offset, UInt Length);

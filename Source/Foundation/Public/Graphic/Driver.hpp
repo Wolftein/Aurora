@@ -38,7 +38,7 @@ namespace Graphic
         virtual Ref<const Capabilities> GetCapabilities() const = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateBuffer(Object ID, Bool Geometry, UInt Capacity, CPtr<UInt08> Data) = 0;
+        virtual void CreateBuffer(Object ID, Usage Type, UInt Capacity, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-
         virtual Ptr<void> Map(Object ID, Ref<UInt> Offset, UInt Length) = 0;

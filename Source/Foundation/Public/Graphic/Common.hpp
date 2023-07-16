@@ -260,6 +260,14 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
+    enum class Usage
+    {
+        Uniform,
+        Indices,
+        Vertices,
+    };
+
+    // -=(Undocumented)=-
     enum class VertexFormat
     {
         Float16x2,

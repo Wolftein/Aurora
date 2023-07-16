@@ -29,10 +29,10 @@ namespace Scene
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Font::Load(Ref<Metrics> Metrics, Ref<Atlas> Image, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning)
+    void Font::Load(Ref<Metrics> Metrics, Ref<Graphic::Image> Atlas, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning)
     {
         mMetrics = Move(Metrics);
-        mImage   = Move(Image);
+        mAtlas   = Move(Atlas);
         mGlyphs  = Move(Glyphs);
         mKerning = Move(Kerning);
     }
@@ -45,7 +45,7 @@ namespace Scene
         const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>("_Private");
         Texture->Load(
             Graphic::TextureFormat::RGBA8UIntNorm,
-            Graphic::TextureLayout::Source, mImage.Width, mImage.Height, 1, mImage.Data);
+            Graphic::TextureLayout::Source, mAtlas.GetWidth(), mAtlas.GetHeight(), 1, mAtlas.GetBytes());
 
         mMaterial = NewPtr<Graphic::Material>("_Private");
         mMaterial->SetTexture(0, Texture);

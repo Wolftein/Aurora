@@ -11,7 +11,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Kernel.hpp"
-#include <windows.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -28,33 +27,33 @@ namespace Engine
         Log::Service::GetSingleton().Initialise("Aurora.log");
 
         // Creates the platform service
-        LOG_INFO("Initializing platform service");
+        LOG_INFO("Kernel: Creating platform service");
         SPtr<Platform::Service> PlatformService = AddSubsystem<Platform::Service>();
 
         // Creates the input service
-        LOG_INFO("Initializing input service");
+        LOG_INFO("Kernel: Creating input service");
         AddSubsystem<Input::Service>();
 
         // Create the game's window
-        LOG_INFO("Initializing display");
+        LOG_INFO("Kernel: Creating display ({}, {})", Properties.GetWindowWidth(), Properties.GetWindowHeight());
         mDisplay = PlatformService->Initialise(
             Properties.GetWindowTitle(),
             Properties.GetWindowWidth(),
             Properties.GetWindowHeight());
 
         // Create the graphic service
-        LOG_INFO("Initializing graphics service");
+        LOG_INFO("Kernel: Creating graphics service");
         SPtr<Graphic::Service> GraphicService = AddSubsystem<Graphic::Service>();
         GraphicService->Initialise(
             Graphic::Backend::Direct3D11, mDisplay->GetHandle(), Properties.GetWindowWidth(), Properties.GetWindowHeight());
 
         // Create the audio service
-        LOG_INFO("Initializing audio service");
+        LOG_INFO("Kernel: Creating audio service");
         SPtr<Audio::Service> AudioService = AddSubsystem<Audio::Service>();
-        AudioService->Initialise(Audio::Backend::XAudio2, Audio::Driver::k_MaxSubmixes);
+        AudioService->Initialise(Audio::Backend::XAudio2, Audio::k_MaxSubmixes);
 
         // Create the content service
-        LOG_INFO("Initializing content service");
+        LOG_INFO("Kernel: Creating content service");
         AddSubsystem<Content::Service>();
     }
 
