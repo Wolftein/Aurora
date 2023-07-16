@@ -23,7 +23,7 @@ namespace Graphic
 
     void Camera::Compute()
     {
-        mWorld = (mView = mTransformation) * mProjection;
+        mWorld = (mView = mTransformation.AsMatrix()) * mProjection;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -39,7 +39,7 @@ namespace Graphic
 
     Vector2f Camera::GetWorldCoordinates(Ref<const Vector2f> Position, Ref<const Rectf> Viewport) const
     {
-        const Vector3f Coordinates = GetScreenCoordinates(Vector3f(Position.GetX(), Position.GetY(), 0), Viewport);
+        const Vector3f Coordinates = GetWorldCoordinates(Vector3f(Position.GetX(), Position.GetY(), 0), Viewport);
 
         return Vector2f(Coordinates.GetX(), Coordinates.GetY());
     }

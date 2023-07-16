@@ -165,7 +165,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        operator Matrix4<Base>() const
+        Matrix4<Base> AsMatrix() const
         {
             return Matrix4<Base>::CreateTransform(mPosition, mRotation, mScale);
         }

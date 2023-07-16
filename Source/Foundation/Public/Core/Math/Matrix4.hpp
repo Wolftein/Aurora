@@ -93,6 +93,42 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Vector3<Base> GetRight() const
+        {
+            return Vector3<Base>(GetComponent(0), GetComponent(1), GetComponent(2));
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> GetLeft() const
+        {
+            return -GetRight();
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> GetUp() const
+        {
+            return Vector3<Base>(GetComponent(4), GetComponent(5), GetComponent(6));
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> GetDown() const
+        {
+            return -GetUp();
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> GetForward() const
+        {
+            return Vector3<Base>(GetComponent(8), GetComponent(9), GetComponent(10));
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> GetBackward() const
+        {
+            return -GetForward();
+        }
+
+        // -=(Undocumented)=-
         Ref<Base> operator()(UInt Component)
         {
             return operator[](Component);

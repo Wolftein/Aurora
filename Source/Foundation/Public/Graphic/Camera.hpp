@@ -47,10 +47,41 @@ namespace Graphic
             return mWorld;
         }
 
-        // TODO Vector3f GetRight() const;
-        // TODO Vector3f GetLeft() const;
-        // TODO Vector3f GetUp() const;
-        // TODO Vector3f GetForward() const;
+        // -=(Undocumented)=-
+        Vector3f GetRight() const
+        {
+            return mView.GetRight();
+        }
+
+        // -=(Undocumented)=-
+        Vector3f GetLeft() const
+        {
+            return mView.GetLeft();
+        }
+
+        // -=(Undocumented)=-
+        Vector3f GetUp() const
+        {
+            return mView.GetUp();
+        }
+
+        // -=(Undocumented)=-
+        Vector3f GetDown() const
+        {
+            return mView.GetDown();
+        }
+
+        // -=(Undocumented)=-
+        Vector3f GetForward() const
+        {
+            return mView.GetForward();
+        }
+
+        // -=(Undocumented)=-
+        Vector3f GetBackward() const
+        {
+            return mView.GetBackward();
+        }
 
         // -=(Undocumented)=-
         void SetPerspective(Real32 Eyes, Real32 Aspect, Real32 ZNear, Real32 ZFar)
