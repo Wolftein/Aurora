@@ -115,12 +115,14 @@ namespace Audio
 
         if (FAILED(mLibrary.XAudio2Create(& mDevice, 0, XAUDIO2_DEFAULT_PROCESSOR)))
         {
-            return false; // TODO_LOG: Cannot initialize XAudio2
+            LOG_ERROR("XAudio2: Failed to initialize.");
+            return false;
         }
 
         if (FAILED(mDevice->CreateMasteringVoice(& mMaster)))
         {
-            return false; // TODO_LOG: Cannot initialize master channel
+            LOG_ERROR("XAudio2: Failed to create master voice.");
+            return false;
         }
 
         // Initialise Submixes
