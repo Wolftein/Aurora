@@ -28,8 +28,17 @@ namespace fmtquill
     Ref<std::ostream> operator<<(Ref<std::ostream> Stream, Ref<const CStr> Value);
 
     // -=(Undocumented)=-
+    Ref<std::ostream> operator<<(Ref<std::ostream> Stream, Ref<const SStr> Value);
+
+    // -=(Undocumented)=-
     template <>
     struct formatter<CStr> : ostream_formatter
+    {
+    };
+
+    // -=(Undocumented)=-
+    template <>
+    struct formatter<SStr> : ostream_formatter
     {
     };
 }

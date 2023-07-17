@@ -380,6 +380,16 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    static auto As(const Ptr<WCHAR> Value)
+    {
+        Char Buffer[MAX_PATH];
+        ::WideCharToMultiByte(CP_ACP, 0, Value, -1, Buffer, MAX_PATH, NULL, NULL);
+        return SStr(Buffer);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     Bool D3D11Driver::Initialise(Any Display, UInt Width, UInt Height)
     {
         decltype(& D3D11CreateDevice)  D3D11CreateDevicePtr = nullptr;
@@ -424,6 +434,7 @@ namespace Graphic
             ThrowIfFail(CreateDXGIFactoryPtr(IID_PPV_ARGS(& mDisplayFactory)));
 
             LoadCapabilities();
+            LoadAdapters();
 
             if (Display.has_value())
             {
@@ -1068,6 +1079,30 @@ namespace Graphic
             break;
         default:
             break;
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::LoadAdapters()
+    {
+        ComPtr<IDXGIAdapter1> DXGIAdapter;
+        for (UInt Index = 0; SUCCEEDED(mDisplayFactory->EnumAdapters1(Index, & DXGIAdapter)); ++Index)
+        {
+            DXGI_ADAPTER_DESC1 DXGIDescription;
+            if (SUCCEEDED(DXGIAdapter->GetDesc1(& DXGIDescription)))
+            {
+                if ((DXGIDescription.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) == 0)
+                {
+                    Ref<Graphic::Adapter> AdapterInfo = mCapabilities.Adapters.push_back();
+
+                    AdapterInfo.Description          = As(DXGIDescription.Description);
+                    AdapterInfo.DedicatedMemoryInMBs = DXGIDescription.DedicatedVideoMemory >> 20;
+                    AdapterInfo.SharedMemoryInMBs    = DXGIDescription.SharedSystemMemory >> 20;
+                    AdapterInfo.SystemMemoryInMBs    = DXGIDescription.DedicatedSystemMemory >> 20;
+                }
+            }
         }
     }
 

@@ -26,4 +26,13 @@ namespace fmtquill
         Stream << std::string_view(Value.data(), Value.size());
         return Stream;
     }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Ref<std::ostream> operator<<(Ref<std::ostream> Stream, Ref<const SStr> Value)
+    {
+        Stream << std::string_view(Value.data(), Value.size());
+        return Stream;
+    }
 }

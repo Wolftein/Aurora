@@ -27,6 +27,9 @@ namespace Graphic
         k_Default        = 0,
 
         // -=(Undocumented)=-
+        k_MaxAdapters    = 0x0008,
+
+        // -=(Undocumented)=-
         k_MaxAttachments = 0x0004,
 
         // -=(Undocumented)=-
@@ -302,6 +305,22 @@ namespace Graphic
     using  Object = UInt;
 
     // -=(Undocumented)=-
+    struct Adapter
+    {
+        // -=(Undocumented)=-
+        SStr Description;
+
+        // -=(Undocumented)=-
+        UInt DedicatedMemoryInMBs;
+
+        // -=(Undocumented)=-
+        UInt SystemMemoryInMBs;
+
+        // -=(Undocumented)=-
+        UInt SharedMemoryInMBs;
+    };
+
+    // -=(Undocumented)=-
     struct Attribute
     {
         // -=(Undocumented)=-
@@ -338,6 +357,9 @@ namespace Graphic
 
         // -=(Undocumented)=-
         Language Language = Language::Version_1;
+
+        // -=(Undocumented)=-
+        Stack<Adapter, k_MaxAdapters> Adapters;
     };
 
     // -=(Undocumented)=-

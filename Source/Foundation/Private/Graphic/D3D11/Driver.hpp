@@ -143,6 +143,9 @@ namespace Graphic
         void LoadCapabilities();
 
         // -=(Undocumented)=-
+        void LoadAdapters();
+
+        // -=(Undocumented)=-
         void CreateSwapchainResources(Ref<D3D11Pass> Pass, UInt Width, UInt Height);
 
         // -=(Undocumented)=-

@@ -68,7 +68,16 @@ namespace Graphic
             else
             {
                 Ref<const Capabilities> Capabilities = mDriver->GetCapabilities();
-                LOG_INFO("D3D11: Detected shader model {}", static_cast<UInt>(Capabilities.Language) + 1);
+                LOG_INFO("Graphics: Detected shader model {}", static_cast<UInt>(Capabilities.Language) + 1);
+
+                for (Ref<const Adapter> Adapter : Capabilities.Adapters)
+                {
+                    LOG_INFO("Graphics: Found GPU '{}", Adapter.Description);
+                    LOG_INFO("Graphics: \tMemory {} (video), {} (system), {} (shared)",
+                             Adapter.DedicatedMemoryInMBs,
+                             Adapter.SystemMemoryInMBs,
+                             Adapter.SharedMemoryInMBs);
+                }
             }
         }
         return Successful;
