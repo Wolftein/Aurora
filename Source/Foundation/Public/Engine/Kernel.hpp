@@ -39,7 +39,7 @@ namespace Engine
         void Initialize(Ref<const Properties> Properties);
 
         // -=(Undocumented)=-
-        void Run();
+        void Tick();
 
         // -=(Undocumented)=-
         SPtr<Platform::Window> GetDisplay() const

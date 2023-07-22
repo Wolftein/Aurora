@@ -28,7 +28,7 @@ namespace Graphic
             TCHAR Buffer[1024];
             ::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, Result, 0, Buffer, 1024, NULL);
 
-            LOG_CRITICAL("{}'", Buffer);
+            LOG_CRITICAL(Buffer);
         }
     }
 

@@ -110,6 +110,7 @@ namespace Audio
     {
         if (!InitialiseLibrary())
         {
+            LOG_ERROR("XAudio2: Failed to find XAudio2 libraries, please make sure you have XAudio v2.9 or v2.8.");
             return false;
         }
 
@@ -191,7 +192,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void XAudio2Driver::SetListener(Ref<const Vector3f> Position, Ref<const Vector4f> Orientation)
+    void XAudio2Driver::SetListener(Ref<const Vector3f> Position)
     {
         m3DAudioListener.Position    = X3DAUDIO_VECTOR(Position.GetX(), Position.GetY(), Position.GetZ());
         m3DAudioListener.Velocity    = X3DAUDIO_VECTOR(0, 0, 0); // TODO For 3D implementation

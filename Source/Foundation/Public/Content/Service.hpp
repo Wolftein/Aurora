@@ -98,6 +98,13 @@ namespace Content
 
         // -=(Undocumented)=-
         template<typename Type>
+        SPtr<Type> Retrieve(Ref<const Uri> Key, Bool CreateIfMissing)
+        {
+            return GetFactory(Type::RTTI_CATEGORY)->template GetOrCreate<Type>(Key, CreateIfMissing);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
         SPtr<Type> Load(Ref<const Uri> Key)
         {
             return Load<Type>(Key, false);

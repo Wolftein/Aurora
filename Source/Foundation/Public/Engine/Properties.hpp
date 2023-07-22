@@ -32,6 +32,18 @@ namespace Engine
         void Load(Ref<TOMLParser> Parser);
 
         // -=(Undocumented)=-
+        void SetWindowHandle(Any Handle)
+        {
+            mWindowHandle = Handle;
+        }
+
+        // -=(Undocumented)=-
+        Any GetWindowHandle() const
+        {
+            return mWindowHandle;
+        }
+
+        // -=(Undocumented)=-
         void SetWindowTitle(CStr Title)
         {
             mWindowTitle = Title;
@@ -72,6 +84,7 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        Any  mWindowHandle;
         SStr mWindowTitle;
         UInt mWindowWidth;
         UInt mWindowHeight;

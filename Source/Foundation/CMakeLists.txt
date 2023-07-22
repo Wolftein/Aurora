@@ -51,9 +51,9 @@ ExternalProject_Add(EP_EASTL
         GIT_REPOSITORY https://github.com/electronicarts/EASTL
         GIT_SUBMODULES_RECURSE OFF
         CMAKE_ARGS
-            -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-            -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+            -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${WIN32_CMAKE_ARGS}"
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DEASTL_BUILD_TESTS=OFF
             -DEASTL_BUILD_BENCHMARK=OFF
         UPDATE_COMMAND "" INSTALL_COMMAND "")
@@ -77,9 +77,10 @@ ExternalProject_Add(EP_GLFW
         GIT_SUBMODULES_RECURSE OFF
         CMAKE_ARGS
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-            -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DGLFW_BUILD_TESTS=OFF
+            -DGLFW_BUILD_DOCS=OFF
+            -DGLFW_BUILD_EXAMPLES=OFF
         UPDATE_COMMAND "" INSTALL_COMMAND "")
 ExternalProject_Get_Property(EP_GLFW SOURCE_DIR)
 ExternalProject_Get_Property(EP_GLFW BINARY_DIR)
@@ -100,7 +101,7 @@ ExternalProject_Add(EP_DRLIBS
         CMAKE_ARGS
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-            -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+            -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${WIN32_CMAKE_ARGS}"
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         CONFIGURE_COMMAND "" BUILD_COMMAND "" UPDATE_COMMAND "" INSTALL_COMMAND "")
 ExternalProject_Get_Property(EP_DRLIBS SOURCE_DIR)
@@ -116,7 +117,7 @@ ExternalProject_Add(EP_STB
         CMAKE_ARGS
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-            -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+            -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${WIN32_CMAKE_ARGS}"
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         CONFIGURE_COMMAND "" BUILD_COMMAND "" UPDATE_COMMAND "" INSTALL_COMMAND "")
 ExternalProject_Get_Property(EP_STB SOURCE_DIR)
@@ -132,7 +133,7 @@ ExternalProject_Add(EP_TOML
         CMAKE_ARGS
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-            -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+            -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${WIN32_CMAKE_ARGS}"
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         CONFIGURE_COMMAND "" BUILD_COMMAND "" UPDATE_COMMAND "" INSTALL_COMMAND "")
 ExternalProject_Get_Property(EP_TOML SOURCE_DIR)
@@ -149,7 +150,7 @@ ExternalProject_Add(EP_QUILL
         CMAKE_ARGS
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-            -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+            -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${WIN32_CMAKE_ARGS}"
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         UPDATE_COMMAND "" INSTALL_COMMAND "")
 ExternalProject_Get_Property(EP_QUILL SOURCE_DIR)
@@ -162,8 +163,8 @@ LIST(APPEND PROJECT_LIBRARY ${BINARY_DIR}/quill/quill.lib)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ADD_DEFINITIONS(-DAE_CONTENT_LOCATOR_DEFAULT)
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MP3)        # Sound
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_WAV)        # Sound
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MP3)        # MP3
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_WAV)        # WAV
 ADD_DEFINITIONS(-DAE_CONTENT_LOADER_STB)        # Image
 ADD_DEFINITIONS(-DAE_CONTENT_LOADER_EFFECT)     # Pipeline
 ADD_DEFINITIONS(-DAE_CONTENT_LOADER_ARTERY)     # Font
@@ -173,12 +174,6 @@ ADD_DEFINITIONS(-DAE_CONTENT_LOADER_ARTERY)     # Font
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${PROJECT_SOURCE})
-
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Compiler (Flag)
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-SET_PROPERTY(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebugDLL")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Libraries

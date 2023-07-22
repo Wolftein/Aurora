@@ -164,7 +164,7 @@ namespace Content
     {
         if (Asset && Asset->HasCreated())
         {
-            Asset->SetCondition(Resource::Condition::Pending);
+            Asset->SetStatus(Resource::Status::Pending);
 
             if (Async)
             {
@@ -320,11 +320,11 @@ namespace Content
 
             if (Asset->OnLoad(Context))
             {
-                Asset->SetCondition(Resource::Condition::Loaded);
+                Asset->SetStatus(Resource::Status::Loaded);
             }
             else
             {
-                Asset->SetCondition(Resource::Condition::Failed);
+                Asset->SetStatus(Resource::Status::Failed);
             }
 
             Factory->SetMemoryUsage(Factory->GetMemoryUsage() + Asset->GetMemory() - LastMemoryUsage);
@@ -336,7 +336,7 @@ namespace Content
             Factory->SetMemoryUsage(Factory->GetMemoryUsage() - Asset->GetMemory());
 
             Asset->OnUnload(Context);
-            Asset->SetCondition(Resource::Condition::Unloaded);
+            Asset->SetStatus(Resource::Status::Unloaded);
         }
     }
 }

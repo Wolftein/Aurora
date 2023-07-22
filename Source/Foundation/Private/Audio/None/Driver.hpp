@@ -38,7 +38,7 @@ namespace Audio
         void Restore() override;
 
         // \see Driver::SetListener
-        void SetListener(Ref<const Vector3f> Position, Ref<const Vector4f> Orientation) override;
+        void SetListener(Ref<const Vector3f> Position) override;
 
         // \see Driver::SetMasterVolume
         void SetMasterVolume(Real32 Volume) override;

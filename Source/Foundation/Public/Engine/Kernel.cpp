@@ -35,17 +35,23 @@ namespace Engine
         AddSubsystem<Input::Service>();
 
         // Create the game's window
-        LOG_INFO("Kernel: Creating display ({}, {})", Properties.GetWindowWidth(), Properties.GetWindowHeight());
-        mDisplay = PlatformService->Initialise(
-            Properties.GetWindowTitle(),
-            Properties.GetWindowWidth(),
-            Properties.GetWindowHeight());
+        Any DisplayHandle = Properties.GetWindowHandle();
+        if (!DisplayHandle.has_value())
+        {
+            LOG_INFO("Kernel: Creating display ({}, {})", Properties.GetWindowWidth(), Properties.GetWindowHeight());
+            mDisplay = PlatformService->Initialise(
+                Properties.GetWindowTitle(),
+                Properties.GetWindowWidth(),
+                Properties.GetWindowHeight());
+
+            DisplayHandle = mDisplay->GetHandle();
+        }
 
         // Create the graphic service
         LOG_INFO("Kernel: Creating graphics service");
         SPtr<Graphic::Service> GraphicService = AddSubsystem<Graphic::Service>();
         GraphicService->Initialise(
-            Graphic::Backend::Direct3D11, mDisplay->GetHandle(), Properties.GetWindowWidth(), Properties.GetWindowHeight());
+            Graphic::Backend::Direct3D11, DisplayHandle, Properties.GetWindowWidth(), Properties.GetWindowHeight());
 
         // Create the audio service
         LOG_INFO("Kernel: Creating audio service");
@@ -60,14 +66,11 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Kernel::Run()
+    void Kernel::Tick()
     {
-        while (mDisplay->Poll())
+        Execute([](Ref<Core::Subsystem> Service)
         {
-            Execute([](Ref<Core::Subsystem> Service)
-            {
-                Service.OnTick();
-            });
-        }
+            Service.OnTick();
+        });
     }
 }

@@ -72,8 +72,8 @@ namespace Graphic
 
                 for (Ref<const Adapter> Adapter : Capabilities.Adapters)
                 {
-                    LOG_INFO("Graphics: Found GPU '{}", Adapter.Description);
-                    LOG_INFO("Graphics: \tMemory {} (video), {} (system), {} (shared)",
+                    LOG_INFO("Graphics: Found GPU '{}'", Adapter.Description);
+                    LOG_INFO("Graphics:     Memory {} (video), {} (system), {} (shared)",
                              Adapter.DedicatedMemoryInMBs,
                              Adapter.SystemMemoryInMBs,
                              Adapter.SharedMemoryInMBs);

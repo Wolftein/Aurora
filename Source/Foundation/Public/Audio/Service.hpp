@@ -41,7 +41,7 @@ namespace Audio
         void Restore();
 
         // -=(Undocumented)=-
-        void SetListener(Ref<const Vector3f> Position, Ref<const Vector4f> Orientation);
+        void SetListener(Ref<const Vector3f> Position);
 
         // -=(Undocumented)=-
         void SetMasterVolume(Real32 Volume);

@@ -20,11 +20,8 @@
 #include "Log/Service.hpp"
 
 #include "Math/Color.hpp"
-#include "Math/Matrix4.hpp"
 #include "Math/Rect.hpp"
-#include "Math/Vector2.hpp"
-#include "Math/Vector3.hpp"
-#include "Math/Vector4.hpp"
+#include "Math/Transform.hpp"
 
 #include "Serialization/TOML/Parser.hpp"
 

@@ -26,7 +26,7 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
-        enum class Condition
+        enum class Status
         {
             None, Pending, Loaded, Failed, Unloaded
         };
@@ -35,10 +35,10 @@ namespace Content
 
         // -=(Undocumented)=-
         Resource(Ref<const Uri> Key, UInt Category)
-            : mKey       { Key },
-              mCategory  { Category },
-              mMemory    { 0 },
-              mCondition { Condition::None }
+            : mKey      { Key },
+              mCategory { Category },
+              mMemory   { 0 },
+              mStatus   { Status::None }
         {
         }
 
@@ -70,21 +70,21 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        void SetCondition(Condition Condition)
+        void SetStatus(Status Status)
         {
-            mCondition = Condition;
+            mStatus = Status;
         }
 
         // -=(Undocumented)=-
         Bool HasCreated() const
         {
-            return mCondition == Condition::None;
+            return mStatus == Status::None;
         }
 
         // -=(Undocumented)=-
         Bool HasUnloaded() const
         {
-            return mCondition == Condition::Unloaded;
+            return mStatus == Status::Unloaded;
         }
 
         // -=(Undocumented)=-
@@ -96,13 +96,13 @@ namespace Content
         // -=(Undocumented)=-
         Bool HasFailed() const
         {
-            return mCondition == Condition::Failed;
+            return mStatus == Status::Failed;
         }
 
         // -=(Undocumented)=-
         Bool HasLoaded() const
         {
-            return mCondition == Condition::Loaded;
+            return mStatus == Status::Loaded;
         }
 
     public:
@@ -127,7 +127,7 @@ namespace Content
         const Uri  mKey;
         const UInt mCategory;
         UInt       mMemory;
-        Condition  mCondition;
+        Status     mStatus;
     };
 
     // -=(Undocumented)=-
