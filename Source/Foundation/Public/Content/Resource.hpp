@@ -76,6 +76,12 @@ namespace Content
         }
 
         // -=(Undocumented)=-
+        Status GetStatus() const
+        {
+            return mStatus;
+        }
+
+        // -=(Undocumented)=-
         Bool HasCreated() const
         {
             return mStatus == Status::None;
