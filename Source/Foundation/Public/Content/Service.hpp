@@ -44,7 +44,7 @@ namespace Content
         {
             for (const CStr Extension : Extensions)
             {
-                RemoveLoader(Extension);
+                RemoveLoader(STRING_FIX(Extension));
             }
         }
 
@@ -88,13 +88,13 @@ namespace Content
         Chunk Find(Ref<const Uri> Key);
 
         // -=(Undocumented)=-
-        void Register(Ref<const SPtr<Resource>> Asset)
+        void Register(Ref<const SPtr<Resource>> Asset, Bool Cacheable)
         {
-            Register(Asset, false);
+            Register(Asset, Cacheable, false);
         }
 
         // -=(Undocumented)=-
-        void Register(Ref<const SPtr<Resource>> Asset, Bool Async);
+        void Register(Ref<const SPtr<Resource>> Asset, Bool Cacheable, Bool Async);
 
         // -=(Undocumented)=-
         template<typename Type>
@@ -179,7 +179,7 @@ namespace Content
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Table<UInt, SPtr<Factory>> mFactories;
-        Table<CStr, SPtr<Loader>>  mLoaders;
-        Table<CStr, SPtr<Locator>> mLocators;
+        Table<SStr, SPtr<Loader>>  mLoaders;
+        Table<SStr, SPtr<Locator>> mLocators;
     };
 }

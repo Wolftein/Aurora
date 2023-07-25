@@ -28,7 +28,7 @@ namespace Platform
            mKeyboard { NewPtr<GLFWKeyboard>() },
            mMouse    { NewPtr<GLFWMouse>() }
     {
-        SPtr<Input::Service> Input = System.GetSubsystem<Input::Service>();
+        const SPtr<Input::Service> Input = System.GetSubsystem<Input::Service>();
         Input->Register<Input::Keyboard>(mKeyboard);
         Input->Register<Input::Mouse>(mMouse);
     }
@@ -222,5 +222,21 @@ namespace Platform
         SInt32 X, Y;
         glfwGetWindowPos(mHandle, & X, & Y);
         return Vector2i(X, Y);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void GLFWWindow::SetClipboard(CStr Text)
+    {
+        glfwSetClipboardString(mHandle, Text.data());
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    SStr GLFWWindow::GetClipboard() const
+    {
+        return SStr(glfwGetClipboardString(mHandle));
     }
 }

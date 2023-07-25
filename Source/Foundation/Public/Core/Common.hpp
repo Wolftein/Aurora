@@ -84,6 +84,9 @@ inline namespace Core
     using CStr   = eastl::string_view;
 
     // -=(Undocumented)=-
+#define STRING_FIX(Value) SStr(Value)  // TODO: Remove this until heterogeous lookup is fixed
+
+    // -=(Undocumented)=-
     template<typename Type>
     using Ptr    = typename eastl::add_pointer<Type>::type;
 
@@ -129,5 +132,5 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Key, typename Value, typename Hash = eastl::hash<Key>, typename Predicate = eastl::equal_to<>>
-    using Table  = eastl::hash_map<Key, Value, Hash, Predicate>; // TODO: fix homogenous lookup :-(
+    using Table  = eastl::hash_map<Key, Value, Hash, Predicate>;
 }

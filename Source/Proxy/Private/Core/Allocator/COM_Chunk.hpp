@@ -26,9 +26,10 @@ inline namespace COM
     {
         HRESULT Allocate([in] vbInt32 Bytes);
 
-        HRESULT Free();
+        [local]
+        HRESULT Copy([in, satype(void)] SAFEARRAY ** Source, [in] vbInt32 Size, [in] vbInt32 Offset);
 
-        [local] HRESULT Copy([in, satype(void)] SAFEARRAY * Source, [in] vbInt32 Size, [in] vbInt32 Offset);
+        HRESULT Free();
 
         HRESULT GetData([in, satype(vbInt8)] SAFEARRAY ** Result);
 
@@ -46,11 +47,11 @@ inline namespace COM
         // \see Memory_Chunk_::Allocate
         HRESULT Allocate(vbInt32 Bytes) override;
 
+        // \see Memory_Chunk_::Copy
+        HRESULT Copy(SAFEARRAY ** Source, vbInt32 Size, vbInt32 Offset) override;
+
         // \see Memory_Chunk_::Free
         HRESULT Free() override;
-
-        // \see Memory_Chunk_::Copy
-        HRESULT Copy(SAFEARRAY * Source, vbInt32 Size, vbInt32 Offset) override;
 
         // \see Memory_Chunk_::GetData
         HRESULT GetData(SAFEARRAY ** Result) override;

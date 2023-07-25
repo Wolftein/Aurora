@@ -62,7 +62,7 @@ namespace Content
     {
         for (const CStr Extension : Loader->GetExtensions())
         {
-            mLoaders.try_emplace(Extension, Loader);
+            mLoaders.try_emplace(Extension.data(), Loader);
         }
     }
 
@@ -71,7 +71,7 @@ namespace Content
 
     void Service::RemoveLoader(CStr Extension)
     {
-        mLoaders.erase(Extension);
+        mLoaders.erase(STRING_FIX(Extension));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -79,7 +79,7 @@ namespace Content
 
     void Service::AddLocator(CStr Schema, Ref<const SPtr<Locator>> Locator)
     {
-        mLocators.try_emplace(Schema, Locator);
+        mLocators.try_emplace(STRING_FIX(Schema), Locator);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -87,7 +87,7 @@ namespace Content
 
     void Service::RemoveLocator(CStr Schema)
     {
-        mLocators.erase(Schema);
+        mLocators.erase(STRING_FIX(Schema));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -119,7 +119,7 @@ namespace Content
 
     Chunk Service::Find(Ref<const Uri> Key)
     {
-        if (const auto It = mLocators.find(Key.GetSchema()); It != mLocators.end())
+        if (const auto It = mLocators.find(SStr(Key.GetSchema())); It != mLocators.end())
         {
             return It->second->Open(Key.GetPath());
         }
@@ -137,11 +137,11 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Register(Ref<const SPtr<Resource>> Asset, Bool Async)
+    void Service::Register(Ref<const SPtr<Resource>> Asset, Bool Cacheable, Bool Async)
     {
         if (Asset)
         {
-            const Bool Inserted = GetFactory(Asset->GetCategory())->Insert(Asset);
+            const Bool Inserted = !Cacheable || GetFactory(Asset->GetCategory())->Insert(Asset);
 
             if (Inserted)
             {
@@ -270,7 +270,7 @@ namespace Content
     {
         Ref<const Uri> Key = Asset->GetKey();
 
-        if (const auto Iterator = mLoaders.find(Key.GetExtension()); Iterator != mLoaders.end())
+        if (const auto Iterator = mLoaders.find(STRING_FIX(Key.GetExtension())); Iterator != mLoaders.end())
         {
             Ref<const SPtr<Loader>> Loader = Iterator->second;
 

@@ -66,5 +66,11 @@ namespace Platform
 
         // -=(Undocumented)=-
         virtual Vector2i GetPosition() const = 0;
+
+        // -=(Undocumented)=-
+        virtual void SetClipboard(CStr Text) = 0;
+
+        // -=(Undocumented)=-
+        virtual SStr GetClipboard() const = 0;
     };
 }

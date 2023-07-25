@@ -75,6 +75,12 @@ namespace Platform
         // \see Window::GetPosition
         Vector2i GetPosition() const override;
 
+        // \see Window::SetClipboard
+        void SetClipboard(CStr Text) override;
+
+        // \see Window::GetClipboard
+        SStr GetClipboard() const override;
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -16,6 +16,7 @@
 #include "Graphic/COM_Texture.hpp"
 #include "Graphic/COM_Material.hpp"
 #include "Scene/COM_Font.hpp"
+#include <Content/Locator/SystemLocator.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -38,6 +39,15 @@ inline namespace COM
     HRESULT Content_Service::AddLocator(vbStr8 Schema, IUnknown * Locator)
     {
         mWrapper->AddLocator(Schema, NewPtr<Visual_Basic_Content_Locator>(Locator));
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Content_Service::AddSystemLocator(vbStr8 Schema, vbStr8 Folder)
+    {
+        mWrapper->AddLocator(Schema, NewPtr<Content::SystemLocator>(Folder));
         return S_OK;
     }
 
@@ -80,9 +90,9 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Content_Service::Register(Content_Resource_ * Asset, vbBool Async)
+    HRESULT Content_Service::Register(Content_Resource_ * Asset, vbBool Cacheable, vbBool Async)
     {
-        mWrapper->Register(GetResource(Asset), VBIsTrue(Async));
+        mWrapper->Register(GetResource(Asset), VBIsTrue(Cacheable), VBIsTrue(Async));
         return S_OK;
     }
 

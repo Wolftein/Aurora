@@ -30,6 +30,8 @@ inline namespace COM
 
         HRESULT AddLocator([in] vbStr8 Schema, [in] IUnknown * Locator);
 
+        HRESULT AddSystemLocator([in] vbStr8 Schema, [in] vbStr8 Folder);
+
         HRESULT RemoveLocator([in] vbStr8 Schema);
 
         HRESULT SetMemoryBudget([in] Content_Resource_Type Category, [in] vbInt64 Budget);
@@ -38,7 +40,7 @@ inline namespace COM
 
         HRESULT GetMemoryUsage([in] Content_Resource_Type Category, [out, retval] vbInt64 * Result);
 
-        HRESULT Register([in] Content_Resource_ * Asset, [in, defaultvalue(false)] vbBool Async);
+        HRESULT Register([in] Content_Resource_ * Asset, [in] vbBool Cacheable, [in, defaultvalue(false)] vbBool Async);
 
         HRESULT Find([in] vbStr8 Key, [out, retval] Memory_Chunk_ ** Result);
 
@@ -67,6 +69,9 @@ inline namespace COM
         // \see Content_Service_::AddLocator
         HRESULT AddLocator(vbStr8 Schema, IUnknown * Locator) override;
 
+        // \see Content_Service_::AddSystemLocator
+        HRESULT AddSystemLocator(vbStr8 Schema, vbStr8 Folder) override;
+
         // \see Content_Service_::RemoveLocator
         HRESULT RemoveLocator(vbStr8 Schema) override;
 
@@ -80,7 +85,7 @@ inline namespace COM
         HRESULT GetMemoryUsage(Content_Resource_Type Category, vbInt64 * Result) override;
 
         // \see Content_Service_::Register
-        HRESULT Register(Content_Resource_ * Asset, vbBool Async) override;
+        HRESULT Register(Content_Resource_ * Asset, vbBool Cacheable, vbBool Async) override;
 
         // \see Content_Service_::Find
         HRESULT Find(vbStr8 Key, Memory_Chunk_ ** Result) override;

@@ -33,21 +33,27 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Memory_Chunk::Free()
+    HRESULT Memory_Chunk::Copy(SAFEARRAY ** Source, vbInt32 Size, vbInt32 Offset)
     {
-        mWrapper.Clear();
+        if (!Source)
+        {
+            return E_INVALIDARG;
+        }
+
+        const Ptr<SAFEARRAY> Array = (* Source);
+        const UInt Address = reinterpret_cast<UInt>(Array->pvData) + (Array->cbElements * Offset);
+        const UInt Length  = Array->cbElements * Size;
+
+        FastCopyMemory(mWrapper.GetData(), reinterpret_cast<Ptr<void>>(Address), Length);
         return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Memory_Chunk::Copy(SAFEARRAY * Source, vbInt32 Size, vbInt32 Offset)
+    HRESULT Memory_Chunk::Free()
     {
-        const UInt Address = reinterpret_cast<UInt>(Source->pvData) + (Source->cbElements * Offset);
-        const UInt Length  = Source->cbElements * Size;
-
-        FastCopyMemory(mWrapper.GetData(), reinterpret_cast<Ptr<void>>(Address), Length);
+        mWrapper.Clear();
         return S_OK;
     }
 
