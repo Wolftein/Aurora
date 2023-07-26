@@ -43,7 +43,7 @@ namespace Content
 
         const HANDLE Handle = ::CreateFile((mPath + Path.data()).c_str(), Access, 0, 0, OPEN_EXISTING, Attributes, 0);
 
-        if (Handle)
+        if (Handle != INVALID_HANDLE_VALUE)
         {
             Output = Chunk(::GetFileSize(Handle, nullptr));
 

@@ -158,7 +158,7 @@ inline namespace COM
                 (* Result) = CREATE_RESOURCE(Graphic_Texture, Graphic::Texture);
                 break;
             case Content_Resource_Type::eResourceTypeFont:
-                //(* Result) = CREATE_RESOURCE(Scene_Font, Scene::Font);
+                (* Result) = CREATE_RESOURCE(Scene_Font, Scene::Font);
                 break;
         };
 

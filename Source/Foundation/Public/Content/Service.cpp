@@ -119,7 +119,7 @@ namespace Content
 
     Chunk Service::Find(Ref<const Uri> Key)
     {
-        if (const auto It = mLocators.find(SStr(Key.GetSchema())); It != mLocators.end())
+        if (const auto It = mLocators.find(STRING_FIX(Key.GetSchema())); It != mLocators.end())
         {
             return It->second->Open(Key.GetPath());
         }
