@@ -42,7 +42,10 @@ namespace Log
 
         if (!Filename.empty())
         {
-            Configuration.default_handlers.emplace_back(quill::file_handler(Filename.data(), "w"));
+            quill::FileHandlerConfig Settings;
+            Settings.set_open_mode('w');
+
+            Configuration.default_handlers.emplace_back(quill::file_handler(Filename.data(), Settings));
         }
 
         // Configure the pattern of all handlers

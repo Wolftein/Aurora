@@ -13,10 +13,6 @@
 #include "Service.hpp"
 #include <Platform/GLFW/GLFWWindow.hpp>
 
-#ifdef EA_PLATFORM_WINDOWS
-    #include <windows.h>
-#endif // EA_PLATFORM_WINDOWS
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -29,9 +25,6 @@ namespace Platform
     Service::Service(Ref<Context> System)
         : Subsystem(System)
     {
-#ifdef EA_PLATFORM_WINDOWS
-        CoInitializeEx(NULL, COINIT_MULTITHREADED);
-#endif
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -39,9 +32,6 @@ namespace Platform
 
     Service::~Service()
     {
-#ifdef EA_PLATFORM_WINDOWS
-        CoUninitialize();
-#endif
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

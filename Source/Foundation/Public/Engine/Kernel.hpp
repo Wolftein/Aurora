@@ -36,6 +36,9 @@ namespace Engine
     public:
 
         // -=(Undocumented)=-
+        ~Kernel();
+
+        // -=(Undocumented)=-
         void Initialize(Ref<const Properties> Properties);
 
         // -=(Undocumented)=-
