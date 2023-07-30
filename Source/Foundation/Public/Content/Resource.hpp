@@ -46,6 +46,31 @@ namespace Content
         virtual ~Resource() = default;
 
         // -=(Undocumented)=-
+        Bool Create(Ref<Subsystem::Context> Context)
+        {
+            const Bool Result = OnCreate(Context);
+
+            if (Result)
+            {
+                SetStatus(Status::Loaded);
+            }
+            else
+            {
+                SetStatus(Status::Failed);
+            }
+            return Result;
+        }
+
+        // -=(Undocumented)=-
+        void Dispose(Ref<Subsystem::Context> Context)
+        {
+            OnDispose(Context);
+
+            SetStatus(Status::Unloaded);
+            SetMemory(0);
+        }
+
+        // -=(Undocumented)=-
         Ref<const Uri> GetKey() const
         {
             return mKey;
@@ -111,18 +136,17 @@ namespace Content
             return mStatus == Status::Loaded;
         }
 
-    public:
+    protected:
 
         // -=(Undocumented)=-
-        virtual Bool OnLoad(Ref<Subsystem::Context> Context)
+        virtual Bool OnCreate(Ref<Subsystem::Context> Context)
         {
             return false;
         }
 
         // -=(Undocumented)=-
-        virtual void OnUnload(Ref<Subsystem::Context> Context)
+        virtual void OnDispose(Ref<Subsystem::Context> Context)
         {
-            SetMemory(0);
         }
 
     private:

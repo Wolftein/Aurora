@@ -347,21 +347,25 @@ inline namespace Core
         // -=(Undocumented)=-
         static Matrix4<Base> CreateOrthographic(Base Left, Base Right, Base Bottom, Base Top, Base ZNear, Base ZFar)
         {
-            return Matrix4<Base>(2 / (Right - Left),
+            const Real32 Width  = (Right - Left);
+            const Real32 Height = (Top - Bottom);
+            const Real32 Depth  = (ZFar - ZNear);
+
+            return Matrix4<Base>(2 / Width,
                                  0,
                                  0,
                                  0,
                                  0,
-                                 2 / (Top - Bottom),
+                                 2 / Height,
                                  0,
                                  0,
                                  0,
                                  0,
-                                 2 / (ZFar - ZNear),
+                                 2 / Depth,
                                  0,
-                                 -(Right + Left) / (Right - Left),
-                                 -(Top + Bottom) / (Top - Bottom),
-                                 -(ZFar + ZNear) / (ZFar - ZNear),
+                                 -(Right + Left) / Width,
+                                 -(Top + Bottom) / Height,
+                                 -(ZFar + ZNear) / Depth,
                                  1);
         }
 
@@ -379,7 +383,7 @@ inline namespace Core
             const Vector4<Base> C2(Axes[0].GetZ(), Axes[1].GetZ(), Axes[2].GetZ(), 0);
             const Vector4<Base> C3(Axes[3].GetX(), Axes[3].GetY(), Axes[3].GetZ(), 1);
 
-            return Matrix<Base>(C0, C1, C2, C3);
+            return Matrix4<Base>(C0, C1, C2, C3);
         }
 
         // -=(Undocumented)=-
@@ -387,9 +391,9 @@ inline namespace Core
         {
             const Matrix4<Base> Matrix = Matrix4<Base>::FromRotation(Quaternion<Base>::Normalize(Rotation));
 
-            Vector4f C0(Matrix.GetComponent(0), Matrix.GetComponent(4), Matrix.GetComponent(8), 0);
-            Vector4f C1(Matrix.GetComponent(1), Matrix.GetComponent(5), Matrix.GetComponent(9), 0);
-            Vector4f C2(Matrix.GetComponent(2), Matrix.GetComponent(6), Matrix.GetComponent(10), 0);
+            Vector4f C0(Matrix.GetComponent(0), Matrix.GetComponent(1), Matrix.GetComponent(2),  0);
+            Vector4f C1(Matrix.GetComponent(4), Matrix.GetComponent(5), Matrix.GetComponent(6),  0);
+            Vector4f C2(Matrix.GetComponent(8), Matrix.GetComponent(9), Matrix.GetComponent(10), 0);
             Vector4f C3(Position.GetX(), Position.GetY(), Position.GetZ(), 1);
 
             C0 *= Scale.GetX();

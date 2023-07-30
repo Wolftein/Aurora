@@ -25,8 +25,6 @@ inline namespace COM
     [object, uuid("03E55C9C-9624-45F2-A7D5-B98916070F0A"), pointer_default(unique)]
     __interface Graphic_Material_ : public Content_Resource_
     {
-        HRESULT Initialize([in] vbStr8 Name);
-
         HRESULT GetID([out, retval] vbInt32 * Result);
 
         HRESULT SetTexture([in] vbInt32 Slot, [in] Graphic_Texture_ * Texture);
@@ -38,10 +36,7 @@ inline namespace COM
     {
     public:
 
-        // \see Graphic_Material_::Initialize
-        HRESULT Initialize(vbStr8 Name) override;
-
-        // \see Graphic_Material_::GetDepth
+        // \see Graphic_Material_::GetID
         HRESULT GetID(vbInt32 * Result) override;
 
         // \see Graphic_Material_::SetTexture

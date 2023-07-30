@@ -44,13 +44,13 @@ namespace Graphic
             return mProperties;
         }
 
-    public:
+    protected:
 
-        // \see Resource::OnLoad(Ref<Subsystem::Context>)
-        Bool OnLoad(Ref<Subsystem::Context> Context) override;
+        // \see Resource::OnCreate(Ref<Subsystem::Context>)
+        Bool OnCreate(Ref<Subsystem::Context> Context) override;
 
-        // \see Resource::OnUnload(Ref<Subsystem::Context>)
-        void OnUnload(Ref<Subsystem::Context> Context) override;
+        // \see Resource::OnDispose(Ref<Subsystem::Context>)
+        void OnDispose(Ref<Subsystem::Context> Context) override;
 
     private:
 

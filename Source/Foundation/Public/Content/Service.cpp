@@ -315,17 +315,10 @@ namespace Content
             // and load the new data
             if (Asset->HasLoaded())
             {
-                Asset->OnUnload(Context);
+                Asset->Dispose(Context);
             }
 
-            if (Asset->OnLoad(Context))
-            {
-                Asset->SetStatus(Resource::Status::Loaded);
-            }
-            else
-            {
-                Asset->SetStatus(Resource::Status::Failed);
-            }
+            Asset->Create(Context);
 
             Factory->SetMemoryUsage(Factory->GetMemoryUsage() + Asset->GetMemory() - LastMemoryUsage);
         }
@@ -335,8 +328,7 @@ namespace Content
 
             Factory->SetMemoryUsage(Factory->GetMemoryUsage() - Asset->GetMemory());
 
-            Asset->OnUnload(Context);
-            Asset->SetStatus(Resource::Status::Unloaded);
+            Asset->Dispose(Context);
         }
     }
 }

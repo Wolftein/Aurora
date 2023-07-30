@@ -40,7 +40,7 @@ namespace Scene
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Font::OnLoad(Ref<Subsystem::Context> Context)
+    Bool Font::OnCreate(Ref<Subsystem::Context> Context)
     {
         const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>("_Private");
         Texture->Load(
@@ -51,7 +51,7 @@ namespace Scene
         mMaterial->SetTexture(0, Texture);
         mMaterial->SetParameter(0, Vector2f(Texture->GetWidth(), Texture->GetHeight()));
 
-        if (! mMaterial->OnLoad(Context) || ! Texture->OnLoad(Context))
+        if (! mMaterial->Create(Context) || !Texture->Create(Context))
         {
             return false;
         }
@@ -63,16 +63,16 @@ namespace Scene
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Font::OnUnload(Ref<Subsystem::Context> Context)
+    void Font::OnDispose(Ref<Subsystem::Context> Context)
     {
         if (mMaterial)
         {
             if (Ref<const SPtr<Graphic::Texture>> Texture = mMaterial->GetTexture(0))
             {
-                Texture->OnUnload(Context);
+                Texture->Dispose(Context);
             }
 
-            mMaterial->OnUnload(Context);
+            mMaterial->Dispose(Context);
         }
     }
 }
