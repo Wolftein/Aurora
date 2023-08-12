@@ -116,7 +116,7 @@ namespace Graphic
         // -=(Undocumented)=-
         void SetPosition(Real32 X, Real32 Y, Real32 Z)
         {
-            mTransformation.SetPosition(Vector3f(X, Y, Y));
+            mTransformation.SetPosition(Vector3f(X, Y, Z));
         }
 
         // -=(Undocumented)=-
@@ -140,7 +140,7 @@ namespace Graphic
         // -=(Undocumented)=-
         void SetScale(Real32 X, Real32 Y, Real32 Z)
         {
-            mTransformation.SetScale(Vector3f(X, Y, Y));
+            mTransformation.SetScale(Vector3f(X, Y, Z));
         }
 
         // -=(Undocumented)=-

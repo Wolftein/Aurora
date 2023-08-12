@@ -16,7 +16,7 @@
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Scene
+namespace Graphic
 {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -29,7 +29,7 @@ namespace Scene
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Font::Load(Ref<Metrics> Metrics, Ref<Graphic::Image> Atlas, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning)
+    void Font::Load(Ref<Metrics> Metrics, Ref<Image> Atlas, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning)
     {
         mMetrics = Move(Metrics);
         mAtlas   = Move(Atlas);
@@ -42,22 +42,23 @@ namespace Scene
 
     Bool Font::OnCreate(Ref<Subsystem::Context> Context)
     {
-        const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>("_Private");
-        Texture->Load(
+        Bool Success;
+
+        // Allocates texture for the atlas
+        const SPtr<Texture> Atlas = NewPtr<Texture>("_Private");
+        Atlas->Load(
             Graphic::TextureFormat::RGBA8UIntNorm,
             Graphic::TextureLayout::Source, mAtlas.GetWidth(), mAtlas.GetHeight(), 1, mAtlas.GetBytes());
+        Success = Atlas->Create(Context);
 
+        // Allocates material for the font
         mMaterial = NewPtr<Graphic::Material>("_Private");
-        mMaterial->SetTexture(0, Texture);
-        mMaterial->SetParameter(0, Vector2f(Texture->GetWidth(), Texture->GetHeight()));
+        mMaterial->SetTexture(0, Atlas);
+        mMaterial->SetParameter(0, Vector2f(Atlas->GetWidth(), Atlas->GetHeight()));
+        Success = Success && mMaterial->Create(Context);
 
-        if (! mMaterial->Create(Context) || !Texture->Create(Context))
-        {
-            return false;
-        }
-
-        SetMemory(mGlyphs.size() * sizeof(Glyph) + mMaterial->GetMemory() + Texture->GetMemory());
-        return true;
+        SetMemory(mGlyphs.size() * sizeof(Glyph) + mMaterial->GetMemory() + Atlas->GetMemory());
+        return Success;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -67,7 +68,7 @@ namespace Scene
     {
         if (mMaterial)
         {
-            if (Ref<const SPtr<Graphic::Texture>> Texture = mMaterial->GetTexture(0))
+            if (Ref<const SPtr<Texture>> Texture = mMaterial->GetTexture(0))
             {
                 Texture->Dispose(Context);
             }

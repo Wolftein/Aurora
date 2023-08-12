@@ -21,7 +21,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool ArteryFontLoader::Load(Ref<Chunk> Data, Ref<const SPtr<Scene::Font>> Asset)
+    Bool ArteryFontLoader::Load(Ref<Chunk> Data, Ref<const SPtr<Graphic::Font>> Asset)
     {
         UInt32 CurrentOffset = 0;
 
@@ -45,10 +45,10 @@ namespace Content
         }
 
         // Font Data
-        Scene::Font::Metrics              FontMetrics;
-        Graphic::Image                    FontAtlas;
-        Table<UInt32, Scene::Font::Glyph> FontGlyphs;
-        Table<UInt64, Real32>             FontKerning;
+        Graphic::Font::Metrics              FontMetrics;
+        Graphic::Image                      FontAtlas;
+        Table<UInt32, Graphic::Font::Glyph> FontGlyphs;
+        Table<UInt64, Real32>               FontKerning;
 
         // Read header
         ArteryFontHeader FontHeader;
@@ -89,7 +89,7 @@ namespace Content
             {
                 Ref<ArteryGlyph> Glyph = Glyphs[Element];
 
-                FontGlyphs.try_emplace(Glyph.Codepoint, Scene::Font::Glyph {
+                FontGlyphs.try_emplace(Glyph.Codepoint, Graphic::Font::Glyph {
                     Glyph.Advance.Horizontal,
                     Rectf(Glyph.PlaneBounds.Left, Glyph.PlaneBounds.Top, Glyph.PlaneBounds.Right, Glyph.PlaneBounds.Bottom),
                     Rectf(Glyph.ImageBounds.Left, Glyph.ImageBounds.Top, Glyph.ImageBounds.Right, Glyph.ImageBounds.Bottom)
@@ -143,7 +143,7 @@ namespace Content
 
         for (auto & Iterator : FontGlyphs)
         {
-            Ref<Scene::Font::Glyph> Element = Iterator.second;
+            Ref<Graphic::Font::Glyph> Element = Iterator.second;
 
             const Real32 MinY = FontMetrics.Ascender - Element.PlaneBounds.GetTop();
             const Real32 MaxY = MinY + Element.PlaneBounds.GetTop() - Element.PlaneBounds.GetBottom();

@@ -13,7 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Content/Loader.hpp"
-#include "Scene/Font.hpp"
+#include "Graphic/Font.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,7 +22,7 @@
 namespace Content
 {
     // -=(Undocumented)=-
-    class ArteryFontLoader final : public AbstractLoader<ArteryFontLoader, Scene::Font>
+    class ArteryFontLoader final : public AbstractLoader<ArteryFontLoader, Graphic::Font>
     {
     public:
 
@@ -34,7 +34,7 @@ namespace Content
         }
 
         // \see AbstractLoader::Load
-        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Scene::Font>> Asset);
+        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Graphic::Font>> Asset);
 
     private:
 

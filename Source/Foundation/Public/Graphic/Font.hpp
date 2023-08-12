@@ -12,14 +12,14 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Graphic/Image.hpp"
-#include "Graphic/Material.hpp"
+#include "Image.hpp"
+#include "Material.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Scene
+namespace Graphic
 {
     // -=(Undocumented)=-
     class Font final : public Content::AbstractResource<Hash("Font")>
@@ -64,7 +64,7 @@ namespace Scene
         Font(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(Ref<Metrics> Metrics, Ref<Graphic::Image> Atlas, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning);
+        void Load(Ref<Metrics> Metrics, Ref<Image> Atlas, Ref<Table<UInt32, Glyph>> Glyphs, Ref<Table<UInt64, Real32>> Kerning);
 
         // -=(Undocumented)=-
         Ref<const Metrics> GetMetrics() const
@@ -105,14 +105,14 @@ namespace Scene
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Metrics                 mMetrics;
-        Table<UInt32, Glyph>    mGlyphs;
-        Table<UInt64, Real32>   mKerning;
+        Metrics               mMetrics;
+        Table<UInt32, Glyph>  mGlyphs;
+        Table<UInt64, Real32> mKerning;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Graphic::Image          mAtlas;
-        SPtr<Graphic::Material> mMaterial;
+        Image                 mAtlas;
+        SPtr<Material>        mMaterial;
     };
 }
