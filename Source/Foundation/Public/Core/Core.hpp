@@ -23,6 +23,8 @@
 #include "Math/Rect.hpp"
 #include "Math/Transform.hpp"
 
+#include "Memory/Reader.hpp"
+
 #include "Serialization/TOML/Parser.hpp"
 
 #include "System/Subsystem.hpp"

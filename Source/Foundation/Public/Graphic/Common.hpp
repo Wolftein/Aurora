@@ -51,7 +51,7 @@ namespace Graphic
         k_MaxPipelines   = 0x00C0,
 
         // -=(Undocumented)=-
-        k_MaxSamplers    = 0x0040,
+        k_MaxSamplers    = 0x00FF,
 
         // -=(Undocumented)=-
         k_MaxSources     = 0x0004,
@@ -431,6 +431,15 @@ namespace Graphic
 
         // -=(Undocumented)=-
         TextureFilter Filter = TextureFilter::Nearest;
+
+        // -=(Undocumented)=-
+        Sampler() = default;
+
+        // -=(Undocumented)=-
+        Sampler(TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter)
+            : EdgeU { EdgeU }, EdgeV { EdgeV }, Filter { Filter }
+        {
+        }
     };
 
     // -=(Undocumented)=-
@@ -446,7 +455,7 @@ namespace Graphic
         Binding Uniforms[k_MaxUniforms];
 
         // -=(Undocumented)=-
-        Recti   Scissor                = { 0, 0, INT32_MAX, INT32_MAX };
+        Recti   Scissor                = { 0, 0, UINT16_MAX, UINT16_MAX };
 
         // -=(Undocumented)=-
         UInt    Stencil                = 0;

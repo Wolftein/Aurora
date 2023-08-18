@@ -32,7 +32,7 @@ namespace Engine
     void Kernel::Initialize(Ref<const Properties> Properties)
     {
         // Creates the logging service
-        Log::Service::GetSingleton().Initialise("Aurora.log");
+        Log::Service::GetSingleton().Initialise(Properties.GetLogFilename());
 
         // Creates the platform service
         LOG_INFO("Kernel: Creating platform service");

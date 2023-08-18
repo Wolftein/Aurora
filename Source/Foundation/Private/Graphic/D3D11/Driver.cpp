@@ -320,7 +320,7 @@ namespace Graphic
             }
             return Content;
         }
-        return static_cast<D3D11_SUBRESOURCE_DATA *>(nullptr);
+        return static_cast<Ptr<D3D11_SUBRESOURCE_DATA>>(nullptr);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -411,7 +411,7 @@ namespace Graphic
             ComPtr<ID3D11Device>        Device;
             ComPtr<ID3D11DeviceContext> DeviceImmediate;
 
-            UInt Flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
+            UInt Flags = D3D11_CREATE_DEVICE_SINGLETHREADED | D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #if defined(_DEBUG)
             Flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
@@ -555,17 +555,10 @@ namespace Graphic
         Description.SampleDesc        = { 1, 0 };
         Description.OutputWindow      = eastl::any_cast<HWND>(Display);
         Description.Windowed          = true;
+        Description.SwapEffect        = DXGI_SWAP_EFFECT_DISCARD;
 
-        ComPtr<IDXGIFactory4> Factory;
-        Description.SwapEffect        = FAILED(mDisplayFactory.As(& Factory))
-            ? DXGI_SWAP_EFFECT_DISCARD
-            : DXGI_SWAP_EFFECT_FLIP_DISCARD;
-
-        ThrowIfFail(
-            mDisplayFactory->CreateSwapChain(mDevice.Get(), & Description, mPasses[ID].Display.GetAddressOf()));
-
-        ThrowIfFail(
-            mDisplayFactory->MakeWindowAssociation(eastl::any_cast<HWND>(Display), DXGI_MWA_NO_WINDOW_CHANGES));
+        ThrowIfFail(mDisplayFactory->CreateSwapChain(mDevice.Get(), & Description, mPasses[ID].Display.GetAddressOf()));
+        ThrowIfFail(mDisplayFactory->MakeWindowAssociation(Description.OutputWindow, DXGI_MWA_NO_WINDOW_CHANGES));
 
         CreateSwapchainResources(mPasses[ID], Width, Height);
     }
@@ -1026,7 +1019,6 @@ namespace Graphic
                 }
             }
 
-            // Draw!
             if (NewestSubmission.Indices.Buffer != 0)
             {
                 mDeviceImmediate->DrawIndexed(
@@ -1137,8 +1129,8 @@ namespace Graphic
     {
         Ref<D3D11Sampler> Sampler = mSamplers[
             static_cast<UInt>(Descriptor.EdgeU)       |
-            static_cast<UInt>(Descriptor.EdgeV)  << 3 |
-            static_cast<UInt>(Descriptor.Filter) << 6];
+            static_cast<UInt>(Descriptor.EdgeV)  << 2 |
+            static_cast<UInt>(Descriptor.Filter) << 4];
 
         if (!Sampler.Resource)
         {

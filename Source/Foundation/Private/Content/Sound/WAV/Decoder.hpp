@@ -56,7 +56,7 @@ namespace Audio
         // -=(Undocumented)=-
         UInt GetSize() const
         {
-            return mFrames * mChannel * (mDepth / sizeof(UInt08));
+            return mFrames * mChannel * (mDepth / 8u);
         }
 
     private:

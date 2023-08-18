@@ -49,7 +49,10 @@ namespace Audio
 
     static auto GetKey(Ref<const SPtr<Sound>> Sound)
     {
-        return (Sound->GetChannel() << 16) | Sound->GetDepth();
+        const UInt Key = (Sound->GetChannel() << 16)
+            | (Sound->GetDepth() << 8)
+            | (Sound->GetDepth() >= 32 ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM);
+        return Key;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -153,7 +156,7 @@ namespace Audio
             Ref<XAudioInstance> InstanceRef = (* Iterator);
 
             XAUDIO2_VOICE_STATE State;
-            InstanceRef.Source->GetState(& State);
+            InstanceRef.Source->GetState(& State, XAUDIO2_VOICE_NOSAMPLESPLAYED);
 
             if (InstanceRef.Finished && State.BuffersQueued == 0)
             {
@@ -243,50 +246,52 @@ namespace Audio
 
     Object XAudio2Driver::Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat)
     {
-        if (mMixes.full())
-        {
+        if (mMixes.full()) {
             return 0;
         }
 
-        XAUDIO2_SEND_DESCRIPTOR SendDescriptor[] {
-            { 0u, mSubmixes[Submix] },
+        XAUDIO2_SEND_DESCRIPTOR SendDescriptor[]{
+            {0u, mSubmixes[Submix]},
         };
-        XAUDIO2_VOICE_SENDS     SendList;
-        SendList.pSends    = SendDescriptor;
+        XAUDIO2_VOICE_SENDS SendList;
+        SendList.pSends = SendDescriptor;
         SendList.SendCount = 1;
 
         // Create or reuse a source voice channel
         Ptr<IXAudio2SourceVoice> Voice = GetOrCreateMix(Sound);
-        Voice->SetOutputVoices(& SendList);
+        Voice->SetOutputVoices(&SendList);
         Voice->SetVolume(1.0f);
         Voice->SetFrequencyRatio(1.0f);
         Voice->SetSourceSampleRate(Sound->GetFrequency());
 
         // Add play instance into the mixer and apply 3D
         Ref<XAudioInstance> Instance = mMixes.push_back();
-        Instance.Repeat    = Repeat;
+        Instance.Repeat = Repeat;
         Instance.Frequency = 1.0f;
-        Instance.Sound     = Sound;
-        Instance.Emitter   = Emitter;
-        Instance.Submix    = mSubmixes[Submix];
-        Instance.Source    = Voice;
-        Instance.Finished  = false;
+        Instance.Sound = Sound;
+        Instance.Emitter = Emitter;
+        Instance.Submix = mSubmixes[Submix];
+        Instance.Source = Voice;
+        Instance.Finished = false;
 
         // Reset seek table in-case the sound was already being played
         Sound->Seek(0);
 
         // Fill initial buffer of the sound instance
-        CPtr<UInt08> Data;
-        Instance.Finished = !Sound->Read(Data);
+        for (UInt Stream = 0; Stream < k_MaxBuffers && !Instance.Finished; ++Stream)
+        {
+            CPtr<UInt08> Data;
+            Instance.Finished = !Sound->Read(Data);
 
-        XAUDIO2_BUFFER Buffer { 0 };
-        Buffer.pAudioData = Data.data();
-        Buffer.AudioBytes = Data.size_bytes();
-        Buffer.Flags      = (Instance.Finished) ? XAUDIO2_END_OF_STREAM : 0;
-        Buffer.LoopCount  = (Instance.Finished && Repeat) ? XAUDIO2_LOOP_INFINITE : 0;
-        Buffer.pContext   = Voice;
+            XAUDIO2_BUFFER Buffer { 0 };
+            Buffer.pAudioData = Data.data();
+            Buffer.AudioBytes = Data.size_bytes();
+            Buffer.Flags      = (Instance.Finished) ? XAUDIO2_END_OF_STREAM : 0;
+            Buffer.LoopCount  = (Instance.Finished && Repeat) ? XAUDIO2_LOOP_INFINITE : 0;
+            Buffer.pContext   = Voice;
 
-        Voice->SubmitSourceBuffer(& Buffer);
+            Voice->SubmitSourceBuffer(& Buffer);
+        }
 
         // Uses channel address as unique identifier for the instance
         return reinterpret_cast<UInt>(Voice);
@@ -316,7 +321,9 @@ namespace Audio
         {
             Real32 Doppler;
             InstancePtr->Source->GetFrequencyRatio(& Doppler);
-            InstancePtr->Source->SetFrequencyRatio(InstancePtr->Frequency = Pitch * (Doppler / InstancePtr->Frequency));
+
+            InstancePtr->Frequency = Pitch * (Doppler / InstancePtr->Frequency);
+            InstancePtr->Source->SetFrequencyRatio(InstancePtr->Frequency);
         }
     }
 
@@ -330,6 +337,19 @@ namespace Audio
         if (InstancePtr)
         {
             InstancePtr->Source->Start();
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void XAudio2Driver::Pause(Object Instance)
+    {
+        const Ptr<XAudioInstance> InstancePtr = GetInstance(Instance);
+
+        if (InstancePtr)
+        {
+            InstancePtr->Source->Stop();
         }
     }
 
@@ -425,12 +445,18 @@ namespace Audio
             Description.wBitsPerSample  = Sound->GetDepth();
             Description.nChannels       = Sound->GetChannel();
             Description.nSamplesPerSec  = Sound->GetFrequency();
-            Description.nBlockAlign     = static_cast<DWORD>(Description.nChannels * (Description.wBitsPerSample / 8));
+            Description.nBlockAlign     = Description.nChannels * (Description.wBitsPerSample / 8);
             Description.nAvgBytesPerSec = Description.nSamplesPerSec * Description.nBlockAlign;
             Description.cbSize          = 0;
 
             mDevice->CreateSourceVoice(& Mixer, & Description, 0, XAUDIO2_DEFAULT_FREQ_RATIO, this);
         }
+
+        if (Mixer)
+        {
+            Mixer->SetSourceSampleRate(Sound->GetFrequency());
+        }
+
         return Mixer;
     }
 

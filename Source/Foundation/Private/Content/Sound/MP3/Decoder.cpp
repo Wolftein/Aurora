@@ -43,9 +43,9 @@ namespace Audio
 
     Bool MP3Decoder::Read(Ref<CPtr<UInt08>> Output)
     {
-        const UInt Frames = drmp3_read_pcm_frames_f32(& mDescription, mDescription.sampleRate, mBuffers);
+        const UInt Frames = drmp3_read_pcm_frames_f32(& mDescription, mDescription.sampleRate, mBuffer);
 
-        Output = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(mBuffers), Frames * mDescription.channels * sizeof(Real32));
+        Output = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(mBuffer), Frames * mDescription.channels * sizeof(Real32));
 
         if (mDescription.atEnd)
         {

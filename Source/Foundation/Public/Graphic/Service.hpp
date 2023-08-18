@@ -76,7 +76,7 @@ namespace Graphic
         template<typename T>
         Ptr<T> Map(Object ID, Bool Discard, UInt Offset, UInt Length)
         {
-            return static_cast<Ptr<T>>(Map(ID, Discard, Offset, Length * sizeof(T)));
+            return static_cast<Ptr<T>>(Map(ID, Discard, Offset * sizeof(T), Length * sizeof(T)));
         }
 
         // -=(Undocumented)=-

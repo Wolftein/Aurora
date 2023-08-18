@@ -68,6 +68,9 @@ namespace Audio
         void Start(Object Instance);
 
         // -=(Undocumented)=-
+        void Pause(Object Instance);
+
+        // -=(Undocumented)=-
         void Stop(Object Instance, Bool Immediately);
 
         // -=(Undocumented)=-

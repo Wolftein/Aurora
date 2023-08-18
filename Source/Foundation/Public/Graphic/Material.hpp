@@ -47,6 +47,18 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        void SetSampler(UInt Slot, Ref<const Sampler> Sampler)
+        {
+            mSamplers[Slot] = Sampler;
+        }
+
+        // -=(Undocumented)=-
+        Ref<const Sampler> GetSampler(UInt Slot) const
+        {
+            return mSamplers[Slot];
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         void SetParameter(UInt Offset, Type Parameter)
         {
@@ -81,6 +93,7 @@ namespace Graphic
 
         Object                             mID;
         Array<SPtr<Texture>, k_MaxSources> mTextures;
+        Array<Sampler, k_MaxSources>       mSamplers;
         Vector<Vector4f>                   mParameters; // TODO: Replace with pre allocated chunked memory
     };
 }

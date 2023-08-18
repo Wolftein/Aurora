@@ -84,6 +84,12 @@ inline namespace Core
     using CStr   = eastl::string_view;
 
     // -=(Undocumented)=-
+    using SStr16 = eastl::string16;
+
+    // -=(Undocumented)=-
+    using CStr16 = eastl::basic_string_view<char16_t>;
+
+    // -=(Undocumented)=-
 #define STRING_FIX(Value) SStr(Value)  // TODO: Remove this until heterogeous lookup is fixed
 
     // -=(Undocumented)=-

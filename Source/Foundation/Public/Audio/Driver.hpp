@@ -69,6 +69,9 @@ namespace Audio
         virtual void Start(Object Instance) = 0;
 
         // -=(Undocumented)=-
+        virtual void Pause(Object Instance) = 0;
+
+        // -=(Undocumented)=-
         virtual void Stop(Object Instance, Bool Immediately) = 0;
 
         // -=(Undocumented)=-

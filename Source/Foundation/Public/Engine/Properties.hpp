@@ -79,6 +79,18 @@ namespace Engine
             return mWindowHeight;
         }
 
+        // -=(Undocumented)=-
+        void SetLogFilename(CStr Filename)
+        {
+            mLogFilename = Filename;
+        }
+
+        // -=(Undocumented)=-
+        CStr GetLogFilename() const
+        {
+            return mLogFilename;
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -88,5 +100,11 @@ namespace Engine
         SStr mWindowTitle;
         UInt mWindowWidth;
         UInt mWindowHeight;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        SStr mLogFilename;
+
     };
 }

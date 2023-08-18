@@ -107,9 +107,9 @@ namespace Graphic
         // -=(Undocumented)=-
         struct D3D11Pass
         {
+            ComPtr<IDXGISwapChain>         Display;
             ComPtr<ID3D11RenderTargetView> Color[k_MaxAttachments];
             ComPtr<ID3D11DepthStencilView> Auxiliary;
-            ComPtr<IDXGISwapChain>         Display;
         };
 
         // -=(Undocumented)=-

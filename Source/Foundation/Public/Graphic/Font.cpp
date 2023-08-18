@@ -54,6 +54,7 @@ namespace Graphic
         // Allocates material for the font
         mMaterial = NewPtr<Graphic::Material>("_Private");
         mMaterial->SetTexture(0, Atlas);
+        mMaterial->SetSampler(0, Sampler(TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Trilinear));
         mMaterial->SetParameter(0, Vector2f(Atlas->GetWidth(), Atlas->GetHeight()));
         Success = Success && mMaterial->Create(Context);
 

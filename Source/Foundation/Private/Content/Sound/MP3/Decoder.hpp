@@ -68,6 +68,6 @@ namespace Audio
 
         Chunk  mChunk;
         drmp3  mDescription;
-        Real32 mBuffers[BUFFER_SIZE];
+        Real32 mBuffer[BUFFER_SIZE];
     };
 }

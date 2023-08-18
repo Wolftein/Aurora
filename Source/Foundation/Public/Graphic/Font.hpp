@@ -73,10 +73,18 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        Ptr<const Glyph> GetGlyph(UInt32 Unicode) const
+        Ptr<const Glyph> GetGlyph(UInt32 Unicode, UInt32 Fallback = '?') const
         {
             const auto Iterator = mGlyphs.find(Unicode);
-            return (Iterator == mGlyphs.end() ? nullptr : & Iterator->second);
+
+            if (Iterator != mGlyphs.end())
+            {
+                return & Iterator->second;
+            }
+            else
+            {
+                return (Fallback != 0 ? GetGlyph(Fallback) : nullptr);
+            }
         }
 
         // -=(Undocumented)=-
@@ -87,7 +95,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        SPtr<const Graphic::Material> GetMaterial() const
+        SPtr<Graphic::Material> GetMaterial() const
         {
             return mMaterial;
         }
@@ -112,7 +120,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Image                 mAtlas;
+        Image                 mAtlas;       // TODO: Support multiple page atlas
         SPtr<Material>        mMaterial;
     };
 }

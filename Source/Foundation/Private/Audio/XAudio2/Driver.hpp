@@ -73,6 +73,9 @@ namespace Audio
         // \see Driver::Start
         void Start(Object Instance) override;
 
+        // \see Driver::Pause
+        void Pause(Object Instance) override;
+
         // \see Driver::Stop
         void Stop(Object Instance, Bool Immediately) override;
 

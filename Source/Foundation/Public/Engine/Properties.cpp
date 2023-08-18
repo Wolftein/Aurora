@@ -29,9 +29,10 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Properties::Properties()
-        : mWindowTitle  { DEFAULT_TITLE },
-          mWindowWidth  { DEFAULT_WIDTH },
-          mWindowHeight { DEFAULT_HEIGHT }
+        : mWindowTitle  { DEFAULT_TITLE  },
+          mWindowWidth  { DEFAULT_WIDTH  },
+          mWindowHeight { DEFAULT_HEIGHT },
+          mLogFilename  { "Aurora.log"   }
     {
     }
 
