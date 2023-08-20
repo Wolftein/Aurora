@@ -185,7 +185,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool PipelineLoader::Load(Ref<Chunk> Data, Ref<const SPtr<Graphic::Pipeline>> Asset)
+    Bool PipelineLoader::Load(Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset)
     {
         Graphic::Descriptor Description;
 

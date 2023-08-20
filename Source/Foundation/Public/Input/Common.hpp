@@ -164,7 +164,10 @@ namespace Input
         };
 
         // -=(Undocumented)=-
-        Type Type;
+        Real64 Time;
+
+        // -=(Undocumented)=-
+        Type   Type;
 
         // -=(Undocumented)=-
         union

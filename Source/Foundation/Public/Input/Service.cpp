@@ -31,13 +31,30 @@ namespace Input
 
     void Service::OnTick()
     {
+        // Poll all raw-input event(s) from the input-devices.
         Vector<Event> Collector;
 
-        for(Ref<const SPtr<Device>> Device : mDevices)
+        for(ConstSPtr<Device> Device : mDevices)
         {
             Device->Poll(Collector);
         }
 
-        // TODO: Callbacks
+        // Sort all raw-input event(s) by its time
+        Sort(Collector, [](Ref<const Event> First, Ref<const Event> Second)
+        {
+           return First.Time < Second.Time;
+        });
+
+        // Dispatch all event(s)
+        for (Ref<const Event> Event : Collector)
+        {
+            for (ConstSPtr<Listener> Listener : mListeners)
+            {
+                if (Listener->OnEvent(Event))
+                {
+                    break;
+                }
+            }
+        }
     }
 }

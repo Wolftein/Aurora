@@ -35,13 +35,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetTexture(UInt Slot, Ref<const SPtr<Texture>> Texture)
+        void SetTexture(UInt Slot, ConstSPtr<Texture> Texture)
         {
             mTextures[Slot] = Texture;
         }
 
         // -=(Undocumented)=-
-        Ref<const SPtr<Texture>> GetTexture(UInt Slot) const
+        ConstSPtr<Texture> GetTexture(UInt Slot) const
         {
             return mTextures[Slot];
         }

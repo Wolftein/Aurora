@@ -37,6 +37,9 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        virtual ~Subsystem() = default;
+
+        // -=(Undocumented)=-
         virtual void OnTick()
         {
         }

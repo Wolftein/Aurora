@@ -60,7 +60,7 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        Bool Insert(Ref<const SPtr<Resource>> Resource);
+        Bool Insert(ConstSPtr<Resource> Resource);
 
         // -=(Undocumented)=-
         Bool Unload(Ref<const Uri> Key);

@@ -83,4 +83,11 @@ inline namespace Core
             EA::StdC::MemcpyS(Destination, Source, Size);
         }
     }
+
+    // -=(Undocumented)=-
+    template<typename Type, typename Function>
+    inline void Sort(Type Collection, Function Compare)
+    {
+        eastl::sort(Collection.begin(), Collection.end(), Compare);
+    }
 }

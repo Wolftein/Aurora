@@ -117,6 +117,10 @@ inline namespace Core
     using FPtr   = eastl::function<Type>;
 
     // -=(Undocumented)=-
+    template<typename Type>
+    using ConstSPtr = Ref<const SPtr<Type>>;
+
+    // -=(Undocumented)=-
     template<typename Value, UInt Capacity>
     using Array  = eastl::array<Value, Capacity>;
 

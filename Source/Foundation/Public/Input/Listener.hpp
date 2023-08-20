@@ -6,41 +6,50 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#pragma once
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Loader.hpp"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "Device.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Content
+namespace Input
 {
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    Bool STBLoader::Load(Ref<Chunk> Data, ConstSPtr<Graphic::Texture> Asset)
+    // -=(Undocumented)=-
+    class Listener
     {
-        SInt32 Width, Height, Channel;
+    public:
 
-        Ptr<stbi_uc> Image = stbi_load_from_memory(
-            Data.GetData<stbi_uc>(), Data.GetSize(), & Width, & Height, & Channel, STBI_rgb_alpha);
+        // -=(Undocumented)=-
+        virtual ~Listener() = default;
 
-        if (Image)
-        {
-            Chunk Chunk(Image, Width * Height * Channel, [](auto Data) {
-                stbi_image_free(Data);
-            });
+        // -=(Undocumented)=-
+        virtual Bool OnEvent(Ref<const Event> Event);
 
-            Asset->Load(Graphic::TextureFormat::RGBA8UIntNorm, Graphic::TextureLayout::Source, Width, Height, 1, Chunk);
+        // -=(Undocumented)=-
+        virtual Bool OnKeyType(UInt Codepoint);
 
-            return true;
-        }
-        return false;
-    }
+        // -=(Undocumented)=-
+        virtual Bool OnKeyUp(Key Key);
+
+        // -=(Undocumented)=-
+        virtual Bool OnKeyDown(Key Key);
+
+        // -=(Undocumented)=-
+        virtual Bool OnMouseMove(UInt X, UInt Y);
+
+        // -=(Undocumented)=-
+        virtual Bool OnMouseScroll(UInt X, UInt Y);
+
+        // -=(Undocumented)=-
+        virtual Bool OnMouseUp(UInt X, UInt Y, Button Button);
+
+        // -=(Undocumented)=-
+        virtual Bool OnMouseDown(UInt X, UInt Y, Button Button);
+    };
 }

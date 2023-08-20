@@ -34,7 +34,7 @@ namespace Content
         void OnTick() override;
 
         // -=(Undocumented)=-
-        void AddLoader(Ref<const SPtr<Loader>> Loader);
+        void AddLoader(ConstSPtr<Loader> Loader);
 
         // -=(Undocumented)=-
         void RemoveLoader(CStr Extension);
@@ -49,7 +49,7 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        void AddLocator(CStr Schema, Ref<const SPtr<Locator>> Locator);
+        void AddLocator(CStr Schema, ConstSPtr<Locator> Locator);
 
         // -=(Undocumented)=-
         void RemoveLocator(CStr Schema);
@@ -88,13 +88,13 @@ namespace Content
         Chunk Find(Ref<const Uri> Key);
 
         // -=(Undocumented)=-
-        void Register(Ref<const SPtr<Resource>> Asset, Bool Cacheable)
+        void Register(ConstSPtr<Resource> Asset, Bool Cacheable)
         {
             Register(Asset, Cacheable, false);
         }
 
         // -=(Undocumented)=-
-        void Register(Ref<const SPtr<Resource>> Asset, Bool Cacheable, Bool Async);
+        void Register(ConstSPtr<Resource> Asset, Bool Cacheable, Bool Async);
 
         // -=(Undocumented)=-
         template<typename Type>
@@ -114,7 +114,7 @@ namespace Content
         template<typename Type>
         SPtr<Type> Load(Ref<const Uri> Key, Bool Async)
         {
-            Ref<const SPtr<Type>> Asset = GetFactory(Type::RTTI_CATEGORY)->template GetOrCreate<Type>(Key, true);
+            ConstSPtr<Type> Asset = GetFactory(Type::RTTI_CATEGORY)->template GetOrCreate<Type>(Key, true);
 
             Load(Asset, Async);
 
@@ -122,25 +122,25 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        void Load(Ref<const SPtr<Resource>> Asset)
+        void Load(ConstSPtr<Resource> Asset)
         {
             Load(Asset, false);
         }
 
         // -=(Undocumented)=-
-        void Load(Ref<const SPtr<Resource>> Asset, Bool Async);
+        void Load(ConstSPtr<Resource> Asset, Bool Async);
 
         // -=(Undocumented)=-
-        void Reload(Ref<const SPtr<Resource>> Asset)
+        void Reload(ConstSPtr<Resource> Asset)
         {
             Reload(Asset, false);
         }
 
         // -=(Undocumented)=-
-        void Reload(Ref<const SPtr<Resource>> Asset, Bool Async);
+        void Reload(ConstSPtr<Resource> Asset, Bool Async);
 
         // -=(Undocumented)=-
-        void Unload(Ref<const SPtr<Resource>> Asset);
+        void Unload(ConstSPtr<Resource> Asset);
 
         // -=(Undocumented)=-
         template<typename Type>
@@ -165,13 +165,13 @@ namespace Content
         void RegisterDefaultResources();
 
         // -=(Undocumented)=-
-        Ref<const SPtr<Factory>> GetFactory(UInt Category);
+        ConstSPtr<Factory> GetFactory(UInt Category);
 
         // -=(Undocumented)=-
-        Bool Parse(Ref<const SPtr<Resource>> Asset);
+        Bool Parse(ConstSPtr<Resource> Asset);
 
         // -=(Undocumented)=-
-        void Process(Ref<const SPtr<Resource>> Asset, Bool Loaded);
+        void Process(ConstSPtr<Resource> Asset, Bool Loaded);
 
     private:
 

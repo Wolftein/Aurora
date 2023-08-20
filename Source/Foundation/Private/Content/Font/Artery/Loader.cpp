@@ -21,7 +21,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool ArteryFontLoader::Load(Ref<Chunk> Data, Ref<const SPtr<Graphic::Font>> Asset)
+    Bool ArteryFontLoader::Load(Ref<Chunk> Data, ConstSPtr<Graphic::Font> Asset)
     {
         UInt32 CurrentOffset = 0;
 

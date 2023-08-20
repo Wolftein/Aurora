@@ -47,7 +47,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    static auto GetKey(Ref<const SPtr<Sound>> Sound)
+    static auto GetKey(ConstSPtr<Sound> Sound)
     {
         const UInt Key = (Sound->GetChannel() << 16)
             | (Sound->GetDepth() << 8)
@@ -244,14 +244,15 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Object XAudio2Driver::Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat)
+    Object XAudio2Driver::Play(UInt Submix, ConstSPtr<Sound> Sound, ConstSPtr<Emitter> Emitter, Bool Repeat)
     {
-        if (mMixes.full()) {
+        if (mMixes.full())
+        {
             return 0;
         }
 
-        XAUDIO2_SEND_DESCRIPTOR SendDescriptor[]{
-            {0u, mSubmixes[Submix]},
+        XAUDIO2_SEND_DESCRIPTOR SendDescriptor[] {
+            { 0u, mSubmixes[Submix] },
         };
         XAUDIO2_VOICE_SENDS SendList;
         SendList.pSends = SendDescriptor;
@@ -380,7 +381,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void XAudio2Driver::Stop(Ref<const SPtr<Emitter>> Emitter, Bool Immediately)
+    void XAudio2Driver::Stop(ConstSPtr<Emitter> Emitter, Bool Immediately)
     {
         for (auto It = mMixes.begin(); It != mMixes.end(); ++It)
         {
@@ -422,7 +423,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Ptr<IXAudio2SourceVoice> XAudio2Driver::GetOrCreateMix(Ref<const SPtr<Sound>> Sound)
+    Ptr<IXAudio2SourceVoice> XAudio2Driver::GetOrCreateMix(ConstSPtr<Sound> Sound)
     {
         const auto FindByKey = [Key = GetKey(Sound)](Ref<const XAudioSource> InstanceRef)
         {

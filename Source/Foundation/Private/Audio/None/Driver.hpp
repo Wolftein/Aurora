@@ -53,7 +53,7 @@ namespace Audio
         Real32 GetSubmixVolume(UInt Submix) override;
 
         // \see Driver::Play
-        Object Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat) override;
+        Object Play(UInt Submix, ConstSPtr<Sound> Sound, ConstSPtr<Emitter> Emitter, Bool Repeat) override;
 
         // \see Driver::SetGain
         void SetGain(Object Instance, Real32 Gain) override;
@@ -71,7 +71,7 @@ namespace Audio
         void Stop(Object Instance, Bool Immediately) override;
 
         // \see Driver::Stop
-        void Stop(Ref<const SPtr<Emitter>> Emitter, Bool Immediately) override;
+        void Stop(ConstSPtr<Emitter> Emitter, Bool Immediately) override;
 
         // \see Driver::Halt
         void Halt(UInt Submix) override;

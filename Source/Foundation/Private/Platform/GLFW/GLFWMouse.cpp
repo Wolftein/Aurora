@@ -24,7 +24,7 @@ namespace Platform
     void GLFWMouse::OnMouseMove(UInt X, UInt Y)
     {
         const Input::Event Event {
-            .Type = Input::Event::Type::MouseMove, .MouseAxis = { X, Y }
+            .Time = glfwGetTime(), .Type = Input::Event::Type::MouseMove, .MouseAxis = { X, Y }
         };
         Invoke(Event);
     }
@@ -37,7 +37,7 @@ namespace Platform
         const auto Type = (Action == GLFW_RELEASE ? Input::Event::Type::MouseUp : Input::Event::Type::MouseDown);
 
         const Input::Event Event {
-            .Type = Type, .MouseAction = { Translate(Button) }
+            .Time = glfwGetTime(), .Type = Type, .MouseAction = { Translate(Button) }
         };
         Invoke(Event);
     }
@@ -48,7 +48,7 @@ namespace Platform
     void GLFWMouse::OnMouseScroll(UInt X, UInt Y)
     {
         const Input::Event Event {
-            .Type = Input::Event::Type::MouseScroll, .MouseAxis = { X, Y }
+            .Time = glfwGetTime(), .Type = Input::Event::Type::MouseScroll, .MouseAxis = { X, Y }
         };
         Invoke(Event);
     }

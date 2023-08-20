@@ -24,7 +24,7 @@ namespace Platform
     void GLFWKeyboard::OnKeyType(UInt Codepoint)
     {
         const Input::Event Event {
-            .Type = Input::Event::Type::KeyType, .KeyType = { Codepoint }
+            .Time = glfwGetTime(), .Type = Input::Event::Type::KeyType, .KeyType = { Codepoint }
         };
         Invoke(Event);
     }
@@ -37,7 +37,7 @@ namespace Platform
         const auto Type = (Action == GLFW_RELEASE ? Input::Event::Type::KeyUp : Input::Event::Type::KeyDown);
 
         const Input::Event Event {
-            .Type = Type, .KeyAction = { Translate(Key) }
+            .Time = glfwGetTime(), .Type = Type, .KeyAction = { Translate(Key) }
         };
         Invoke(Event);
     }

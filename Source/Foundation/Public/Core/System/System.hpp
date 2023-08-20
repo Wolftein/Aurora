@@ -30,7 +30,7 @@ inline namespace Core
         template<typename T>
         void Execute(T Functor)
         {
-            for (Ref<const SPtr<Subsystem>> SubsystemPtr : mSubsystems)
+            for (ConstSPtr<Subsystem> SubsystemPtr : mSubsystems)
             {
                 Functor(* SubsystemPtr);
             }
@@ -48,7 +48,7 @@ inline namespace Core
         template<typename T>
         SPtr<T> GetSubsystem()
         {
-            for (Ref<const SPtr<Subsystem>> SubsystemPtr : mSubsystems)
+            for (ConstSPtr<Subsystem> SubsystemPtr : mSubsystems)
             {
                 if (typeid(T) == typeid(* SubsystemPtr))
                 {

@@ -58,7 +58,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::AddLoader(Ref<const SPtr<Loader>> Loader)
+    void Service::AddLoader(ConstSPtr<Loader> Loader)
     {
         for (const CStr Extension : Loader->GetExtensions())
         {
@@ -77,7 +77,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::AddLocator(CStr Schema, Ref<const SPtr<Locator>> Locator)
+    void Service::AddLocator(CStr Schema, ConstSPtr<Locator> Locator)
     {
         mLocators.try_emplace(STRING_FIX(Schema), Locator);
     }
@@ -137,7 +137,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Register(Ref<const SPtr<Resource>> Asset, Bool Cacheable, Bool Async)
+    void Service::Register(ConstSPtr<Resource> Asset, Bool Cacheable, Bool Async)
     {
         if (Asset)
         {
@@ -160,7 +160,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Load(Ref<const SPtr<Resource>> Asset, Bool Async)
+    void Service::Load(ConstSPtr<Resource> Asset, Bool Async)
     {
         if (Asset && Asset->HasCreated())
         {
@@ -180,7 +180,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Reload(Ref<const SPtr<Resource>> Asset, Bool Async)
+    void Service::Reload(ConstSPtr<Resource> Asset, Bool Async)
     {
         if (Asset && Asset->HasFinished())
         {
@@ -198,7 +198,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Unload(Ref<const SPtr<Resource>> Asset)
+    void Service::Unload(ConstSPtr<Resource> Asset)
     {
         if (Asset && GetFactory(Asset->GetCategory())->Unload(Asset->GetKey()))
         {
@@ -213,7 +213,7 @@ namespace Content
     {
         const Vector<SPtr<Resource>> Assets = GetFactory(Category)->Prune(Force);
 
-        for (Ref<const SPtr<Resource>> Asset : Assets)
+        for (ConstSPtr<Resource> Asset : Assets)
         {
             Process(Asset, false);  // TODO: async operation
         }
@@ -254,7 +254,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Ref<const SPtr<Factory>> Service::GetFactory(UInt Category)
+    ConstSPtr<Factory> Service::GetFactory(UInt Category)
     {
         if (auto Iterator = mFactories.find(Category); Iterator != mFactories.end())
         {
@@ -266,13 +266,13 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Parse(Ref<const SPtr<Resource>> Asset)
+    Bool Service::Parse(ConstSPtr<Resource> Asset)
     {
         Ref<const Uri> Key = Asset->GetKey();
 
         if (const auto Iterator = mLoaders.find(STRING_FIX(Key.GetExtension())); Iterator != mLoaders.end())
         {
-            Ref<const SPtr<Loader>> Loader = Iterator->second;
+            ConstSPtr<Loader> Loader = Iterator->second;
 
             if (Chunk File = Find(Key); File.HasData())
             {
@@ -300,7 +300,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Process(Ref<const SPtr<Resource>> Asset, Bool Loaded)
+    void Service::Process(ConstSPtr<Resource> Asset, Bool Loaded)
     {
         Ref<const SPtr<Factory>> Factory = GetFactory(Asset->GetCategory());
         Ref<Context>             Context = GetContext();

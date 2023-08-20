@@ -56,7 +56,7 @@ namespace Audio
         Real32 GetSubmixVolume(UInt Submix);
 
         // -=(Undocumented)=-
-        Object Play(UInt Submix, Ref<const SPtr<Sound>> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat);
+        Object Play(UInt Submix, ConstSPtr<Sound> Sound, ConstSPtr<Emitter> Emitter, Bool Repeat);
 
         // -=(Undocumented)=-
         void SetGain(Object Instance, Real32 Gain);
@@ -74,7 +74,7 @@ namespace Audio
         void Stop(Object Instance, Bool Immediately);
 
         // -=(Undocumented)=-
-        void Stop(Ref<const SPtr<Emitter>> Emitter, Bool Immediately);
+        void Stop(ConstSPtr<Emitter> Emitter, Bool Immediately);
 
         // -=(Undocumented)=-
         void Halt(UInt Submix);

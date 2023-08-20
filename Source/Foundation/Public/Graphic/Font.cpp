@@ -69,7 +69,7 @@ namespace Graphic
     {
         if (mMaterial)
         {
-            if (Ref<const SPtr<Texture>> Texture = mMaterial->GetTexture(0))
+            if (ConstSPtr<Texture> Texture = mMaterial->GetTexture(0))
             {
                 Texture->Dispose(Context);
             }

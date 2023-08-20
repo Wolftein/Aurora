@@ -37,7 +37,7 @@ namespace Content
         }
 
         // \see AbstractLoader::Load
-        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Graphic::Pipeline>> Asset);
+        Bool Load(Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset);
 
     private:
 

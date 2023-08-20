@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Listener.hpp"
 #include "Keyboard.hpp"
 #include "Mouse.hpp"
 
@@ -34,7 +35,7 @@ namespace Input
 
         // -=(Undocumented)=-
         template<typename T>
-        void Register(Ref<const SPtr<T>> Device)
+        void Register(ConstSPtr<T> Device)
         {
             if constexpr (eastl::is_base_of_v<Keyboard, T>)
             {
@@ -50,7 +51,7 @@ namespace Input
 
         // -=(Undocumented)=-
         template<typename T>
-        void Unregister(Ref<const SPtr<T>> Device)
+        void Unregister(ConstSPtr<T> Device)
         {
             if constexpr (eastl::is_base_of_v<Keyboard, T>)
             {
@@ -62,6 +63,18 @@ namespace Input
             }
 
             mDevices.erase_first(Device);
+        }
+
+        // -=(Undocumented)=-
+        void AddListener(ConstSPtr<Listener> Listener)
+        {
+            mListeners.emplace_back(Listener);
+        }
+
+        // -=(Undocumented)=-
+        void RemoveListener(ConstSPtr<Listener> Listener)
+        {
+            mListeners.erase_first(Listener);
         }
 
         // -=(Undocumented)=-
@@ -125,12 +138,9 @@ namespace Input
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Vector<SPtr<Device>> mDevices;
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        SPtr<Keyboard>       mKeyboard;
-        SPtr<Mouse>          mMouse;
+        Vector<SPtr<Device>>   mDevices;
+        SPtr<Keyboard>         mKeyboard;
+        SPtr<Mouse>            mMouse;
+        Vector<SPtr<Listener>> mListeners;
     };
 }

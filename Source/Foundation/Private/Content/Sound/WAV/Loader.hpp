@@ -34,6 +34,6 @@ namespace Content
         }
 
         // \see AbstractLoader::Load
-        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Audio::Sound>> Asset);
+        Bool Load(Ref<Chunk> Data, ConstSPtr<Audio::Sound> Asset);
     };
 }
