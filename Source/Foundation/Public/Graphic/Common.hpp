@@ -39,6 +39,9 @@ namespace Graphic
         k_MaxBuffers     = 0x0080,
 
         // -=(Undocumented)=-
+        k_MaxDisplays    = 0x0080,
+
+        // -=(Undocumented)=-
         k_MaxMaterials   = 0x1000,
 
         // -=(Undocumented)=-
@@ -305,6 +308,19 @@ namespace Graphic
     using  Object = UInt;
 
     // -=(Undocumented)=-
+    struct Display
+    {
+        // -=(Undocumented)=-
+        UInt Width;
+
+        // -=(Undocumented)=-
+        UInt Height;
+
+        // -=(Undocumented)=-
+        UInt Frequency;
+    };
+
+    // -=(Undocumented)=-
     struct Adapter
     {
         // -=(Undocumented)=-
@@ -318,6 +334,9 @@ namespace Graphic
 
         // -=(Undocumented)=-
         UInt SharedMemoryInMBs;
+
+        // -=(Undocumented)=-
+        Stack<Display, k_MaxDisplays> Displays;
     };
 
     // -=(Undocumented)=-

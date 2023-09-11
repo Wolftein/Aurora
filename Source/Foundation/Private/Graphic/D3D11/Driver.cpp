@@ -1080,7 +1080,7 @@ namespace Graphic
     void D3D11Driver::LoadAdapters()
     {
         ComPtr<IDXGIAdapter1> DXGIAdapter;
-        for (UInt Index = 0; SUCCEEDED(mDisplayFactory->EnumAdapters1(Index, & DXGIAdapter)); ++Index)
+        for (UInt Index = 0; SUCCEEDED(mDisplayFactory->EnumAdapters1(Index, DXGIAdapter.GetAddressOf())); ++Index)
         {
             DXGI_ADAPTER_DESC1 DXGIDescription;
             if (SUCCEEDED(DXGIAdapter->GetDesc1(& DXGIDescription)))
@@ -1093,6 +1093,27 @@ namespace Graphic
                     AdapterInfo.DedicatedMemoryInMBs = DXGIDescription.DedicatedVideoMemory >> 20;
                     AdapterInfo.SharedMemoryInMBs    = DXGIDescription.SharedSystemMemory >> 20;
                     AdapterInfo.SystemMemoryInMBs    = DXGIDescription.DedicatedSystemMemory >> 20;
+                }
+            }
+
+            ComPtr<IDXGIOutput> DXGIOutput;
+            if (SUCCEEDED(DXGIAdapter->EnumOutputs(0, DXGIOutput.GetAddressOf())))
+            {
+                UINT        Length = 0;
+                DXGI_FORMAT Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+                if (SUCCEEDED(DXGIOutput->GetDisplayModeList(Format, 0, & Length, NULL)))
+                {
+                    Vector<DXGI_MODE_DESC> Descriptions(Length);
+                    DXGIOutput->GetDisplayModeList(Format, 0, & Length, Descriptions.data());
+
+                    for (Ref<DXGI_MODE_DESC> Description : Descriptions)
+                    {
+                        Ref<Graphic::Display> DisplayInfo = mCapabilities.Adapters[Index].Displays.push_back();
+                        DisplayInfo.Width     = Description.Width;
+                        DisplayInfo.Height    = Description.Height;
+                        DisplayInfo.Frequency = Description.RefreshRate.Numerator / Description.RefreshRate.Denominator;
+                    }
                 }
             }
         }

@@ -12,9 +12,6 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Allocator/Chunk.hpp"
-#include "Allocator/Handle.hpp"
-
 #include "Core/Trait.hpp"
 
 #include "Log/Service.hpp"
@@ -23,6 +20,8 @@
 #include "Math/Rect.hpp"
 #include "Math/Transform.hpp"
 
+#include "Memory/Chunk.hpp"
+#include "Memory/Handle.hpp"
 #include "Memory/Reader.hpp"
 
 #include "Serialization/TOML/Parser.hpp"

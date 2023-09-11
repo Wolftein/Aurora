@@ -47,9 +47,9 @@ namespace Input
         virtual Bool OnMouseScroll(UInt X, UInt Y);
 
         // -=(Undocumented)=-
-        virtual Bool OnMouseUp(UInt X, UInt Y, Button Button);
+        virtual Bool OnMouseUp(Button Button);
 
         // -=(Undocumented)=-
-        virtual Bool OnMouseDown(UInt X, UInt Y, Button Button);
+        virtual Bool OnMouseDown(Button Button);
     };
 }

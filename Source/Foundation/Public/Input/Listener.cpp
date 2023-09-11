@@ -32,9 +32,9 @@ namespace Input
         case Event::Type::KeyDown:
             return OnKeyDown(Event.KeyAction.Key);
         case Event::Type::MouseUp:
-            return OnMouseUp(0, 0, Event.MouseAction.Button);
+            return OnMouseUp(Event.MouseAction.Button);
         case Event::Type::MouseDown:
-            return OnMouseDown(0, 0, Event.MouseAction.Button);
+            return OnMouseDown(Event.MouseAction.Button);
         case Event::Type::MouseMove:
             return OnMouseMove(Event.MouseAxis.X, Event.MouseAxis.Y);
         case Event::Type::MouseScroll:
@@ -87,7 +87,7 @@ namespace Input
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Listener::OnMouseUp(UInt X, UInt Y, Button Button)
+    Bool Listener::OnMouseUp(Button Button)
     {
         return false;
     }
@@ -95,7 +95,7 @@ namespace Input
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Listener::OnMouseDown(UInt X, UInt Y, Button Button)
+    Bool Listener::OnMouseDown(Button Button)
     {
         return false;
     }
