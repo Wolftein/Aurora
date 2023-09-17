@@ -30,6 +30,31 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    HRESULT Graphic_Service::CreatePassFromDisplay(vbInt32 Handle, vbInt32 Width, vbInt32 Height, vbInt32 * Result)
+    {
+        (* Result) = mWrapper->CreatePass(reinterpret_cast<HWND>(Handle), Width, Height);
+
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Graphic_Service::DeletePass(vbInt32 * ID)
+    {
+        if (* ID != 0)
+        {
+            mWrapper->DeletePass(* ID);
+
+            * ID = 0;
+        }
+
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     HRESULT Graphic_Service::Prepare(vbInt32 ID, Math_Rectf * Viewport, Graphic_Clear Clear, vbInt32 Tint, vbReal32 Depth, vbInt8 Stencil)
     {
         mWrapper->Prepare(ID, Ref<Rectf>(* Viewport), static_cast<Graphic::Clear>(Clear), Color(Tint), Depth, Stencil);

@@ -308,7 +308,7 @@ namespace Graphic
     using  Object = UInt;
 
     // -=(Undocumented)=-
-    struct Display
+    struct Resolution
     {
         // -=(Undocumented)=-
         UInt Width;
@@ -336,7 +336,7 @@ namespace Graphic
         UInt SharedMemoryInMBs;
 
         // -=(Undocumented)=-
-        Stack<Display, k_MaxDisplays> Displays;
+        Stack<Resolution, k_MaxDisplays> Displays;
     };
 
     // -=(Undocumented)=-

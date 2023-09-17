@@ -12,10 +12,10 @@
 
 #include "COM_Service.hpp"
 #include "Audio/COM_Sound.hpp"
+#include "Graphic/COM_Font.hpp"
+#include "Graphic/COM_Material.hpp"
 #include "Graphic/COM_Pipeline.hpp"
 #include "Graphic/COM_Texture.hpp"
-#include "Graphic/COM_Material.hpp"
-#include "Scene/COM_Font.hpp"
 #include <Content/Locator/SystemLocator.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -129,7 +129,7 @@ inline namespace COM
             (* Result) = RETRIEVE_RESOURCE(Graphic_Texture, Graphic::Texture);
             break;
         case Content_Resource_Type::eResourceTypeFont:
-            (* Result) = RETRIEVE_RESOURCE(Scene_Font, Scene::Font);
+            (* Result) = RETRIEVE_RESOURCE(Graphic_Font, Graphic::Font);
             break;
         };
         return S_OK;
@@ -158,7 +158,7 @@ inline namespace COM
                 (* Result) = CREATE_RESOURCE(Graphic_Texture, Graphic::Texture);
                 break;
             case Content_Resource_Type::eResourceTypeFont:
-                (* Result) = CREATE_RESOURCE(Scene_Font, Scene::Font);
+                (* Result) = CREATE_RESOURCE(Graphic_Font, Graphic::Font);
                 break;
         };
 
@@ -203,7 +203,7 @@ inline namespace COM
             (* Result) = (mWrapper->Exist<Graphic::Texture>(Key) ? VBTrue : VBFalse);
             break;
         case Content_Resource_Type::eResourceTypeFont:
-            (* Result) = (mWrapper->Exist<Scene::Font>(Key) ? VBTrue : VBFalse);
+            (* Result) = (mWrapper->Exist<Graphic::Font>(Key) ? VBTrue : VBFalse);
             break;
         };
 
@@ -233,7 +233,7 @@ inline namespace COM
         case Content_Resource_Type::eResourceTypePipeline: return CCast<Graphic_Pipeline>(Asset);
         case Content_Resource_Type::eResourceTypeSound:    return CCast<Audio_Sound>(Asset);
         case Content_Resource_Type::eResourceTypeTexture:  return CCast<Graphic_Texture>(Asset);
-        case Content_Resource_Type::eResourceTypeFont:     return CCast<Scene_Font>(Asset);
+        case Content_Resource_Type::eResourceTypeFont:     return CCast<Graphic_Font>(Asset);
         }
 
         return nullptr;

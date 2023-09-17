@@ -23,13 +23,26 @@ inline namespace COM
 
     HRESULT Kernel::Initialize(Kernel_Properties *Properties)
     {
-        Engine::Properties CProperties;
-        CProperties.SetWindowHandle(reinterpret_cast<HWND>(Properties->WindowHandle));
-        CProperties.SetWindowTitle(VBString16ToString8(Properties->WindowTitle));
-        CProperties.SetWindowWidth(Properties->WindowWidth);
-        CProperties.SetWindowHeight(Properties->WindowHeight);
+        Engine::Properties EngineProperties;
 
-        mWrapper.Initialize(CProperties);
+        if (Properties->WindowHandle)
+        {
+            EngineProperties.SetWindowHandle(reinterpret_cast<HWND>(Properties->WindowHandle));
+        }
+        if (Properties->WindowTitle)
+        {
+            EngineProperties.SetWindowTitle(VBString16ToString8(Properties->WindowTitle));
+        }
+        EngineProperties.SetWindowWidth(Properties->WindowWidth);
+        EngineProperties.SetWindowHeight(Properties->WindowHeight);
+
+        if (Properties->LogFilename)
+        {
+            EngineProperties.SetLogFilename(VBString16ToString8(Properties->LogFilename));
+        }
+
+        mWrapper.Initialize(EngineProperties);
+
         return S_OK;
     }
 
@@ -66,6 +79,20 @@ inline namespace COM
     HRESULT Kernel::GetGraphicService(Graphic_Service_ * *Result)
     {
         (*Result) = CCreate<Graphic_Service>(mWrapper.GetSubsystem<Graphic::Service>());
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Kernel::CreateRenderer(Graphic_Pipeline_ * FontDefaultPipeline, Scene_Renderer_ ** Result)
+    {
+        const SPtr<Graphic::Pipeline> Pipeline = CCast<Graphic_Pipeline>(FontDefaultPipeline);
+
+        (*Result) = CCreate<Scene_Renderer>(NewPtr<Scene::Renderer>(mWrapper));
+
+        CCast<Scene_Renderer>(* Result)->SetDefaultFontPipeline(Pipeline);
+
         return S_OK;
     }
 }

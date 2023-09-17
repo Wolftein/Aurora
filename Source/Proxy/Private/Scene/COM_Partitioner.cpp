@@ -10,7 +10,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "COM_Chunk.hpp"
+#include "COM_Partitioner.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,67 +21,91 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Memory_Chunk::Allocate(vbInt32 Bytes)
+    HRESULT Scene_Partitioner::Insert(Scene_Partitioner_Item * Object)
     {
-        if (Bytes > 0)
+        mQuadtree.Insert(Object);
+        mQuadtreeDirty = true;
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Scene_Partitioner::Remove(Scene_Partitioner_Item * Object)
+    {
+        mQuadtree.Remove(Object);
+        mQuadtreeDirty = true;
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Scene_Partitioner::Update(Scene_Partitioner_Item * Object)
+    {
+        mQuadtree.Update(Object);
+        mQuadtreeDirty = true;
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Scene_Partitioner::Clear()
+    {
+        mQuadtree.Clear();
+        mQuadtreeDirty = true;
+
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Scene_Partitioner::Query(vbInt32 X1, vbInt32 Y1, vbInt32 X2, vbInt32 Y2, SAFEARRAY ** Result)
+    {
+        mQuadtreeDirty |= (mLastQueryX1 != X1 || mLastQueryY1 != Y1 || mLastQueryX2 != X2 || mLastQueryY2 != Y2);
+
+        if (mQuadtreeDirty)
         {
-            mWrapper = Chunk(Bytes);
-        }
-        return S_OK;
-    }
+            mQuadtreeDirty = false;
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+            mLastQueryX1   = X1;
+            mLastQueryY1   = Y1;
+            mLastQueryX2   = X2;
+            mLastQueryY2   = Y2;
 
-    HRESULT Memory_Chunk::Copy(SAFEARRAY ** Source, vbInt32 Size, vbInt32 Offset)
-    {
-        if (Source && SUCCEEDED(::SafeArrayLock(* Source)))
-        {
-            const Ptr<SAFEARRAY> Array = (* Source);
+            auto Query = mQuadtree.QueryIntersectsRegion(BoundingBox<Real32>(X1, Y1, X2 - X1, Y2 - Y1));
 
-            const UInt Address = reinterpret_cast<UInt>(Array->pvData) + (Array->cbElements * Offset);
-            const UInt Length  = Array->cbElements * Size;
-            FastCopyMemory(mWrapper.GetData(), reinterpret_cast<Ptr<void>>(Address), Length);
+            mLastQueryList.clear();
 
-            ::SafeArrayUnlock(Array);
+            while (!Query.EndOfQuery())
+            {
+                mLastQueryList.push_back(* Query.GetCurrent());
+
+                Query.Next();
+            }
         }
 
+        CPtr<Scene_Partitioner_Item> Chunk(mLastQueryList.data(), mLastQueryList.size());
+        VBSpanToSafeArrayTemp(Chunk, Result);
+
         return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Memory_Chunk::Free()
+    HRESULT Scene_Partitioner::Overlaps(vbInt32 X, vbInt32 Y, vbInt32 Radius, Scene_Partitioner_Item * Object, vbBool * Result)
     {
-        mWrapper.Clear();
-        return S_OK;
-    }
+        const UInt X1 = X - Radius / 2.0f;
+        const UInt Y1 = Y - Radius;
+        const UInt X2 = X + Radius / 2.0f;
+        const UInt Y2 = Y;
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        const bool noOverlap = X1 > Object->RectX2 || Object->RectX1 > X2 || Y1 > Object->RectY2 || Object->RectY1 > Y2;
 
-    HRESULT Memory_Chunk::GetData(SAFEARRAY ** Result)
-    {
-        VBSpanToSafeArrayTemp(mWrapper.GetSpan<UInt08>(), Result);
-        return S_OK;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    HRESULT Memory_Chunk::GetText(vbStr16 * Result)
-    {
-        (* Result) = VBString8ToString16(mWrapper.GetText());
-        return S_OK;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    HRESULT Memory_Chunk::GetSize(vbInt32 * Result)
-    {
-        (* Result) = mWrapper.GetSize();
+        (* Result) = (noOverlap ? VBFalse : VBTrue);
         return S_OK;
     }
 }

@@ -18,6 +18,8 @@
 
 #include "Graphic/COM_Service.hpp"
 
+#include "Scene/Experimental/COM_Renderer.hpp"
+
 #include <Engine/Kernel.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -34,6 +36,7 @@ inline namespace COM
         vbStr16 WindowTitle;
         vbInt32 WindowWidth;
         vbInt32 WindowHeight;
+        vbStr16 LogFilename;
     } Kernel_Properties;
 
     // -=(Undocumented)=-
@@ -49,6 +52,8 @@ inline namespace COM
         HRESULT GetContentService([out, retval] Content_Service_ ** Result);
 
         HRESULT GetGraphicService([out, retval] Graphic_Service_ ** Result);
+
+        HRESULT CreateRenderer([in] Graphic_Pipeline_ * FontDefaultPipeline, [out, retval] Scene_Renderer_ ** Result);
     };
 
     // -=(Undocumented)=-
@@ -71,5 +76,8 @@ inline namespace COM
 
         // \see Engine_::GetGraphicService
         HRESULT GetGraphicService(Graphic_Service_ ** Result) override;
+
+        // \see Engine_::CreateRenderer
+        HRESULT CreateRenderer(Graphic_Pipeline_ * FontDefaultPipeline, Scene_Renderer_ ** Result) override;
     };
 }

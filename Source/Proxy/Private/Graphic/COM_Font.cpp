@@ -21,7 +21,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Font::GetKey(vbStr16 * Result)
+    HRESULT Graphic_Font::GetKey(vbStr16 * Result)
     {
         (* Result) = VBString8ToString16(mWrapper->GetKey().GetUrl());
         return S_OK;
@@ -30,7 +30,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Font::GetMemory(vbInt64 * Result)
+    HRESULT Graphic_Font::GetMemory(vbInt64 * Result)
     {
         CPPToVBInt64(mWrapper->GetMemory(), * Result);
         return S_OK;
@@ -39,7 +39,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Font::GetCategory(Content_Resource_Type *Result)
+    HRESULT Graphic_Font::GetCategory(Content_Resource_Type *Result)
     {
         (* Result) = Content_Resource_Type::eResourceTypeFont;
         return S_OK;
@@ -48,7 +48,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Font::GetStatus(Content_Resource_Status * Result)
+    HRESULT Graphic_Font::GetStatus(Content_Resource_Status * Result)
     {
         (* Result) = static_cast<Content_Resource_Status>(mWrapper->GetStatus());
         return S_OK;

@@ -48,6 +48,8 @@ inline namespace COM
 
         HRESULT Start([in] vbInt32 Instance);
 
+        HRESULT Pause([in] vbInt32 Instance);
+
         HRESULT StopByID([in] vbInt32 Instance, [in, defaultvalue(1)] vbBool Immediately);
 
         HRESULT StopByEmitter([in] Audio_Emitter_ * Emitter, [in, defaultvalue(1)] vbBool Immediately);
@@ -93,6 +95,9 @@ inline namespace COM
 
         // \inheritDoc
         HRESULT Start(vbInt32 Instance) override;
+
+        // \inheritDoc
+        HRESULT Pause(vbInt32 Instance) override;
 
         // \inheritDoc
         HRESULT StopByID(vbInt32 Instance, vbBool Immediately) override;

@@ -1109,10 +1109,10 @@ namespace Graphic
 
                     for (Ref<DXGI_MODE_DESC> Description : Descriptions)
                     {
-                        Ref<Graphic::Display> DisplayInfo = mCapabilities.Adapters[Index].Displays.push_back();
-                        DisplayInfo.Width     = Description.Width;
-                        DisplayInfo.Height    = Description.Height;
-                        DisplayInfo.Frequency = Description.RefreshRate.Numerator / Description.RefreshRate.Denominator;
+                        Ref<Graphic::Resolution> Resolution = mCapabilities.Adapters[Index].Displays.push_back();
+                        Resolution.Width     = Description.Width;
+                        Resolution.Height    = Description.Height;
+                        Resolution.Frequency = Description.RefreshRate.Numerator / Description.RefreshRate.Denominator;
                     }
                 }
             }

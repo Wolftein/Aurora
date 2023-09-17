@@ -47,7 +47,6 @@ inline namespace COM
         HRESULT Scale([in] vbReal32 X, [in] vbReal32 Y, [in] vbReal32 Z);
 
         HRESULT Rotate([in] vbReal32 Angle, [in] vbReal32 AxisX, [in] vbReal32 AxisY, [in] vbReal32 AxisZ);
-
     };
 
     // -=(Undocumented)=-

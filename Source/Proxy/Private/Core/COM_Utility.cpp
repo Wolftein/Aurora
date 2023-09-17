@@ -6,14 +6,11 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#pragma once
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Content/COM_Resource.hpp"
-#include <Scene/Font.hpp>
+#include "COM_Utility.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,28 +18,12 @@
 
 inline namespace COM
 {
-    // -=(Undocumented)=-
-    [object, uuid("BF302730-1CFF-11EE-ADCD-1418C3A8EDB8"), pointer_default(unique)]
-    __interface Scene_Font_ : public Content_Resource_
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Utility::IsArrayNull(SAFEARRAY ** Array, vbBool * Result)
     {
-    };
-
-    // -=(Undocumented)=-
-    [coclass, uuid("C390EC16-1CFF-11EE-ADCD-1418C3A8EDB8")]
-    class ATL_NO_VTABLE Scene_Font : public Scene_Font_, public CSmartPtrWrapper<Scene::Font>
-    {
-    public:
-
-        // \see Content_Resource_::GetKey
-        HRESULT GetKey(vbStr16 * Result) override;
-
-        // \see Content_Resource_::GetMemory
-        HRESULT GetMemory(vbInt64 * Result) override;
-
-        // \see Content_Resource_::GetCategory
-        HRESULT GetCategory(Content_Resource_Type * Result) override;
-
-        // \see Content_Resource_::GetStatus
-        HRESULT GetStatus(Content_Resource_Status * Result) override;
-    };
+        (* Result) = (Array == nullptr || (* Array) == nullptr || (* Array)->cDims == 0);
+        return S_OK;
+    }
 }

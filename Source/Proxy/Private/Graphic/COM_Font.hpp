@@ -12,9 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Graphic/COM_Common.hpp"
-#include "Graphic/COM_Texture.hpp"
-#include <Graphic/Material.hpp>
+#include "Content/COM_Resource.hpp"
+#include <Graphic/Font.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -23,30 +22,16 @@
 inline namespace COM
 {
     // -=(Undocumented)=-
-    [object, uuid("03E55C9C-9624-45F2-A7D5-B98916070F0A"), pointer_default(unique)]
-    __interface Graphic_Material_ : public Content_Resource_
+    [object, uuid("BF302730-1CFF-11EE-ADCD-1418C3A8EDB8"), pointer_default(unique)]
+    __interface Graphic_Font_ : public Content_Resource_
     {
-        HRESULT GetID([out, retval] vbInt32 * Result);
-
-        HRESULT SetTexture([in] vbInt32 Slot, [in] Graphic_Texture_ * Texture);
-
-        HRESULT SetSampler([in] vbInt32 Slot, [in] Graphic_Texture_Edge EdgeU, [in] Graphic_Texture_Edge EdgeV, [in] Graphic_Texture_Filter Filter);
     };
 
     // -=(Undocumented)=-
-    [coclass, uuid("3015D5E9-DEAB-41F7-8810-E963C69BADF9")]
-    class ATL_NO_VTABLE Graphic_Material : public Graphic_Material_, public CSmartPtrWrapper<Graphic::Material>
+    [coclass, uuid("C390EC16-1CFF-11EE-ADCD-1418C3A8EDB8")]
+    class ATL_NO_VTABLE Graphic_Font : public Graphic_Font_, public CSmartPtrWrapper<Graphic::Font>
     {
     public:
-
-        // \see Graphic_Material_::GetID
-        HRESULT GetID(vbInt32 * Result) override;
-
-        // \see Graphic_Material_::SetTexture
-        HRESULT SetTexture(vbInt32 Slot, Graphic_Texture_ * Texture) override;
-
-        // \see Graphic_Material_::SetSampler
-        HRESULT SetSampler(vbInt32 Slot, Graphic_Texture_Edge EdgeU, Graphic_Texture_Edge EdgeV, Graphic_Texture_Filter Filter) override;
 
         // \see Content_Resource_::GetKey
         HRESULT GetKey(vbStr16 * Result) override;

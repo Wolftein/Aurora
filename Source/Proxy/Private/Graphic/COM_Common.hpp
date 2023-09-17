@@ -31,6 +31,24 @@ inline namespace COM
     } Graphic_Clear;
 
     // -=(Undocumented)=-
+    [export, uuid("B373A5E4-3BB0-11EE-ADD4-1418C3A8EDB8"), v1_enum]
+    typedef enum Graphic_Texture_Edge
+    {
+        eTextureEdgeClamp,
+        eTextureEdgeRepeat,
+        eTextureEdgeMirror,
+    } Graphic_Texture_Edge;
+
+    // -=(Undocumented)=-
+    [export, uuid("B796E764-3BB0-11EE-ADD4-1418C3A8EDB8"), v1_enum]
+    typedef enum Graphic_Texture_Filter
+    {
+        eTextureFilterNearest,
+        eTextureFilterBilinear,
+        eTextureFilterTrilinear,
+    } Graphic_Texture_Filter;
+
+    // -=(Undocumented)=-
     [export, uuid("89B21548-137D-11EE-ADCB-1418C3A8EDB8"), v1_enum]
     typedef enum Graphic_Texture_Format
     {

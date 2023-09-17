@@ -10,7 +10,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "COM_Material.hpp"
+#include "COM_Renderer.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,68 +21,105 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Graphic_Material::GetID(vbInt32 * Result)
+    HRESULT Scene_Renderer::FinalRelease()
     {
-        (* Result) = mWrapper->GetID();
+        mWrapper = nullptr;
         return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Graphic_Material::SetTexture(vbInt32 Slot, Graphic_Texture_ * Texture)
+    HRESULT Scene_Renderer::Begin(Graphic_Camera_ * Camera)
     {
-        mWrapper->SetTexture(Slot, CCast<Graphic_Texture>(Texture));
+        mWrapper->Begin(CCast<Graphic_Camera>(Camera));
         return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Graphic_Material::SetSampler(vbInt32 Slot, Graphic_Texture_Edge EdgeU, Graphic_Texture_Edge EdgeV, Graphic_Texture_Filter Filter)
+    HRESULT Scene_Renderer::SetParameter(vbInt32 Offset, vbReal32 X, vbReal32 Y, vbReal32 Z, vbReal32 W)
     {
-        Graphic::Sampler Sampler(
-            static_cast<Graphic::TextureEdge>(EdgeU),
-            static_cast<Graphic::TextureEdge>(EdgeV),
-            static_cast<Graphic::TextureFilter>(Filter));
+        mWrapper->SetParameter(Offset, Vector4f(X, Y, Z, W));
+        return S_OK;
+    }
 
-        mWrapper->SetSampler(Slot, Sampler);
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Scene_Renderer::Draw(Math_Rectf * Destination,
+                                 Math_Rectf * Source,
+                                 vbReal32 Depth,
+                                 vbReal32 Angle,
+                                 vbInt32  Tint,
+                                 Renderer_Order Order,
+                                 Graphic_Pipeline_ * Pipeline,
+                                 Graphic_Material_ * Material)
+    {
+        mWrapper->Draw(Ref<Rectf>(* Destination),
+                       Ref<Rectf>(* Source),
+                       Depth,
+                       Angle,
+                       Color(Tint),
+                       static_cast<Scene::Renderer::Order>(Order),
+                       CCast<Graphic_Pipeline>(Pipeline),
+                       CCast<Graphic_Material>(Material));
         return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Graphic_Material::GetKey(vbStr16 * Result)
+    HRESULT Scene_Renderer::DrawFont(Graphic_Font_ * Font,
+                                     vbStr16 Text,
+                                     Renderer_Alignment Alignment,
+                                     vbReal32 X,
+                                     vbReal32 Y,
+                                     vbReal32 Depth,
+                                     vbReal32 Scale,
+                                     vbInt32 Tint)
     {
-        (* Result) = VBString8ToString16(mWrapper->GetKey().GetUrl());
+        mWrapper->DrawFont(CCast<Graphic_Font>(Font),
+            VBString16ToString8(Text),
+            static_cast<Scene::Renderer::Alignment>(Alignment), Vector2f(X, Y), Depth, Scale, Color(Tint));
         return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Graphic_Material::GetMemory(vbInt64 * Result)
+    HRESULT Scene_Renderer::End()
     {
-        CPPToVBInt64(mWrapper->GetMemory(), * Result);
+        mWrapper->End();
         return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Graphic_Material::GetCategory(Content_Resource_Type *Result)
+    HRESULT Scene_Renderer::UIBegin(vbInt32 Device, vbInt32 Width, vbInt32 Height, vbInt32 Tint)
     {
-        (* Result) = Content_Resource_Type::eResourceTypeMaterial;
+        mUIDevice = Device;
+        mWrapper->GetGraphics()->Prepare(Device, Rectf(0, 0, Width, Height), Graphic::Clear::All, Color(Tint), 1, 0);
+
+        Graphic::Camera Camera;
+        Camera.SetOrthographic(Width, Height, 1000, -1000);
+
+        mWrapper->Begin(Camera);
         return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Graphic_Material::GetStatus(Content_Resource_Status * Result)
+    HRESULT Scene_Renderer::UIFlush(vbBool Synchronised)
     {
-        (* Result) = static_cast<Content_Resource_Status>(mWrapper->GetStatus());
+        mWrapper->End();
+
+        mWrapper->GetGraphics()->Commit(mUIDevice, VBIsTrue(Synchronised));
+
         return S_OK;
     }
 }

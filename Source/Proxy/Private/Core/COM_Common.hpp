@@ -17,6 +17,7 @@
 #include <atlbase.h>
 #include <atlcom.h>
 #include <atlconv.h>
+#include <atlctl.h>
 #include <atlplus.h>
 #include <Core/Core.hpp>
 
@@ -192,7 +193,13 @@ inline namespace Proxy
     public:
 
         // -=(Undocumented)=-
-        void Internal_Reset(Ref<const SPtr<T>> Pointer)
+        CSmartPtrWrapper()
+            : mWrapper { nullptr }
+        {
+        }
+
+        // -=(Undocumented)=-
+        void Internal_Reset(ConstSPtr<T> Pointer)
         {
             mWrapper = Pointer;
         }
