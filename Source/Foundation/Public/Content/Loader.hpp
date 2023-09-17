@@ -32,7 +32,7 @@ namespace Content
         virtual List<CStr> GetExtensions() const = 0;
 
         // -=(Undocumented)=-
-        virtual Bool Load(Ref<Chunk> Data, ConstSPtr<Resource> Asset) = 0;
+        virtual Bool Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Resource> Asset) = 0;
     };
 
     // -=(Undocumented)=-
@@ -42,9 +42,9 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
-        Bool Load(Ref<Chunk> Data, ConstSPtr<Resource> Asset) override final
+        Bool Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Resource> Asset) override final
         {
-            return static_cast<Ptr<Impl>>(this)->Load(Data, CastPtr<Type>(Asset));
+            return static_cast<Ptr<Impl>>(this)->Load(Service, Data, CastPtr<Type>(Asset));
         }
     };
 }

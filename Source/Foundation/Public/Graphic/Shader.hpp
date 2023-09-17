@@ -12,44 +12,47 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Content/Loader.hpp"
-#include "Graphic/Pipeline.hpp"
+#include "Texture.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Content
+namespace Graphic
 {
     // -=(Undocumented)=-
-    class PipelineLoader final : public AbstractLoader<PipelineLoader, Graphic::Pipeline>
+    class Shader final : public Content::AbstractResource<Hash("Shader")>
     {
     public:
 
         // -=(Undocumented)=-
-        PipelineLoader(Graphic::Backend Backend, Graphic::Language Target);
-
-        // \see Loader::GetExtensions
-        List<CStr> GetExtensions() const override
-        {
-            static List<CStr> EXTENSION_LIST = { "effect" };
-            return EXTENSION_LIST;
-        }
-
-        // \see AbstractLoader::Load
-        Bool Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset);
-
-    private:
+        Shader(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
-        Chunk CompileDXBC(ConstSPtr<class Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage);
+        void SetBytecode(CStr Bytecode)
+        {
+            mBytecode = Bytecode;
+        }
+
+        // -=(Undocumented)=-
+        CStr GetBytecode() const
+        {
+            return mBytecode;
+        }
+
+    protected:
+
+        // \see Resource::OnCreate(Ref<Subsystem::Context>)
+        Bool OnCreate(Ref<Subsystem::Context> Context) override;
+
+        // \see Resource::OnDispose(Ref<Subsystem::Context>)
+        void OnDispose(Ref<Subsystem::Context> Context) override;
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Graphic::Backend  mBackend;
-        Graphic::Language mTarget;
+        SStr mBytecode;
     };
 }

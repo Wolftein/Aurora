@@ -23,7 +23,7 @@
 namespace Content
 {
     // -=(Undocumented)=-
-    class Service final : public Subsystem
+    class Service final : public EnableSmartPointer<Service>, public Subsystem
     {
     public:
 

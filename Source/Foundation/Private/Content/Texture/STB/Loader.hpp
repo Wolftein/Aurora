@@ -34,6 +34,6 @@ namespace Content
         }
 
         // \see AbstractLoader::Load
-        Bool Load(Ref<Chunk> Data, Ref<const SPtr<Graphic::Texture>> Asset);
+        Bool Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, Ref<const SPtr<Graphic::Texture>> Asset);
     };
 }

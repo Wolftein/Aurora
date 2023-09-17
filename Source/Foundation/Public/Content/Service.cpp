@@ -25,6 +25,9 @@
     #include "Content/Texture/STB/Loader.hpp"
 #endif // AE_CONTENT_LOADER_STB
 #ifdef    AE_CONTENT_LOADER_EFFECT
+    #include "Content/Shader/Loader.hpp"
+#endif // AE_CONTENT_LOADER_EFFECT
+#ifdef    AE_CONTENT_LOADER_EFFECT
     #include "Graphic/Service.hpp"
     #include "Content/Pipeline/Loader.hpp"
 #endif // AE_CONTENT_LOADER_EFFECT
@@ -241,6 +244,10 @@ namespace Content
 #endif // AE_CONTENT_LOADER_STB
 
 #ifdef    AE_CONTENT_LOADER_EFFECT
+        AddLoader(NewPtr<Content::ShaderLoader>());
+#endif // AE_CONTENT_LOADER_EFFECT
+
+#ifdef    AE_CONTENT_LOADER_EFFECT
         Ref<const Graphic::Capabilities> GraphicCapabilities = GetSubsystem<Graphic::Service>()->GetCapabilities();
         AddLoader(NewPtr<Content::PipelineLoader>(
             GraphicCapabilities.Backend, GraphicCapabilities.Language));
@@ -276,7 +283,7 @@ namespace Content
 
             if (Chunk File = Find(Key); File.HasData())
             {
-                if (Loader->Load(File, Asset))
+                if (Loader->Load(shared_from_this(), File, Asset))
                 {
                     return true;
                 }

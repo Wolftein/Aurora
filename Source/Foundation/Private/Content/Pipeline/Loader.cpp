@@ -11,6 +11,8 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Loader.hpp"
+#include <Graphic/Shader.hpp>
+#include <Content/Service.hpp>
 
 #ifdef    EA_PLATFORM_WINDOWS
     #include <d3dcompiler.h>
@@ -185,13 +187,12 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool PipelineLoader::Load(Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset)
+    Bool PipelineLoader::Load(ConstSPtr<Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset)
     {
         Graphic::Descriptor Description;
 
         TOMLParser        Parser(Data.GetText());
         const TOMLSection Properties = Parser.GetSection("Properties");
-        const TOMLSection Program    = Parser.GetSection("Program");
 
         // Parse 'blend' section
         const TOMLSection Blend = Properties.GetSection("Blend");
@@ -210,11 +211,11 @@ namespace Content
 
         // Parse 'stencil' section
         const TOMLSection Stencil = Properties.GetSection("Stencil");
-        Description.StencilMask      = Stencil.GetBool("Mask", false);
-        Description.StencilCondition = ParseTestCondition(Stencil.GetString("Condition", "LessEqual"));
-        Description.StencilOnFail    = ParseTestAction(Stencil.GetString("OnFail", "Always"));
-        Description.StencilOnZFail   = ParseTestAction(Stencil.GetString("OnZFail", "Always"));
-        Description.StencilOnZPass   = ParseTestAction(Stencil.GetString("OnZPass", "Always"));
+        Description.StencilMask        = Stencil.GetBool("Mask", false);
+        Description.StencilCondition   = ParseTestCondition(Stencil.GetString("Condition", "LessEqual"));
+        Description.StencilOnFail      = ParseTestAction(Stencil.GetString("OnFail", "Always"));
+        Description.StencilOnDepthFail = ParseTestAction(Stencil.GetString("OnDepthFail", "Always"));
+        Description.StencilOnDepthPass = ParseTestAction(Stencil.GetString("OnDepthPass", "Always"));
 
         // Parse 'rasterizer' section
         const TOMLSection Rasterizer = Properties.GetSection("Rasterizer");
@@ -245,58 +246,81 @@ namespace Content
 
         Description.InputTopology = ParseVertexTopology(Layout.GetString("Topology", "Triangle"));
 
-        // TODO: Load code from separate file with defines and includes, etc.
-        Chunk Chunk_1;
-        Chunk Chunk_2;
-        Chunk Chunk_3;
+        // Parse program section by loading each shader
+        const TOMLSection Program = Parser.GetSection("Program");
 
-        switch (mBackend)
-        {
-        case Graphic::Backend::Direct3D11:
-            Chunk_1 = CompileDXBC(Program.GetString("Code"), Graphic::Stage::Vertex);
-            Chunk_2 = CompileDXBC(Program.GetString("Code"), Graphic::Stage::Fragment);
-            Chunk_3 = CompileDXBC(Program.GetString("Code"), Graphic::Stage::Geometry);
-            break;
-        default:
-            break;
-        }
+        Chunk Chunk_1 = CompileDXBC(Service, Program.GetSection("VS"), Graphic::Stage::Vertex);
+        Chunk Chunk_2 = CompileDXBC(Service, Program.GetSection("FS"), Graphic::Stage::Fragment);
+        Chunk Chunk_3 = CompileDXBC(Service, Program.GetSection("GS"), Graphic::Stage::Geometry);
 
         if (Chunk_1.HasData() && Chunk_2.HasData())
         {
             Asset->Load(Chunk_1, Chunk_2, Chunk_3, Description);
             return true;
         }
+
         return false;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Chunk PipelineLoader::CompileDXBC(CStr Code, Graphic::Stage Stage)
+    Chunk PipelineLoader::CompileDXBC(ConstSPtr<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage)
     {
+        Chunk Compilation;
+
+        if (Section.IsEmpty())
+        {
+            return Compilation;
+        }
+
+        // Load the shader file from the content service
+        ConstSPtr<Graphic::Shader> Shader = Service->Load<Graphic::Shader>(Section.GetString("Filename"));
+        const CStr         Code     = Shader->GetBytecode();
+        const CStr         Entry    = Section.GetString("Entry", "main");
+        const Vector<CStr> Defines  = Section.GetStringArray("Defines");
+
 #ifdef    EA_PLATFORM_WINDOWS
+        constexpr auto GenerateShaderMacro = [](Ref<const Vector<CStr>> Defines)
+        {
+            static D3D_SHADER_MACRO Collection[256];
+
+            for (UInt Index = 0; Index < Defines.size(); ++Index)
+            {
+                const CStr Define    = Defines[Index];
+                const UInt Delimiter = Define.find_first_of('=');
+
+                const SStr Name(Delimiter != CStr::npos ? Define.substr(0, Delimiter) : Define);
+                const SStr Data(Delimiter != CStr::npos ? Define.substr(Delimiter) : "true");
+
+                Collection[Index].Name = Name.data();
+                Collection[Index].Definition = Data.data();
+            }
+
+            Collection[Defines.size()] = { nullptr, nullptr };
+
+            return reinterpret_cast<Ptr<const D3D_SHADER_MACRO>>(& Collection);
+        };
+
         Ptr<ID3DBlob> Error    = nullptr;
         Ptr<ID3DBlob> Bytecode = nullptr;
 
-        constexpr CStr kShaderEntries[] = {
-            "vertex", "pixel", "geometry"
-        };
         constexpr CStr kShaderProfiles[][3] = {
             { "vs_4_0_level_9_1", "ps_4_0_level_9_1", nullptr  },
             { "vs_4_0_level_9_1", "ps_4_0_level_9_1", nullptr  },
             { "vs_4_0_level_9_3", "ps_4_0_level_9_3", nullptr  },
+            { "vs_4_0",           "ps_4_0",           "gs_4_0" },
             { "vs_5_0",           "ps_5_0",           "gs_5_0" },
             { "vs_6_0",           "ps_6_0",           "gs_6_0" }
         };
 
-        Ref<const CStr> Entry   = kShaderEntries[static_cast<UInt>(Stage)];
         Ref<const CStr> Profile = kShaderProfiles[static_cast<UInt>(mTarget)][static_cast<UInt>(Stage)];
 
         const HRESULT Result   = D3DCompile(
             Code.data(),
             Code.size(),
             nullptr,
-            nullptr,
+            GenerateShaderMacro(Defines),
             nullptr,
             Entry.data(),
             Profile.data(),
@@ -304,8 +328,6 @@ namespace Content
             0,
             & Bytecode,
             & Error);
-
-        Chunk Compilation;
 
         if (SUCCEEDED(Result))
         {

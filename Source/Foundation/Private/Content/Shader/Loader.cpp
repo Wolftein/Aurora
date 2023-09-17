@@ -12,9 +12,6 @@
 
 #include "Loader.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -24,23 +21,9 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool STBLoader::Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Texture> Asset)
+    Bool ShaderLoader::Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Shader> Asset)
     {
-        SInt32 Width, Height, Channel;
-
-        Ptr<stbi_uc> Image = stbi_load_from_memory(
-            Data.GetData<stbi_uc>(), Data.GetSize(), & Width, & Height, & Channel, STBI_rgb_alpha);
-
-        if (Image)
-        {
-            Chunk Chunk(Image, Width * Height * Channel, [](auto Data) {
-                stbi_image_free(Data);
-            });
-
-            Asset->Load(Graphic::TextureFormat::RGBA8UIntNorm, Graphic::TextureLayout::Source, Width, Height, 1, Chunk);
-
-            return true;
-        }
-        return false;
+        Asset->SetBytecode(Data.GetText()); // TODO: Include files :(--D)
+        return true;
     }
 }

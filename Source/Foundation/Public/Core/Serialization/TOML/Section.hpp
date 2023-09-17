@@ -56,10 +56,16 @@ inline namespace Core
         Bool GetBool(CStr Key, Bool Default = false) const;
 
         // -=(Undocumented)=-
+        Vector<Bool> GetBoolArray(CStr Key) const;
+
+        // -=(Undocumented)=-
         void SetString(CStr Key, CStr Value);
 
         // -=(Undocumented)=-
         CStr GetString(CStr Key, CStr Default = "") const;
+
+        // -=(Undocumented)=-
+        Vector<CStr> GetStringArray(CStr Key) const;
 
         // -=(Undocumented)=-
         void SetNumber(CStr Key, SInt Value);
@@ -68,10 +74,16 @@ inline namespace Core
         SInt GetNumber(CStr Key, SInt Default = 0) const;
 
         // -=(Undocumented)=-
+        Vector<SInt> GetNumberArray(CStr Key) const;
+
+        // -=(Undocumented)=-
         void SetReal(CStr Key, Real Value);
 
         // -=(Undocumented)=-
         Real GetReal(CStr Key, Real Default = 0) const;
+
+        // -=(Undocumented)=-
+        Vector<Real> GetRealArray(CStr Key) const;
 
     private:
 

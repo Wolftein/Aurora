@@ -37,7 +37,9 @@ inline namespace Core
         // -=(Undocumented)=-
         template<typename Type>
         explicit Reader(CPtr<Type> Block)
-            : Reader(Block.data(), Block.size())
+            : mBuffer { reinterpret_cast<Ptr<UInt08>>(Block.data()) },
+              mLength { Block.size_bytes() },
+              mOffset { 0 }
         {
         }
 

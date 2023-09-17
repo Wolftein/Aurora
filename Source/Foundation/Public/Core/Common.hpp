@@ -143,4 +143,8 @@ inline namespace Core
     // -=(Undocumented)=-
     template<typename Key, typename Value, typename Hash = eastl::hash<Key>, typename Predicate = eastl::equal_to<>>
     using Table  = eastl::hash_map<Key, Value, Hash, Predicate>;
+
+    // -=(Undocumented)=-
+    template<typename Class>
+    using EnableSmartPointer = eastl::enable_shared_from_this<Class>;
 }

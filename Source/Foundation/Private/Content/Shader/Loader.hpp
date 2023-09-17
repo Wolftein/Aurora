@@ -13,7 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Content/Loader.hpp"
-#include "Graphic/Pipeline.hpp"
+#include "Graphic/Shader.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,34 +22,18 @@
 namespace Content
 {
     // -=(Undocumented)=-
-    class PipelineLoader final : public AbstractLoader<PipelineLoader, Graphic::Pipeline>
+    class ShaderLoader final : public AbstractLoader<ShaderLoader, Graphic::Shader>
     {
     public:
-
-        // -=(Undocumented)=-
-        PipelineLoader(Graphic::Backend Backend, Graphic::Language Target);
 
         // \see Loader::GetExtensions
         List<CStr> GetExtensions() const override
         {
-            static List<CStr> EXTENSION_LIST = { "effect" };
+            static List<CStr> EXTENSION_LIST = { "shader" };
             return EXTENSION_LIST;
         }
 
         // \see AbstractLoader::Load
-        Bool Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset);
-
-    private:
-
-        // -=(Undocumented)=-
-        Chunk CompileDXBC(ConstSPtr<class Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage);
-
-    private:
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        Graphic::Backend  mBackend;
-        Graphic::Language mTarget;
+        Bool Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Shader> Asset);
     };
 }

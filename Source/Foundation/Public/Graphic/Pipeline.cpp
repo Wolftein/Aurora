@@ -44,13 +44,14 @@ namespace Graphic
 
     Bool Pipeline::OnCreate(Ref<Subsystem::Context> Context)
     {
-        SetMemory(mShaders[0].GetSize() + mShaders[1].GetSize() + mShaders[2].GetSize() + sizeof(mProperties));
+        SetMemory(mShaders[0].GetSize() + mShaders[1].GetSize() + mShaders[2].GetSize());
 
         mID = Context.GetSubsystem<Graphic::Service>()->CreatePipeline(mShaders[0], mShaders[1], mShaders[2], mProperties);
 
-        mShaders[0].Clear();
-        mShaders[1].Clear();
-        mShaders[2].Clear();
+        for (Ref<Chunk> Shader : mShaders)
+        {
+            Shader.Clear();
+        }
 
         return (mID > 0);
     }

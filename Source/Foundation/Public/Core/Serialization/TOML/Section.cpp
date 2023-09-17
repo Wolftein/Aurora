@@ -125,6 +125,22 @@ inline namespace Core
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    Vector<Bool> TOMLSection::GetBoolArray(CStr Key) const
+    {
+        const TOMLArray Section = GetArray(Key);
+
+        Vector<Bool> Array(Section.GetSize());
+
+        for (UInt Index = 0, Limit = Section.GetSize(); Index < Limit; ++Index)
+        {
+            Array.emplace_back(Section.GetBool(Index));
+        }
+        return Array;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void TOMLSection::SetString(CStr Key, CStr Value)
     {
         mTable->insert_or_assign(AsView(Key), AsView(Value));
@@ -138,6 +154,22 @@ inline namespace Core
         const auto String = (* mTable)[AsView(Key)].value_or(AsView(Default));
 
         return CStr { String.data(), String.size() };
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Vector<CStr> TOMLSection::GetStringArray(CStr Key) const
+    {
+        const TOMLArray Section = GetArray(Key);
+
+        Vector<CStr> Array(Section.GetSize());
+
+        for (UInt Index = 0, Limit = Section.GetSize(); Index < Limit; ++Index)
+        {
+            Array.emplace_back(Section.GetString(Index));
+        }
+        return Array;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -159,6 +191,22 @@ inline namespace Core
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    Vector<SInt> TOMLSection::GetNumberArray(CStr Key) const
+    {
+        const TOMLArray Section = GetArray(Key);
+
+        Vector<SInt> Array(Section.GetSize());
+
+        for (UInt Index = 0, Limit = Section.GetSize(); Index < Limit; ++Index)
+        {
+            Array.emplace_back(Section.GetNumber(Index));
+        }
+        return Array;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void TOMLSection::SetReal(CStr Key, Real Value)
     {
         mTable->insert_or_assign(AsView(Key), Value);
@@ -171,4 +219,21 @@ inline namespace Core
     {
         return (* mTable)[AsView(Key)].value_or(Default);
     }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Vector<Real> TOMLSection::GetRealArray(CStr Key) const
+    {
+        const TOMLArray Section = GetArray(Key);
+
+        Vector<Real> Array(Section.GetSize());
+
+        for (UInt Index = 0, Limit = Section.GetSize(); Index < Limit; ++Index)
+        {
+            Array.emplace_back(Section.GetReal(Index));
+        }
+        return Array;
+    }
+
 }

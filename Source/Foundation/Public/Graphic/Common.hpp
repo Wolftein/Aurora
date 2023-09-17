@@ -428,10 +428,10 @@ namespace Graphic
         TestAction     StencilOnFail       = TestAction::Keep;
 
         // -=(Undocumented)=-
-        TestAction     StencilOnZFail      = TestAction::Keep;
+        TestAction     StencilOnDepthFail  = TestAction::Keep;
 
         // -=(Undocumented)=-
-        TestAction     StencilOnZPass      = TestAction::Keep;
+        TestAction     StencilOnDepthPass  = TestAction::Keep;
 
         // -=(Undocumented)=-
         Attribute      InputLayout[k_MaxAttributes];
