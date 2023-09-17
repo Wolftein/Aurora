@@ -61,7 +61,7 @@ namespace Graphic
         void DeletePass(Object ID) override;
 
         // \see Driver::CreatePipeline
-        void CreatePipeline(Object ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties) override;
+        void CreatePipeline(Object ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, CPtr<UInt08> Geometry, Ref<const Descriptor> Properties) override;
 
         // \see Driver::DeletePipeline
         void DeletePipeline(Object ID) override;
@@ -117,6 +117,7 @@ namespace Graphic
         {
             ComPtr<ID3D11VertexShader>      VS;
             ComPtr<ID3D11PixelShader>       PS;
+            ComPtr<ID3D11GeometryShader>    GS;
             ComPtr<ID3D11BlendState>        BS;
             ComPtr<ID3D11DepthStencilState> DS;
             ComPtr<ID3D11RasterizerState>   RS;

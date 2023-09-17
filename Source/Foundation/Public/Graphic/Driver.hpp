@@ -62,7 +62,7 @@ namespace Graphic
         virtual void DeletePass(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreatePipeline(Object ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties) = 0;
+        virtual void CreatePipeline(Object ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, CPtr<UInt08> Geometry, Ref<const Descriptor> Properties) = 0;
 
         // -=(Undocumented)=-
         virtual void DeletePipeline(Object ID) = 0;

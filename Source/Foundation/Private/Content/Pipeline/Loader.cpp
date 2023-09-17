@@ -248,12 +248,14 @@ namespace Content
         // TODO: Load code from separate file with defines and includes, etc.
         Chunk Chunk_1;
         Chunk Chunk_2;
+        Chunk Chunk_3;
 
         switch (mBackend)
         {
         case Graphic::Backend::Direct3D11:
             Chunk_1 = CompileDXBC(Program.GetString("Code"), Graphic::Stage::Vertex);
             Chunk_2 = CompileDXBC(Program.GetString("Code"), Graphic::Stage::Fragment);
+            Chunk_3 = CompileDXBC(Program.GetString("Code"), Graphic::Stage::Geometry);
             break;
         default:
             break;
@@ -261,7 +263,7 @@ namespace Content
 
         if (Chunk_1.HasData() && Chunk_2.HasData())
         {
-            Asset->Load(Chunk_1, Chunk_2, Description);
+            Asset->Load(Chunk_1, Chunk_2, Chunk_3, Description);
             return true;
         }
         return false;
@@ -276,28 +278,19 @@ namespace Content
         Ptr<ID3DBlob> Error    = nullptr;
         Ptr<ID3DBlob> Bytecode = nullptr;
 
-        Ptr<const char> Target = "";
-        Ptr<const char> Entry  = (Stage == Graphic::Stage::Vertex ? "vertex" : "pixel");
+        constexpr CStr kShaderEntries[] = {
+            "vertex", "pixel", "geometry"
+        };
+        constexpr CStr kShaderProfiles[][3] = {
+            { "vs_4_0_level_9_1", "ps_4_0_level_9_1", nullptr  },
+            { "vs_4_0_level_9_1", "ps_4_0_level_9_1", nullptr  },
+            { "vs_4_0_level_9_3", "ps_4_0_level_9_3", nullptr  },
+            { "vs_5_0",           "ps_5_0",           "gs_5_0" },
+            { "vs_6_0",           "ps_6_0",           "gs_6_0" }
+        };
 
-        switch (mTarget)
-        {
-        case Graphic::Language::Version_1:
-        case Graphic::Language::Version_2:
-            Target = (Stage == Graphic::Stage::Vertex ? "vs_4_0_level_9_1" : "ps_4_0_level_9_1");
-            break;
-        case Graphic::Language::Version_3:
-            Target = (Stage == Graphic::Stage::Vertex ? "vs_4_0_level_9_3" : "ps_4_0_level_9_3");
-            break;
-        case Graphic::Language::Version_4:
-            Target = (Stage == Graphic::Stage::Vertex ? "vs_4_0" : "ps_4_0");
-            break;
-        case Graphic::Language::Version_5:
-            Target = (Stage == Graphic::Stage::Vertex ? "vs_5_0" : "ps_5_0");
-            break;
-        case Graphic::Language::Version_6:
-            Target = (Stage == Graphic::Stage::Vertex ? "vs_6_0" : "ps_6_0");
-            break;
-        }
+        Ref<const CStr> Entry   = kShaderEntries[static_cast<UInt>(Stage)];
+        Ref<const CStr> Profile = kShaderProfiles[static_cast<UInt>(mTarget)][static_cast<UInt>(Stage)];
 
         const HRESULT Result   = D3DCompile(
             Code.data(),
@@ -305,8 +298,8 @@ namespace Content
             nullptr,
             nullptr,
             nullptr,
-            Entry,
-            Target,
+            Entry.data(),
+            Profile.data(),
             D3DCOMPILE_OPTIMIZATION_LEVEL3,
             0,
             & Bytecode,

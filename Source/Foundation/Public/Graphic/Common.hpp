@@ -151,6 +151,7 @@ namespace Graphic
     {
         Vertex,
         Fragment,
+        Geometry,
     };
 
     // -=(Undocumented)=-

@@ -598,12 +598,18 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreatePipeline(Object ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties)
+    void D3D11Driver::CreatePipeline(Object ID, CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, CPtr<UInt08> Geometry, Ref<const Descriptor> Properties)
     {
         Ref<D3D11Pipeline> Pipeline = mPipelines[ID];
 
         ThrowIfFail(mDevice->CreateVertexShader(Vertex.data(), Vertex.size(), nullptr, Pipeline.VS.GetAddressOf()));
         ThrowIfFail(mDevice->CreatePixelShader(Fragment.data(), Fragment.size(), nullptr, Pipeline.PS.GetAddressOf()));
+
+        if (!Geometry.empty())
+        {
+            ThrowIfFail(
+                mDevice->CreateGeometryShader(Geometry.data(), Geometry.size(), nullptr, Pipeline.GS.GetAddressOf()));
+        }
 
         {
             D3D11_BLEND_DESC Description = CD3D11_BLEND_DESC(CD3D11_DEFAULT());
@@ -908,9 +914,12 @@ namespace Graphic
                 {
                     const UInt32 Count = Max - Min;
 
+                    // TODO: Resource Binding Target
                     mDeviceImmediate->VSSetConstantBuffers1(
                         Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
                     mDeviceImmediate->PSSetConstantBuffers1(
+                        Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
+                    mDeviceImmediate->GSSetConstantBuffers1(
                         Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
                 }
             }
@@ -938,6 +947,10 @@ namespace Graphic
                 if (Old.PS != New.PS)
                 {
                     mDeviceImmediate->PSSetShader(New.PS.Get(), nullptr, 0);
+                }
+                if (Old.GS != New.GS)
+                {
+                    mDeviceImmediate->GSSetShader(New.GS.Get(), nullptr, 0);
                 }
                 if (Old.BS != New.BS)
                 {
@@ -989,8 +1002,10 @@ namespace Graphic
                 {
                     const UInt32 Count = Max - Min;
 
+                    // TODO: Resource Binding Target
                     mDeviceImmediate->VSSetSamplers(Min, Count, & Array[Min]);
                     mDeviceImmediate->PSSetSamplers(Min, Count, & Array[Min]);
+                    mDeviceImmediate->GSSetSamplers(Min, Count, & Array[Min]);
                 }
             }
 
@@ -1014,8 +1029,10 @@ namespace Graphic
                 {
                     const UInt32 Count = Max - Min;
 
+                    // TODO: Resource Binding Target
                     mDeviceImmediate->VSSetShaderResources(Min, Count, & Array[Min]);
                     mDeviceImmediate->PSSetShaderResources(Min, Count, & Array[Min]);
+                    mDeviceImmediate->GSSetShaderResources(Min, Count, & Array[Min]);
                 }
             }
 

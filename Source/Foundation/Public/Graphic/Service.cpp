@@ -192,13 +192,13 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    UInt Service::CreatePipeline(CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, Ref<const Descriptor> Properties)
+    UInt Service::CreatePipeline(CPtr<UInt08> Vertex, CPtr<UInt08> Fragment, CPtr<UInt08> Geometry, Ref<const Descriptor> Properties)
     {
         const Object ID = mPipelines.Allocate();
 
         if (ID > 0)
         {
-            mDriver->CreatePipeline(ID, Vertex, Fragment, Properties);
+            mDriver->CreatePipeline(ID, Vertex, Fragment, Geometry, Properties);
         }
         return ID;
     }
