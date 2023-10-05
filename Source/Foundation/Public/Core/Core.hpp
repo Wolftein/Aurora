@@ -12,8 +12,6 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Trait.hpp"
-
 #include "Log/Service.hpp"
 
 #include "Math/Color.hpp"
@@ -22,7 +20,6 @@
 
 #include "Memory/Chunk.hpp"
 #include "Memory/Handle.hpp"
-#include "Memory/Reader.hpp"
 
 #include "Serialization/TOML/Parser.hpp"
 

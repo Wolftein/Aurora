@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Common.hpp"
+#include "Core/Types.hpp"
 
 #define QUILL_DISABLE_NON_PREFIXED_MACROS
 #define QUILL_ROOT_LOGGER_ONLY

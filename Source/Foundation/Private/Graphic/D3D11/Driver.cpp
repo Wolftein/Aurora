@@ -329,9 +329,9 @@ namespace Graphic
     static auto As(Usage Value)
     {
         constexpr static D3D11_BIND_FLAG k_Mapping[] = {
-            D3D11_BIND_CONSTANT_BUFFER,        // Usage::Uniform
-            D3D11_BIND_INDEX_BUFFER,           // Usage::Indices
             D3D11_BIND_VERTEX_BUFFER,          // Usage::Vertices
+            D3D11_BIND_INDEX_BUFFER,           // Usage::Indices
+            D3D11_BIND_CONSTANT_BUFFER,        // Usage::Uniform
         };
         return k_Mapping[static_cast<UInt32>(Value)];
     }
@@ -489,47 +489,25 @@ namespace Graphic
         };
         Ptr<D3D11_SUBRESOURCE_DATA> Pointer = (Data.empty() ? nullptr : & Content);
 
-        Ref<D3D11Buffer> Buffer = mBuffers[ID];
-        Buffer.Offset   = 0;
-        Buffer.Capacity = Capacity;
-        ThrowIfFail(mDevice->CreateBuffer(& Descriptor, Pointer, Buffer.Object.GetAddressOf()));
+        ThrowIfFail(mDevice->CreateBuffer(& Descriptor, Pointer, mBuffers[ID].Object.GetAddressOf()));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Ptr<void> D3D11Driver::Map(Object ID, Ref<UInt> Offset, UInt Length)
-    {
-        Ref<D3D11Buffer> Buffer = mBuffers[ID];
-
-        Offset = (Buffer.Offset + Length > Buffer.Capacity ? 0u : Buffer.Offset);
-
-        Buffer.Offset = Offset + Length;
-
-        return Map(ID, !Offset, Offset, Length);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    Ptr<void> D3D11Driver::Map(Object ID, Bool Discard, UInt Offset, UInt Length)
+    void D3D11Driver::UpdateBuffer(Object ID, Bool Discard, UInt Offset, CPtr<UInt08> Data)
     {
         const D3D11_MAP          Mode = (Discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE);
         D3D11_MAPPED_SUBRESOURCE Memory;
 
-        if (FAILED(mDeviceImmediate->Map(mBuffers[ID].Object.Get(), 0, Mode, 0, & Memory)))
+        // TODO: CopySubResource with a Staging Buffer to achieve maximum parallelism?
+
+        if (SUCCEEDED(mDeviceImmediate->Map(mBuffers[ID].Object.Get(), 0, Mode, 0, & Memory)))
         {
-            return nullptr;
+            FastCopyMemory<false>((Ptr<void>)((UInt) Memory.pData + Offset), Data.data(), Data.size_bytes());
+
+            mDeviceImmediate->Unmap(mBuffers[ID].Object.Get(), 0);
         }
-        return static_cast<Ptr<UInt08>>(Memory.pData) + Offset;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void D3D11Driver::Unmap(Object ID)
-    {
-        mDeviceImmediate->Unmap(mBuffers[ID].Object.Get(), 0);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -858,26 +836,28 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::Submit(CPtr<Submission> Submissions)
+    void D3D11Driver::Submit(CPtr<Submission> Submissions) // TODO: Clean this function
     {
-        Submission EmptyDummySubmission;
+        const Submission EmptySubmission { .Scissor = { 0, 0, 0, 0 } };
 
-        for (UInt Index = 0; Index < Submissions.size(); ++Index)
+        for (UInt Batch = 0; Batch < Submissions.size(); ++Batch)
         {
-            Ref<const Submission> NewestSubmission = Submissions[Index];
-            Ref<const Submission> OldestSubmission = (Index > 0 ? Submissions[Index - 1] : EmptyDummySubmission);
+            Ref<const Submission> NewestSubmission = Submissions[Batch];
+            Ref<const Submission> OldestSubmission = (Batch > 0 ? Submissions[Batch - 1] : EmptySubmission);
 
-            // Apply vertices when it has changed
-            if (OldestSubmission.Vertices.Buffer != NewestSubmission.Vertices.Buffer)
+            // Apply vertices if it has changed
+            if (OldestSubmission.Vertices.Buffer != NewestSubmission.Vertices.Buffer ||
+                OldestSubmission.Vertices.Stride != NewestSubmission.Vertices.Stride)
             {
                 Ref<const D3D11Buffer> Buffer = mBuffers[NewestSubmission.Vertices.Buffer];
                 const UINT Stride = NewestSubmission.Vertices.Stride;
-                const UINT Offset = 0;
+                const UINT Offset = 0; //NewestSubmission.Vertices.Offset;
                 mDeviceImmediate->IASetVertexBuffers(0, 1, Buffer.Object.GetAddressOf(), & Stride, & Offset);
             }
 
-            // Apply indices when it has changed
-            if (OldestSubmission.Indices.Buffer != NewestSubmission.Indices.Buffer)
+            // Apply indices if it has changed
+            if (OldestSubmission.Indices.Buffer != NewestSubmission.Indices.Buffer ||
+                OldestSubmission.Indices.Stride != NewestSubmission.Indices.Stride)
             {
                 Ref<const D3D11Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
                 const DXGI_FORMAT      Format = (NewestSubmission.Indices.Stride == sizeof(UInt16)
@@ -886,46 +866,8 @@ namespace Graphic
                 mDeviceImmediate->IASetIndexBuffer(Buffer.Object.Get(), Format, 0);
             }
 
-            // Apply uniforms when it has changed
-            {
-                Ptr<ID3D11Buffer> Array[k_MaxUniforms];
-                UINT   ArrayOffset[k_MaxUniforms];
-                UINT   ArrayLength[k_MaxUniforms];
-                UInt32 Min = k_MaxUniforms;
-                UInt32 Max = 0u;
-
-                for (UInt32 Element = 0; Element < k_MaxUniforms; ++Element)
-                {
-                    Ref<const Binding> Old = OldestSubmission.Uniforms[Element];
-                    Ref<const Binding> New = NewestSubmission.Uniforms[Element];
-
-                    if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Length != New.Length)
-                    {
-                        Min = min(Element, Min);
-                        Max = max(Element + 1, Max);
-                    }
-
-                    Array[Element]       = mBuffers[New.Buffer].Object.Get();
-                    ArrayOffset[Element] = Align<16>(New.Offset);
-                    ArrayLength[Element] = Align<16>(New.Length);
-                }
-
-                if (Min != k_MaxUniforms && Max != 0u)
-                {
-                    const UInt32 Count = Max - Min;
-
-                    // TODO: Resource Binding Target
-                    mDeviceImmediate->VSSetConstantBuffers1(
-                        Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
-                    mDeviceImmediate->PSSetConstantBuffers1(
-                        Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
-                    mDeviceImmediate->GSSetConstantBuffers1(
-                        Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
-                }
-            }
-
-            // Apply the scissor test when it has changed, or it's the first batch
-            if (Index == 0 || OldestSubmission.Scissor != NewestSubmission.Scissor)
+            // Apply the scissor rect if it has changed
+            if (OldestSubmission.Scissor != NewestSubmission.Scissor)
             {
                 const RECT Rect {
                     NewestSubmission.Scissor.GetLeft(),  NewestSubmission.Scissor.GetTop(),
@@ -934,7 +876,7 @@ namespace Graphic
                 mDeviceImmediate->RSSetScissorRects(1, & Rect);
             }
 
-            // Apply pipeline when it has changed
+            // Apply pipeline or stencil value if it has changed
             if (OldestSubmission.Pipeline != NewestSubmission.Pipeline)
             {
                 Ref<const D3D11Pipeline> Old = mPipelines[OldestSubmission.Pipeline];
@@ -979,7 +921,10 @@ namespace Graphic
                     mPipelines[NewestSubmission.Pipeline].DS.Get(), NewestSubmission.Stencil);
             }
 
-            // Apply samplers when it has changed, or it's the first batch
+            // TODO: Find a better way to do all this, I DON'T LIKE IT!
+
+            // Apply resources of each stage if it has changed
+            auto ApplySampler = [&]<Stage Stage>(Ref<const Signature> OldSignature, Ref<const Signature> NewSignature)
             {
                 Ptr<ID3D11SamplerState> Array[k_MaxSources];
                 UInt32 Min = k_MaxSources;
@@ -987,10 +932,10 @@ namespace Graphic
 
                 for (UInt32 Element = 0; Element < k_MaxSources; ++Element)
                 {
-                    Ref<D3D11Sampler> PrevSampler = GetOrCreateSampler(OldestSubmission.Samplers[Element]);
-                    Ref<D3D11Sampler> NextSampler = GetOrCreateSampler(NewestSubmission.Samplers[Element]);
+                    Ref<D3D11Sampler> PrevSampler = GetOrCreateSampler(OldSignature.Samplers[Element]);
+                    Ref<D3D11Sampler> NextSampler = GetOrCreateSampler(NewSignature.Samplers[Element]);
 
-                    if (Index == 0 || PrevSampler.Resource != NextSampler.Resource)
+                    if (Batch == 0 || PrevSampler.Resource != NextSampler.Resource)
                     {
                         Min = min(Element, Min);
                         Max = max(Element + 1, Max);
@@ -1002,40 +947,117 @@ namespace Graphic
                 {
                     const UInt32 Count = Max - Min;
 
-                    // TODO: Resource Binding Target
-                    mDeviceImmediate->VSSetSamplers(Min, Count, & Array[Min]);
-                    mDeviceImmediate->PSSetSamplers(Min, Count, & Array[Min]);
-                    mDeviceImmediate->GSSetSamplers(Min, Count, & Array[Min]);
+                    if (Stage == Stage::Vertex)
+                    {
+                        mDeviceImmediate->VSSetSamplers(Min, Count, & Array[Min]);
+                    }
+                    else if (Stage == Stage::Fragment)
+                    {
+                        mDeviceImmediate->PSSetSamplers(Min, Count, & Array[Min]);
+                    }
+                    else
+                    {
+                        mDeviceImmediate->GSSetSamplers(Min, Count, & Array[Min]);
+                    }
                 }
-            }
-
-            // Apply textures when it has changed
+            };
+            auto ApplyTexture = [this]<Stage Stage>(Ref<const Signature> OldSignature, Ref<const Signature> NewSignature)
             {
                 Ptr<ID3D11ShaderResourceView> Array[k_MaxSources];
                 UInt32 Min = k_MaxSources;
                 UInt32 Max = 0u;
 
-                for (UInt32 Element = 0; Element < k_MaxSources && NewestSubmission.Textures[Element] != 0; ++Element)
+                for (UInt32 Element = 0; Element < k_MaxSources && NewSignature.Textures[Element] != 0; ++Element)
                 {
-                    if (OldestSubmission.Textures[Element] != NewestSubmission.Textures[Element])
+                    if (OldSignature.Textures[Element] != NewSignature.Textures[Element])
                     {
                         Min = min(Element, Min);
                         Max = max(Element + 1, Max);
                     }
-                    Array[Element] = mTextures[NewestSubmission.Textures[Element]].Resource.Get();
+                    Array[Element] = mTextures[NewSignature.Textures[Element]].Resource.Get();
                 }
 
                 if (Min != k_MaxSources && Max != 0u)
                 {
                     const UInt32 Count = Max - Min;
 
-                    // TODO: Resource Binding Target
-                    mDeviceImmediate->VSSetShaderResources(Min, Count, & Array[Min]);
-                    mDeviceImmediate->PSSetShaderResources(Min, Count, & Array[Min]);
-                    mDeviceImmediate->GSSetShaderResources(Min, Count, & Array[Min]);
+                    if (Stage == Stage::Vertex)
+                    {
+                        mDeviceImmediate->VSSetShaderResources(Min, Count, & Array[Min]);
+                    }
+                    else if (Stage == Stage::Fragment)
+                    {
+                        mDeviceImmediate->PSSetShaderResources(Min, Count, & Array[Min]);
+                    }
+                    else
+                    {
+                        mDeviceImmediate->GSSetShaderResources(Min, Count, & Array[Min]);
+                    }
                 }
+            };
+            auto ApplyUniform = [this]<Stage Stage>(Ref<const Signature> OldSignature, Ref<const Signature> NewSignature)
+            {
+                Ptr<ID3D11Buffer> Array[k_MaxUniforms];
+                UINT   ArrayOffset[k_MaxUniforms];
+                UINT   ArrayLength[k_MaxUniforms];
+                UInt32 Min = k_MaxUniforms;
+                UInt32 Max = 0u;
+
+                for (UInt32 Element = 0; Element < k_MaxUniforms; ++Element)
+                {
+                    Ref<const Binding> Old = OldSignature.Uniforms[Element];
+                    Ref<const Binding> New = NewSignature.Uniforms[Element];
+
+                    if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Length != New.Length)
+                    {
+                        Min = min(Element, Min);
+                        Max = max(Element + 1, Max);
+                    }
+
+                    Array[Element]       = mBuffers[New.Buffer].Object.Get();
+                    ArrayOffset[Element] = Align<16>(New.Offset);
+                    ArrayLength[Element] = Align<16>(New.Length);
+                }
+
+                if (Min != k_MaxUniforms && Max != 0u)
+                {
+                    const UInt32 Count = Max - Min;
+
+                    if (Stage == Stage::Vertex)
+                    {
+                        mDeviceImmediate->VSSetConstantBuffers1(
+                            Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
+                    }
+                    else if (Stage == Stage::Fragment)
+                    {
+                        mDeviceImmediate->PSSetConstantBuffers1(
+                            Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
+                    }
+                    else
+                    {
+                        mDeviceImmediate->GSSetConstantBuffers1(
+                            Min, Count, & Array[Min], & ArrayOffset[Min], & ArrayLength[Min]);
+                    }
+                }
+            };
+            auto ApplyResources = [&]<Stage Stage>(Ref<const Submission> OldSubmission, Ref<const Submission> NewSubmission)
+            {
+                constexpr UInt Slot = static_cast<UInt>(Stage);
+
+                ApplySampler.template operator()<Stage>(OldSubmission.Root[Slot], NewSubmission.Root[Slot]);
+                ApplyTexture.template operator()<Stage>(OldSubmission.Root[Slot], NewSubmission.Root[Slot]);
+                ApplyUniform.template operator()<Stage>(OldSubmission.Root[Slot], NewSubmission.Root[Slot]);
+            };
+
+            ApplyResources.template operator()<Stage::Vertex>(OldestSubmission, NewestSubmission);
+            ApplyResources.template operator()<Stage::Fragment>(OldestSubmission, NewestSubmission);
+
+            if (mPipelines[NewestSubmission.Pipeline].GS)
+            {
+                ApplyResources.template operator()<Stage::Geometry>(OldestSubmission, NewestSubmission);
             }
 
+            // Issue draw command
             if (NewestSubmission.Indices.Buffer != 0)
             {
                 mDeviceImmediate->DrawIndexed(

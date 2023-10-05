@@ -40,14 +40,8 @@ namespace Graphic
         // -=(Undocumented)=-
         virtual void CreateBuffer(Object ID, Usage Type, UInt Capacity, CPtr<UInt08> Data) = 0;
 
-        // -=(Undocumented)=-
-        virtual Ptr<void> Map(Object ID, Ref<UInt> Offset, UInt Length) = 0;
-
-        // -=(Undocumented)=-
-        virtual Ptr<void> Map(Object ID, Bool Discard, UInt Offset, UInt Length) = 0;
-
-        // -=(Undocumented)=-
-        virtual void Unmap(Object ID) = 0;
+        // -=(Undocumented)=
+        virtual void UpdateBuffer(Object ID, Bool Discard, UInt Offset, CPtr<UInt08> Data) = 0;
 
         // -=(Undocumented)=-
         virtual void DeleteBuffer(Object ID) = 0;

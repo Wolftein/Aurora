@@ -39,14 +39,8 @@ namespace Graphic
         // \see Driver::CreateBuffer
         void CreateBuffer(Object ID, Usage Type, UInt Capacity, CPtr<UInt08> Data) override;
 
-        // \see Driver::Map
-        Ptr<void> Map(Object ID, Ref<UInt> Offset, UInt Length) override;
-
-        // \see Driver::Map
-        Ptr<void> Map(Object ID, Bool Discard, UInt Offset, UInt Length) override;
-
-        // \see Driver::Unmap
-        void Unmap(Object ID) override;
+        // \see Driver::UpdateBuffer
+        void UpdateBuffer(Object ID, Bool Discard, UInt Offset, CPtr<UInt08> Data) override;
 
         // \see Driver::DeleteBuffer
         void DeleteBuffer(Object ID) override;
@@ -100,8 +94,6 @@ namespace Graphic
         struct D3D11Buffer
         {
             ComPtr<ID3D11Buffer>             Object;
-            UInt                             Offset;
-            UInt                             Capacity;
         };
 
         // -=(Undocumented)=-

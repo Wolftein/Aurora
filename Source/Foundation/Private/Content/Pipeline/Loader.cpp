@@ -249,13 +249,14 @@ namespace Content
         // Parse program section by loading each shader
         const TOMLSection Program = Parser.GetSection("Program");
 
-        Chunk Chunk_1 = CompileDXBC(Service, Program.GetSection("VS"), Graphic::Stage::Vertex);
-        Chunk Chunk_2 = CompileDXBC(Service, Program.GetSection("FS"), Graphic::Stage::Fragment);
-        Chunk Chunk_3 = CompileDXBC(Service, Program.GetSection("GS"), Graphic::Stage::Geometry);
+        Array<Chunk, Graphic::k_MaxStages> Bytecodes;
+        Bytecodes[0] = Compile(Service, Program.GetSection("Vertex"), Graphic::Stage::Vertex);
+        Bytecodes[1] = Compile(Service, Program.GetSection("Fragment"), Graphic::Stage::Fragment);
+        Bytecodes[2] = Compile(Service, Program.GetSection("Geometry"), Graphic::Stage::Geometry);
 
-        if (Chunk_1.HasData() && Chunk_2.HasData())
+        if (Bytecodes[0].HasData() && Bytecodes[1].HasData())
         {
-            Asset->Load(Chunk_1, Chunk_2, Chunk_3, Description);
+            Asset->Load(Bytecodes, Description);
             return true;
         }
 
@@ -265,42 +266,51 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Chunk PipelineLoader::CompileDXBC(ConstSPtr<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage)
+    Chunk PipelineLoader::Compile(ConstSPtr<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage)
     {
-        Chunk Compilation;
-
         if (Section.IsEmpty())
         {
-            return Compilation;
+            return Chunk();
         }
-
-        // Load the shader file from the content service
-        ConstSPtr<Graphic::Shader> Shader = Service->Load<Graphic::Shader>(Section.GetString("Filename"));
-        const CStr         Code     = Shader->GetBytecode();
-        const CStr         Entry    = Section.GetString("Entry", "main");
-        const Vector<CStr> Defines  = Section.GetStringArray("Defines");
-
-#ifdef    EA_PLATFORM_WINDOWS
-        constexpr auto GenerateShaderMacro = [](Ref<const Vector<CStr>> Defines)
+        else
         {
-            static D3D_SHADER_MACRO Collection[256];
+            ConstSPtr<Graphic::Shader> Shader = Service->Load<Graphic::Shader>(Section.GetString("Filename"));
+            const CStr         Code     = Shader->GetBytecode();
+            const CStr         Entry    = Section.GetString("Entry", "main");
+            const Vector<CStr> Defines  = Section.GetStringArray("Defines");
 
-            for (UInt Index = 0; Index < Defines.size(); ++Index)
+            Vector<Property> Properties(Defines.size());
+
+            for (CStr Definition : Defines)
             {
-                const CStr Define    = Defines[Index];
-                const UInt Delimiter = Define.find_first_of('=');
+                const UInt Delimiter = Definition.find_first_of('=');
 
-                const SStr Name(Delimiter != CStr::npos ? Define.substr(0, Delimiter) : Define);
-                const SStr Data(Delimiter != CStr::npos ? Define.substr(Delimiter) : "true");
+                const SStr Name(Delimiter != CStr::npos ? Definition.substr(0, Delimiter) : Definition);
+                const SStr Data(Delimiter != CStr::npos ? Definition.substr(Delimiter) : "true");
 
-                Collection[Index].Name = Name.data();
-                Collection[Index].Definition = Data.data();
+                Properties.emplace_back(Property { Name, Data });
             }
 
-            Collection[Defines.size()] = { nullptr, nullptr };
+#ifdef    EA_PLATFORM_WINDOWS
+            return CompileDXBC(Entry, Code, Properties, Stage);
+#endif // EA_PLATFORM_WINDOWS
+        }
+    }
 
-            return reinterpret_cast<Ptr<const D3D_SHADER_MACRO>>(& Collection);
-        };
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Chunk PipelineLoader::CompileDXBC(CStr Entry, CStr Code, Ref<Vector<Property>> Properties, Graphic::Stage Stage)
+    {
+#ifdef    EA_PLATFORM_WINDOWS
+        D3D_SHADER_MACRO Defines[256];
+
+        for (UInt Index = 0; Index < Properties.size(); ++Index)
+        {
+            Defines[Index].Name       = Properties[Index].Name.c_str();
+            Defines[Index].Definition = Properties[Index].Definition.c_str();
+        }
+        Defines[Properties.size()] = { nullptr, nullptr };
 
         Ptr<ID3DBlob> Error    = nullptr;
         Ptr<ID3DBlob> Bytecode = nullptr;
@@ -320,7 +330,7 @@ namespace Content
             Code.data(),
             Code.size(),
             nullptr,
-            GenerateShaderMacro(Defines),
+            Defines,
             nullptr,
             Entry.data(),
             Profile.data(),
@@ -328,6 +338,8 @@ namespace Content
             0,
             & Bytecode,
             & Error);
+
+        Chunk Compilation;
 
         if (SUCCEEDED(Result))
         {

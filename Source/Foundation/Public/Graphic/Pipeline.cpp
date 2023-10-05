@@ -31,11 +31,9 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Pipeline::Load(Ref<Chunk> Vertex, Ref<Chunk> Fragment, Ref<Chunk> Geometry, Ref<const Descriptor> Properties)
+    void Pipeline::Load(Ref<Array<Chunk, k_MaxStages>> Stages, Ref<const Descriptor> Properties)
     {
-        mShaders[0] = Move(Vertex);
-        mShaders[1] = Move(Fragment);
-        mShaders[2] = Move(Geometry);
+        mShaders    = Move(Stages);
         mProperties = Properties;
     }
 
@@ -44,7 +42,14 @@ namespace Graphic
 
     Bool Pipeline::OnCreate(Ref<Subsystem::Context> Context)
     {
-        SetMemory(mShaders[0].GetSize() + mShaders[1].GetSize() + mShaders[2].GetSize());
+        UInt Memory = 0;
+
+        for (Ref<Chunk> Shader : mShaders)
+        {
+            Memory += Shader.GetSize();
+        }
+
+        SetMemory(Memory);
 
         mID = Context.GetSubsystem<Graphic::Service>()->CreatePipeline(mShaders[0], mShaders[1], mShaders[2], mProperties);
 

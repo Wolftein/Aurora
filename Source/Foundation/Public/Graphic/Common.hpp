@@ -60,6 +60,9 @@ namespace Graphic
         k_MaxSources     = 0x0004,
 
         // -=(Undocumented)=-
+        k_MaxStages      = 0x0003,
+
+        // -=(Undocumented)=-
         k_MaxTextures    = 0x0800,
 
         // -=(Undocumented)=-
@@ -269,9 +272,9 @@ namespace Graphic
     // -=(Undocumented)=-
     enum class Usage
     {
-        Uniform,
-        Indices,
         Vertices,
+        Indices,
+        Uniform,
     };
 
     // -=(Undocumented)=-
@@ -451,42 +454,40 @@ namespace Graphic
 
         // -=(Undocumented)=-
         TextureFilter Filter = TextureFilter::Nearest;
-
-        // -=(Undocumented)=-
-        Sampler() = default;
-
-        // -=(Undocumented)=-
-        Sampler(TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter)
-            : EdgeU { EdgeU }, EdgeV { EdgeV }, Filter { Filter }
-        {
-        }
     };
 
     // -=(Undocumented)=-
-    struct Submission
+    struct Signature
     {
         // -=(Undocumented)=-
-        Binding Vertices;
-
-        // -=(Undocumented)=-
-        Binding Indices;
-
-        // -=(Undocumented)=-
         Binding Uniforms[k_MaxUniforms];
-
-        // -=(Undocumented)=-
-        Recti   Scissor                = { 0, 0, UINT16_MAX, UINT16_MAX };
-
-        // -=(Undocumented)=-
-        UInt    Stencil                = 0;
-
-        // -=(Undocumented)=-
-        Object  Pipeline               = 0;
 
         // -=(Undocumented)=-
         Sampler Samplers[k_MaxSources];
 
         // -=(Undocumented)=-
         Object  Textures[k_MaxSources] = { 0 };
+    };
+
+    // -=(Undocumented)=-
+    struct Submission
+    {
+        // -=(Undocumented)=-
+        Binding   Vertices;
+
+        // -=(Undocumented)=-
+        Binding   Indices;
+
+        // -=(Undocumented)=-
+        Recti     Scissor                = { 0, 0, UINT16_MAX, UINT16_MAX };
+
+        // -=(Undocumented)=-
+        UInt      Stencil                = 0;
+
+        // -=(Undocumented)=-
+        Object    Pipeline               = 0;
+
+        // -=(Undocumented)=-
+        Signature Root[k_MaxStages];
     };
 }

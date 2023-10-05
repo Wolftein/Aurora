@@ -46,8 +46,10 @@ namespace Audio
     {
         Bool Successful = true;
 
-        if (!mDriver) {
-            switch (Backend) {
+        if (!mDriver)
+        {
+            switch (Backend)
+            {
 #ifdef    EA_PLATFORM_WINDOWS
             case Backend::XAudio2:
                 mDriver = NewUniquePtr<XAudio2Driver>();
@@ -57,9 +59,11 @@ namespace Audio
                 mDriver = NewUniquePtr<NoneDriver>();
                 break;
             }
+
             Successful = mDriver->Initialise(Submixes);
 
-            if (!Successful) {
+            if (!Successful)
+            {
                 mDriver = nullptr;
             }
         }

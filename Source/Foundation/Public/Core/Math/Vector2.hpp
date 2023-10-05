@@ -12,7 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Common.hpp"
+#include "Core/Types.hpp"
+#include "Trigonometry.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -293,11 +294,11 @@ inline namespace Core
         static Vector2<Base> Slerp(Ref<const Vector2<Base>> Start, Ref<const Vector2<Base>> End, Real32 Percentage)
         {
             const Real32 Dot   = eastl::clamp(Start.Dot(End), -1.0f, +1.0f);
-            const Real32 Theta = std::acos(Dot) * Percentage;
+            const Real32 Theta = InverseCosine(Dot) * Percentage;
 
             const Vector2<Base> Relative = Normalize(End - Start * Dot);
 
-            return (Start * std::cos(Theta)) + (Relative * std::sin(Theta));
+            return (Start * Cosine(Theta)) + (Relative * Sine(Theta));
         }
 
     private:

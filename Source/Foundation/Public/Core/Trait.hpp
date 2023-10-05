@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Common.hpp"
+#include "Types.hpp"
 #include <EAStdC/EAMemory.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -89,5 +89,11 @@ inline namespace Core
     inline void Sort(Type Collection, Function Compare)
     {
         eastl::sort(Collection.begin(), Collection.end(), Compare);
+    }
+
+    // -=(Undocumented)=-
+    inline auto Convert(CStr Key)
+    {
+        return std::string_view { Key.data(), Key.size() };
     }
 }

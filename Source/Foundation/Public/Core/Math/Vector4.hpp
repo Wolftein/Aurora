@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Common.hpp"
+#include "Core/Types.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -335,6 +335,23 @@ inline namespace Core
             const Base Z = (Lhs.GetZ() < Rhs.GetZ() ? Rhs.GetZ() : Lhs.GetZ());
             const Base W = (Lhs.GetW() < Rhs.GetW() ? Rhs.GetW() : Lhs.GetW());
             return Vector4<Base>(X, Y, Z, W);
+        }
+
+        // -=(Undocumented)=-
+        static Vector4<Base> Lerp(Ref<const Vector4<Base>> Start, Ref<const Vector4<Base>> End, Real32 Percentage)
+        {
+            return (Start + Percentage * (End - Start));
+        }
+
+        // -=(Undocumented)=-
+        static Vector4<Base> Slerp(Ref<const Vector4<Base>> Start, Ref<const Vector4<Base>> End, Real32 Percentage)
+        {
+            const Real32 Dot   = eastl::clamp(Start.Dot(End), -1.0f, +1.0f);
+            const Real32 Theta = InverseCosine(Dot) * Percentage;
+
+            const Vector4<Base> Relative = Normalize(End - Start * Dot);
+
+            return (Start * Cosine(Theta)) + (Relative * Sine(Theta));
         }
 
     private:

@@ -177,7 +177,7 @@ inline namespace Core
         {
             const Base HalfAngle = 0.5 * Angle;
 
-            return Quaternion<Base>(Vector3<Base>::Normalize(Axis) * std::sin(HalfAngle), std::cos(HalfAngle));
+            return Quaternion<Base>(Vector3<Base>::Normalize(Axis) * Sine(HalfAngle), Cosine(HalfAngle));
         }
 
         // -=(Undocumented)=-
@@ -185,12 +185,12 @@ inline namespace Core
         {
             const Vector3<Base> HalfAngles = Angles * static_cast<Base>(0.5);
 
-            const Base SinX = std::sin(HalfAngles.GetX());
-            const Base CosX = std::cos(HalfAngles.GetX());
-            const Base SinY = std::sin(HalfAngles.GetY());
-            const Base CosY = std::cos(HalfAngles.GetY());
-            const Base SinZ = std::sin(HalfAngles.GetZ());
-            const Base CosZ = std::cos(HalfAngles.GetZ());
+            const Base SinX = Sine(HalfAngles.GetX());
+            const Base CosX = Cosine(HalfAngles.GetX());
+            const Base SinY = Sine(HalfAngles.GetY());
+            const Base CosY = Cosine(HalfAngles.GetY());
+            const Base SinZ = Sine(HalfAngles.GetZ());
+            const Base CosZ = Cosine(HalfAngles.GetZ());
 
             return Quaternion<Base>(CosX * CosY * CosZ + SinX * SinY * SinZ,
                                     SinX * CosY * CosZ - CosX * SinY * SinZ,

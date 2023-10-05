@@ -11,6 +11,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Parser.hpp"
+#include <Core/Trait.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -18,14 +19,6 @@
 
 inline namespace Core
 {
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    static auto AsView(CStr Key)
-    {
-        return std::string_view { Key.data(), Key.size() };
-    }
-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -38,7 +31,7 @@ inline namespace Core
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     TOMLParser::TOMLParser(CStr Text)
-        : mTable { toml::parse(AsView(Text)) }
+        : mTable { toml::parse(Convert(Text)) }
     {
     }
 
@@ -56,11 +49,11 @@ inline namespace Core
 
     TOMLSection TOMLParser::GetSection(CStr Key, Bool CreateIfNeeded)
     {
-        Ptr<toml::table> Table = mTable[AsView(Key)].as_table();
+        Ptr<toml::table> Table = mTable[Convert(Key)].as_table();
 
         if (Table == nullptr && CreateIfNeeded)
         {
-            Table = mTable.emplace<toml::table>(AsView(Key)).first->second.as_table();
+            Table = mTable.emplace<toml::table>(Convert(Key)).first->second.as_table();
         }
         return TOMLSection(Table);
     }

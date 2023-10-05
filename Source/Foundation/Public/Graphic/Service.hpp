@@ -56,31 +56,13 @@ namespace Graphic
         UInt CreateBuffer(Usage Type, UInt Capacity, CPtr<UInt08> Data = CPtr<UInt08>());
 
         // -=(Undocumented)=-
-        Ptr<void> Map(Object ID, Ref<UInt> Offset, UInt Length);
-
-        // -=(Undocumented)=-
-        Ptr<void> Map(Object ID, Bool Discard, UInt Offset, UInt Length);
-
-        // -=(Undocumented)=-
         template<typename T>
-        Ptr<T> Map(Object ID, Ref<UInt> Offset, UInt Length)
+        void UpdateBuffer(Object ID, Bool Discard, UInt Offset, CPtr<T> Data)
         {
-            Ptr<T> Mapping = static_cast<Ptr<T>>(Map(ID, Offset, Length * sizeof(T)));
+            const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(Data.data()), Data.size_bytes());
 
-            Offset /= sizeof(T);
-
-            return Mapping;
+            mDriver->UpdateBuffer(ID, Discard, Offset, Bytes);
         }
-
-        // -=(Undocumented)=-
-        template<typename T>
-        Ptr<T> Map(Object ID, Bool Discard, UInt Offset, UInt Length)
-        {
-            return static_cast<Ptr<T>>(Map(ID, Discard, Offset * sizeof(T), Length * sizeof(T)));
-        }
-
-        // -=(Undocumented)=-
-        void Unmap(Object ID);
 
         // -=(Undocumented)=-
         void DeleteBuffer(Object ID);
@@ -124,11 +106,8 @@ namespace Graphic
         {
             const CPtr<UInt08> Bytes = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(Data.data()), Data.size_bytes());
 
-            UpdateTexture(ID, Level, Offset, Pitch, Bytes);
+            mDriver->UpdateTexture(ID, Level, Offset, Pitch, Bytes);
         }
-
-        // -=(Undocumented)=-
-        void UpdateTexture(Object ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt08> Data);
 
         // -=(Undocumented)=-
         void CopyTexture(Object Destination, UInt DstLevel, Vector3f DstOffset, Object Source, UInt SrcLevel, Recti SrcOffset);

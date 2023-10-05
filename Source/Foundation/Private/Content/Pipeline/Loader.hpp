@@ -42,7 +42,22 @@ namespace Content
     private:
 
         // -=(Undocumented)=-
-        Chunk CompileDXBC(ConstSPtr<class Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage);
+        struct Property
+        {
+            // -=(Undocumented)=-
+            SStr Name;
+
+            // -=(Undocumented)=-
+            SStr Definition;
+        };
+
+    private:
+
+        // -=(Undocumented)=-
+        Chunk Compile(ConstSPtr<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage);
+
+        // -=(Undocumented)=-
+        Chunk CompileDXBC(CStr Entry, CStr Code, Ref<Vector<Property>> Properties, Graphic::Stage Stage);
 
     private:
 

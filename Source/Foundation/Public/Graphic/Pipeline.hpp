@@ -30,7 +30,7 @@ namespace Graphic
         Pipeline(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(Ref<Chunk> Vertex, Ref<Chunk> Fragment, Ref<Chunk> Geometry, Ref<const Descriptor> Properties);
+        void Load(Ref<Array<Chunk, k_MaxStages>> Stages, Ref<const Descriptor> Properties);
 
         // -=(Undocumented)=-
         Object GetID() const
@@ -57,8 +57,8 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Object          mID;
-        Array<Chunk, 3> mShaders;
-        Descriptor      mProperties;
+        Object                    mID;
+        Array<Chunk, k_MaxStages> mShaders;
+        Descriptor                mProperties;
     };
 }

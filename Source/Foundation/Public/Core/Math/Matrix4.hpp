@@ -335,7 +335,7 @@ inline namespace Core
         // -=(Undocumented)=-
         static Matrix4<Base> CreatePerspective(Base Eyes, Base Aspect, Base ZNear, Base ZFar)
         {
-            const Base Y = 1 / std::tan(Eyes * 0.5);
+            const Base Y = 1 / Tangent(Eyes * 0.5);
             const Base X = Y / Aspect;
 
             return Matrix4<Base>(X, 0,  0, 0,
