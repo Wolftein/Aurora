@@ -22,6 +22,13 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
+    template<typename Enum>
+    inline constexpr auto CastEnum(Enum Value)
+    {
+        return static_cast<eastl::underlying_type_t<Enum>>(Value);
+    }
+
+    // -=(Undocumented)=-
     template<UInt Alignment>
     inline constexpr UInt Align(UInt Value)
     {

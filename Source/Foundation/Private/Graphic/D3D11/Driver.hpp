@@ -144,6 +144,15 @@ namespace Graphic
         // -=(Undocumented)=-
         Ref<D3D11Sampler> GetOrCreateSampler(Ref<const Sampler> Descriptor);
 
+        // -=(Undocumented)=-
+        void ApplySamplerResources(Ref<const Submission> Oldest, Ref<const Submission> Newest);
+
+        // -=(Undocumented)=-
+        void ApplyTextureResources(Ref<const Submission> Oldest, Ref<const Submission> Newest);
+
+        // -=(Undocumented)=-
+        void ApplyUniformResources(Ref<const Submission> Oldest, Ref<const Submission> Newest);
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

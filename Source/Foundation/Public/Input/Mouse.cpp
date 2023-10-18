@@ -47,7 +47,7 @@ namespace Input
 
     bool Mouse::IsButtonPressed(Button Button) const
     {
-        return !mLastButtons.test(static_cast<UInt>(Button)) && mThisButtons.test(static_cast<UInt>(Button));
+        return !mLastButtons.test(CastEnum(Button)) && mThisButtons.test(CastEnum(Button));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -55,7 +55,7 @@ namespace Input
 
     bool Mouse::IsButtonHeld(Button Button) const
     {
-        return mThisButtons.test(static_cast<UInt>(Button));
+        return mThisButtons.test(CastEnum(Button));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -63,7 +63,7 @@ namespace Input
 
     Bool Mouse::IsButtonReleased(Button Button) const
     {
-        return mLastButtons.test(static_cast<UInt>(Button)) && !mThisButtons.test(static_cast<UInt>(Button));
+        return mLastButtons.test(CastEnum(Button)) && !mThisButtons.test(CastEnum(Button));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -80,10 +80,10 @@ namespace Input
             switch (Event.Type)
             {
             case Event::Type::MouseUp:
-                mThisButtons.reset(static_cast<UInt>(Event.MouseAction.Button));
+                mThisButtons.reset(CastEnum(Event.MouseAction.Button));
                 break;
             case Event::Type::MouseDown:
-                mThisButtons.set(static_cast<UInt>(Event.MouseAction.Button));
+                mThisButtons.set(CastEnum(Event.MouseAction.Button));
                 break;
             case Event::Type::MouseMove:
                 mThisMousePosition.Set(Event.MouseAxis.X, Event.MouseAxis.Y);

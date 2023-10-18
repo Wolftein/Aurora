@@ -324,7 +324,7 @@ namespace Content
             { "vs_6_0",           "ps_6_0",           "gs_6_0" }
         };
 
-        Ref<const CStr> Profile = kShaderProfiles[static_cast<UInt>(mTarget)][static_cast<UInt>(Stage)];
+        Ref<const CStr> Profile = kShaderProfiles[CastEnum(mTarget)][CastEnum(Stage)];
 
         const HRESULT Result   = D3DCompile(
             Code.data(),

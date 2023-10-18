@@ -457,16 +457,16 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    struct Signature
+    struct Instance
     {
         // -=(Undocumented)=-
-        Binding Uniforms[k_MaxUniforms];
+        UInt Count  = 0;
 
         // -=(Undocumented)=-
-        Sampler Samplers[k_MaxSources];
+        UInt Base   = 0;
 
         // -=(Undocumented)=-
-        Object  Textures[k_MaxSources] = { 0 };
+        UInt Offset = 0;
     };
 
     // -=(Undocumented)=-
@@ -488,6 +488,15 @@ namespace Graphic
         Object    Pipeline               = 0;
 
         // -=(Undocumented)=-
-        Signature Root[k_MaxStages];
+        Binding   Uniforms[k_MaxUniforms];          // TODO: Split in different stages
+
+        // -=(Undocumented)=-
+        Sampler   Samplers[k_MaxSources];           // TODO: Split in different stages
+
+        // -=(Undocumented)=-
+        Object    Textures[k_MaxSources] = { 0 };   // TODO: Split in different stages
+
+        // -=(Undocumented)=-
+        Instance  Primitive;
     };
 }

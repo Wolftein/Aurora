@@ -69,7 +69,7 @@ namespace Graphic
             else
             {
                 Ref<const Capabilities> Capabilities = mDriver->GetCapabilities();
-                LOG_INFO("Graphics: Detected shader model {}", static_cast<UInt>(Capabilities.Language) + 1);
+                LOG_INFO("Graphics: Detected shader model {}", CastEnum(Capabilities.Language) + 1);
 
                 for (Ref<const Adapter> Adapter : Capabilities.Adapters)
                 {

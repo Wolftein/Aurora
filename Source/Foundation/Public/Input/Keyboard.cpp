@@ -23,7 +23,7 @@ namespace Input
 
     bool Keyboard::IsKeyPressed(Key Key) const
     {
-        return !mLastKeys.test(static_cast<UInt>(Key)) && mThisKeys.test(static_cast<UInt>(Key));
+        return !mLastKeys.test(CastEnum(Key)) && mThisKeys.test(CastEnum(Key));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -31,7 +31,7 @@ namespace Input
 
     bool Keyboard::IsKeyHeld(Key Key) const
     {
-        return mThisKeys.test(static_cast<UInt>(Key));
+        return mThisKeys.test(CastEnum(Key));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -39,7 +39,7 @@ namespace Input
 
     Bool Keyboard::IsKeyReleased(Key Key) const
     {
-        return mLastKeys.test(static_cast<UInt>(Key)) && !mThisKeys.test(static_cast<UInt>(Key));
+        return mLastKeys.test(CastEnum(Key)) && !mThisKeys.test(CastEnum(Key));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -57,10 +57,10 @@ namespace Input
                 // TODO
                 break;
             case Event::Type::KeyDown:
-                mThisKeys.set(static_cast<UInt>(Event.KeyAction.Key));
+                mThisKeys.set(CastEnum(Event.KeyAction.Key));
                 break;
             case Event::Type::KeyUp:
-                mThisKeys.reset(static_cast<UInt>(Event.KeyAction.Key));
+                mThisKeys.reset(CastEnum(Event.KeyAction.Key));
                 break;
             default:
                 break;

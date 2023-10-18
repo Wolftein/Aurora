@@ -121,7 +121,7 @@ namespace Content
         // -=(Undocumented)=-
         Bool HasFinished() const
         {
-            return HasLoaded() | HasFailed();
+            return HasUnloaded() || HasLoaded() || HasFailed();
         }
 
         // -=(Undocumented)=-

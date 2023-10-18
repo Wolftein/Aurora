@@ -15,6 +15,7 @@
 #include "Graphic/COM_Font.hpp"
 #include "Graphic/COM_Material.hpp"
 #include "Graphic/COM_Pipeline.hpp"
+#include "Graphic/COM_Shader.hpp"
 #include "Graphic/COM_Texture.hpp"
 #include <Content/Locator/SystemLocator.hpp>
 
@@ -131,7 +132,10 @@ inline namespace COM
         case Content_Resource_Type::eResourceTypeFont:
             (* Result) = RETRIEVE_RESOURCE(Graphic_Font, Graphic::Font);
             break;
-        };
+        case Content_Resource_Type::eResourceTypeShader:
+            (* Result) = RETRIEVE_RESOURCE(Graphic_Shader, Graphic::Shader);
+            break;
+        }
         return S_OK;
     }
 
@@ -160,7 +164,10 @@ inline namespace COM
             case Content_Resource_Type::eResourceTypeFont:
                 (* Result) = CREATE_RESOURCE(Graphic_Font, Graphic::Font);
                 break;
-        };
+            case Content_Resource_Type::eResourceTypeShader:
+                (* Result) = CREATE_RESOURCE(Graphic_Shader, Graphic::Shader);
+                break;
+        }
 
         return S_OK;
     }
@@ -205,7 +212,10 @@ inline namespace COM
         case Content_Resource_Type::eResourceTypeFont:
             (* Result) = (mWrapper->Exist<Graphic::Font>(Key) ? VBTrue : VBFalse);
             break;
-        };
+        case Content_Resource_Type::eResourceTypeShader:
+            (* Result) = (mWrapper->Exist<Graphic::Shader>(Key) ? VBTrue : VBFalse);
+            break;
+        }
 
         return S_OK;
     }
@@ -234,6 +244,7 @@ inline namespace COM
         case Content_Resource_Type::eResourceTypeSound:    return CCast<Audio_Sound>(Asset);
         case Content_Resource_Type::eResourceTypeTexture:  return CCast<Graphic_Texture>(Asset);
         case Content_Resource_Type::eResourceTypeFont:     return CCast<Graphic_Font>(Asset);
+        case Content_Resource_Type::eResourceTypeShader:   return CCast<Graphic_Shader>(Asset);
         }
 
         return nullptr;

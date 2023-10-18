@@ -30,6 +30,7 @@ inline namespace COM
         eResourceTypeSound    = Hash("Sound"),
         eResourceTypeTexture  = Hash("Texture"),
         eResourceTypeFont     = Hash("Font"),
+        eResourceTypeShader   = Hash("Shader"),
     } Content_Resource_Type;
 
     // -=(Undocumented)=-
