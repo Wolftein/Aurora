@@ -27,7 +27,7 @@ namespace Graphic
         // TODO: Configurable?
         CreateTransientBuffer(mInFlyBuffers[0], Usage::Vertices, 64 * 1024 * 1024); // 64mb
         CreateTransientBuffer(mInFlyBuffers[1], Usage::Indices,   4 * 1024 * 1024); // 4mb
-        CreateTransientBuffer(mInFlyBuffers[2], Usage::Uniform,  2 * 1024 * 1024); // 16mb
+        CreateTransientBuffer(mInFlyBuffers[2], Usage::Uniform,  16 * 1024 * 1024); // 16mb
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
