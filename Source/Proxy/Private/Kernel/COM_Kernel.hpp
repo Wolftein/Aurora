@@ -18,7 +18,7 @@
 
 #include "Graphic/COM_Service.hpp"
 
-#include "Scene/Experimental/COM_Renderer.hpp"
+#include "Graphic/COM_Renderer.hpp"
 
 #include <Engine/Kernel.hpp>
 
@@ -53,7 +53,7 @@ inline namespace COM
 
         HRESULT GetGraphicService([out, retval] Graphic_Service_ ** Result);
 
-        HRESULT CreateRenderer([in] Graphic_Pipeline_ * FontDefaultPipeline, [out, retval] Scene_Renderer_ ** Result);
+        HRESULT GetGraphicRenderer([out, retval] Graphic_Renderer_ ** Result);
     };
 
     // -=(Undocumented)=-
@@ -77,7 +77,14 @@ inline namespace COM
         // \see Engine_::GetGraphicService
         HRESULT GetGraphicService(Graphic_Service_ ** Result) override;
 
-        // \see Engine_::CreateRenderer
-        HRESULT CreateRenderer(Graphic_Pipeline_ * FontDefaultPipeline, Scene_Renderer_ ** Result) override;
+        // \see Engine_::GetGraphicRenderer
+        HRESULT GetGraphicRenderer(Graphic_Renderer_ ** Result) override;
+
+    private:
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        SPtr<Graphic::Renderer> mRenderer;
     };
 }

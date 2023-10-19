@@ -43,6 +43,8 @@ inline namespace COM
 
         mWrapper.Initialize(EngineProperties);
 
+        mRenderer = NewPtr<Graphic::Renderer>(mWrapper);
+
         return S_OK;
     }
 
@@ -85,14 +87,9 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Kernel::CreateRenderer(Graphic_Pipeline_ * FontDefaultPipeline, Scene_Renderer_ ** Result)
+    HRESULT Kernel::GetGraphicRenderer(Graphic_Renderer_ ** Result)
     {
-        const SPtr<Graphic::Pipeline> Pipeline = CCast<Graphic_Pipeline>(FontDefaultPipeline);
-
-        (*Result) = CCreate<Scene_Renderer>(NewPtr<Scene::Renderer>(mWrapper));
-
-        CCast<Scene_Renderer>(* Result)->SetDefaultFontPipeline(Pipeline);
-
+        (*Result) = CCreate<Graphic_Renderer>(mRenderer);
         return S_OK;
     }
 }

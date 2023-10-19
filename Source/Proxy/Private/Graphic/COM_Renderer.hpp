@@ -17,8 +17,8 @@
 #include "Graphic/COM_Camera.hpp"
 #include "Graphic/COM_Material.hpp"
 #include "Graphic/COM_Pipeline.hpp"
-#include <Graphic/COM_Font.hpp>
-#include <Scene/Experimental/Renderer.hpp>
+#include "Graphic/COM_Font.hpp"
+#include <Graphic/Renderer.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -54,7 +54,7 @@ inline namespace COM
 
     // -=(Undocumented)=-
     [object, uuid("FB866167-F639-4982-85AC-280255832156"), pointer_default(unique)]
-    __interface Scene_Renderer_
+    __interface Graphic_Renderer_
     {
         HRESULT Begin([in] Graphic_Camera_ * Camera);
 
@@ -70,37 +70,34 @@ inline namespace COM
                      [in] Graphic_Material_ * Material);
 
         HRESULT DrawFont([in] Graphic_Font_ * Font,
+                         [in] Graphic_Pipeline_ * Pipeline,
                          [in] vbStr16 Text,
-                         [in] Renderer_Alignment Alignment,
                          [in] vbReal32 X,
                          [in] vbReal32 Y,
                          [in] vbReal32 Depth,
                          [in] vbReal32 Scale,
-                         [in] vbInt32 Tint);
+                         [in] vbInt32 Tint,
+                         [in] Renderer_Alignment Alignment);
 
         HRESULT End();
-
-        HRESULT UIBegin([in] vbInt32 Device, [in] vbInt32 Width, [in] vbInt32 Height, [in] vbInt32 Tint);
-
-        HRESULT UIFlush([in] vbBool Synchronised);
     };
 
     // -=(Undocumented)=-
     [coclass, uuid("42407F72-E795-40E0-B6D6-06C949932CD7")]
-    class ATL_NO_VTABLE Scene_Renderer : public Scene_Renderer_, public CSmartPtrWrapper<Scene::Renderer>
+    class ATL_NO_VTABLE Graphic_Renderer : public Graphic_Renderer_, public CSmartPtrWrapper<Graphic::Renderer>
     {
     public:
 
         // \inheritDoc
         HRESULT FinalRelease();
 
-        // \see Scene_Renderer_::Begin
+        // \see Graphic_Renderer_::Begin
         HRESULT Begin(Graphic_Camera_ * Camera) override;
 
-        // \see Scene_Renderer_::SetParameter
+        // \see Graphic_Renderer_::SetParameter
         HRESULT SetParameter(vbInt32 Offset, vbReal32 X, vbReal32 Y, vbReal32 Z, vbReal32 W);
 
-        // \see Scene_Renderer_::Draw
+        // \see Graphic_Renderer_::Draw
         HRESULT Draw(Math_Rectf * Destination,
                      Math_Rectf * Source,
                      vbReal32 Depth,
@@ -110,27 +107,18 @@ inline namespace COM
                      Graphic_Pipeline_ * Pipeline,
                      Graphic_Material_ * Material) override;
 
-        // \see Scene_Renderer_::DrawFont
+        // \see Graphic_Renderer_::DrawFont
         HRESULT DrawFont(Graphic_Font_ * Font,
+                         Graphic_Pipeline_ * Pipeline,
                          vbStr16 Text,
-                         Renderer_Alignment Alignment,
                          vbReal32 X,
                          vbReal32 Y,
                          vbReal32 Depth,
                          vbReal32 Scale,
-                         vbInt32 Tint) override;
+                         vbInt32 Tint,
+                         Renderer_Alignment Alignment) override;
 
         // \see Scene_Renderer_::End
         HRESULT End() override;
-
-        // \see Scene_Renderer_::UIBegin
-        HRESULT UIBegin(vbInt32 Device, vbInt32 Width, vbInt32 Height, vbInt32 Tint);
-
-        // \see Scene_Renderer_::UIFlush
-        HRESULT UIFlush(vbBool Synchronised);
-
-    private:
-
-        vbInt32 mUIDevice;
     };
 }

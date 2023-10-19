@@ -23,7 +23,7 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    class Encoder
+    class Encoder final
     {
     public:
 
@@ -146,28 +146,28 @@ namespace Graphic
         template<typename Vertex, typename Index>
         Bool Ensure(UInt Vertices, UInt Indices, SPtr<const Material> Material)
         {
-            const Bool HasSpaceForVertices
+            const Bool FitsVertices
                 = mInFlyBuffers[0].Writer + Vertices * sizeof(Vertex) <= mInFlyBuffers[0].Capacity;
-            const Bool HasSpaceForIndices
+            const Bool FitsIndices
                 = mInFlyBuffers[1].Writer + Indices * sizeof(Index)  <= mInFlyBuffers[1].Capacity;
-            const Bool HasSpaceForUniforms
+            const Bool FitsUniforms
                 = mInFlyBuffers[2].Writer + Align<256>(Material->GetParameters().size_bytes()) <= mInFlyBuffers[2].Capacity;
 
-            if (! HasSpaceForVertices || ! HasSpaceForIndices || ! HasSpaceForUniforms)
+            if (! FitsVertices || ! FitsIndices || ! FitsUniforms)
             {
                 Flush();
 
-                if (! HasSpaceForVertices)
+                if (! FitsVertices)
                 {
                     mInFlyBuffers[0].Reader = mInFlyBuffers[0].Writer = mInFlyBuffers[0].Marker = 0;
                 }
 
-                if (! HasSpaceForIndices)
+                if (! FitsIndices)
                 {
                     mInFlyBuffers[1].Reader = mInFlyBuffers[1].Writer = mInFlyBuffers[1].Marker = 0;
                 }
 
-                if (! HasSpaceForUniforms)
+                if (! FitsUniforms)
                 {
                     mInFlyBuffers[2].Reader = mInFlyBuffers[2].Writer = mInFlyBuffers[2].Marker = 0;
 
