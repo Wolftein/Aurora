@@ -43,6 +43,9 @@ namespace Graphic
         struct Metrics
         {
             // -=(Undocumented)=-
+            Real32 Distance;
+
+            // -=(Undocumented)=-
             Real32 Ascender;
 
             // -=(Undocumented)=-

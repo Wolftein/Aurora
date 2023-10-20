@@ -84,7 +84,7 @@ inline namespace COM
         mWrapper->DrawFont(
             CCast<Graphic_Font>(Font),
             CCast<Graphic_Pipeline>(Pipeline),
-            VBString16ToString8(Text),
+            VBString16ToString16(Text),
             Vector2f(X, Y),
             Depth,
             Scale,

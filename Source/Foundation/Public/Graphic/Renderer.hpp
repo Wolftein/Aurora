@@ -87,8 +87,8 @@ namespace Graphic
             ConstSPtr<Graphic::Material> Material);
 
         // -=(Undocumented)=-
-        // TODO: Extended this to support UTF8 + strokes
-        void DrawFont(ConstSPtr<Font> Font, ConstSPtr<Graphic::Pipeline> Pipeline, CStr Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Alignment Alignment);
+        // TODO: strokes
+        void DrawFont(ConstSPtr<Font> Font, ConstSPtr<Graphic::Pipeline> Pipeline, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Alignment Alignment);
 
         // -=(Undocumented)=-
         void End();

@@ -55,7 +55,7 @@ namespace Graphic
         mMaterial = NewPtr<Graphic::Material>("_Private");
         mMaterial->SetTexture(0, Atlas);
         mMaterial->SetSampler(0, Sampler { TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear });
-        mMaterial->SetParameter(0, Vector2f(Atlas->GetWidth(), Atlas->GetHeight()));
+        mMaterial->SetParameter(0, Vector3f(Atlas->GetWidth(), Atlas->GetHeight(), mMetrics.Distance));
         Success = Success && mMaterial->Create(Context);
 
         SetMemory(mGlyphs.size() * sizeof(Glyph) + mMaterial->GetMemory() + Atlas->GetMemory());
