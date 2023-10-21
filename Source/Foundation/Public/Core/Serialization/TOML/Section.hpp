@@ -26,7 +26,7 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        TOMLSection(Ptr<toml::table> Table);
+        TOMLSection(Ptr<toml::table> Table = nullptr);
 
         // -=(Undocumented)=-
         Bool IsNull() const;

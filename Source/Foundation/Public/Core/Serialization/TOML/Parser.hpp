@@ -37,6 +37,9 @@ inline namespace Core
         // -=(Undocumented)=-
         TOMLSection GetSection(CStr Key, Bool CreateIfNeeded = true);
 
+        // -=(Undocumented)=-
+        SStr Dump() const;
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

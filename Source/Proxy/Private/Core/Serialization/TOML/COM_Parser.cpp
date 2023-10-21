@@ -10,69 +10,49 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Parser.hpp"
-#include <Core/Log/Service.hpp>
-#include <Core/Trait.hpp>
+#include "COM_Parser.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Core
+inline namespace COM
 {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    TOMLParser::TOMLParser()
-        : mTable { }
+    HRESULT TOMLParser::Load(vbStr16 Content)
     {
+        Core::TOMLParser Parser(VBString16ToString8(Content));
+        Internal_Reset(Parser);
+
+        return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    TOMLParser::TOMLParser(CStr Text)
+    HRESULT TOMLParser::Dump(vbStr16 * Result)
     {
-        try
-        {
-            mTable = toml::parse(Convert(Text));
-        } catch (Ref<const toml::ex::parse_error> Error)
-        {
-            LOG_ERROR("Error trying to parse TOML: {}", Error.description());
-        }
+        (* Result) = VBString8ToString16(mWrapper.Dump());
+        return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    TOMLSection TOMLParser::GetRoot()
+    HRESULT TOMLParser::GetRoot(TOMLSection_ ** Result)
     {
-        return TOMLSection(reinterpret_cast<Ptr<toml::table>>(& mTable));
+        (* Result) = CCreate<TOMLSection>(mWrapper.GetRoot());
+        return S_OK;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    TOMLSection TOMLParser::GetSection(CStr Key, Bool CreateIfNeeded)
+    HRESULT TOMLParser::GetSection(vbStr8 Key, vbBool CreateIfNecessary, TOMLSection_ ** Result)
     {
-        Ptr<toml::table> Table = mTable[Convert(Key)].as_table();
-
-        if (Table == nullptr && CreateIfNeeded)
-        {
-            Table = mTable.emplace<toml::table>(Convert(Key)).first->second.as_table();
-        }
-        return TOMLSection(Table);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    SStr TOMLParser::Dump() const
-    {
-        std::ostringstream Stream;
-        Stream << mTable << std::endl;
-
-        const std::string Data = Stream.str();
-        return SStr(Data.data(), Data.size());
+        (* Result) = CCreate<TOMLSection>(mWrapper.GetSection(Key, CreateIfNecessary));
+        return S_OK;
     }
 }

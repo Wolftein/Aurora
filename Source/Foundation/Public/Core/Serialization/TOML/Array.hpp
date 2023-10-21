@@ -27,7 +27,7 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        TOMLArray(Ptr<toml::array> Array);
+        TOMLArray(Ptr<toml::array> Array = nullptr);
 
         // -=(Undocumented)=-
         Bool IsNull() const;
