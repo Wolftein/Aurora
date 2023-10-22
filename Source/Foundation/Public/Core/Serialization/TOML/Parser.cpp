@@ -35,7 +35,7 @@ inline namespace Core
     {
         try
         {
-            mTable = toml::parse(Convert(Text));
+            mTable = toml::parse(Text);
         } catch (Ref<const toml::ex::parse_error> Error)
         {
             LOG_ERROR("Error trying to parse TOML: {}", Error.description());
@@ -55,11 +55,11 @@ inline namespace Core
 
     TOMLSection TOMLParser::GetSection(CStr Key, Bool CreateIfNeeded)
     {
-        Ptr<toml::table> Table = mTable[Convert(Key)].as_table();
+        Ptr<toml::table> Table = mTable[Key].as_table();
 
         if (Table == nullptr && CreateIfNeeded)
         {
-            Table = mTable.emplace<toml::table>(Convert(Key)).first->second.as_table();
+            Table = mTable.emplace<toml::table>(Key).first->second.as_table();
         }
         return TOMLSection(Table);
     }
@@ -71,8 +71,6 @@ inline namespace Core
     {
         std::ostringstream Stream;
         Stream << mTable << std::endl;
-
-        const std::string Data = Stream.str();
-        return SStr(Data.data(), Data.size());
+        return Stream.str();
     }
 }

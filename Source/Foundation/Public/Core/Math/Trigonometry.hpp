@@ -25,11 +25,11 @@ inline namespace Core
     template<typename Type>
     Type Cosine(Type Angle)
     {
-        if constexpr (eastl::is_base_of_v<Real64, Type>)
+        if constexpr (std::is_base_of_v<Real64, Type>)
         {
             return cos(Angle);
         }
-        else if constexpr (eastl::is_base_of_v<Real32, Type>)
+        else if constexpr (std::is_base_of_v<Real32, Type>)
         {
             return cosf(Angle);
         }
@@ -43,11 +43,11 @@ inline namespace Core
     template<typename Type>
     Type Sine(Type Angle)
     {
-        if constexpr (eastl::is_base_of_v<Real64, Type>)
+        if constexpr (std::is_base_of_v<Real64, Type>)
         {
             return sin(Angle);
         }
-        else if constexpr (eastl::is_base_of_v<Real32, Type>)
+        else if constexpr (std::is_base_of_v<Real32, Type>)
         {
             return sinf(Angle);
         }
@@ -61,11 +61,11 @@ inline namespace Core
     template<typename Type>
     Type Tangent(Type Angle)
     {
-        if constexpr (eastl::is_base_of_v<Real64, Type>)
+        if constexpr (std::is_base_of_v<Real64, Type>)
         {
             return tan(Angle);
         }
-        else if constexpr (eastl::is_base_of_v<Real32, Type>)
+        else if constexpr (std::is_base_of_v<Real32, Type>)
         {
             return tanf(Angle);
         }
@@ -79,11 +79,11 @@ inline namespace Core
     template<typename Type>
     Type InverseCosine(Type Angle)
     {
-        if constexpr (eastl::is_base_of_v<Real64, Type>)
+        if constexpr (std::is_base_of_v<Real64, Type>)
         {
             return acos(Angle);
         }
-        else if constexpr (eastl::is_base_of_v<Real32, Type>)
+        else if constexpr (std::is_base_of_v<Real32, Type>)
         {
             return acosf(Angle);
         }
@@ -97,11 +97,11 @@ inline namespace Core
     template<typename Type>
     Type InverseSine(Type Angle)
     {
-        if constexpr (eastl::is_base_of_v<Real64, Type>)
+        if constexpr (std::is_base_of_v<Real64, Type>)
         {
             return asin(Angle);
         }
-        else if constexpr (eastl::is_base_of_v<Real32, Type>)
+        else if constexpr (std::is_base_of_v<Real32, Type>)
         {
             return asinf(Angle);
         }

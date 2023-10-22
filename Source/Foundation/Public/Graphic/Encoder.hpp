@@ -36,6 +36,9 @@ namespace Graphic
         // -=(Undocumented)=-
         static constexpr UInt k_UniformBlockPerMaterial  = 2;
 
+        // -=(Undocumented)=-
+        static constexpr UInt k_UniformBlockPerObject    = 3;
+
     public:
 
         // -=(Undocumented)=-
@@ -126,6 +129,7 @@ namespace Graphic
             }
         }
 
+        // -=(Undocumented)=-
         template<typename Type>
         void SetScene(Ref<const Type> Scene)
         {
@@ -143,15 +147,23 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        void SetObject(CPtr<Vector4f> Object)
+        {
+            Ptr<void> ObjectDataPtr
+                = AllocateTransientUniforms(mInFlyRanges[k_UniformBlockPerObject], Object.size_bytes());
+            FastCopyMemory(ObjectDataPtr, Object.data(), Object.size_bytes());
+        }
+
+        // -=(Undocumented)=-
         template<typename Vertex, typename Index>
-        Bool Ensure(UInt Vertices, UInt Indices, SPtr<const Material> Material)
+        Bool Ensure(UInt Vertices, UInt Indices, UInt Uniforms)
         {
             const Bool FitsVertices
                 = mInFlyBuffers[0].Writer + Vertices * sizeof(Vertex) <= mInFlyBuffers[0].Capacity;
             const Bool FitsIndices
                 = mInFlyBuffers[1].Writer + Indices * sizeof(Index)  <= mInFlyBuffers[1].Capacity;
             const Bool FitsUniforms
-                = mInFlyBuffers[2].Writer + Align<256>(Material->GetParameters().size_bytes()) <= mInFlyBuffers[2].Capacity;
+                = mInFlyBuffers[2].Writer + Align<256>(Uniforms * sizeof(Vector4f)) <= mInFlyBuffers[2].Capacity;
 
             if (! FitsVertices || ! FitsIndices || ! FitsUniforms)
             {
@@ -239,6 +251,6 @@ namespace Graphic
         Vector<Submission>        mInFlySubmission;
         Submission                mInFlyBatch;
         Array<TransientBuffer, 3> mInFlyBuffers;
-        Array<TransientRange,  3> mInFlyRanges;
+        Array<TransientRange,  4> mInFlyRanges;
     };
 }

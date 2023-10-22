@@ -67,28 +67,16 @@ namespace Graphic
         mInFlyBuffers[1].Marker = mInFlyBuffers[1].Writer;
 
         // Apply batch's uniforms range
-        SetUniforms(
-            k_UniformBlockPerScene,
-            mInFlyBuffers[2].ID,
-            mInFlyRanges[k_UniformBlockPerScene].Offset,
-            mInFlyRanges[k_UniformBlockPerScene].Length);
-
-        if (mInFlyRanges[k_UniformBlockPerTechnique].Length > 0)
+        for (UInt Block = 0; Block < Graphic::k_MaxUniforms; ++Block)
         {
-            SetUniforms(
-                k_UniformBlockPerTechnique,
-                mInFlyBuffers[2].ID,
-                mInFlyRanges[k_UniformBlockPerTechnique].Offset,
-                mInFlyRanges[k_UniformBlockPerTechnique].Length);
-        }
-
-        if (mInFlyRanges[k_UniformBlockPerMaterial].Length > 0)
-        {
-            SetUniforms(
-                k_UniformBlockPerMaterial,
-                mInFlyBuffers[2].ID,
-                mInFlyRanges[k_UniformBlockPerMaterial].Offset,
-                mInFlyRanges[k_UniformBlockPerMaterial].Length);
+            if (mInFlyRanges[Block].Length > 0)
+            {
+                SetUniforms(
+                    Block,
+                    mInFlyBuffers[2].ID,
+                    mInFlyRanges[Block].Offset,
+                    mInFlyRanges[Block].Length);
+            }
         }
 
         // Add the batch into submission

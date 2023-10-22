@@ -525,7 +525,7 @@ namespace Graphic
         Description.BufferDesc.Width  = Width;
         Description.BufferDesc.Height = Height;
         Description.SampleDesc        = { 1, 0 };
-        Description.OutputWindow      = eastl::any_cast<HWND>(Display);
+        Description.OutputWindow      = std::any_cast<HWND>(Display);
         Description.Windowed          = true;
         Description.SwapEffect        = DXGI_SWAP_EFFECT_DISCARD;
 
@@ -997,7 +997,7 @@ namespace Graphic
             {
                 if ((DXGIDescription.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) == 0)
                 {
-                    Ref<Graphic::Adapter> AdapterInfo = mCapabilities.Adapters.push_back();
+                    Ref<Graphic::Adapter> AdapterInfo = mCapabilities.Adapters.emplace_back();
 
                     AdapterInfo.Description          = As(DXGIDescription.Description);
                     AdapterInfo.DedicatedMemoryInMBs = DXGIDescription.DedicatedVideoMemory >> 20;
@@ -1019,7 +1019,7 @@ namespace Graphic
 
                     for (Ref<DXGI_MODE_DESC> Description : Descriptions)
                     {
-                        Ref<Graphic::Resolution> Resolution = mCapabilities.Adapters[Index].Displays.push_back();
+                        Ref<Graphic::Resolution> Resolution = mCapabilities.Adapters[Index].Displays.emplace_back();
                         Resolution.Width     = Description.Width;
                         Resolution.Height    = Description.Height;
                         Resolution.Frequency = Description.RefreshRate.Numerator / Description.RefreshRate.Denominator;

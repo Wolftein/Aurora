@@ -56,11 +56,11 @@ inline namespace Core
 
     TOMLSection TOMLSection::GetSection(CStr Key, Bool CreateIfNeeded) const
     {
-        Ptr<toml::table> Table = mTable->get_as<toml::table>(Convert(Key));
+        Ptr<toml::table> Table = mTable->get_as<toml::table>(Key);
 
         if (Table == nullptr && CreateIfNeeded)
         {
-            Table = mTable->emplace<toml::table>(Convert(Key)).first->second.as_table();
+            Table = mTable->emplace<toml::table>(Key).first->second.as_table();
         }
         return TOMLSection(Table);
     }
@@ -70,7 +70,7 @@ inline namespace Core
 
     TOMLSection TOMLSection::SetSection(CStr Key)
     {
-        Ptr<toml::table> Table = mTable->emplace<toml::table>(Convert(Key)).first->second.as_table();
+        Ptr<toml::table> Table = mTable->emplace<toml::table>(Key).first->second.as_table();
 
         return TOMLSection(Table);
     }
@@ -80,11 +80,11 @@ inline namespace Core
 
     TOMLArray TOMLSection::GetArray(CStr Key, Bool CreateIfNeeded) const
     {
-        Ptr<toml::array> Array = mTable->get_as<toml::array>(Convert(Key));
+        Ptr<toml::array> Array = mTable->get_as<toml::array>(Key);
 
         if (Array == nullptr && CreateIfNeeded)
         {
-            Array = mTable->emplace<toml::array>(Convert(Key)).first->second.as_array();
+            Array = mTable->emplace<toml::array>(Key).first->second.as_array();
         }
         return TOMLArray { Array };
     }
@@ -94,7 +94,7 @@ inline namespace Core
 
     TOMLArray TOMLSection::SetArray(CStr Key)
     {
-        Ptr<toml::array> Array = mTable->emplace<toml::array>(Convert(Key)).first->second.as_array();
+        Ptr<toml::array> Array = mTable->emplace<toml::array>(Key).first->second.as_array();
 
         return TOMLArray { Array };
     }
@@ -104,7 +104,7 @@ inline namespace Core
 
     void TOMLSection::SetBool(CStr Key, Bool Value)
     {
-        mTable->insert_or_assign(Convert(Key), Value);
+        mTable->insert_or_assign(Key, Value);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -112,7 +112,7 @@ inline namespace Core
 
     Bool TOMLSection::GetBool(CStr Key, Bool Default) const
     {
-        return (* mTable)[Convert(Key)].value_or(Default);
+        return (* mTable)[Key].value_or(Default);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -136,7 +136,7 @@ inline namespace Core
 
     void TOMLSection::SetString(CStr Key, CStr Value)
     {
-        mTable->insert_or_assign(Convert(Key), Convert(Value));
+        mTable->insert_or_assign(Key, Value);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -144,7 +144,7 @@ inline namespace Core
 
     CStr TOMLSection::GetString(CStr Key, CStr Default) const
     {
-        const auto String = (* mTable)[Convert(Key)].value_or(Convert(Default));
+        const auto String = (* mTable)[Key].value_or(Default);
 
         return CStr { String.data(), String.size() };
     }
@@ -170,7 +170,7 @@ inline namespace Core
 
     void TOMLSection::SetNumber(CStr Key, SInt Value)
     {
-        mTable->insert_or_assign(Convert(Key), Value);
+        mTable->insert_or_assign(Key, Value);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -178,7 +178,7 @@ inline namespace Core
 
     SInt TOMLSection::GetNumber(CStr Key, SInt Default) const
     {
-        return (* mTable)[Convert(Key)].value_or(Default);
+        return (* mTable)[Key].value_or(Default);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -202,7 +202,7 @@ inline namespace Core
 
     void TOMLSection::SetReal(CStr Key, Real Value)
     {
-        mTable->insert_or_assign(Convert(Key), Value);
+        mTable->insert_or_assign(Key, Value);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -210,7 +210,7 @@ inline namespace Core
 
     Real TOMLSection::GetReal(CStr Key, Real Default) const
     {
-        return (* mTable)[Convert(Key)].value_or(Default);
+        return (* mTable)[Key].value_or(Default);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

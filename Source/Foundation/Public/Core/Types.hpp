@@ -12,16 +12,17 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <EASTL/bitset.h>
-#include <EASTL/fixed_vector.h>
-#include <EASTL/initializer_list.h>
-#include <EASTL/shared_ptr.h>
-#include <EASTL/sort.h>
+#include <any>
+#include <array>
+#include <bitset>
+#include <functional>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+
 #include <EASTL/span.h>
-#include <EASTL/string.h>
-#include <EASTL/unordered_map.h>
-#include <EASTL/vector.h>
-#include <EASTL/any.h>
+#include <EASTL/fixed_vector.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -30,40 +31,40 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    using Any    = eastl::any;
+    using Any    = std::any;
 
     // -=(Undocumented)=-
-    using Bool   = bool8_t;
+    using Bool   = bool;
 
     // -=(Undocumented)=-
-    using SInt   = ssize_t;
+    using SInt   = std::intptr_t;
 
     // -=(Undocumented)=-
-    using SInt08 = int8_t;
+    using SInt08 = std::int8_t;
 
     // -=(Undocumented)=-
-    using SInt16 = int16_t;
+    using SInt16 = std::int16_t;
 
     // -=(Undocumented)=-
-    using SInt32 = int32_t;
+    using SInt32 = std::int32_t;
 
     // -=(Undocumented)=-
-    using SInt64 = int64_t;
+    using SInt64 = std::int64_t;
 
     // -=(Undocumented)=-
-    using UInt   = size_t;
+    using UInt   = std::uintptr_t;
 
     // -=(Undocumented)=-
-    using UInt08 = uint8_t;
+    using UInt08 = std::uint8_t;
 
     // -=(Undocumented)=-
-    using UInt16 = uint16_t;
+    using UInt16 = std::uint16_t;
 
     // -=(Undocumented)=-
-    using UInt32 = uint32_t;
+    using UInt32 = std::uint32_t;
 
     // -=(Undocumented)=-
-    using UInt64 = uint64_t;
+    using UInt64 = std::uint64_t;
 
     // -=(Undocumented)=-
     using Real   = double_t;
@@ -75,30 +76,42 @@ inline namespace Core
     using Real64 = double_t;
 
     // -=(Undocumented)=-
-    using Char   = char;
+    using SStr   = std::string;
 
     // -=(Undocumented)=-
-    using SStr   = eastl::string;
+    using CStr   = std::string_view;
 
     // -=(Undocumented)=-
-    using CStr   = eastl::string_view;
+    using Char   = SStr::value_type;
 
     // -=(Undocumented)=-
-    using SStr16 = eastl::string16;
+    using SStr16 = std::u16string;
 
     // -=(Undocumented)=-
-    using CStr16 = eastl::basic_string_view<char16_t>;
+    using CStr16 = std::u16string_view;
+
+    // -=(Undocumented)=-
+    using Char16 = SStr16::value_type;
+
+    // -=(Undocumented)=-
+    using SStr32 = std::u32string;
+
+    // -=(Undocumented)=-
+    using CStr32 = std::u32string_view;
+
+    // -=(Undocumented)=-
+    using Char32 = SStr32::value_type;
 
     // -=(Undocumented)=-
 #define STRING_FIX(Value) SStr(Value)  // TODO: Remove this until heterogeous lookup is fixed
 
     // -=(Undocumented)=-
     template<typename Type>
-    using Ptr    = typename eastl::add_pointer<Type>::type;
+    using Ptr    = typename std::add_pointer<Type>::type;
 
     // -=(Undocumented)=-
     template<typename Type>
-    using Ref    = typename eastl::add_lvalue_reference<Type>::type;
+    using Ref    = typename std::add_lvalue_reference<Type>::type;
 
     // -=(Undocumented)=-
     template<typename Type>
@@ -106,27 +119,31 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
-    using SPtr   = eastl::shared_ptr<Type>;
-
-    // -=(Undocumented)=-
-    template<typename Type, typename Deleter = eastl::default_delete<Type>>
-    using UPtr   = eastl::unique_ptr<Type, Deleter>;
-
-    // -=(Undocumented)=-
-    template<typename Type>
-    using FPtr   = eastl::function<Type>;
+    using SPtr   = std::shared_ptr<Type>;
 
     // -=(Undocumented)=-
     template<typename Type>
     using ConstSPtr = Ref<const SPtr<Type>>;
 
     // -=(Undocumented)=-
-    template<typename Value, UInt Capacity>
-    using Array  = eastl::array<Value, Capacity>;
+    template<typename Type, typename Deleter = std::default_delete<Type>>
+    using UPtr   = std::unique_ptr<Type, Deleter>;
 
     // -=(Undocumented)=-
-    template<typename Type, UInt Capacity>
-    using Bitset = eastl::bitset<Capacity, Type>;
+    template<typename Type>
+    using ConstUPtr = Ref<const UPtr<Type>>;
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    using FPtr   = std::function<Type>;
+
+    // -=(Undocumented)=-
+    template<typename Value, UInt Capacity>
+    using Array  = std::array<Value, Capacity>;
+
+    // -=(Undocumented)=-
+    template<UInt Capacity>
+    using Bitset = std::bitset<Capacity>;
 
     // -=(Undocumented)=-
     template<typename Value>
@@ -138,13 +155,13 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Value>
-    using Vector = eastl::vector<Value>;
+    using Vector = std::vector<Value>;
 
     // -=(Undocumented)=-
-    template<typename Key, typename Value, typename Hash = eastl::hash<Key>, typename Predicate = eastl::equal_to<>>
-    using Table  = eastl::hash_map<Key, Value, Hash, Predicate>;
+    template<typename Key, typename Value, typename Hash = std::hash<Key>, typename Predicate = std::equal_to<>>
+    using Table  = std::unordered_map<Key, Value, Hash, Predicate>;
 
     // -=(Undocumented)=-
     template<typename Class>
-    using EnableSmartPointer = eastl::enable_shared_from_this<Class>;
+    using EnableSmartPointer = std::enable_shared_from_this<Class>;
 }

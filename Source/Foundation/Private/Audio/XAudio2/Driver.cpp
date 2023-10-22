@@ -22,19 +22,19 @@ namespace Audio
         { 0.0f, 1.0f }, { 0.25f, 0.0f }, { 1.0f, 0.0f }
     };
     static X3DAUDIO_DISTANCE_CURVE       XAUDIO2_LFE_CURVE  = {
-        XAUDIO2_LFE_RAMP, eastl::size(XAUDIO2_LFE_RAMP)
+        XAUDIO2_LFE_RAMP, std::size(XAUDIO2_LFE_RAMP)
     };
     static X3DAUDIO_DISTANCE_CURVE_POINT XAUDIO2_REV_RAMP[] = {
         { 0.0f, 0.5f }, { 0.75f, 1.0f }, { 1.0f, 0.0f }
     };
     static X3DAUDIO_DISTANCE_CURVE       XAUDIO2_REV_CURVE  = {
-        XAUDIO2_REV_RAMP, eastl::size(XAUDIO2_REV_RAMP)
+        XAUDIO2_REV_RAMP, std::size(XAUDIO2_REV_RAMP)
     };
     static X3DAUDIO_DISTANCE_CURVE_POINT XAUDIO2_VOL_RAMP[] = {
         { 0.0f, 1.0f }, { 0.15f, 0.8239f }, { 0.3625f, 0.4406f }, { 0.575f, 0.2403f }, { 0.7875f, 0.1037f }, { 1.0f, 0.0f }
     };
     static X3DAUDIO_DISTANCE_CURVE       XAUDIO2_VOL_CURVE  = {
-        XAUDIO2_VOL_RAMP, eastl::size(XAUDIO2_VOL_RAMP)
+        XAUDIO2_VOL_RAMP, std::size(XAUDIO2_VOL_RAMP)
     };
 }
 
@@ -135,7 +135,7 @@ namespace Audio
 
         for (UInt32 Index = 0; Index < Submixes; ++Index)
         {
-            mDevice->CreateSubmixVoice(& mSubmixes.push_back(), Details.InputChannels, Details.InputSampleRate);
+            mDevice->CreateSubmixVoice(& mSubmixes.emplace_back(), Details.InputChannels, Details.InputSampleRate);
         }
 
         // Initialise X3D audio for positional 3D voices
@@ -246,7 +246,7 @@ namespace Audio
 
     Object XAudio2Driver::Play(UInt Submix, ConstSPtr<Sound> Sound, ConstSPtr<Emitter> Emitter, Bool Repeat)
     {
-        if (mMixes.full())
+        if (! mMixes.empty())
         {
             return 0;
         }
@@ -266,7 +266,7 @@ namespace Audio
         Voice->SetSourceSampleRate(Sound->GetFrequency());
 
         // Add play instance into the mixer and apply 3D
-        Ref<XAudioInstance> Instance = mMixes.push_back();
+        Ref<XAudioInstance> Instance = mMixes.emplace_back();
         Instance.Repeat = Repeat;
         Instance.Frequency = 1.0f;
         Instance.Sound = Sound;
@@ -432,7 +432,7 @@ namespace Audio
 
         Ptr<IXAudio2SourceVoice> Mixer = nullptr;
 
-        if (const auto Iterator = eastl::find_if(mVoices.begin(), mVoices.end(), FindByKey); Iterator != mVoices.end())
+        if (const auto Iterator = std::find_if(mVoices.begin(), mVoices.end(), FindByKey); Iterator != mVoices.end())
         {
             Mixer = Iterator->Source;
 

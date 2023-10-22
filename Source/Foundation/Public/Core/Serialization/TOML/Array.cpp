@@ -92,7 +92,7 @@ inline namespace Core
 
     void TOMLArray::AddString(CStr Value)
     {
-        mArray->emplace_back<std::string>(Convert(Value));
+        mArray->emplace_back<std::string>(Value);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -100,9 +100,7 @@ inline namespace Core
 
     CStr TOMLArray::GetString(UInt Index) const
     {
-        const auto String = (* mArray)[Index].value_or(Convert(""));
-
-        return CStr { String.data(), String.size() };
+        return (* mArray)[Index].value_or("");
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

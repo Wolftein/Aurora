@@ -12,9 +12,12 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Log/Common.hpp"
 #include "Core/Log/Log.hpp"
 #include "Core/Log/Sink.hpp"
+
+#define QUILL_DISABLE_NON_PREFIXED_MACROS
+#define QUILL_ROOT_LOGGER_ONLY
+#include <quill/Quill.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]

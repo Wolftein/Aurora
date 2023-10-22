@@ -13,7 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Types.hpp"
-#include <EAStdC/EAMemory.h>
+#include <algorithm>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -25,7 +25,7 @@ inline namespace Core
     template<typename Enum>
     inline constexpr auto CastEnum(Enum Value)
     {
-        return static_cast<eastl::underlying_type_t<Enum>>(Value);
+        return static_cast<std::underlying_type_t<Enum>>(Value);
     }
 
     // -=(Undocumented)=-
@@ -46,61 +46,41 @@ inline namespace Core
     template<typename Type, typename... Args>
     inline SPtr<Type> NewPtr(Args && ... Arguments)
     {
-        return eastl::make_shared<Type>(Arguments...);
+        return std::make_shared<Type>(Arguments...);
     }
 
     // -=(Undocumented)=-
     template<typename Type, typename... Args>
     inline UPtr<Type> NewUniquePtr(Args && ... Arguments)
     {
-        return eastl::make_unique<Type>(Arguments...);
+        return std::make_unique<Type>(Arguments...);
     }
 
     // -=(Undocumented)=-
     template<typename Destination, typename Source>
     inline SPtr<Destination> CastPtr(SPtr<Source> Pointer)
     {
-        return eastl::static_shared_pointer_cast<Destination>(Pointer);
+        return std::static_pointer_cast<Destination>(Pointer);
     }
 
     // -=(Undocumented)=-
     template<typename Type>
     inline auto Move(Type && Object)
     {
-        return eastl::move(Object);
+        return std::move(Object);
     }
 
     // -=(Undocumented)=-
     template<typename Type, typename Primitive = Type>
     inline auto Exchange(Type & Object, Primitive && Value)
     {
-        return eastl::exchange(Object, Value);
+        return std::exchange(Object, Value);
     }
 
     // -=(Undocumented)=-
     template<Bool Cacheable = true>
     inline auto FastCopyMemory(Ptr<void> Destination, Ptr<const void> Source, UInt Size)
     {
-        if constexpr (Cacheable)
-        {
-            EA::StdC::MemcpyC(Destination, Source, Size);
-        }
-        else
-        {
-            EA::StdC::MemcpyS(Destination, Source, Size);
-        }
-    }
-
-    // -=(Undocumented)=-
-    template<typename Type, typename Function>
-    inline void Sort(Type Collection, Function Compare)
-    {
-        eastl::sort(Collection.begin(), Collection.end(), Compare);
-    }
-
-    // -=(Undocumented)=-
-    inline auto Convert(CStr Key)
-    {
-        return std::string_view { Key.data(), Key.size() };
+        memcpy(Destination, Source, Size);
     }
 }

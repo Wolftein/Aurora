@@ -33,23 +33,56 @@ namespace Graphic
         // -=(Undocumented)=-
         enum class Order
         {
-            Opaque, Transparent
+            // -=(Undocumented)=-
+            Subtractive,
+
+            // -=(Undocumented)=-
+            Additive,
+
+            // -=(Undocumented)=-
+            Normal,
+
+            // -=(Undocumented)=-
+            Opaque,
         };
 
         // -=(Undocumented)=-
         enum class Alignment
         {
+            // -=(Undocumented)=-
             LeftTop        = (1 << 0) | (1 << 3),
+
+            // -=(Undocumented)=-
             LeftMiddle     = (1 << 0) | (1 << 4),
+
+            // -=(Undocumented)=-
             LeftBottom     = (1 << 0) | (1 << 5),
+
+            // -=(Undocumented)=-
             LeftBaseline   = (1 << 0) | (1 << 6),
+
+            // -=(Undocumented)=-
             CenterTop      = (1 << 1) | (1 << 3),
+
+            // -=(Undocumented)=-
             CenterMiddle   = (1 << 1) | (1 << 4),
+
+            // -=(Undocumented)=-
             CenterBottom   = (1 << 1) | (1 << 5),
+
+            // -=(Undocumented)=-
             CenterBaseline = (1 << 1) | (1 << 6),
+
+            // -=(Undocumented)=-
             RightTop       = (1 << 2) | (1 << 3),
+
+            // -=(Undocumented)=-
             RightMiddle    = (1 << 2) | (1 << 4),
+
+            // -=(Undocumented)=-
             RightBottom    = (1 << 2) | (1 << 5),
+
+            // -=(Undocumented)=-
             RightBaseline  = (1 << 2) | (1 << 6),
         };
 
@@ -87,8 +120,15 @@ namespace Graphic
             ConstSPtr<Graphic::Material> Material);
 
         // -=(Undocumented)=-
-        // TODO: strokes
-        void DrawFont(ConstSPtr<Font> Font, ConstSPtr<Graphic::Pipeline> Pipeline, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Alignment Alignment);
+        void DrawFont(
+            ConstSPtr<Font> Font,
+            ConstSPtr<Graphic::Pipeline> Pipeline,
+            CStr16 Text,
+            Vector2f Position,
+            Real32 Depth,
+            Real32 Scale,
+            Color Tint,
+            Alignment Alignment);
 
         // -=(Undocumented)=-
         void End();

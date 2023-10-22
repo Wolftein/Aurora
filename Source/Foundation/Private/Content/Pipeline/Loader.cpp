@@ -316,9 +316,9 @@ namespace Content
         Ptr<ID3DBlob> Bytecode = nullptr;
 
         constexpr CStr kShaderProfiles[][3] = {
-            { "vs_4_0_level_9_1", "ps_4_0_level_9_1", nullptr  },
-            { "vs_4_0_level_9_1", "ps_4_0_level_9_1", nullptr  },
-            { "vs_4_0_level_9_3", "ps_4_0_level_9_3", nullptr  },
+            { "vs_4_0_level_9_1", "ps_4_0_level_9_1", ""       },
+            { "vs_4_0_level_9_1", "ps_4_0_level_9_1", ""       },
+            { "vs_4_0_level_9_3", "ps_4_0_level_9_3", ""       },
             { "vs_4_0",           "ps_4_0",           "gs_4_0" },
             { "vs_5_0",           "ps_5_0",           "gs_5_0" },
             { "vs_6_0",           "ps_6_0",           "gs_6_0" }

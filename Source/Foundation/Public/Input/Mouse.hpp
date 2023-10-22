@@ -56,10 +56,10 @@ namespace Input
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Vector2i        mLastMousePosition;
-        Vector2i        mThisMousePosition;
-        Vector2i        mThisMouseScroll;
-        Bitset<UInt, 8> mLastButtons;
-        Bitset<UInt, 8> mThisButtons;
+        Vector2i  mLastMousePosition;
+        Vector2i  mThisMousePosition;
+        Vector2i  mThisMouseScroll;
+        Bitset<8> mLastButtons;
+        Bitset<8> mThisButtons;
     };
 }

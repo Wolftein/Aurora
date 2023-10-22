@@ -40,7 +40,7 @@ namespace Input
         }
 
         // Sort all raw-input event(s) by its time
-        Sort(Collector, [](Ref<const Event> First, Ref<const Event> Second)
+        std::sort(Collector.begin(), Collector.end(), [](Ref<const Event> First, Ref<const Event> Second)
         {
            return First.Time < Second.Time;
         });

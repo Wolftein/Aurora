@@ -30,8 +30,10 @@ inline namespace COM
     [export, uuid("D260AA57-1CFF-11EE-ADCD-1418C3A8EDB8"), v1_enum]
     typedef enum Renderer_Order
     {
+        eRendererOrderSubtractive,
+        eRendererOrderAdditive,
+        eRendererOrderNormal,
         eRendererOrderOpaque,
-        eRendererOrderTransparent,
     } Renderer_Order_Draw;
 
     // -=(Undocumented)=-

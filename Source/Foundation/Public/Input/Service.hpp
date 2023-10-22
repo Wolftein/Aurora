@@ -37,11 +37,11 @@ namespace Input
         template<typename T>
         void Register(ConstSPtr<T> Device)
         {
-            if constexpr (eastl::is_base_of_v<Keyboard, T>)
+            if constexpr (std::is_base_of_v<Keyboard, T>)
             {
                 mKeyboard = Device;
             }
-            else if constexpr (eastl::is_base_of_v<Mouse, T>)
+            else if constexpr (std::is_base_of_v<Mouse, T>)
             {
                 mMouse = Device;
             }
@@ -53,16 +53,16 @@ namespace Input
         template<typename T>
         void Unregister(ConstSPtr<T> Device)
         {
-            if constexpr (eastl::is_base_of_v<Keyboard, T>)
+            if constexpr (std::is_base_of_v<Keyboard, T>)
             {
                 mKeyboard = nullptr;
             }
-            else if constexpr (eastl::is_base_of_v<Mouse, T>)
+            else if constexpr (std::is_base_of_v<Mouse, T>)
             {
                 mMouse = nullptr;
             }
 
-            mDevices.erase_first(Device);
+            mDevices.erase(std::remove(mDevices.begin(), mDevices.end(), Device));
         }
 
         // -=(Undocumented)=-
@@ -74,7 +74,7 @@ namespace Input
         // -=(Undocumented)=-
         void RemoveListener(ConstSPtr<Listener> Listener)
         {
-            mListeners.erase_first(Listener);
+            mListeners.erase(std::remove(mListeners.begin(), mListeners.end(), Listener));
         }
 
         // -=(Undocumented)=-

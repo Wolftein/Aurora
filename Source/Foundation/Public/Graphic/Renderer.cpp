@@ -52,7 +52,7 @@ namespace Graphic
             return;
         }
 
-        Ref<Drawable> Drawable = mDrawables.push_back();
+        Ref<Drawable> Drawable = mDrawables.emplace_back();
         Drawable.ID          = GenerateUniqueID(Order, Pipeline->GetID(), Material->GetID(), Depth);
         Drawable.Destination = Destination;
         Drawable.Source      = Source;
@@ -158,7 +158,7 @@ namespace Graphic
                 Rectf PositionRect = (Glyph->PlaneBounds * Scale) + Vector2f(CurrentX, CurrentY);
 
                 // TODO: Make it own queue so that we don't need to sort lot of small objects
-                Draw(PositionRect, Glyph->ImageBounds, Depth, 0.0f, Tint, Order::Transparent, Pipeline, Font->GetMaterial());
+                Draw(PositionRect, Glyph->ImageBounds, Depth, 0.0f, Tint, Order::Normal, Pipeline, Font->GetMaterial());
 
                 if (Letter < Text.size() - 1)
                 {
@@ -237,7 +237,7 @@ namespace Graphic
     void Renderer::Flush()
     {
         // Sort all drawables back to front and by material/pipeline
-        eastl::sort(mDrawablesPtr.begin(), mDrawablesPtr.end(), [](Ptr<const Drawable> Left, Ptr<const Drawable> Right)
+        std::sort(mDrawablesPtr.begin(), mDrawablesPtr.end(), [](Ptr<const Drawable> Left, Ptr<const Drawable> Right)
         {
             return Left->ID > Right->ID;
         });
@@ -263,7 +263,7 @@ namespace Graphic
                 UInt Index = 0;
 
                 // Ensure we have enough space for the batch otherwise flush previous batches
-                mEncoder.Ensure<VertexShaderLayout, SInt16>(Count * 4, Count * 6, ThisDrawable->Material);
+                mEncoder.Ensure<VertexShaderLayout, SInt16>(Count * 4, Count * 6, ThisDrawable->Material->GetParameters().size());
 
                 for (UInt Drawable = Start; Drawable <= Element; ++Drawable, Index += 4)
                 {
@@ -301,47 +301,46 @@ namespace Graphic
 
     UInt64 Renderer::GenerateUniqueID(Order Order, UInt Pipeline, UInt Material, Real32 Depth) const
     {
-        // TODO: Clean this
         union
         {
-            UInt64 Key;
+            UInt64 Value;
 
             struct
             {
-                UInt64 bDepth     : 32;
-                UInt64 bMaterial  : 16;
-                UInt64 bTechnique : 8;
-                UInt64 bType      : 8;
-
+                UInt64 iDepth        : 32;
+                UInt64 iMaterial     : 16;
+                UInt64 iTechnique    : 8;
+                UInt64 iTranslucency : 8;
             } Opaque;
 
             struct
             {
-                UInt64 bMaterial  : 16;
-                UInt64 bTechnique : 8;
-                UInt64 bDepth     : 32;
-                UInt64 bType      : 8;
+                UInt64 iMaterial     : 16;
+                UInt64 iTechnique    : 8;
+                UInt64 iDepth        : 32;
+                UInt64 iTranslucency : 8;
             } Transparent;
-
         } ID;
 
-        if (Order == Order::Transparent)
+        switch (Order)
         {
-            ID.Transparent.bType     = 0;
-            ID.Transparent.bMaterial = Material;
-            ID.Transparent.bTechnique = Pipeline;
-            ID.Transparent.bDepth = * (UInt32 *) (& Depth);
-        }
-        else
-        {
-            const auto zDepthInv = (1.0f + Depth);
+        case Order::Subtractive:
+        case Order::Additive:
+        case Order::Normal:
+            ID.Transparent.iMaterial     = Material;
+            ID.Transparent.iTechnique    = Pipeline;
+            ID.Transparent.iDepth        = * reinterpret_cast<Ptr<const UInt32>>(& Depth);
+            ID.Transparent.iTranslucency = CastEnum(Order);
+            break;
+        case Order::Opaque:
+            const Real32 DepthInv = (1.0f + Depth);
 
-            ID.Opaque.bType     = 1;
-            ID.Opaque.bMaterial = Material;
-            ID.Opaque.bTechnique = Pipeline;
-            ID.Opaque.bDepth = * (UInt32 *) (& zDepthInv);
+            ID.Opaque.iMaterial          = Material;
+            ID.Opaque.iTechnique         = Pipeline;
+            ID.Opaque.iDepth             = * reinterpret_cast<Ptr<const UInt32>>(& DepthInv);
+            ID.Opaque.iTranslucency      = CastEnum(Order);
+            break;
         }
-
-        return ID.Key;
+        return ID.Value;
     }
 }
