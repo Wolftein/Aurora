@@ -29,9 +29,9 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Begin(Ref<const Camera> Camera)
+    void Renderer::Begin(Ref<const Camera> Camera, Real32 Time)
     {
-        mEncoder.SetScene<Matrix4f>(Camera.GetWorld());
+        mEncoder.SetScene<Scene>(Scene { Camera.GetWorld(), Time });
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -185,7 +185,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::WriteGeometry(Ptr<const Drawable> Drawable, Ptr<VertexShaderGeometry> Buffer)
+    void Renderer::WriteGeometry(Ptr<const Drawable> Drawable, Ptr<VertexShaderLayout> Buffer)
     {
         const Real32 DestinationX1 = Drawable->Destination.GetLeft();
         const Real32 DestinationX2 = Drawable->Destination.GetRight();
@@ -205,30 +205,30 @@ namespace Graphic
 
             const Matrix4f Transformation = Matrix4f::CreateTransform(Position, Rotation, Size);
 
-            Buffer->V1.Position = Transformation * Vector3f(-0.5f, -0.5f, 0.0f);
-            Buffer->V2.Position = Transformation * Vector3f( 0.5f, -0.5f, 0.0f);
-            Buffer->V3.Position = Transformation * Vector3f(-0.5f,  0.5f, 0.0f);
-            Buffer->V4.Position = Transformation * Vector3f( 0.5f,  0.5f, 0.0f);
+            Buffer[0].Position = Transformation * Vector3f(-0.5f, -0.5f, 0.0f);
+            Buffer[1].Position = Transformation * Vector3f( 0.5f, -0.5f, 0.0f);
+            Buffer[2].Position = Transformation * Vector3f(-0.5f,  0.5f, 0.0f);
+            Buffer[3].Position = Transformation * Vector3f( 0.5f,  0.5f, 0.0f);
         }
         else
         {
-            Buffer->V1.Position.Set(DestinationX1, DestinationY1, Drawable->Depth);
-            Buffer->V2.Position.Set(DestinationX2, DestinationY2, Drawable->Depth);
-            Buffer->V3.Position.Set(DestinationX3, DestinationY3, Drawable->Depth);
-            Buffer->V4.Position.Set(DestinationX4, DestinationY4, Drawable->Depth);
+            Buffer[0].Position.Set(DestinationX1, DestinationY1, Drawable->Depth);
+            Buffer[1].Position.Set(DestinationX2, DestinationY2, Drawable->Depth);
+            Buffer[2].Position.Set(DestinationX3, DestinationY3, Drawable->Depth);
+            Buffer[3].Position.Set(DestinationX4, DestinationY4, Drawable->Depth);
         }
 
-        Buffer->V1.Color = Drawable->Color;
-        Buffer->V1.Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetTop());
+        Buffer[0].Color = Drawable->Color;
+        Buffer[0].Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetTop());
 
-        Buffer->V2.Color = Drawable->Color;
-        Buffer->V2.Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetTop());
+        Buffer[1].Color = Drawable->Color;
+        Buffer[1].Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetTop());
 
-        Buffer->V3.Color = Drawable->Color;
-        Buffer->V3.Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetBottom());
+        Buffer[2].Color = Drawable->Color;
+        Buffer[2].Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetBottom());
 
-        Buffer->V4.Color = Drawable->Color;
-        Buffer->V4.Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetBottom());
+        Buffer[3].Color = Drawable->Color;
+        Buffer[3].Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetBottom());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -268,7 +268,7 @@ namespace Graphic
                 for (UInt Drawable = Start; Drawable <= Element; ++Drawable, Index += 4)
                 {
                     Ptr<VertexShaderLayout> Vertices = mEncoder.AllocateTransientVertices<VertexShaderLayout>(4);
-                    WriteGeometry(mDrawablesPtr[Drawable], reinterpret_cast<Ptr<VertexShaderGeometry>>(Vertices));
+                    WriteGeometry(mDrawablesPtr[Drawable], Vertices);
 
                     Ptr<UInt16> Indices = mEncoder.AllocateTransientIndices<UInt16>(6);
                     Indices[0] = Index;

@@ -30,9 +30,9 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Graphic_Renderer::Begin(Graphic_Camera_ * Camera)
+    HRESULT Graphic_Renderer::Begin(Graphic_Camera_ * Camera, vbReal32 Time)
     {
-        mWrapper->Begin(CCast<Graphic_Camera>(Camera));
+        mWrapper->Begin(CCast<Graphic_Camera>(Camera), Time);
         return S_OK;
     }
 

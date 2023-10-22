@@ -201,7 +201,7 @@ namespace Content
         Description.BlendColorDstFactor = ParseBlendFactor(Blend.GetString("ColorDstFactor", "Zero"));
         Description.BlendColorEquation  = ParseBlendFunction(Blend.GetString("ColorEquation", "Add"));
         Description.BlendAlphaSrcFactor = ParseBlendFactor(Blend.GetString("AlphaSrcFactor", "One"));
-        Description.BlendAlphaDstFactor = ParseBlendFactor(Blend.GetString("AlphaSrcFactor", "Zero"));
+        Description.BlendAlphaDstFactor = ParseBlendFactor(Blend.GetString("AlphaDstFactor", "Zero"));
         Description.BlendAlphaEquation  = ParseBlendFunction(Blend.GetString("AlphaEquation", "Add"));
 
         // Parse 'depth' section
@@ -212,10 +212,10 @@ namespace Content
         // Parse 'stencil' section
         const TOMLSection Stencil = Properties.GetSection("Stencil");
         Description.StencilMask        = Stencil.GetBool("Mask", false);
-        Description.StencilCondition   = ParseTestCondition(Stencil.GetString("Condition", "LessEqual"));
-        Description.StencilOnFail      = ParseTestAction(Stencil.GetString("OnFail", "Always"));
-        Description.StencilOnDepthFail = ParseTestAction(Stencil.GetString("OnDepthFail", "Always"));
-        Description.StencilOnDepthPass = ParseTestAction(Stencil.GetString("OnDepthPass", "Always"));
+        Description.StencilCondition   = ParseTestCondition(Stencil.GetString("Condition", "Always"));
+        Description.StencilOnFail      = ParseTestAction(Stencil.GetString("OnFail", "Keep"));
+        Description.StencilOnDepthFail = ParseTestAction(Stencil.GetString("OnDepthFail", "Keep"));
+        Description.StencilOnDepthPass = ParseTestAction(Stencil.GetString("OnDepthPass", "Keep"));
 
         // Parse 'rasterizer' section
         const TOMLSection Rasterizer = Properties.GetSection("Rasterizer");

@@ -31,6 +31,8 @@ inline namespace COM
         HRESULT SetTexture([in] vbInt32 Slot, [in] Graphic_Texture_ * Texture);
 
         HRESULT SetSampler([in] vbInt32 Slot, [in] Graphic_Texture_Edge EdgeU, [in] Graphic_Texture_Edge EdgeV, [in] Graphic_Texture_Filter Filter);
+
+        HRESULT SetParameter([in] vbInt32 Offset, [in] vbReal32 X, [in, defaultvalue(0)] vbReal32 Y, [in, defaultvalue(0)] vbReal32 Z, [in, defaultvalue(0)] vbReal32 W);
     };
 
     // -=(Undocumented)=-
@@ -47,6 +49,9 @@ inline namespace COM
 
         // \see Graphic_Material_::SetSampler
         HRESULT SetSampler(vbInt32 Slot, Graphic_Texture_Edge EdgeU, Graphic_Texture_Edge EdgeV, Graphic_Texture_Filter Filter) override;
+
+        // \see Graphic_Material_::SetParameter
+        HRESULT SetParameter(vbInt32 Offset, vbReal32 X, vbReal32 Y, vbReal32 Z, vbReal32 W) override;
 
         // \see Content_Resource_::GetKey
         HRESULT GetKey(vbStr16 * Result) override;

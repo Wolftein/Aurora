@@ -92,7 +92,7 @@ namespace Graphic
         Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        void Begin(Ref<const Camera> Camera);
+        void Begin(Ref<const Camera> Camera, Real32 Time);
 
         // -=(Undocumented)=-
         template<typename Type>
@@ -136,20 +136,26 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
-        struct VertexShaderLayout
+        struct Scene
         {
-            Vector3f Position;
-            UInt32   Color;
-            Vector2f Texture;
+            // -=(Undocumented)=-
+            Matrix4f World;
+
+            // -=(Undocumented)=-
+            Real32   Time;
         };
 
         // -=(Undocumented)=-
-        struct VertexShaderGeometry
+        struct VertexShaderLayout
         {
-            VertexShaderLayout V1;
-            VertexShaderLayout V2;
-            VertexShaderLayout V3;
-            VertexShaderLayout V4;
+            // -=(Undocumented)=-
+            Vector3f Position;
+
+            // -=(Undocumented)=-
+            UInt32   Color;
+
+            // -=(Undocumented)=-
+            Vector2f Texture;
         };
 
         // -=(Undocumented)=-
@@ -168,7 +174,7 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
-        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<VertexShaderGeometry> Buffer);
+        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<VertexShaderLayout> Buffer);
 
         // -=(Undocumented)=-
         void Flush();
