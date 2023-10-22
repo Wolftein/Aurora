@@ -219,7 +219,7 @@ namespace Content
 
         // Parse 'rasterizer' section
         const TOMLSection Rasterizer = Properties.GetSection("Rasterizer");
-        Description.Fill = Rasterizer.GetBool("Fill", false);
+        Description.Fill = Rasterizer.GetBool("Fill", true);
         Description.Cull = ParseCull(Rasterizer.GetString("Cull", "Back"));
 
         // Parse 'layout' section

@@ -42,7 +42,6 @@ namespace Platform
         {
             glfwDestroyWindow(mHandle);
         }
-        glfwTerminate();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -50,68 +49,63 @@ namespace Platform
 
     Bool GLFWWindow::Create(CStr Title, UInt Width, UInt Height)
     {
-        const Bool Succeed = glfwInit();
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-        if (Succeed)
+        glfwWindowHint(GLFW_VISIBLE,   GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
+        mHandle = glfwCreateWindow(Width, Height, Title.data(), nullptr, nullptr);
+
+        if (glfwRawMouseMotionSupported())
         {
-            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-            glfwWindowHint(GLFW_VISIBLE,   GLFW_FALSE);
-            glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-            glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-
-            mHandle = glfwCreateWindow(Width, Height, Title.data(), nullptr, nullptr);
-
-            if (glfwRawMouseMotionSupported())
-            {
-                glfwSetInputMode(mHandle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-            }
-
-            glfwSetWindowPos(mHandle,
-                (glfwGetVideoMode(glfwGetPrimaryMonitor())->width  - Width ) / 2,
-                (glfwGetVideoMode(glfwGetPrimaryMonitor())->height - Height) / 2);
-
-            glfwShowWindow(mHandle);
-
-            glfwSetWindowUserPointer(mHandle, this);
-
-            glfwSetKeyCallback(mHandle,  [](Ptr<GLFWwindow> Window, int Key, int Scancode, int Action, int Mods)
-            {
-                Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
-
-                (Self->mKeyboard)->OnKeyAction(Key, Scancode, Action, Mods);
-            });
-
-            glfwSetCharCallback(mHandle, [](Ptr<GLFWwindow> Window, unsigned int Codepoint)
-            {
-                Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
-
-                (Self->mKeyboard)->OnKeyType(Codepoint);
-            });
-
-            glfwSetCursorPosCallback(mHandle, [](Ptr<GLFWwindow> Window, Real64 X, Real64 Y)
-            {
-                Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
-
-                (Self->mMouse)->OnMouseMove(X, Y);
-            });
-
-            glfwSetMouseButtonCallback(mHandle, [](Ptr<GLFWwindow> Window, int Button, int Action, int Mods)
-            {
-                Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
-
-                (Self->mMouse)->OnMouseAction(Button, Action, Mods);
-            });
-
-            glfwSetScrollCallback(mHandle, [](Ptr<GLFWwindow> Window, Real64 X, Real64 Y)
-            {
-                Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
-
-                (Self->mMouse)->OnMouseScroll(X, Y);
-            });
+            glfwSetInputMode(mHandle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
         }
 
-        return Succeed;
+        glfwSetWindowPos(mHandle,
+                         (glfwGetVideoMode(glfwGetPrimaryMonitor())->width  - Width ) / 2,
+                         (glfwGetVideoMode(glfwGetPrimaryMonitor())->height - Height) / 2);
+
+        glfwShowWindow(mHandle);
+
+        glfwSetWindowUserPointer(mHandle, this);
+
+        glfwSetKeyCallback(mHandle,  [](Ptr<GLFWwindow> Window, int Key, int Scancode, int Action, int Mods)
+        {
+            Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
+
+            (Self->mKeyboard)->OnKeyAction(Key, Scancode, Action, Mods);
+        });
+
+        glfwSetCharCallback(mHandle, [](Ptr<GLFWwindow> Window, unsigned int Codepoint)
+        {
+            Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
+
+            (Self->mKeyboard)->OnKeyType(Codepoint);
+        });
+
+        glfwSetCursorPosCallback(mHandle, [](Ptr<GLFWwindow> Window, Real64 X, Real64 Y)
+        {
+            Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
+
+            (Self->mMouse)->OnMouseMove(X, Y);
+        });
+
+        glfwSetMouseButtonCallback(mHandle, [](Ptr<GLFWwindow> Window, int Button, int Action, int Mods)
+        {
+            Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
+
+            (Self->mMouse)->OnMouseAction(Button, Action, Mods);
+        });
+
+        glfwSetScrollCallback(mHandle, [](Ptr<GLFWwindow> Window, Real64 X, Real64 Y)
+        {
+            Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
+
+            (Self->mMouse)->OnMouseScroll(X, Y);
+        });
+
+        return true;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

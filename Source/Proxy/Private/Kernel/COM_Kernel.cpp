@@ -60,9 +60,18 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    HRESULT Kernel::GetPlatformService(Platform_Service_ ** Result)
+    {
+        (* Result) = CCreate<Platform_Service>(mWrapper.GetSubsystem<Platform::Service>());
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     HRESULT Kernel::GetAudioService(Audio_Service_ * *Result)
     {
-        (*Result) = CCreate<Audio_Service>(mWrapper.GetSubsystem<Audio::Service>());
+        (* Result) = CCreate<Audio_Service>(mWrapper.GetSubsystem<Audio::Service>());
         return S_OK;
     }
 
@@ -71,7 +80,7 @@ inline namespace COM
 
     HRESULT Kernel::GetContentService(Content_Service_ * *Result)
     {
-        (*Result) = CCreate<Content_Service>(mWrapper.GetSubsystem<Content::Service>());
+        (* Result) = CCreate<Content_Service>(mWrapper.GetSubsystem<Content::Service>());
         return S_OK;
     }
 
@@ -80,7 +89,7 @@ inline namespace COM
 
     HRESULT Kernel::GetGraphicService(Graphic_Service_ * *Result)
     {
-        (*Result) = CCreate<Graphic_Service>(mWrapper.GetSubsystem<Graphic::Service>());
+        (* Result) = CCreate<Graphic_Service>(mWrapper.GetSubsystem<Graphic::Service>());
         return S_OK;
     }
 
@@ -89,7 +98,7 @@ inline namespace COM
 
     HRESULT Kernel::GetGraphicRenderer(Graphic_Renderer_ ** Result)
     {
-        (*Result) = CCreate<Graphic_Renderer>(mRenderer);
+        (* Result) = CCreate<Graphic_Renderer>(mRenderer);
         return S_OK;
     }
 }

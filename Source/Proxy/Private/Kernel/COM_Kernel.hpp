@@ -20,6 +20,8 @@
 
 #include "Graphic/COM_Renderer.hpp"
 
+#include "Platform/COM_Service.hpp"
+
 #include <Engine/Kernel.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -47,6 +49,8 @@ inline namespace COM
 
         HRESULT Tick();
 
+        HRESULT GetPlatformService([out, retval] Platform_Service_ ** Result);
+
         HRESULT GetAudioService([out, retval] Audio_Service_ ** Result);
 
         HRESULT GetContentService([out, retval] Content_Service_ ** Result);
@@ -67,6 +71,9 @@ inline namespace COM
 
         // \see Engine_::Tick
         HRESULT Tick() override;
+
+        // \see Engine_::GetPlatformService
+        HRESULT GetPlatformService(Platform_Service_ ** Result) override;
 
         // \see Engine_::GetAudioService
         HRESULT GetAudioService(Audio_Service_ ** Result) override;
