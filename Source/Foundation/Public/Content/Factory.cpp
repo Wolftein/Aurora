@@ -64,7 +64,7 @@ namespace Content
 
     Bool Factory::Insert(ConstSPtr<Resource> Resource)
     {
-        return mAssets.try_emplace(STRING_FIX(Resource->GetKey().GetPath()), Resource).second;
+        return mAssets.try_emplace(SStr(Resource->GetKey().GetPath()), Resource).second;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -72,7 +72,7 @@ namespace Content
 
     Bool Factory::Unload(Ref<const Uri> Key)
     {
-        if (const auto Iterator = mAssets.find(STRING_FIX(Key.GetPath())); Iterator != mAssets.end())
+        if (const auto Iterator = mAssets.find(Key.GetPath()); Iterator != mAssets.end())
         {
             ConstSPtr<Resource> Asset = Iterator->second;
 

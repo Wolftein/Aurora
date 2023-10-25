@@ -74,7 +74,7 @@ namespace Content
 
     void Service::RemoveLoader(CStr Extension)
     {
-        mLoaders.erase(STRING_FIX(Extension));
+        mLoaders.erase(mLoaders.find(Extension));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -82,7 +82,7 @@ namespace Content
 
     void Service::AddLocator(CStr Schema, ConstSPtr<Locator> Locator)
     {
-        mLocators.try_emplace(STRING_FIX(Schema), Locator);
+        mLocators.try_emplace(SStr(Schema), Locator);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -90,7 +90,7 @@ namespace Content
 
     void Service::RemoveLocator(CStr Schema)
     {
-        mLocators.erase(STRING_FIX(Schema));
+        mLocators.erase(mLocators.find(Schema));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -122,7 +122,7 @@ namespace Content
 
     Chunk Service::Find(Ref<const Uri> Key)
     {
-        if (const auto It = mLocators.find(STRING_FIX(Key.GetSchema())); It != mLocators.end())
+        if (const auto It = mLocators.find(Key.GetSchema()); It != mLocators.end())
         {
             return It->second->Open(Key.GetPath());
         }
@@ -277,7 +277,7 @@ namespace Content
     {
         Ref<const Uri> Key = Asset->GetKey();
 
-        if (const auto Iterator = mLoaders.find(STRING_FIX(Key.GetExtension())); Iterator != mLoaders.end())
+        if (const auto Iterator = mLoaders.find(Key.GetExtension()); Iterator != mLoaders.end())
         {
             ConstSPtr<Loader> Loader = Iterator->second;
 

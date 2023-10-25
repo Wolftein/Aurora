@@ -46,7 +46,7 @@ namespace Content
         {
             SPtr<Type> Result = nullptr;
 
-            if (const auto Iterator = mAssets.find(STRING_FIX(Key.GetPath())); Iterator != mAssets.end())
+            if (const auto Iterator = mAssets.find(Key.GetPath()); Iterator != mAssets.end())
             {
                 Result = CastPtr<Type>(Iterator->second);
             }
@@ -54,7 +54,7 @@ namespace Content
             {
                 Result = NewPtr<Type>(Key);
 
-                mAssets.try_emplace(STRING_FIX(Key.GetPath()), Result);
+                mAssets.try_emplace(SStr(Key.GetPath()), Result);
             }
             return Result;
         }
@@ -73,7 +73,7 @@ namespace Content
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Table<SStr, SPtr<Resource>> mAssets;
+        StringTable<SPtr<Resource>> mAssets;
         UInt64                      mAssetsBudget;
         UInt64                      mAssetsUsage;
     };

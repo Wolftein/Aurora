@@ -54,7 +54,6 @@ namespace Input
             switch (Event.Type)
             {
             case Event::Type::KeyType:
-                // TODO
                 break;
             case Event::Type::KeyDown:
                 mThisKeys.set(CastEnum(Event.KeyAction.Key));

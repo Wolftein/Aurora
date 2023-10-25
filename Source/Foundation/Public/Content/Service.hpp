@@ -44,7 +44,7 @@ namespace Content
         {
             for (const CStr Extension : Extensions)
             {
-                RemoveLoader(STRING_FIX(Extension));
+                RemoveLoader(Extension);
             }
         }
 
@@ -179,7 +179,7 @@ namespace Content
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Table<UInt, SPtr<Factory>> mFactories;
-        Table<SStr, SPtr<Loader>>  mLoaders;
-        Table<SStr, SPtr<Locator>> mLocators;
+        StringTable<SPtr<Loader>>  mLoaders;
+        StringTable<SPtr<Locator>> mLocators;
     };
 }

@@ -103,9 +103,6 @@ inline namespace Core
     using Char32 = SStr32::value_type;
 
     // -=(Undocumented)=-
-#define STRING_FIX(Value) SStr(Value)  // TODO: Remove this until heterogeous lookup is fixed
-
-    // -=(Undocumented)=-
     template<typename Type>
     using Ptr    = typename std::add_pointer<Type>::type;
 
@@ -164,4 +161,29 @@ inline namespace Core
     // -=(Undocumented)=-
     template<typename Class>
     using EnableSmartPointer = std::enable_shared_from_this<Class>;
+
+    // -=(Undocumented)=-
+    struct StringHash
+    {
+        using is_transparent = void;
+
+        [[nodiscard]] size_t operator()(Ptr<const Char> Value) const
+        {
+            return std::hash<CStr>{ }(Value);
+        }
+
+        [[nodiscard]] size_t operator()(CStr Value) const
+        {
+            return std::hash<CStr>{ }(Value);
+        }
+
+        [[nodiscard]] size_t operator()(Ref<const SStr> Value) const
+        {
+            return std::hash<SStr>{ }(Value);
+        }
+    };
+
+    // -=(Undocumented)=-
+    template<typename Value>
+    using StringTable = Table<SStr, Value, StringHash>;
 }
