@@ -184,8 +184,8 @@ namespace Input
 
             struct
             {
-                UInt X;
-                UInt Y;
+                SInt X;
+                SInt Y;
             } MouseAxis;
 
             struct

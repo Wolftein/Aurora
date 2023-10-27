@@ -42,7 +42,7 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        Encoder(ConstSPtr<Service> Graphics);
+        Encoder(ConstSPtr<Graphic::Service> Graphics, UInt VertexCapacity, UInt IndexCapacity, UInt UniformCapacity);
 
         // -=(Undocumented)=-
         ~Encoder();

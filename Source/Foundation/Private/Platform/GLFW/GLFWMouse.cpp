@@ -21,7 +21,7 @@ namespace Platform
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void GLFWMouse::OnMouseMove(UInt X, UInt Y)
+    void GLFWMouse::OnMouseMove(SInt X, SInt Y)
     {
         const Input::Event Event {
             .Time = glfwGetTime(), .Type = Input::Event::Type::MouseMove, .MouseAxis = { X, Y }
@@ -45,7 +45,7 @@ namespace Platform
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void GLFWMouse::OnMouseScroll(UInt X, UInt Y)
+    void GLFWMouse::OnMouseScroll(SInt X, SInt Y)
     {
         const Input::Event Event {
             .Time = glfwGetTime(), .Type = Input::Event::Type::MouseScroll, .MouseAxis = { X, Y }

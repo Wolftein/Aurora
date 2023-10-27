@@ -231,6 +231,19 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Vector2<Base> operator*(Ref<const Vector2<Base>> Vector) const
+        {
+            const Base X = Vector.GetX();
+            const Base Y = Vector.GetY();
+            const Base W = 1.0f / (X * GetComponent(3) + Y * GetComponent(7) + GetComponent(15));
+
+            const Base VectorX = (GetComponent(0) * X + GetComponent(4) * Y + GetComponent(12)) * W;
+            const Base VectorY = (GetComponent(1) * X + GetComponent(5) * Y + GetComponent(13)) * W;
+
+            return Vector2<Base>(VectorX, VectorY);
+        }
+
+        // -=(Undocumented)=-
         Vector3<Base> operator*(Ref<const Vector3<Base>> Vector) const
         {
             const Base X = Vector.GetX();

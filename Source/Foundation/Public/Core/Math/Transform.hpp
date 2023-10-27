@@ -97,7 +97,7 @@ inline namespace Core
         // -=(Undocumented)=-
         Ref<Transform> Translate(Ref<const Vector2<Base>> Translation)
         {
-            return Translate(Vector3<Base>(Translation.GetX(), Translation.GetY()));
+            return Translate(Vector3<Base>(Translation.GetX(), Translation.GetY(), 0));
         }
 
         // -=(Undocumented)=-

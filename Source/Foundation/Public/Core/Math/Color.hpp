@@ -26,6 +26,12 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        constexpr Color()
+            : mComponents { 0.0f, 0.0f, 0.0f, 0.0f }
+        {
+        }
+
+        // -=(Undocumented)=-
         constexpr Color(Real32 Red, Real32 Green, Real32 Blue, Real32 Alpha)
             : mComponents { Red, Green, Blue, Alpha }
         {

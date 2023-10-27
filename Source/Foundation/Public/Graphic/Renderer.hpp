@@ -31,6 +31,15 @@ namespace Graphic
         inline constexpr static UInt k_MaxDrawables = 16384;
 
         // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxVertices  = 64 * 1024 * 1024; // 64mb
+
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxIndices   =  8 * 1024 * 1024; // 8mb
+
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxUniform   = 16 * 1024 * 1024; // 16mb
+
+        // -=(Undocumented)=-
         enum class Order
         {
             // -=(Undocumented)=-
@@ -92,7 +101,10 @@ namespace Graphic
         Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        void Begin(Ref<const Camera> Camera, Real32 Time);
+        void SetPipeline(ConstSPtr<Pipeline> Geometry, ConstSPtr<Pipeline> Font);
+
+        // -=(Undocumented)=-
+        void Begin(Ref<const Matrix4f> Projection);
 
         // -=(Undocumented)=-
         template<typename Type>
@@ -109,26 +121,40 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void Draw(
-            Rectf Destination,
-            Rectf Source,
-            Real32 Depth,
-            Real32 Angle,
-            Color Tint,
-            Order Order,
-            ConstSPtr<Graphic::Pipeline> Pipeline,
-            ConstSPtr<Graphic::Material> Material);
+        void DrawLine(Ref<const Array<Vector2f, 2>> Points, Real32 Depth, Ref<const Array<Color, 2>> Tint, Real32 Thickness = 1.0f);
 
         // -=(Undocumented)=-
-        void DrawFont(
-            ConstSPtr<Font> Font,
-            ConstSPtr<Graphic::Pipeline> Pipeline,
-            CStr16 Text,
-            Vector2f Position,
-            Real32 Depth,
-            Real32 Scale,
-            Color Tint,
-            Alignment Alignment);
+        void DrawLine(Ref<const Array<Vector2f, 2>> Points, Real32 Depth, Ref<const Color> Tint, Real32 Thickness = 1.0f)
+        {
+            DrawLine(Points, Depth, Array<Color, 2> { Tint, Tint }, Thickness);
+        }
+
+        // -=(Undocumented)=-b
+        void DrawRectangle(Ref<const Array<Vector2f, 4>> Points, Real32 Depth, Ref<const Array<Color, 4>> Tint);
+
+        // -=(Undocumented)=-
+        void DrawRectangle(Ref<const Rectf> Rectangle, Real32 Depth, Real32 Angle, Ref<const Array<Color, 4>> Tint);
+
+        // -=(Undocumented)=-
+        void DrawRectangle(Ref<const Rectf> Rectangle, Real32 Depth, Real32 Angle, Ref<const Color> Tint)
+        {
+            DrawRectangle(Rectangle, Depth, Angle, Array<Color, 4> { Tint, Tint, Tint, Tint });
+        }
+
+        // -=(Undocumented)=-
+        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Real32 Depth, Real32 Angle,
+            Order Order, Ref<const Array<Color, 4>> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+
+        // -=(Undocumented)=-
+        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Real32 Depth, Real32 Angle,
+            Order Order, Ref<const Color> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+        {
+            DrawTexture(Rectangle, Source, Depth, Angle, Order, Array<Color, 4> { Tint, Tint, Tint, Tint }, Pipeline, Material);
+        }
+
+        // -=(Undocumented)=-
+        // TODO: Don't sort multiple rectangles and allow rotated text
+        void DrawFont(ConstSPtr<Font> Font, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Alignment Alignment);
 
         // -=(Undocumented)=-
         void End();
@@ -136,17 +162,17 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
-        struct Scene
+        struct PosColorLayout
         {
             // -=(Undocumented)=-
-            Matrix4f World;
+            Vector3f Position;
 
             // -=(Undocumented)=-
-            Real32   Time;
+            UInt32   Color;
         };
 
         // -=(Undocumented)=-
-        struct VertexShaderLayout
+        struct PosColorTextureLayout
         {
             // -=(Undocumented)=-
             Vector3f Position;
@@ -161,23 +187,45 @@ namespace Graphic
         // -=(Undocumented)=-
         struct Drawable
         {
+            // -=(Undocumented)=-
             UInt64                  ID;
-            Rectf                   Destination;
-            Rectf                   Source;
-            Real32                  Angle;
-            Real32                  Depth;
-            UInt32                  Color;
+
+            // -=(Undocumented)=-
+            Real                    Depth;
+
+            // -=(Undocumented)=-
+            Array<Vector2f, 4>      Position;
+
+            // -=(Undocumented)=-
+            Array<Color, 4>         Color;
+
+            // -=(Undocumented)=-
+            Array<Vector2f, 4>      Texture;
+
+            // -=(Undocumented)=-
             SPtr<Graphic::Pipeline> Pipeline;
+
+            // -=(Undocumented)=-
             SPtr<Graphic::Material> Material;
         };
 
     private:
 
         // -=(Undocumented)=-
-        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<VertexShaderLayout> Buffer);
+        void Flush();
 
         // -=(Undocumented)=-
-        void Flush();
+        void Push(
+            Ref<const Array<Vector2f, 4>> Position,
+            Ref<const Array<Color, 4>> Tint,
+            Ref<const Array<Vector2f, 4>> Texture,
+            Order Order, Real32 Depth, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+
+        // -=(Undocumented)=-
+        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<PosColorLayout> Buffer);
+
+        // -=(Undocumented)=-
+        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<PosColorTextureLayout> Buffer);
 
         // -=(Undocumented)=-
         UInt64 GenerateUniqueID(Order Order, UInt Pipeline, UInt Material, Real32 Depth) const;
@@ -192,13 +240,14 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Stack<Drawable,      k_MaxDrawables> mDrawables;
-        Stack<Ptr<Drawable>, k_MaxDrawables> mDrawablesPtr;
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
         Vector<Vector4f>                     mTechnique;
+        Array<SPtr<Pipeline>, 2>             mPipelines;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Stack<Drawable, k_MaxDrawables>      mDrawables;
+        Stack<Ptr<Drawable>, k_MaxDrawables> mDrawablesPtr;
     };
 
 }

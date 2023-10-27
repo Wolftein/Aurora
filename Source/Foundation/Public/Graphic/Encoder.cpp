@@ -21,13 +21,12 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Encoder::Encoder(ConstSPtr<Service> Graphics)
+    Encoder::Encoder(ConstSPtr<Graphic::Service> Graphics, UInt VertexCapacity, UInt IndexCapacity, UInt UniformCapacity)
         : mGraphics { Graphics }
     {
-        // TODO: Configurable?
-        CreateTransientBuffer(mInFlyBuffers[0], Usage::Vertices, 64 * 1024 * 1024); // 64mb
-        CreateTransientBuffer(mInFlyBuffers[1], Usage::Indices,   4 * 1024 * 1024); // 4mb
-        CreateTransientBuffer(mInFlyBuffers[2], Usage::Uniform,  16 * 1024 * 1024); // 16mb
+        CreateTransientBuffer(mInFlyBuffers[0], Usage::Vertex, VertexCapacity);
+        CreateTransientBuffer(mInFlyBuffers[1], Usage::Index, IndexCapacity);
+        CreateTransientBuffer(mInFlyBuffers[2], Usage::Uniform, UniformCapacity);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -45,10 +44,20 @@ namespace Graphic
 
     void Encoder::Draw(UInt VertexStrideBytes, UInt IndexStrideBytes)
     {
+        const Bool HasIndices = (IndexStrideBytes > 0);
+
         // Apply draw parameter(s)
-        mInFlyBatch.Primitive.Count  = (mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker) / IndexStrideBytes;
-        mInFlyBatch.Primitive.Base   = (mInFlyBuffers[1].Marker - mInFlyBuffers[1].Reader) / IndexStrideBytes;
-        mInFlyBatch.Primitive.Offset = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VertexStrideBytes;
+        if (HasIndices)
+        {
+            mInFlyBatch.Primitive.Count  = (mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker) / IndexStrideBytes;
+            mInFlyBatch.Primitive.Base   = (mInFlyBuffers[1].Marker - mInFlyBuffers[1].Reader) / IndexStrideBytes;
+            mInFlyBatch.Primitive.Offset = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VertexStrideBytes;
+        }
+        else
+        {
+            mInFlyBatch.Primitive.Count  = (mInFlyBuffers[0].Writer - mInFlyBuffers[0].Marker) / VertexStrideBytes;
+            mInFlyBatch.Primitive.Base   = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VertexStrideBytes;
+        }
 
         // Apply batch's vertices range
         SetVertices(
@@ -59,12 +68,15 @@ namespace Graphic
         mInFlyBuffers[0].Marker = mInFlyBuffers[0].Writer;
 
         // Apply batch's indices range
-        SetIndices(
-            mInFlyBuffers[1].ID,
-            mInFlyBuffers[1].Reader,
-            mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker,
-            IndexStrideBytes);
-        mInFlyBuffers[1].Marker = mInFlyBuffers[1].Writer;
+        if (HasIndices)
+        {
+            SetIndices(
+                mInFlyBuffers[1].ID,
+                mInFlyBuffers[1].Reader,
+                mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker,
+                IndexStrideBytes);
+            mInFlyBuffers[1].Marker = mInFlyBuffers[1].Writer;
+        }
 
         // Apply batch's uniforms range
         for (UInt Block = 0; Block < Graphic::k_MaxUniforms; ++Block)

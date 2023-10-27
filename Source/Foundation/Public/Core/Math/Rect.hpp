@@ -27,21 +27,30 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        Rect()
+            : mX1 { 0 },
+              mY1 { 0 },
+              mX2 { 0 },
+              mY2 { 0 }
+        {
+        }
+
+        // -=(Undocumented)=-
+        Rect(Base Left, Base Top, Base Right, Base Bottom)
+            : mX1 { Left },
+              mY1 { Top },
+              mX2 { Right },
+              mY2 { Bottom }
+        {
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         Rect(Vector2<Type> Minimum, Vector2<Type> Maximum)
             : mX1 { Minimum.GetX() },
               mY1 { Minimum.GetY() },
               mX2 { Maximum.GetX() },
               mY2 { Maximum.GetY() }
-        {
-        }
-
-        // -=(Undocumented)=-
-        Rect(Base Left = 0, Base Top = 0, Base Right = 0, Base Bottom = 0)
-            : mX1 { Left },
-              mY1 { Top },
-              mX2 { Right },
-              mY2 { Bottom }
         {
         }
 

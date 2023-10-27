@@ -58,21 +58,32 @@ inline namespace COM
     [object, uuid("FB866167-F639-4982-85AC-280255832156"), pointer_default(unique)]
     __interface Graphic_Renderer_
     {
-        HRESULT Begin([in] Graphic_Camera_ * Camera, [in] vbReal32 Time);
+        HRESULT Begin([in] Graphic_Camera_ * Camera);
 
-        HRESULT SetParameter([in] vbInt32 Offset, [in] vbReal32 X, [in] vbReal32 Y, [in] vbReal32 Z, [in] vbReal32 W);
+        HRESULT SetPipeline([in] Graphic_Pipeline_ * Geometry, [in] Graphic_Pipeline_ * Font);
 
-        HRESULT Draw([in] Math_Rectf * Destination,
-                     [in] Math_Rectf * Source,
-                     [in] vbReal32 Depth,
-                     [in] vbReal32 Angle,
-                     [in] vbInt32 Tint,
-                     [in] Renderer_Order Order,
-                     [in] Graphic_Pipeline_ * Pipeline,
-                     [in] Graphic_Material_ * Material);
+        HRESULT SetParameter([in] vbInt32 Offset, [in] vbReal32 X, [in, defaultvalue(0)] vbReal32 Y, [in, defaultvalue(0)] vbReal32 Z, [in, defaultvalue(0)] vbReal32 W);
+
+        HRESULT DrawLine([in] vbReal32 StartX, [in] vbReal32 StartY, [in] vbReal32 EndX, [in] vbReal32 EndY, [in] vbReal32 Depth, [in] vbInt32 Tint, [in, defaultvalue(1)] vbReal32 Thickness);
+
+        // TODO DrawLine Tint2 variant
+
+        HRESULT DrawRectangle([in] Math_Rectf * Rectangle, [in] vbReal32 Depth, [in] vbReal32 Angle, [in] vbInt32 Tint);
+
+        // TODO DrawRectangle Tint4 variant
+
+        HRESULT DrawTexture([in] Math_Rectf * Rectangle,
+                            [in] Math_Rectf * Source,
+                            [in] vbReal32 Depth,
+                            [in] vbReal32 Angle,
+                            [in] Renderer_Order Order,
+                            [in] vbInt32 Tint,
+                            [in] Graphic_Pipeline_ * Pipeline,
+                            [in] Graphic_Material_ * Material);
+
+        // TODO DrawTexture Tint4 variant
 
         HRESULT DrawFont([in] Graphic_Font_ * Font,
-                         [in] Graphic_Pipeline_ * Pipeline,
                          [in] vbStr16 Text,
                          [in] vbReal32 X,
                          [in] vbReal32 Y,
@@ -94,24 +105,32 @@ inline namespace COM
         HRESULT FinalRelease();
 
         // \see Graphic_Renderer_::Begin
-        HRESULT Begin(Graphic_Camera_ * Camera, vbReal32 Time) override;
+        HRESULT Begin(Graphic_Camera_ * Camera) override;
+
+        // \see Graphic_Renderer_::SetPipeline
+        HRESULT SetPipeline(Graphic_Pipeline_ * Geometry, Graphic_Pipeline_ * Font);
 
         // \see Graphic_Renderer_::SetParameter
-        HRESULT SetParameter(vbInt32 Offset, vbReal32 X, vbReal32 Y, vbReal32 Z, vbReal32 W);
+        HRESULT SetParameter(vbInt32 Offset, vbReal32 X, vbReal32 Y, vbReal32 Z, vbReal32 W) override;
 
-        // \see Graphic_Renderer_::Draw
-        HRESULT Draw(Math_Rectf * Destination,
-                     Math_Rectf * Source,
-                     vbReal32 Depth,
-                     vbReal32 Angle,
-                     vbInt32 Tint,
-                     Renderer_Order Order,
-                     Graphic_Pipeline_ * Pipeline,
-                     Graphic_Material_ * Material) override;
+        // \see Graphic_Renderer_::DrawLine
+        HRESULT DrawLine(vbReal32 StartX, vbReal32 StartY, vbReal32 EndX, vbReal32 EndY, vbReal32 Depth, vbInt32 Tint, vbReal32 Thickness) override;
+
+        // \see Graphic_Renderer_::DrawRectangle
+        HRESULT DrawRectangle(Math_Rectf * Rectangle, vbReal32 Depth, vbReal32 Angle, vbInt32 Tint) override;
+
+        // \see Graphic_Renderer_::DrawTexture
+        HRESULT DrawTexture(Math_Rectf * Rectangle,
+                            Math_Rectf * Source,
+                            vbReal32 Depth,
+                            vbReal32 Angle,
+                            Renderer_Order Order,
+                            vbInt32 Tint,
+                            Graphic_Pipeline_ * Pipeline,
+                            Graphic_Material_ * Material) override;
 
         // \see Graphic_Renderer_::DrawFont
         HRESULT DrawFont(Graphic_Font_ * Font,
-                         Graphic_Pipeline_ * Pipeline,
                          vbStr16 Text,
                          vbReal32 X,
                          vbReal32 Y,
@@ -120,7 +139,7 @@ inline namespace COM
                          vbInt32 Tint,
                          Renderer_Alignment Alignment) override;
 
-        // \see Scene_Renderer_::End
+        // \see Graphic_Renderer_::End
         HRESULT End() override;
     };
 }

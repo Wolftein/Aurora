@@ -28,7 +28,15 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        Vector3(Base X = 0, Base Y = 0, Base Z = 0)
+        Vector3()
+            : mX { 0 },
+              mY { 0 },
+              mZ { 0 }
+        {
+        }
+
+        // -=(Undocumented)=-
+        Vector3(Base X, Base Y, Base Z)
             : mX { X },
               mY { Y },
               mZ { Z }

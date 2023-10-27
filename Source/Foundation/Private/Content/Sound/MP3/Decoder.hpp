@@ -24,6 +24,9 @@ namespace Audio
     // -=(Undocumented)=-
     class MP3Decoder final : public Decoder
     {
+    private:
+
+        // -=(Undocumented)=-
         constexpr static UInt BUFFER_SIZE = 192000 * 4;
 
     public:

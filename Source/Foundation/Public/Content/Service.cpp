@@ -65,7 +65,7 @@ namespace Content
     {
         for (const CStr Extension : Loader->GetExtensions())
         {
-            mLoaders.try_emplace(Extension.data(), Loader);
+            mLoaders.try_emplace(SStr(Extension), Loader);
         }
     }
 

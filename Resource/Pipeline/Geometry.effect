@@ -1,0 +1,17 @@
+[Properties.Layout]
+
+    Attributes      = [
+        [0, 0,  "Float32x3"  ],
+        [1, 12, "UIntNorm8x4"]
+    ]
+    Topology        = "Triangle"
+
+[Program.Vertex]
+
+	Entry    = "vertex"
+	Filename = "Resources://Pipeline/Geometry.shader"
+
+[Program.Fragment]
+
+	Entry    = "fragment"
+	Filename = "Resources://Pipeline/Geometry.shader"

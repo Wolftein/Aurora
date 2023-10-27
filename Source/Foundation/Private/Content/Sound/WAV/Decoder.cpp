@@ -30,18 +30,18 @@ namespace Audio
           mChannel    { 0 },
           mFrequency  { 0 }
     {
-        drwav Wav;
+        drwav Description;
 
-        if (drwav_init_memory(& Wav, Chunk.GetData(), Chunk.GetSize(), nullptr))
+        if (drwav_init_memory(& Description, Chunk.GetData(), Chunk.GetSize(), nullptr))
         {
-            mFrames     = Wav.totalPCMFrameCount;
-            mDepth      = Wav.bitsPerSample;
-            mChannel    = Wav.channels;
-            mFrequency  = Wav.sampleRate;
-            mData       = NewUniquePtr<UInt08[]>(GetSize()); // TODO: Remove this heap allocation
+            mFrames     = Description.totalPCMFrameCount;
+            mDepth      = Description.bitsPerSample;
+            mChannel    = Description.channels;
+            mFrequency  = Description.sampleRate;
+            mData       = NewUniquePtr<UInt08[]>(GetSize());
 
-            drwav_read_pcm_frames(& Wav, mFrames, mData.get());
-            drwav_uninit(& Wav);
+            drwav_read_pcm_frames(& Description, mFrames, mData.get());
+            drwav_uninit(& Description);
         }
     }
 

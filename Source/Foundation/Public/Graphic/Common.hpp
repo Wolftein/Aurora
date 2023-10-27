@@ -272,8 +272,8 @@ namespace Graphic
     // -=(Undocumented)=-
     enum class Usage
     {
-        Vertices,
-        Indices,
+        Vertex,
+        Index,
         Uniform,
     };
 

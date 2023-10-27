@@ -27,13 +27,13 @@ namespace Platform
     public:
 
         // -=(Undocumented)=-
-        void OnMouseMove(UInt X, UInt Y);
+        void OnMouseMove(SInt X, SInt Y);
 
         // -=(Undocumented)=-
         void OnMouseAction(SInt Button, SInt Action, SInt Mods);
 
         // -=(Undocumented)=-
-        void OnMouseScroll(UInt X, UInt Y);
+        void OnMouseScroll(SInt X, SInt Y);
 
     private:
 

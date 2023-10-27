@@ -329,8 +329,8 @@ namespace Graphic
     static auto As(Usage Value)
     {
         constexpr static D3D11_BIND_FLAG k_Mapping[] = {
-            D3D11_BIND_VERTEX_BUFFER,          // Usage::Vertices
-            D3D11_BIND_INDEX_BUFFER,           // Usage::Indices
+            D3D11_BIND_VERTEX_BUFFER,          // Usage::Vertex
+            D3D11_BIND_INDEX_BUFFER,           // Usage::Index
             D3D11_BIND_CONSTANT_BUFFER,        // Usage::Uniform
         };
         return k_Mapping[CastEnum(Value)];
