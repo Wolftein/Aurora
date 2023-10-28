@@ -832,12 +832,12 @@ namespace Graphic
 
     void D3D11Driver::Submit(CPtr<Submission> Submissions)
     {
-        const Submission EmptySubmission { .Scissor = { 0, 0, 0, 0 } };
+        static Submission LastSubmission { .Scissor = { 0, 0, 0, 0 } };
 
         for (UInt Batch = 0; Batch < Submissions.size(); ++Batch)
         {
             Ref<const Submission> NewestSubmission = Submissions[Batch];
-            Ref<const Submission> OldestSubmission = (Batch > 0 ? Submissions[Batch - 1] : EmptySubmission);
+            Ref<const Submission> OldestSubmission = (Batch > 0 ? Submissions[Batch - 1] : LastSubmission);
 
             // Apply vertices
             if (OldestSubmission.Vertices.Buffer != NewestSubmission.Vertices.Buffer ||

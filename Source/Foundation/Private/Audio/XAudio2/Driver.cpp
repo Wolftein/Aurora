@@ -135,7 +135,7 @@ namespace Audio
 
         for (UInt32 Index = 0; Index < Submixes; ++Index)
         {
-            mDevice->CreateSubmixVoice(& mSubmixes.emplace_back(), Details.InputChannels, Details.InputSampleRate);
+            mDevice->CreateSubmixVoice(& mSubmixes.push_back(), Details.InputChannels, Details.InputSampleRate);
         }
 
         // Initialise X3D audio for positional 3D voices
@@ -246,7 +246,7 @@ namespace Audio
 
     Object XAudio2Driver::Play(UInt Submix, ConstSPtr<Sound> Sound, ConstSPtr<Emitter> Emitter, Bool Repeat)
     {
-        if (! mMixes.empty())
+        if (mMixes.full())
         {
             return 0;
         }
@@ -266,7 +266,7 @@ namespace Audio
         Voice->SetSourceSampleRate(Sound->GetFrequency());
 
         // Add play instance into the mixer and apply 3D
-        Ref<XAudioInstance> Instance = mMixes.emplace_back();
+        Ref<XAudioInstance> Instance = mMixes.push_back();
         Instance.Repeat = Repeat;
         Instance.Frequency = 1.0f;
         Instance.Sound = Sound;

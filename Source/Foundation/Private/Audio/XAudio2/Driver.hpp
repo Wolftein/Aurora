@@ -176,17 +176,7 @@ namespace Audio
             {
                 return reinterpret_cast<UInt>(InstanceRef.Source) == ID;
             };
-
-            Ptr<XAudioInstance> Instance = nullptr;
-
-            if (ID > 0)
-            {
-                if (const auto Iterator = std::find_if(mMixes.begin(), mMixes.end(), FindByID); Iterator != std::end(mMixes))
-                {
-                    Instance = &* Iterator;
-                }
-            }
-            return Instance;
+            return ID > 0 ? std::find_if(mMixes.begin(), mMixes.end(), FindByID) : nullptr;
         }
 
         // -=(Undocumented)=-

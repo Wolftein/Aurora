@@ -352,22 +352,25 @@ namespace Graphic
             {
                 const UInt Count = Element - Start + 1;
 
+                // Ensure we have enough space for the batch otherwise flush previous batches
+                if (This->Material)
+                {
+                    mEncoder.Ensure<PosColorTextureLayout>(Count * 4, Count * 6, This->Material->GetParameters().size());
+                }
+                else
+                {
+                    mEncoder.Ensure<PosColorLayout>(Count * 4, Count * 6, 0);
+                }
+
                 for (UInt Drawable = Start, Index = 0; Drawable <= Element; ++Drawable, Index += 4)
                 {
                     if (This->Material)
                     {
-                        // Ensure we have enough space for the batch otherwise flush previous batches
-                        mEncoder.Ensure<PosColorTextureLayout, SInt16>(
-                            Count * 4, Count * 6, This->Material->GetParameters().size());
-
                         Ptr<PosColorTextureLayout> Vertices = mEncoder.AllocateTransientVertices<PosColorTextureLayout>(4);
                         WriteGeometry(mDrawablesPtr[Drawable], Vertices);
                     }
                     else
                     {
-                        // Ensure we have enough space for the batch otherwise flush previous batches
-                        mEncoder.Ensure<PosColorLayout, SInt16>(Count * 4, Count * 6, 0);
-
                         Ptr<PosColorLayout> Vertices = mEncoder.AllocateTransientVertices<PosColorLayout>(4);
                         WriteGeometry(mDrawablesPtr[Drawable], Vertices);
                     }
@@ -386,11 +389,11 @@ namespace Graphic
                 if (This->Material)
                 {
                     mEncoder.SetMaterial(This->Material);
-                    mEncoder.Draw(sizeof(PosColorTextureLayout), sizeof(SInt16));
+                    mEncoder.Draw<PosColorTextureLayout>();
                 }
                 else
                 {
-                    mEncoder.Draw(sizeof(PosColorLayout), sizeof(SInt16));
+                    mEncoder.Draw<PosColorLayout>();
                 }
 
                 // Continue with the next batch

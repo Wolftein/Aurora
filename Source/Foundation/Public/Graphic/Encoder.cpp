@@ -42,63 +42,6 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Encoder::Draw(UInt VertexStrideBytes, UInt IndexStrideBytes)
-    {
-        const Bool HasIndices = (IndexStrideBytes > 0);
-
-        // Apply draw parameter(s)
-        if (HasIndices)
-        {
-            mInFlyBatch.Primitive.Count  = (mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker) / IndexStrideBytes;
-            mInFlyBatch.Primitive.Base   = (mInFlyBuffers[1].Marker - mInFlyBuffers[1].Reader) / IndexStrideBytes;
-            mInFlyBatch.Primitive.Offset = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VertexStrideBytes;
-        }
-        else
-        {
-            mInFlyBatch.Primitive.Count  = (mInFlyBuffers[0].Writer - mInFlyBuffers[0].Marker) / VertexStrideBytes;
-            mInFlyBatch.Primitive.Base   = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VertexStrideBytes;
-        }
-
-        // Apply batch's vertices range
-        SetVertices(
-            mInFlyBuffers[0].ID,
-            mInFlyBuffers[0].Reader,
-            mInFlyBuffers[0].Writer - mInFlyBuffers[0].Marker,
-            VertexStrideBytes);
-        mInFlyBuffers[0].Marker = mInFlyBuffers[0].Writer;
-
-        // Apply batch's indices range
-        if (HasIndices)
-        {
-            SetIndices(
-                mInFlyBuffers[1].ID,
-                mInFlyBuffers[1].Reader,
-                mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker,
-                IndexStrideBytes);
-            mInFlyBuffers[1].Marker = mInFlyBuffers[1].Writer;
-        }
-
-        // Apply batch's uniforms range
-        for (UInt Block = 0; Block < Graphic::k_MaxUniforms; ++Block)
-        {
-            if (mInFlyRanges[Block].Length > 0)
-            {
-                SetUniforms(
-                    Block,
-                    mInFlyBuffers[2].ID,
-                    mInFlyRanges[Block].Offset,
-                    mInFlyRanges[Block].Length);
-            }
-        }
-
-        // Add the batch into submission
-        mInFlySubmission.emplace_back(mInFlyBatch);
-        mInFlyBatch = Submission();
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
     void Encoder::Flush()
     {
         // Flush all pending transient data to the GPU buffer
