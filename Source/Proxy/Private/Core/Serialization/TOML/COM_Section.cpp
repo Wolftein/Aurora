@@ -86,7 +86,7 @@ inline namespace COM
 
     HRESULT TOMLSection::SetBool(vbStr8 Key, vbBool Value)
     {
-        mWrapper.SetBool(Key, Value == VBTrue);
+        mWrapper.SetBool(Key, VBIsTrue(Value));
         return S_OK;
     }
 
@@ -95,7 +95,7 @@ inline namespace COM
 
     HRESULT TOMLSection::GetBool(vbStr8 Key, vbBool Default, vbBool * Result)
     {
-        (* Result) = VBIsTrue(mWrapper.GetBool(Key, Default == VBTrue));
+        (* Result) = mWrapper.GetBool(Key, VBIsTrue(Default)) ? VBTrue : VBFalse;
         return S_OK;
     }
 
