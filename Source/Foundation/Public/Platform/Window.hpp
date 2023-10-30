@@ -62,6 +62,9 @@ namespace Platform
         virtual Vector2i GetSize() const = 0;
 
         // -=(Undocumented)=-
+        virtual Vector2f GetScale() const = 0;
+
+        // -=(Undocumented)=-
         virtual void SetPosition(Vector2i Position) = 0;
 
         // -=(Undocumented)=-

@@ -199,6 +199,8 @@ namespace Graphic
             DXGI_FORMAT_R8G8B8A8_UINT,       // TextureFormat::RGBA8UInt
             DXGI_FORMAT_R8G8B8A8_UNORM,      // TextureFormat::RGBA8UIntNorm
             DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, // TextureFormat::RGBA8UIntNorm_sRGB
+            DXGI_FORMAT_B8G8R8A8_UNORM,      // TextureFormat::BGRA8UIntNorm
+            DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, // TextureFormat::BGRA8UIntNorm_sRGB
             DXGI_FORMAT_R16G16B16A16_SINT,   // TextureFormat::RGBA16SInt
             DXGI_FORMAT_R16G16B16A16_SNORM,  // TextureFormat::RGBA16SIntNorm
             DXGI_FORMAT_R16G16B16A16_UINT,   // TextureFormat::RGBA16UInt
@@ -285,6 +287,8 @@ namespace Graphic
             32,     // TextureFormat::RGBA8UInt
             32,     // TextureFormat::RGBA8UIntNorm
             32,     // TextureFormat::RGBA8UIntNorm_sRGB
+            32,     // TextureFormat::BGRA8UIntNorm
+            32,     // TextureFormat::BGRA8UIntNorm_sRGB
             64,     // TextureFormat::RGBA16SInt
             64,     // TextureFormat::RGBA16SIntNorm
             64,     // TextureFormat::RGBA16UInt
@@ -521,7 +525,7 @@ namespace Graphic
         Description.BufferCount       = 2;
         Description.BufferUsage       = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         Description.Flags             = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-        Description.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        Description.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
         Description.BufferDesc.Width  = Width;
         Description.BufferDesc.Height = Height;
         Description.SampleDesc        = { 1, 0 };
@@ -723,7 +727,7 @@ namespace Graphic
             0,
             static_cast<UINT>(Offset.GetRight()),
             static_cast<UINT>(Offset.GetBottom()),
-            0
+            1
         };
         mDeviceImmediate->UpdateSubresource(mTextures[ID].Object.Get(), Level, & Rect, Data.data(), Pitch, 0);
     }
@@ -1010,7 +1014,7 @@ namespace Graphic
             if (SUCCEEDED(DXGIAdapter->EnumOutputs(0, DXGIOutput.GetAddressOf())))
             {
                 UINT        Length = 0;
-                DXGI_FORMAT Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+                DXGI_FORMAT Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 
                 if (SUCCEEDED(DXGIOutput->GetDisplayModeList(Format, 0, & Length, NULL)))
                 {

@@ -70,21 +70,28 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        template<typename T = void>
-        auto GetData()
+        template<typename Type = void>
+        Ptr<Type> GetData()
         {
-            return reinterpret_cast<Ptr<T>>(mData.get());
+            return reinterpret_cast<Ptr<Type>>(mData.get());
         }
 
         // -=(Undocumented)=-
-        template<typename T>
-        auto GetSpan(UInt Offset = 0) const
+        template<typename Type = void>
+        Ptr<const Type> GetData() const
         {
-            return CPtr<T> { reinterpret_cast<Ptr<T>>(mData.get()) + Offset, mSize / sizeof(T) };
+            return reinterpret_cast<Ptr<const Type>>(mData.get());
         }
 
         // -=(Undocumented)=-
-        auto GetText() const
+        template<typename Type>
+        CPtr<Type> GetSpan(UInt Offset = 0) const
+        {
+            return CPtr<Type> { reinterpret_cast<Ptr<Type>>(mData.get()) + Offset, mSize / sizeof(Type) };
+        }
+
+        // -=(Undocumented)=-
+        CStr GetText() const
         {
             return CStr { reinterpret_cast<CStr::pointer>(mData.get()), mSize };
         }

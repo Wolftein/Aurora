@@ -244,6 +244,8 @@ namespace Graphic
         RGBA8UInt,
         RGBA8UIntNorm,
         RGBA8UIntNorm_sRGB,
+        BGRA8UIntNorm,
+        BGRA8UIntNorm_sRGB,
         RGBA16SInt,
         RGBA16SIntNorm,
         RGBA16UInt,

@@ -69,6 +69,9 @@ namespace Platform
         // \see Window::GetSize
         Vector2i GetSize() const override;
 
+        // \see Window::GetScale
+        Vector2f GetScale() const override;
+
         // \see Window::SetPosition
         void SetPosition(Vector2i Position) override;
 
