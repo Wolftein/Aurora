@@ -46,7 +46,7 @@ namespace Content
         {
             SPtr<Type> Result = nullptr;
 
-            if (const auto Iterator = mAssets.find(Key.GetPath()); Iterator != mAssets.end())
+            if (const auto Iterator = mAssets.find(SStr(Key.GetPath())); Iterator != mAssets.end())
             {
                 Result = CastPtr<Type>(Iterator->second);
             }

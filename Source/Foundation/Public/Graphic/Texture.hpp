@@ -30,6 +30,9 @@ namespace Graphic
         Texture(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
+        void Load(TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer);
+
+        // -=(Undocumented)=-
         void Load(TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, Ref<Chunk> Data);
 
         // -=(Undocumented)=-
