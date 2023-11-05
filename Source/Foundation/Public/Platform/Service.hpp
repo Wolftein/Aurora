@@ -35,7 +35,7 @@ namespace Platform
         void OnTick() override;
 
         // -=(Undocumented)=-
-        SPtr<Window> Initialise(CStr Title, UInt Width, UInt Height, Decoration Mode);
+        SPtr<Window> Initialise(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless);
 
         // -=(Undocumented)=-
         Real64 GetTime() const;

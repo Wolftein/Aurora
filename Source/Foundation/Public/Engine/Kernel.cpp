@@ -43,7 +43,9 @@ namespace Engine
         AddSubsystem<Input::Service>();
 
         // Create the game's window
-        Any DisplayHandle = Properties.GetWindowHandle();
+        Any      DisplayHandle = Properties.GetWindowHandle();
+        Vector2i DisplaySize(Properties.GetWindowWidth(), Properties.GetWindowHeight());
+
         if (!DisplayHandle.has_value())
         {
             LOG_INFO("Kernel: Creating display ({}, {})", Properties.GetWindowWidth(), Properties.GetWindowHeight());
@@ -51,16 +53,17 @@ namespace Engine
                 Properties.GetWindowTitle(),
                 Properties.GetWindowWidth(),
                 Properties.GetWindowHeight(),
-                Properties.GetWindowMode());
+                Properties.IsWindowFullscreen(),
+                Properties.IsWindowBorderless());
 
+            DisplaySize   = mDisplay->GetSize();
             DisplayHandle = mDisplay->GetHandle();
         }
 
         // Create the graphic service
         LOG_INFO("Kernel: Creating graphics service");
         SPtr<Graphic::Service> GraphicService = AddSubsystem<Graphic::Service>();
-        GraphicService->Initialise(
-            Graphic::Backend::Direct3D11, DisplayHandle, Properties.GetWindowWidth(), Properties.GetWindowHeight());
+        GraphicService->Initialise(Graphic::Backend::Direct3D11, DisplayHandle, DisplaySize.GetX(), DisplaySize.GetY());
 
         // Create the audio service
         LOG_INFO("Kernel: Creating audio service");

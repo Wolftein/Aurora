@@ -34,7 +34,7 @@ namespace Platform
         ~GLFWWindow();
 
         // -=(Undocumented)=-
-        Bool Create(CStr Title, UInt Width, UInt Height, Decoration Mode);
+        Bool Create(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless);
 
         // \see Window::Poll
         Bool Poll() override;
@@ -55,7 +55,7 @@ namespace Platform
         Bool IsFocused() const override;
 
         // \see Window::SetMode
-        void SetMode(Decoration Mode) override;
+        void SetMode(Bool Fullscreen, Bool Borderless) override;
 
         // \see Window::IsWindowed
         Bool IsWindowed() const override;

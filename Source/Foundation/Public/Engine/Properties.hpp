@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Platform/Common.hpp"
+#include "Core/Serialization/TOML/Parser.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -80,15 +80,22 @@ namespace Engine
         }
 
         // -=(Undocumented)=-
-        void SetWindowMode(Platform::Decoration Mode)
+        void SetWindowMode(Bool Fullscreen, Bool Borderless)
         {
-            mWindowMode = Mode;
+            mWindowFullscreen = Fullscreen;
+            mWindowBorderless = Borderless;
         }
 
         // -=(Undocumented)=-
-        Platform::Decoration GetWindowMode() const
+        Bool IsWindowFullscreen() const
         {
-            return mWindowMode;
+            return mWindowFullscreen;
+        }
+
+        // -=(Undocumented)=-
+        Bool IsWindowBorderless() const
+        {
+            return mWindowBorderless;
         }
 
         // -=(Undocumented)=-
@@ -108,15 +115,16 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Any                  mWindowHandle;
-        SStr                 mWindowTitle;
-        UInt                 mWindowWidth;
-        UInt                 mWindowHeight;
-        Platform::Decoration mWindowMode;
+        Any  mWindowHandle;
+        SStr mWindowTitle;
+        UInt mWindowWidth;
+        UInt mWindowHeight;
+        Bool mWindowFullscreen;
+        Bool mWindowBorderless;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SStr                 mLogFilename;
+        SStr mLogFilename;
     };
 }
