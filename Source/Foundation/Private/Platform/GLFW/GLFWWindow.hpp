@@ -34,7 +34,7 @@ namespace Platform
         ~GLFWWindow();
 
         // -=(Undocumented)=-
-        Bool Create(CStr Title, UInt Width, UInt Height);
+        Bool Create(CStr Title, UInt Width, UInt Height, Decoration Mode);
 
         // \see Window::Poll
         Bool Poll() override;
@@ -55,7 +55,7 @@ namespace Platform
         Bool IsFocused() const override;
 
         // \see Window::SetMode
-        void SetMode(Bool Fullscreen) override;
+        void SetMode(Decoration Mode) override;
 
         // \see Window::IsWindowed
         Bool IsWindowed() const override;
@@ -90,6 +90,7 @@ namespace Platform
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Ptr<GLFWwindow>    mHandle;
+        Vector2i           mDimension;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

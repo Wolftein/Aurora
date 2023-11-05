@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Window.hpp"
+#include "Core/Core.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,23 +21,18 @@
 namespace Platform
 {
     // -=(Undocumented)=-
-    class Service final : public Subsystem
+    enum class Decoration
     {
-    public:
+        // -=(Undocumented)=-
+        Fullscreen,
 
         // -=(Undocumented)=-
-        Service(Ref<Context> System);
+        FullscreenExclusive,
 
         // -=(Undocumented)=-
-        ~Service();
+        Windowed,
 
         // -=(Undocumented)=-
-        void OnTick() override;
-
-        // -=(Undocumented)=-
-        SPtr<Window> Initialise(CStr Title, UInt Width, UInt Height, Decoration Mode);
-
-        // -=(Undocumented)=-
-        Real64 GetTime() const;
+        WindowedBorderless
     };
 }

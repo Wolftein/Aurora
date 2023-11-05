@@ -47,27 +47,52 @@ namespace Platform
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool GLFWWindow::Create(CStr Title, UInt Width, UInt Height)
+    Bool GLFWWindow::Create(CStr Title, UInt Width, UInt Height, Decoration Mode)
     {
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_CLIENT_API,   GLFW_NO_API);
+        glfwWindowHint(GLFW_VISIBLE,      GLFW_FALSE);
 
-        glfwWindowHint(GLFW_VISIBLE,   GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+        Ptr<GLFWmonitor> Monitor         = glfwGetPrimaryMonitor();
+        Ptr<const GLFWvidmode> VideoMode = glfwGetVideoMode(Monitor);
 
-        mHandle = glfwCreateWindow(Width, Height, Title.data(), nullptr, nullptr);
+        switch (Mode)
+        {
+        case Decoration::Fullscreen:
+            glfwWindowHint(GLFW_RED_BITS,     VideoMode->redBits);
+            glfwWindowHint(GLFW_GREEN_BITS,   VideoMode->greenBits);
+            glfwWindowHint(GLFW_BLUE_BITS,    VideoMode->blueBits);
+            glfwWindowHint(GLFW_REFRESH_RATE, VideoMode->refreshRate);
+
+            Width  = VideoMode->width;
+            Height = VideoMode->height;
+            break;
+        case Decoration::FullscreenExclusive:
+            break;
+        case Decoration::Windowed:
+        case Decoration::WindowedBorderless:
+            glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+            glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+            break;
+        }
+
+        const Bool HasDecoration = (Mode == Decoration::Windowed);
+        glfwWindowHint(GLFW_DECORATED, HasDecoration);
+        glfwWindowHint(GLFW_RESIZABLE, HasDecoration);
+
+        const Bool IsFullscreen = (Mode == Decoration::Fullscreen || Mode == Decoration::FullscreenExclusive);
+        mHandle = glfwCreateWindow(Width, Height, Title.data(), IsFullscreen ? Monitor : nullptr, nullptr);
+
+        if (Mode == Decoration::Windowed || Mode == Decoration::WindowedBorderless)
+        {
+            glfwSetWindowPos(mHandle, (VideoMode->width - Width ) / 2, (VideoMode->height - Height) / 2);
+        }
 
         if (glfwRawMouseMotionSupported())
         {
             glfwSetInputMode(mHandle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
         }
 
-        glfwSetWindowPos(mHandle,
-                         (glfwGetVideoMode(glfwGetPrimaryMonitor())->width  - Width ) / 2,
-                         (glfwGetVideoMode(glfwGetPrimaryMonitor())->height - Height) / 2);
-
         glfwShowWindow(mHandle);
-
         glfwSetWindowUserPointer(mHandle, this);
 
         glfwSetKeyCallback(mHandle,  [](Ptr<GLFWwindow> Window, int Key, int Scancode, int Action, int Mods)
@@ -161,9 +186,43 @@ namespace Platform
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void GLFWWindow::SetMode(Bool Fullscreen)
+    void GLFWWindow::SetMode(Decoration Mode)
     {
-        // TODO
+        switch (Mode)
+        {
+        case Decoration::Fullscreen:
+        case Decoration::FullscreenExclusive:
+            mDimension = GetSize();
+
+            glfwSetWindowAttrib(mHandle, GLFW_RESIZABLE, GLFW_FALSE);
+            glfwSetWindowAttrib(mHandle, GLFW_DECORATED, GLFW_FALSE);
+
+            if (Mode == Decoration::FullscreenExclusive)
+            {
+                glfwSetWindowMonitor(mHandle, glfwGetPrimaryMonitor(), 0, 0, mDimension.GetX(), mDimension.GetY(), 0);
+            }
+            else
+            {
+                Ptr<const GLFWvidmode> VideoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+                glfwSetWindowMonitor(mHandle, glfwGetPrimaryMonitor(), 0, 0,
+                    VideoMode->width,
+                    VideoMode->height,
+                    VideoMode->refreshRate);
+            }
+            break;
+        case Decoration::Windowed:
+        case Decoration::WindowedBorderless:
+            Ptr<const GLFWvidmode> VideoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            const UInt X = (VideoMode->width  - mDimension.GetX()) / 2;
+            const UInt Y = (VideoMode->height - mDimension.GetY()) / 2;
+
+            glfwSetWindowMonitor(mHandle, nullptr, X, Y, mDimension.GetX(), mDimension.GetY(), 0);
+
+            const Bool HasDecoration = (Mode == Decoration::Windowed);
+            glfwSetWindowAttrib(mHandle, GLFW_DECORATED, HasDecoration);
+            glfwSetWindowAttrib(mHandle, GLFW_RESIZABLE, HasDecoration);
+            break;
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

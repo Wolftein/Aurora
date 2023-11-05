@@ -50,7 +50,8 @@ namespace Engine
             mDisplay = PlatformService->Initialise(
                 Properties.GetWindowTitle(),
                 Properties.GetWindowWidth(),
-                Properties.GetWindowHeight());
+                Properties.GetWindowHeight(),
+                Properties.GetWindowMode());
 
             DisplayHandle = mDisplay->GetHandle();
         }

@@ -74,6 +74,20 @@ inline namespace Core
         SInt GetNumber(CStr Key, SInt Default = 0) const;
 
         // -=(Undocumented)=-
+        template<typename Type>
+        void SetEnum(CStr Key, Type Value)
+        {
+            SetNumber(Key, static_cast<SInt>(Value));
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        Type GetEnum(CStr Key, Type Default = static_cast<Type>(0)) const
+        {
+            return static_cast<Type>(GetNumber(Key, static_cast<SInt>(Default)));
+        }
+
+        // -=(Undocumented)=-
         Vector<SInt> GetNumberArray(CStr Key) const;
 
         // -=(Undocumented)=-

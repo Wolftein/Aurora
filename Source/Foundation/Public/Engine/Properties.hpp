@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Serialization/TOML/Parser.hpp"
+#include "Platform/Common.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -80,6 +80,18 @@ namespace Engine
         }
 
         // -=(Undocumented)=-
+        void SetWindowMode(Platform::Decoration Mode)
+        {
+            mWindowMode = Mode;
+        }
+
+        // -=(Undocumented)=-
+        Platform::Decoration GetWindowMode() const
+        {
+            return mWindowMode;
+        }
+
+        // -=(Undocumented)=-
         void SetLogFilename(CStr Filename)
         {
             mLogFilename = Filename;
@@ -96,14 +108,15 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Any  mWindowHandle;
-        SStr mWindowTitle;
-        UInt mWindowWidth;
-        UInt mWindowHeight;
+        Any                  mWindowHandle;
+        SStr                 mWindowTitle;
+        UInt                 mWindowWidth;
+        UInt                 mWindowHeight;
+        Platform::Decoration mWindowMode;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SStr mLogFilename;
+        SStr                 mLogFilename;
     };
 }

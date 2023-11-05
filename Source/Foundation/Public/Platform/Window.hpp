@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Core.hpp"
+#include "Common.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -47,7 +47,7 @@ namespace Platform
         virtual Bool IsFocused() const = 0;
 
         // -=(Undocumented)=-
-        virtual void SetMode(Bool Fullscreen) = 0;
+        virtual void SetMode(Decoration Mode) = 0;
 
         // -=(Undocumented)=-
         virtual Bool IsWindowed() const = 0;

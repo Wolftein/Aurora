@@ -47,11 +47,11 @@ namespace Platform
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Window> Service::Initialise(CStr Title, UInt Width, UInt Height)
+    SPtr<Window> Service::Initialise(CStr Title, UInt Width, UInt Height, Decoration Mode)
     {
         SPtr<GLFWWindow> Window = NewPtr<GLFWWindow>(GetContext());
 
-        if (Window->Create(Title, Width, Height))
+        if (Window->Create(Title, Width, Height, Mode))
         {
             return Window;
         }
