@@ -26,5 +26,4 @@ inline namespace COM
         (* Result) = mWrapper->GetTime();
         return S_OK;
     }
-
 }

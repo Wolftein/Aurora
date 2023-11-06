@@ -35,6 +35,7 @@ inline namespace COM
         }
         EngineProperties.SetWindowWidth(Properties->WindowWidth);
         EngineProperties.SetWindowHeight(Properties->WindowHeight);
+        EngineProperties.SetWindowMode(Properties->WindowFullscreen, Properties->WindowBorderless);
 
         if (Properties->LogFilename)
         {
@@ -42,9 +43,6 @@ inline namespace COM
         }
 
         mWrapper.Initialize(EngineProperties);
-
-        mRenderer = NewPtr<Graphic::Renderer>(mWrapper);
-
         return S_OK;
     }
 
@@ -54,6 +52,15 @@ inline namespace COM
     HRESULT Kernel::Tick()
     {
         mWrapper.Tick();
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Kernel::GetDisplay(Window_ ** Result)
+    {
+        (* Result) = CCreate<Window>(mWrapper.GetDisplay());
         return S_OK;
     }
 
@@ -98,6 +105,11 @@ inline namespace COM
 
     HRESULT Kernel::GetGraphicRenderer(Graphic_Renderer_ ** Result)
     {
+        if (mRenderer == nullptr)
+        {
+            mRenderer = NewPtr<Graphic::Renderer>(mWrapper);
+        }
+
         (* Result) = CCreate<Graphic_Renderer>(mRenderer);
         return S_OK;
     }

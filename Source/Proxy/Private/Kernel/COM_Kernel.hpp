@@ -20,7 +20,11 @@
 
 #include "Graphic/COM_Renderer.hpp"
 
+#include "UI/COM_Service.hpp"
+
 #include "Platform/COM_Service.hpp"
+
+#include "Platform/COM_Window.hpp"
 
 #include <Engine/Kernel.hpp>
 
@@ -38,6 +42,8 @@ inline namespace COM
         vbStr16 WindowTitle;
         vbInt32 WindowWidth;
         vbInt32 WindowHeight;
+        vbBool  WindowFullscreen;
+        vbBool  WindowBorderless;
         vbStr16 LogFilename;
     } Kernel_Properties;
 
@@ -48,6 +54,8 @@ inline namespace COM
         HRESULT Initialize([in] Kernel_Properties * Properties);
 
         HRESULT Tick();
+
+        HRESULT GetDisplay([out, retval] Window_ ** Result);
 
         HRESULT GetPlatformService([out, retval] Platform_Service_ ** Result);
 
@@ -71,6 +79,9 @@ inline namespace COM
 
         // \see Engine_::Tick
         HRESULT Tick() override;
+
+        // \see Engine_::GetDisplay
+        HRESULT GetDisplay(Window_ ** Result) override;
 
         // \see Engine_::GetPlatformService
         HRESULT GetPlatformService(Platform_Service_ ** Result) override;

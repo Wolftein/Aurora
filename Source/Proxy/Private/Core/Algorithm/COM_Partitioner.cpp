@@ -21,7 +21,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Partitioner::Insert(Scene_Partitioner_Item * Object)
+    HRESULT Partitioner::Insert(Partitioner_Item * Object)
     {
         mQuadtree.Insert(Object);
         mQuadtreeDirty = true;
@@ -31,7 +31,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Partitioner::Remove(Scene_Partitioner_Item * Object)
+    HRESULT Partitioner::Remove(Partitioner_Item * Object)
     {
         mQuadtree.Remove(Object);
         mQuadtreeDirty = true;
@@ -41,7 +41,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Partitioner::Update(Scene_Partitioner_Item * Object)
+    HRESULT Partitioner::Update(Partitioner_Item * Object)
     {
         mQuadtree.Update(Object);
         mQuadtreeDirty = true;
@@ -51,7 +51,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Partitioner::Clear()
+    HRESULT Partitioner::Clear()
     {
         mQuadtree.Clear();
         mQuadtreeDirty = true;
@@ -62,7 +62,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Partitioner::Query(vbInt32 X1, vbInt32 Y1, vbInt32 X2, vbInt32 Y2, SAFEARRAY ** Result)
+    HRESULT Partitioner::Query(vbInt32 X1, vbInt32 Y1, vbInt32 X2, vbInt32 Y2, SAFEARRAY ** Result)
     {
         mQuadtreeDirty |= (mLastQueryX1 != X1 || mLastQueryY1 != Y1 || mLastQueryX2 != X2 || mLastQueryY2 != Y2);
 
@@ -75,19 +75,20 @@ inline namespace COM
             mLastQueryX2   = X2;
             mLastQueryY2   = Y2;
 
-            auto Query = mQuadtree.QueryIntersectsRegion(BoundingBox<Real32>(X1, Y1, X2 - X1, Y2 - Y1));
+            LooseQuadtree::Query Intersection
+                = mQuadtree.QueryIntersectsRegion(loose_quadtree::BoundingBox<Real32>(X1, Y1, X2 - X1, Y2 - Y1));
 
             mLastQueryList.clear();
 
-            while (!Query.EndOfQuery())
+            while (!Intersection.EndOfQuery())
             {
-                mLastQueryList.push_back(* Query.GetCurrent());
+                mLastQueryList.push_back(* Intersection.GetCurrent());
 
-                Query.Next();
+                Intersection.Next();
             }
         }
 
-        CPtr<Scene_Partitioner_Item> Chunk(mLastQueryList.data(), mLastQueryList.size());
+        CPtr<Partitioner_Item> Chunk(mLastQueryList.data(), mLastQueryList.size());
         VBSpanToSafeArrayTemp(Chunk, Result);
 
         return S_OK;
@@ -96,7 +97,7 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Scene_Partitioner::Overlaps(vbInt32 X, vbInt32 Y, vbInt32 Radius, Scene_Partitioner_Item * Object, vbBool * Result)
+    HRESULT Partitioner::Overlaps(vbInt32 X, vbInt32 Y, vbInt32 Radius, Partitioner_Item * Object, vbBool * Result)
     {
         const UInt X1 = X - Radius / 2.0f;
         const UInt Y1 = Y - Radius;

@@ -16,19 +16,13 @@
 #include <LooseQuadtree.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// [  NAMESPACE  ]
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-using namespace loose_quadtree;
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 inline namespace COM
 {
     [export, uuid("207F73B7-28C7-11EE-ADCE-1418C3A8EDB8")]
-    typedef struct Scene_Partitioner_Item
+    typedef struct Partitioner_Item
     {
         vbInt16  ID;
         vbInt16  Type;
@@ -39,55 +33,56 @@ inline namespace COM
         vbReal32 RectY1;
         vbReal32 RectX2;
         vbReal32 RectY2;
-    } Scene_Partitioner_Item;
+    } Partitioner_Item;
 
     // -=(Undocumented)=-
     [object, uuid("8603F791-28C7-11EE-ADCE-1418C3A8EDB8"), pointer_default(unique)]
-    __interface Scene_Partitioner_
+    __interface Partitioner_
     {
-        HRESULT Insert([in] Scene_Partitioner_Item * Object);
+        HRESULT Insert([in] Partitioner_Item * Object);
 
-        HRESULT Remove([in] Scene_Partitioner_Item * Object);
+        HRESULT Remove([in] Partitioner_Item * Object);
 
-        HRESULT Update([in] Scene_Partitioner_Item * Object);
+        HRESULT Update([in] Partitioner_Item * Object);
 
         HRESULT Clear();
 
-        HRESULT Query([in] vbInt32 X1, [in] vbInt32 Y1, [in] vbInt32 X2, [in] vbInt32 Y2, [in, satype(Scene_Partitioner_Item)] SAFEARRAY ** Result);
+        HRESULT Query([in] vbInt32 X1, [in] vbInt32 Y1, [in] vbInt32 X2, [in] vbInt32 Y2, [in, satype(Partitioner_Item)] SAFEARRAY ** Result);
 
-        HRESULT Overlaps([in] vbInt32 X,[in] vbInt32 Y,[in] vbInt32 Radius, [in] Scene_Partitioner_Item * Object, [out, retval] vbBool * Result);
+        HRESULT Overlaps([in] vbInt32 X,[in] vbInt32 Y,[in] vbInt32 Radius, [in] Partitioner_Item * Object, [out, retval] vbBool * Result);
     };
 
     // -=(Undocumented)=-
     [coclass, uuid("88FED143-28C7-11EE-ADCE-1418C3A8EDB8")]
-    class ATL_NO_VTABLE Scene_Partitioner : public Scene_Partitioner_
+    class ATL_NO_VTABLE Partitioner : public Partitioner_
     {
     public:
 
-        // \see Scene_Partitioner_::Insert
-        HRESULT Insert(Scene_Partitioner_Item * Object) override;
+        // \see Partitioner_::Insert
+        HRESULT Insert(Partitioner_Item * Object) override;
 
-        // \see Scene_Partitioner_::Remove
-        HRESULT Remove(Scene_Partitioner_Item * Object) override;
+        // \see Partitioner_::Remove
+        HRESULT Remove(Partitioner_Item * Object) override;
 
-        // \see Scene_Partitioner_::Update
-        HRESULT Update(Scene_Partitioner_Item * Object) override;
+        // \see Partitioner_::Update
+        HRESULT Update(Partitioner_Item * Object) override;
 
-        // \see Scene_Partitioner_::Clear
+        // \see Partitioner_::Clear
         HRESULT Clear() override;
 
-        // \see Scene_Partitioner_::Query
+        // \see Partitioner_::Query
         HRESULT Query(vbInt32 X1, vbInt32 Y1, vbInt32 X2, vbInt32 Y2, SAFEARRAY ** Result) override;
 
-        // \see Scene_Partitioner_::Overlaps
-        HRESULT Overlaps(vbInt32 X, vbInt32 Y, vbInt32 Radius, Scene_Partitioner_Item * Object, vbBool * Result);
+        // \see Partitioner_::Overlaps
+        HRESULT Overlaps(vbInt32 X, vbInt32 Y, vbInt32 Radius, Partitioner_Item * Object, vbBool * Result);
 
     private:
 
         // -=(Undocumented)=-
         struct LooseQuadtreeExtractor
         {
-            static void ExtractBoundingBox(Ptr<const Scene_Partitioner_Item> Object, Ptr<BoundingBox<Real32>> Boundaries)
+            static void ExtractBoundingBox(
+                Ptr<const Partitioner_Item> Object, Ptr<loose_quadtree::BoundingBox<Real32>> Boundaries)
             {
                 Boundaries->left   = Object->RectX1;
                 Boundaries->top    = Object->RectY1;
@@ -98,20 +93,25 @@ inline namespace COM
 
     private:
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=(Undocumented)=-
+        using LooseQuadtree = loose_quadtree::LooseQuadtree<Real32, Partitioner_Item, LooseQuadtreeExtractor>;
 
-        LooseQuadtree<Real32, Scene_Partitioner_Item, LooseQuadtreeExtractor> mQuadtree;
-        Bool                                                                  mQuadtreeDirty;
-        Vector<Scene_Partitioner_Item>                                        mQuadtreeDatabase;
+    private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Vector<Scene_Partitioner_Item>                                        mLastQueryList;
-        SInt32                                                                mLastQueryX1;
-        SInt32                                                                mLastQueryY1;
-        SInt32                                                                mLastQueryX2;
-        SInt32                                                                mLastQueryY2;
+        LooseQuadtree            mQuadtree;
+        Bool                     mQuadtreeDirty;
+        Vector<Partitioner_Item> mQuadtreeDatabase;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Vector<Partitioner_Item> mLastQueryList;
+        SInt32                   mLastQueryX1;
+        SInt32                   mLastQueryY1;
+        SInt32                   mLastQueryX2;
+        SInt32                   mLastQueryY2;
     };
 }
