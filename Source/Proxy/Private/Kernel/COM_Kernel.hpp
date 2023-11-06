@@ -20,8 +20,6 @@
 
 #include "Graphic/COM_Renderer.hpp"
 
-#include "UI/COM_Service.hpp"
-
 #include "Platform/COM_Service.hpp"
 
 #include "Platform/COM_Window.hpp"
