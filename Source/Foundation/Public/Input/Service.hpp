@@ -74,7 +74,10 @@ namespace Input
         // -=(Undocumented)=-
         void RemoveListener(ConstSPtr<Listener> Listener)
         {
-            mListeners.erase(std::remove(mListeners.begin(), mListeners.end(), Listener));
+            const auto Predicate = [Listener](ConstWPtr<Input::Listener> Base) {
+                return (Listener == Base.lock());
+            };
+            mListeners.erase(std::remove_if(mListeners.begin(), mListeners.end(), Predicate));
         }
 
         // -=(Undocumented)=-
@@ -141,6 +144,6 @@ namespace Input
         Vector<SPtr<Device>>   mDevices;
         SPtr<Keyboard>         mKeyboard;
         SPtr<Mouse>            mMouse;
-        Vector<SPtr<Listener>> mListeners;
+        Vector<WPtr<Listener>> mListeners;
     };
 }

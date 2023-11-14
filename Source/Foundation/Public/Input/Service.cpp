@@ -48,11 +48,20 @@ namespace Input
         // Dispatch all event(s)
         for (Ref<const Event> Event : Collector)
         {
-            for (ConstSPtr<Listener> Listener : mListeners)
+            for (auto Iterator = mListeners.begin(); Iterator != mListeners.end(); /* Unused */)
             {
-                if (Listener->OnEvent(Event))
+                if (ConstSPtr<Listener> Listener = Iterator->lock())
                 {
-                    break;
+                    if (Listener->OnEvent(Event))
+                    {
+                        break;
+                    }
+
+                    ++Iterator;
+                }
+                else
+                {
+                    Iterator = mListeners.erase(Iterator);
                 }
             }
         }
