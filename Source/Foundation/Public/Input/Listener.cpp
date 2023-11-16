@@ -39,6 +39,10 @@ namespace Input
             return OnMouseMove(Event.MouseAxis.X, Event.MouseAxis.Y);
         case Event::Type::MouseScroll:
             return OnMouseScroll(Event.MouseAxis.X, Event.MouseAxis.Y);
+        case Event::Type::WindowFocus:
+            return OnWindowFocus(Event.WindowFocus.State);
+        case Event::Type::WindowResize:
+            return OnWindowResize(Event.WindowResize.Width, Event.WindowResize.Height);
         default:
             return false;
         }
@@ -96,6 +100,22 @@ namespace Input
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Bool Listener::OnMouseDown(Button Button)
+    {
+        return false;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool Listener::OnWindowFocus(Bool Focused)
+    {
+        return false;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool Listener::OnWindowResize(SInt Width, SInt Height)
     {
         return false;
     }

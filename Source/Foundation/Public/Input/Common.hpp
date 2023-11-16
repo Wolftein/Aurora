@@ -161,6 +161,8 @@ namespace Input
             MouseScroll,
             MouseUp,
             MouseDown,
+            WindowFocus,
+            WindowResize,
         };
 
         // -=(Undocumented)=-
@@ -192,6 +194,17 @@ namespace Input
             {
                 Button Button;
             } MouseAction;
+
+            struct
+            {
+                Bool   State;
+            } WindowFocus;
+
+            struct
+            {
+                SInt   Width;
+                SInt   Height;
+            } WindowResize;
         };
     };
 }

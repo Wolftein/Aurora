@@ -61,10 +61,14 @@ namespace Input
     private:
 
         // -=(Undocumented)=-
-        virtual void OnDevicePoll(Ref<const Buffer> Events) = 0;
+        virtual void OnDevicePoll(Ref<const Buffer> Events)
+        {
+        }
 
         // -=(Undocumented)=-
-        virtual void OnDeviceReset() = 0;
+        virtual void OnDeviceReset()
+        {
+        }
 
     private:
 

@@ -51,5 +51,11 @@ namespace Input
 
         // -=(Undocumented)=-
         virtual Bool OnMouseDown(Button Button);
+
+        // -=(Undocumented)=-
+        virtual Bool OnWindowFocus(Bool Focused);
+
+        // -=(Undocumented)=-
+        virtual Bool OnWindowResize(SInt Width, SInt Height);
     };
 }

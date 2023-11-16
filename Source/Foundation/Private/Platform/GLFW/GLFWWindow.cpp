@@ -127,6 +127,26 @@ namespace Platform
             (Self->mMouse)->OnMouseScroll(X, Y);
         });
 
+        glfwSetWindowFocusCallback(mHandle, [](Ptr<GLFWwindow> Window, SInt GotFocus)
+        {
+            Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
+
+            const Input::Event Event {
+                .Time = glfwGetTime(), .Type = Input::Event::Type::WindowFocus, .WindowFocus { !!GotFocus }
+            };
+            Self->Invoke(Event);
+        });
+
+        glfwSetFramebufferSizeCallback(mHandle, [](Ptr<GLFWwindow> Window, SInt Width, SInt Height)
+        {
+            Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
+
+            const Input::Event Event {
+                .Time = glfwGetTime(), .Type = Input::Event::Type::WindowResize, .WindowResize { Width, Height }
+            };
+            Self->Invoke(Event);
+        });
+
         return true;
     }
 
