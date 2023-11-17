@@ -43,6 +43,7 @@ inline namespace COM
         }
 
         mWrapper.Initialize(EngineProperties);
+
         return S_OK;
     }
 
@@ -111,6 +112,23 @@ inline namespace COM
         }
 
         (* Result) = CCreate<Graphic_Renderer>(mRenderer);
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Kernel::GetSciterService(Sciter_Service_ * *Result)
+    {
+        SPtr<UI::SciterHost> Service = mWrapper.GetSubsystem<UI::SciterHost>();
+
+        if (Service == nullptr && mWrapper.GetDisplay())
+        {
+            Service = mWrapper.AddSubsystem<UI::SciterHost>();
+            Service->Attach(mWrapper.GetDisplay());
+        }
+
+        (* Result) = CCreate<Sciter_Service>(Service);
         return S_OK;
     }
 }

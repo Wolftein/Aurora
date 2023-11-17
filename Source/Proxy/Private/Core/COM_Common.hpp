@@ -29,6 +29,10 @@ inline namespace Proxy
 {
     // -=(Undocumented)=-
     [export]
+    typedef VARIANT         vbVariant;
+
+    // -=(Undocumented)=-
+    [export]
     typedef void *          vbAny;
 
     // -=(Undocumented)=-

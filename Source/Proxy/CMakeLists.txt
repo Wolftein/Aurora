@@ -38,6 +38,21 @@ LIST(APPEND PROJECT_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/Public ${CMAKE_CURRENT_S
 
 LIST(APPEND PROJECT_LIBRARY "Engine")
 
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Dependency (Sciter)
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+ExternalProject_Add(EP_SCITER
+        GIT_REPOSITORY https://gitlab.com/sciter-engine/sciter-js-sdk.git
+        GIT_TAG main
+        GIT_SUBMODULES_RECURSE OFF
+        CMAKE_ARGS
+            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+            -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${WIN32_CMAKE_ARGS}"
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        UPDATE_COMMAND "" CONFIGURE_COMMAND "" BUILD_COMMAND "" INSTALL_COMMAND "")
+ExternalProject_Get_Property(EP_SCITER SOURCE_DIR)
+LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR}/include)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (Loose Quadtree)
@@ -50,9 +65,7 @@ ExternalProject_Add(EP_LOOSE_QUADTREE
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
             -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${WIN32_CMAKE_ARGS}"
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            -DEASTL_BUILD_TESTS=OFF
-            -DEASTL_BUILD_BENCHMARK=OFF
-        CONFIGURE_COMMAND "" BUILD_COMMAND "" UPDATE_COMMAND "" INSTALL_COMMAND "")
+        UPDATE_COMMAND "" CONFIGURE_COMMAND "" BUILD_COMMAND "" INSTALL_COMMAND "")
 ExternalProject_Get_Property(EP_LOOSE_QUADTREE SOURCE_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR}/src/include)
 

@@ -24,6 +24,8 @@
 
 #include "Platform/COM_Window.hpp"
 
+#include "UI/COM_SciterHost.hpp"
+
 #include <Engine/Kernel.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -64,6 +66,8 @@ inline namespace COM
         HRESULT GetGraphicService([out, retval] Graphic_Service_ ** Result);
 
         HRESULT GetGraphicRenderer([out, retval] Graphic_Renderer_ ** Result);
+
+        HRESULT GetSciterService([out, retval] Sciter_Service_ ** Result);
     };
 
     // -=(Undocumented)=-
@@ -95,6 +99,9 @@ inline namespace COM
 
         // \see Engine_::GetGraphicRenderer
         HRESULT GetGraphicRenderer(Graphic_Renderer_ ** Result) override;
+
+        // \see Engine_::GetSciterService
+        HRESULT GetSciterService(Sciter_Service_ ** Result) override;
 
     private:
 
