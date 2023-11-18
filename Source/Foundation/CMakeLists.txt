@@ -12,13 +12,14 @@ PROJECT(Engine)
 ## Code
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-FILE(GLOB_RECURSE PROJECT_SOURCE "Public/*.cpp" "Private/*.cpp")
+FILE(GLOB_RECURSE PROJECT_SOURCE   "Public/*.cpp" "Private/*.cpp")
+FILE(GLOB_RECURSE PROJECT_RESOURCE "Resources/*")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-LIST(APPEND PROJECT_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/Public ${CMAKE_CURRENT_SOURCE_DIR}/Private)
+LIST(APPEND PROJECT_INCLUDE  ${CMAKE_CURRENT_SOURCE_DIR}/Public ${CMAKE_CURRENT_SOURCE_DIR}/Private)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (Win32: XAudio2)
@@ -42,6 +43,17 @@ ENDIF ()
 IF    (WIN32)
     LIST(APPEND PROJECT_LIBRARY d3dcompiler)
 ENDIF ()
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Dependency (CMRC)
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+ExternalProject_Add(EP_CMRC
+        GIT_REPOSITORY https://github.com/vector-of-bool/cmrc
+        CONFIGURE_COMMAND "" BUILD_COMMAND "" UPDATE_COMMAND "" INSTALL_COMMAND "")
+ExternalProject_Get_Property(EP_CMRC SOURCE_DIR)
+INCLUDE(${SOURCE_DIR}/CMakeRC.cmake)
+CMRC_ADD_RESOURCE_LIBRARY(Engine-Resources ALIAS Engine::RC NAMESPACE Resources WHENCE ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${PROJECT_RESOURCE})
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (EASTL in-drop replacement for STL)
@@ -162,12 +174,11 @@ LIST(APPEND PROJECT_LIBRARY ${BINARY_DIR}/quill/quill.lib)
 ## Configuration
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-ADD_DEFINITIONS(-DAE_CONTENT_LOCATOR_DEFAULT)
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MP3)        # MP3
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_WAV)        # WAV
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_STB)        # Image
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_EFFECT)     # Pipeline
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_ARTERY)     # Font
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MP3)        # .mp3
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_WAV)        # .wav
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_STB)        # .png, .bmp, .tiff, .tga, .jpg
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_EFFECT)     # .effect, .shader
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_ARTERY)     # .arfont
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Library
@@ -179,7 +190,7 @@ ADD_LIBRARY(${PROJECT_NAME} STATIC ${PROJECT_SOURCE})
 ## Libraries
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC ${PROJECT_LIBRARY})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC ${PROJECT_LIBRARY} PRIVATE Engine::RC)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Includes

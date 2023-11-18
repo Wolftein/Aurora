@@ -1,8 +1,9 @@
 [Properties.Blend]
 
-	ColorSrcFactor  = "SrcAlpha"
+	ColorSrcFactor  = "One"
+	AlphaSrcFactor  = "One"
+
 	ColorDstFactor  = "OneMinusSrcAlpha"
-	AlphaSrcFactor  = "SrcAlpha"
 	AlphaDstFactor  = "OneMinusSrcAlpha"
 
 [Properties.Depth]
@@ -21,9 +22,9 @@
 [Program.Vertex]
 
 	Entry    = "vertex"
-	Filename = "Resources://Pipeline/Font.shader"
+	Filename = "Engine://Pipeline/UI.shader"
 
 [Program.Fragment]
 
 	Entry    = "fragment"
-	Filename = "Resources://Pipeline/Font.shader"
+	Filename = "Engine://Pipeline/UI.shader"

@@ -101,9 +101,6 @@ namespace Graphic
         Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        void SetPipeline(ConstSPtr<Pipeline> Geometry, ConstSPtr<Pipeline> Font);
-
-        // -=(Undocumented)=-
         void Begin(Ref<const Matrix4f> Projection);
 
         // -=(Undocumented)=-
@@ -210,6 +207,9 @@ namespace Graphic
         };
 
     private:
+
+        // -=(Undocumented)=-
+        void CreateDefaultResources(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
         void Flush();

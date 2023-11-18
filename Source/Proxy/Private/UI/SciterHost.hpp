@@ -14,6 +14,7 @@
 
 #include "SciterInput.hpp"
 #include <Content/Service.hpp>
+#include <Input/Service.hpp>
 #include <Graphic/Material.hpp>
 #include <Graphic/Service.hpp>
 #include <Platform/Service.hpp>
@@ -31,7 +32,7 @@ namespace UI
     public:
 
         // -=(Undocumented)=-
-        using Function = FPtr<sciter::value(CPtr<const sciter::value>)>;
+        using Function     = FPtr<sciter::value(CPtr<const sciter::value>)>;
 
     public:
 
@@ -45,7 +46,7 @@ namespace UI
         void OnTick() override;
 
         // -=(Undocumented)=-
-        Bool Attach(ConstSPtr<Platform::Window> Window);
+        Bool Initialise(ConstSPtr<Platform::Window> Window);
 
         // -=(Undocumented)=-
         Bool Load(CStr16 Uri);

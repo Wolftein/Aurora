@@ -31,6 +31,9 @@ inline namespace Core
         // -=(Undocumented)=-
         using Pointer = UPtr<void, Deleter>;
 
+        // -=(Undocumented)=-
+        static constexpr Deleter EMPTY_DELETER  = [](Ptr<void>) {};
+
     public:
 
         // -=(Undocumented)=-

@@ -11,10 +11,8 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Service.hpp"
+#include "Locator/MemoryLocator.hpp"
 
-#ifdef    AE_CONTENT_LOCATOR_DEFAULT
-    #include "Locator/SystemLocator.hpp"
-#endif // AE_CONTENT_LOCATOR_DEFAULT
 #ifdef    AE_CONTENT_LOADER_MP3
     #include "Content/Sound/MP3/Loader.hpp"
 #endif // AE_CONTENT_LOADER_MP3
@@ -227,9 +225,7 @@ namespace Content
 
     void Service::RegisterDefaultResources()
     {
-#ifdef    AE_CONTENT_LOCATOR_DEFAULT
-        AddLocator("file://", NewPtr<Content::SystemLocator>());
-#endif // AE_CONTENT_LOCATOR_DEFAULT
+        AddLocator("Engine://", NewPtr<Content::MemoryLocator>());
 
 #ifdef    AE_CONTENT_LOADER_MP3
         AddLoader(NewPtr<Content::MP3Loader>());

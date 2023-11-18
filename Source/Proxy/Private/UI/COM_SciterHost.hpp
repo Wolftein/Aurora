@@ -25,6 +25,8 @@ inline namespace COM
     [object, uuid("9B74E017-7A81-11EE-ADD5-1418C3A8EDB8"), pointer_default(unique)]
     __interface Sciter_Service_
     {
+        HRESULT Attach([in] vbInt32 OnPreRender, [in] vbInt32 OnPostRender, [in] vbInt32 OnElementRender);
+
         HRESULT Load([in] vbStr16 Uri, [out, retval] vbBool * Result);
 
         [vararg]

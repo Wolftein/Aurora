@@ -9,9 +9,9 @@
 [Program.Vertex]
 
 	Entry    = "vertex"
-	Filename = "Resources://Pipeline/Geometry.shader"
+	Filename = "Engine://Pipeline/Geometry.shader"
 
 [Program.Fragment]
 
 	Entry    = "fragment"
-	Filename = "Resources://Pipeline/Geometry.shader"
+	Filename = "Engine://Pipeline/Geometry.shader"

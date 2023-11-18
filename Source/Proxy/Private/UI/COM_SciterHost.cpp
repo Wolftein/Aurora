@@ -45,7 +45,7 @@ inline namespace COM
         }
         case VT_I8:
         {
-            return sciter::value(static_cast<SInt64>(Value.llVal));
+            return sciter::value(static_cast<SInt32>(Value.llVal));
         }
         case VT_UI1:
         {
@@ -61,7 +61,7 @@ inline namespace COM
         }
         case VT_UI8:
         {
-            return sciter::value(static_cast<SInt64>(Value.ullVal));
+            return sciter::value(static_cast<SInt32>(Value.ullVal));
         }
         case VT_R4:
         {
@@ -106,7 +106,7 @@ inline namespace COM
             Return.boolVal = (Value.get(false) ? VBTrue : VBFalse);
             Return.vt      = VT_BOOL;
         }
-        else if (Value.is_int())
+        else if (Value.is_int() | Value.is_big_int())
         {
             Return.dblVal = Value.get(0);
             Return.vt     = VT_UI4;
@@ -121,17 +121,13 @@ inline namespace COM
             Return.bstrVal = ::SysAllocString(Value.get(WSTR("")).data());
             Return.vt      = VT_BSTR;
         }
-        else if (Value.is_big_int())
-        {
-            CPPToVBInt64(Value.get(static_cast<SInt64>(0)), Return);
-        }
         else if (Value.is_bytes())
         {
             Ref<const aux::bytes> Bytes = Value.get_bytes();
 
             const LPSAFEARRAY SafeArrayPtr = ::SafeArrayCreateVector(VT_UI1, 0, Bytes.length);
             FastCopyMemory(SafeArrayPtr->pvData, Bytes.start, Bytes.length);
-            
+
             Return.parray = SafeArrayPtr;
             Return.vt     = VT_ARRAY | VT_UI1;
         }

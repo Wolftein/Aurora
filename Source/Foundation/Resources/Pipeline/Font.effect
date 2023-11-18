@@ -1,0 +1,29 @@
+[Properties.Blend]
+
+	ColorSrcFactor  = "SrcAlpha"
+	ColorDstFactor  = "OneMinusSrcAlpha"
+	AlphaSrcFactor  = "SrcAlpha"
+	AlphaDstFactor  = "OneMinusSrcAlpha"
+
+[Properties.Depth]
+
+	Mask            = 0
+	Condition       = "LessEqual"
+
+[Properties.Layout]
+
+	Attributes      = [
+		[0, 0,  "Float32x3"  ],
+		[1, 12, "UIntNorm8x4"],
+		[2, 16, "Float32x2"  ]
+	]
+
+[Program.Vertex]
+
+	Entry    = "vertex"
+	Filename = "Engine://Pipeline/Font.shader"
+
+[Program.Fragment]
+
+	Entry    = "fragment"
+	Filename = "Engine://Pipeline/Font.shader"

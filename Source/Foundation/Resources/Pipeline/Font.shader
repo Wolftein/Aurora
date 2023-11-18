@@ -1,57 +1,54 @@
-// #######################
-//         UNIFORM       
-// #######################
-
-cbuffer UBScene    : register(b0)
-{
-    float4x4 uCamera;
-}
-
-cbuffer UBMaterial : register(b2)
-{
-    float2   uDimension;
-    float    uDistance;
-}
-
-// #######################
-//       ATTRIBUTE
-// #######################
-
-struct VSInput
-{
-    float3 Position : ATTRIBUTE0;
-    float4 Color    : ATTRIBUTE1;
-    float2 Texture  : ATTRIBUTE2;
-};
-
-struct FSInput
-{
-    float4 Position : SV_POSITION;
-    float4 Color    : COLOR;
-    float2 Texture  : TEXCOORD0;
-};
-
-// #######################
-//        PROGRAM
-// #######################
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
+//
+// This work is licensed under the terms of the MIT license.
+//
+// For a copy, see <https://opensource.org/licenses/MIT>.
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 // TODO: Configurable
 #define OUTLINE_THICKNESS 0.4
 #define OUTLINE_COLOR     float4(0, 0, 0, 1)
 
-Texture2D    iChannel0          : register(s0);
-SamplerState iChannel0Sampler;
+Texture2D    ColorTexture : register(t0);
+SamplerState ColorSampler : register(s0);
 
-FSInput vertex(VSInput Input)
+// Uniform
+
+cbuffer SceneConstantBuffer : register(b0)
 {
-    FSInput Output;
+    float4x4 uCamera;
+};
 
-    Output.Position = mul(uCamera, float4(Input.Position,  1));
-    Output.Color    = Input.Color;
-    Output.Texture  = Input.Texture;
+cbuffer MaterialConstantBuffer : register(b2)
+{
+    float2   uDimension;
+    float    uDistance;
+};
 
-    return Output;
+// Definition
+
+struct PixelShaderInput
+{
+    float4 Position : SV_POSITION;
+    float4 Color    : COLOR;
+    float2 UV       : TEXCOORD0;
+};
+
+// VS Main
+
+PixelShaderInput vertex(float3 Position : ATTRIBUTE0, float4 Color : ATTRIBUTE1, float2 UV : ATTRIBUTE2)
+{
+    PixelShaderInput Result;
+
+    Result.Position = mul(uCamera, float4(Position,  1));
+    Result.Color    = Color;
+    Result.UV       = UV;
+
+    return Result;
 }
+
+// PS Main
 
 float Median(float3 Color)
 {
@@ -77,12 +74,12 @@ float GetOpacityFromDistance(float signedDistance, float2 Jdx, float2 Jdy)
     return smoothstep(-scaledDistanceLimit, scaledDistanceLimit, signedDistance);
 }
 
-float4 fragment(VertexShaderOutput Input) : SV_Target
+float4 fragment(PixelShaderInput Input) : SV_Target
 {
-    float2 pixelCoord = Input.Texture * uDimension;
+    float2 pixelCoord = Input.UV * uDimension;
     float2 Jdx = ddx(pixelCoord);
     float2 Jdy = ddy(pixelCoord);
-    float3 sample = iChannel0.Sample(iChannel0Sampler, Input.Texture).rgb;
+    float3 sample = ColorTexture.Sample(ColorSampler, Input.UV).rgb;
     float medianSample = Median(sample);
     float signedDistance = medianSample - 0.5f;
 

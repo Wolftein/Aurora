@@ -60,8 +60,6 @@ inline namespace COM
     {
         HRESULT Begin([in] Graphic_Camera_ * Camera);
 
-        HRESULT SetPipeline([in] Graphic_Pipeline_ * Geometry, [in] Graphic_Pipeline_ * Font);
-
         HRESULT SetParameter([in] vbInt32 Offset, [in] vbReal32 X, [in, defaultvalue(0)] vbReal32 Y, [in, defaultvalue(0)] vbReal32 Z, [in, defaultvalue(0)] vbReal32 W);
 
         HRESULT DrawLine([in] vbReal32 StartX, [in] vbReal32 StartY, [in] vbReal32 EndX, [in] vbReal32 EndY, [in] vbReal32 Depth, [in] vbInt32 Tint, [in, defaultvalue(1)] vbReal32 Thickness);
@@ -106,9 +104,6 @@ inline namespace COM
 
         // \see Graphic_Renderer_::Begin
         HRESULT Begin(Graphic_Camera_ * Camera) override;
-
-        // \see Graphic_Renderer_::SetPipeline
-        HRESULT SetPipeline(Graphic_Pipeline_ * Geometry, Graphic_Pipeline_ * Font);
 
         // \see Graphic_Renderer_::SetParameter
         HRESULT SetParameter(vbInt32 Offset, vbReal32 X, vbReal32 Y, vbReal32 Z, vbReal32 W) override;

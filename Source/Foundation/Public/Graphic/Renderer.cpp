@@ -25,15 +25,7 @@ namespace Graphic
     Renderer::Renderer(Ref<Core::Subsystem::Context> Context)
         : mEncoder { Context.GetSubsystem<Graphic::Service>(), k_MaxVertices, k_MaxIndices, k_MaxUniform }
     {
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Renderer::SetPipeline(ConstSPtr<Pipeline> Geometry, ConstSPtr<Pipeline> Font)
-    {
-        mPipelines[0] = Geometry;
-        mPipelines[1] = Font;
+        CreateDefaultResources(Context);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -325,6 +317,16 @@ namespace Graphic
         {
             Flush();
         }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::CreateDefaultResources(Ref<Core::Subsystem::Context> Context)
+    {
+        ConstSPtr<Content::Service> ContentService = Context.GetSubsystem<Content::Service>();
+        mPipelines[0] = ContentService->Load<Graphic::Pipeline>("Engine://Pipeline/Geometry.effect");
+        mPipelines[1] = ContentService->Load<Graphic::Pipeline>("Engine://Pipeline/Font.effect");
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

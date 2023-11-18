@@ -11,7 +11,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "SciterHost.hpp"
-#include <Input/Service.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   DATA   ]
@@ -71,7 +70,7 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool SciterHost::Attach(ConstSPtr<Platform::Window> Window)
+    Bool SciterHost::Initialise(ConstSPtr<Platform::Window> Window)
     {
         // Enable default option(s)
         SciterSetOption(WINDOW_HANDLE, SCITER_SET_SCRIPT_RUNTIME_FEATURES,
@@ -256,8 +255,8 @@ namespace UI
 
     UInt SciterHost::OnSciterAttachBehaviour(LPSCN_ATTACH_BEHAVIOR Behavior)
     {
-        const Ptr<sciter::event_handler> Handler
-            = sciter::behavior_factory::create(Behavior->behaviorName, Behavior->element);
+        Ptr<sciter::event_handler> Handler = sciter::behavior_factory::create(Behavior->behaviorName, Behavior->element);
+
         if (Handler)
         {
             Behavior->elementTag  = Handler;
