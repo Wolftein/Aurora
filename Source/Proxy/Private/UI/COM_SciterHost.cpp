@@ -202,6 +202,15 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    HRESULT Sciter_Service::Draw()
+    {
+        mWrapper->Draw();
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     HRESULT Sciter_Service::Load(vbStr16 Uri, vbBool * Result)
     {
         (* Result) = mWrapper->Load(VBString16ToString16(Uri)) ? VBTrue : VBFalse;
@@ -295,15 +304,6 @@ inline namespace COM
     HRESULT Sciter_Service::GetVariable(vbStr16 Name, vbVariant * Value)
     {
         (* Value) = CopyToVariant(mWrapper->GetVariable(VBString16ToString8(Name)));
-        return S_OK;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    HRESULT Sciter_Service::GetMaterial(Graphic_Material_ ** Result)
-    {
-        (* Result) = CCreate<Graphic_Material>(mWrapper->GetMaterial());
         return S_OK;
     }
 }

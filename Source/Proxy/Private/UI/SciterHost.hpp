@@ -17,6 +17,7 @@
 #include <Input/Service.hpp>
 #include <Graphic/Material.hpp>
 #include <Graphic/Service.hpp>
+#include <Graphic/Renderer.hpp>
 #include <Platform/Service.hpp>
 #include <Platform/Window.hpp>
 
@@ -46,7 +47,10 @@ namespace UI
         void OnTick() override;
 
         // -=(Undocumented)=-
-        Bool Initialise(ConstSPtr<Platform::Window> Window);
+        Bool Initialise(ConstSPtr<Platform::Window> Window, ConstSPtr<Graphic::Renderer> Renderer);
+
+        // -=(Undocumented)=-
+        void Draw();
 
         // -=(Undocumented)=-
         Bool Load(CStr16 Uri);
@@ -101,6 +105,8 @@ namespace UI
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        SPtr<Graphic::Renderer> mRenderer;
         SPtr<Graphic::Material> mMaterial;
+        SPtr<Graphic::Pipeline> mPipeline;
     };
 }

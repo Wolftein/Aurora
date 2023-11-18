@@ -11,6 +11,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "SciterHost.hpp"
+#include <Graphic/Camera.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   DATA   ]
@@ -70,7 +71,7 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool SciterHost::Initialise(ConstSPtr<Platform::Window> Window)
+    Bool SciterHost::Initialise(ConstSPtr<Platform::Window> Window, ConstSPtr<Graphic::Renderer> Renderer)
     {
         // Enable default option(s)
         SciterSetOption(WINDOW_HANDLE, SCITER_SET_SCRIPT_RUNTIME_FEATURES,
@@ -126,6 +127,11 @@ namespace UI
         const Vector2i Size = Window->GetSize();
         SciterProcX(WINDOW_HANDLE, SCITER_X_MSG_SIZE(Size.GetX(), Size.GetY()));
 
+        // Initialize the pipeline that will be used to render the ui
+        mWindow   = Window;
+        mRenderer = Renderer;
+        mPipeline = GetSubsystem<Content::Service>()->Load<Graphic::Pipeline>("Engine://Pipeline/UI.effect");
+
         // Initialize the texture that will be used to render the ui
         const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>(Content::Uri { "_SciterTexture" });
         Texture->Load(Graphic::TextureFormat::BGRA8UIntNorm, Graphic::TextureLayout::Source, Size.GetX(), Size.GetY(), 1);
@@ -146,6 +152,22 @@ namespace UI
             Texture->Create(GetContext());
         };
         GetSubsystem<Input::Service>()->AddListener(NewPtr<SciterInput>(WINDOW_HANDLE, OnDocumentResize));
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void SciterHost::Draw()
+    {
+        const Vector2i Size = mWindow->GetSize();
+
+        const Rectf Destination { 0.0f, 0.0f, static_cast<Real32>(Size.GetX()), static_cast<Real32>(Size.GetY()) };
+        const Rectf Source      { 0.0f, 0.0f, 1.0f, 1.0f };
+
+        mRenderer->Begin(
+            Matrix4f::CreateOrthographic(0, Size.GetX(), Size.GetY(), 0, -1000.0f, +1000.0f));
+        mRenderer->DrawTexture(Destination, Source, 1.0f, 0.0f, Graphic::Renderer::Order::Normal, -1, mPipeline, mMaterial);
+        mRenderer->End();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

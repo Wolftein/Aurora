@@ -25,6 +25,8 @@ inline namespace COM
     [object, uuid("9B74E017-7A81-11EE-ADD5-1418C3A8EDB8"), pointer_default(unique)]
     __interface Sciter_Service_
     {
+        HRESULT Draw();
+
         HRESULT Load([in] vbStr16 Uri, [out, retval] vbBool * Result);
 
         [vararg]
@@ -39,8 +41,6 @@ inline namespace COM
         HRESULT SetVariable([in] vbStr16 Name, [in] vbVariant * Value);
 
         HRESULT GetVariable([in] vbStr16 Name, [out, retval] vbVariant * Value);
-
-        HRESULT GetMaterial([out, retval] Graphic_Material_ ** Result);
     };
 
     // -=(Undocumented)=-
@@ -48,6 +48,9 @@ inline namespace COM
     class ATL_NO_VTABLE Sciter_Service : public Sciter_Service_, public CSmartPtrWrapper<UI::SciterHost>
     {
     public:
+
+        // \see Sciter_Service_::Draw
+        HRESULT Draw();
 
         // \see Sciter_Service_::Load
         HRESULT Load(vbStr16 Uri, vbBool * Result) override;
@@ -69,8 +72,5 @@ inline namespace COM
 
         // \see Sciter_Service_::GetVariable
         HRESULT GetVariable(vbStr16 Name, vbVariant * Value) override;
-
-        // \see Sciter_Service_::GetMaterial
-        HRESULT GetMaterial(Graphic_Material_ ** Result) override;
     };
 }
