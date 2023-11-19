@@ -48,6 +48,12 @@ namespace Platform
         // \see Window::SetTitle
         void SetTitle(CStr Title) override;
 
+        // \see Window::SetVisible
+        oid SetVisible(Bool Visible) override;
+
+        // \see Window::IsVisible
+        Bool IsVisible() const override;
+
         // \see Window::SetFocus
         void SetFocus() override;
 

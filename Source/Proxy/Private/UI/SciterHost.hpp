@@ -15,8 +15,6 @@
 #include "SciterInput.hpp"
 #include <Content/Service.hpp>
 #include <Input/Service.hpp>
-#include <Graphic/Material.hpp>
-#include <Graphic/Service.hpp>
 #include <Graphic/Renderer.hpp>
 #include <Platform/Service.hpp>
 #include <Platform/Window.hpp>
@@ -73,12 +71,6 @@ namespace UI
         // -=(Undocumented)=-
         sciter::value GetVariable(CStr Name);
 
-        // -=(Undocumented)=-
-        ConstSPtr<Graphic::Material> GetMaterial() const
-        {
-            return mMaterial;
-        }
-
     private:
 
         // -=(Undocumented)=-
@@ -98,8 +90,12 @@ namespace UI
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Platform::Window>  mWindow;
-        Bool                    mWindowIsDirty;
+        SPtr<Platform::Window>  mDisplay;
+        Bool                    mDisplayIsDirty;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
         StringTable<Function>   mFunctions;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -41,6 +41,12 @@ namespace Platform
         virtual void SetTitle(CStr Title) = 0;
 
         // -=(Undocumented)=-
+        virtual void SetVisible(Bool Visible) = 0;
+
+        // -=(Undocumented)=-
+        virtual Bool IsVisible() const = 0;
+
+        // -=(Undocumented)=-
         virtual void SetFocus() = 0;
 
         // -=(Undocumented)=-

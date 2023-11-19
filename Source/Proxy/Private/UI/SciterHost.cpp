@@ -11,7 +11,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "SciterHost.hpp"
-#include <Graphic/Camera.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   DATA   ]
@@ -50,9 +49,9 @@ namespace UI
         SciterProcX(WINDOW_HANDLE, SCITER_X_MSG_HEARTBIT(UINT(GetSubsystem<Platform::Service>()->GetTime() * 1000)));
 
         // Execute Sciter's draw function
-        if (mWindowIsDirty)
+        if (mDisplayIsDirty)
         {
-            mWindowIsDirty = false;
+            mDisplayIsDirty = false;
 
             constexpr auto OnDrawCallback = [](LPCBYTE Bytes, INT X, INT Y, UINT Width, UINT Height, LPVOID Parameter)
             {
@@ -63,7 +62,7 @@ namespace UI
             SciterPaintEvent.targetType               = SPT_RECEIVER;
             SciterPaintEvent.target.receiver.param    = this;
             SciterPaintEvent.target.receiver.callback = OnDrawCallback;
-            SciterGetRootElement(WINDOW_HANDLE, &SciterPaintEvent.element);
+            SciterGetRootElement(WINDOW_HANDLE, & SciterPaintEvent.element);
             SciterProcX(WINDOW_HANDLE, SciterPaintEvent);
         }
     }
@@ -71,8 +70,11 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool SciterHost::Initialise(ConstSPtr<Platform::Window> Window, ConstSPtr<Graphic::Renderer> Renderer)
+    Bool SciterHost::Initialise(ConstSPtr<Platform::Window> Display, ConstSPtr<Graphic::Renderer> Renderer)
     {
+        // Attach the current window.
+        mDisplay = Display;
+
         // Enable default option(s)
         SciterSetOption(WINDOW_HANDLE, SCITER_SET_SCRIPT_RUNTIME_FEATURES,
                           ALLOW_FILE_IO
@@ -97,7 +99,7 @@ namespace UI
                 Host->OnSciterLoad(reinterpret_cast<LPSCN_LOAD_DATA>(Notification));
                 break;
             case SC_INVALIDATE_RECT:
-                Host->mWindowIsDirty = true;
+                Host->mDisplayIsDirty = true;
                 break;
             case SC_ATTACH_BEHAVIOR:
                 return Host->OnSciterAttachBehaviour(reinterpret_cast<LPSCN_ATTACH_BEHAVIOR>(Notification));
@@ -120,15 +122,14 @@ namespace UI
         SciterWindowAttachEventHandler(WINDOW_HANDLE, OnHostElementCallback, this, HANDLE_ALL);
 
         // Set device resolution (pixels per inch)
-        const Vector2f Scale = Window->GetScale();
+        const Vector2f Scale = Display->GetScale();
         SciterProcX(WINDOW_HANDLE, SCITER_X_MSG_RESOLUTION(Scale.GetX() * 96));
 
         // Set device size
-        const Vector2i Size = Window->GetSize();
+        const Vector2i Size = Display->GetSize();
         SciterProcX(WINDOW_HANDLE, SCITER_X_MSG_SIZE(Size.GetX(), Size.GetY()));
 
         // Initialize the pipeline that will be used to render the ui
-        mWindow   = Window;
         mRenderer = Renderer;
         mPipeline = GetSubsystem<Content::Service>()->Load<Graphic::Pipeline>("Engine://Pipeline/UI.effect");
 
@@ -159,13 +160,13 @@ namespace UI
 
     void SciterHost::Draw()
     {
-        const Vector2i Size = mWindow->GetSize();
+        const Vector2i Size = mDisplay->GetSize();
 
         const Rectf Destination { 0.0f, 0.0f, static_cast<Real32>(Size.GetX()), static_cast<Real32>(Size.GetY()) };
         const Rectf Source      { 0.0f, 0.0f, 1.0f, 1.0f };
 
         mRenderer->Begin(
-            Matrix4f::CreateOrthographic(0, Size.GetX(), Size.GetY(), 0, -1000.0f, +1000.0f));
+            Matrix4f::CreateOrthographic(0, Size.GetX(), Size.GetY(), 0, -1000.0f, 1000.0f));
         mRenderer->DrawTexture(Destination, Source, 1.0f, 0.0f, Graphic::Renderer::Order::Normal, -1, mPipeline, mMaterial);
         mRenderer->End();
     }

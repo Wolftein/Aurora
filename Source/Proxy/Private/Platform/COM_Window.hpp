@@ -31,7 +31,11 @@ inline namespace COM
 
         HRESULT SetTitle([in] vbStr8 Title);
 
-        HRESULT SetFocus() = 0;
+        HRESULT SetVisible([in] vbBool Visible);
+
+        HRESULT IsVisible([out, retval] vbBool * Result);
+
+        HRESULT SetFocus();
 
         HRESULT IsFocused([out, retval] vbBool * Result);
 
@@ -76,6 +80,12 @@ inline namespace COM
 
         // \see Window_::SetTitle
         HRESULT SetTitle(vbStr8 Title) override;
+
+        // \see Window_::SetVisible
+        HRESULT SetVisible(vbBool Visible) override;
+
+        // \see Window_::IsVisible
+        HRESULT IsVisible(vbBool * Result) override;
 
         // \see Window_::SetFocus
         HRESULT SetFocus() override;
