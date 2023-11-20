@@ -49,7 +49,7 @@ namespace Platform
         void SetTitle(CStr Title) override;
 
         // \see Window::SetVisible
-        oid SetVisible(Bool Visible) override;
+        void SetVisible(Bool Visible) override;
 
         // \see Window::IsVisible
         Bool IsVisible() const override;

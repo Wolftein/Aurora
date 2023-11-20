@@ -89,7 +89,6 @@ namespace Platform
             glfwSetInputMode(mHandle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
         }
 
-        glfwShowWindow(mHandle);
         glfwSetWindowUserPointer(mHandle, this);
 
         glfwSetKeyCallback(mHandle,  [](Ptr<GLFWwindow> Window, int Key, int Scancode, int Action, int Mods)

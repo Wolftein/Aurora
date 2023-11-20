@@ -46,7 +46,7 @@ namespace UI
     void SciterHost::OnTick()
     {
         // Execute Sciter's tick function
-        SciterProcX(WINDOW_HANDLE, SCITER_X_MSG_HEARTBIT(UINT(GetSubsystem<Platform::Service>()->GetTime() * 1000)));
+        SciterProcX(WINDOW_HANDLE, SCITER_X_MSG_HEARTBIT(GetSubsystem<Platform::Service>()->GetTime() * 1000));
 
         // Execute Sciter's draw function
         if (mDisplayIsDirty)
