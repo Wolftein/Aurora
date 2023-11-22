@@ -108,7 +108,7 @@ inline namespace COM
         }
         else if (Value.is_int() | Value.is_big_int())
         {
-            Return.dblVal = Value.get(0);
+            Return.lVal   = Value.get(0);
             Return.vt     = VT_UI4;
         }
         else if (Value.is_float())

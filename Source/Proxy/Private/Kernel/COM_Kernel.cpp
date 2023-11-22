@@ -126,7 +126,7 @@ inline namespace COM
         {
             Service = mWrapper.AddSubsystem<UI::SciterHost>();
             Service->Initialise(
-                mWrapper.GetDisplay(), mRenderer ? mRenderer = NewPtr<Graphic::Renderer>(mWrapper) : mRenderer);
+                mWrapper.GetDisplay(), mRenderer ? mRenderer : mRenderer = NewPtr<Graphic::Renderer>(mWrapper));
         }
 
         (* Result) = CCreate<Sciter_Service>(Service);

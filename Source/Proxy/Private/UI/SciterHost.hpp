@@ -31,7 +31,10 @@ namespace UI
     public:
 
         // -=(Undocumented)=-
-        using Function     = FPtr<sciter::value(CPtr<const sciter::value>)>;
+        using OnScriptCall = FPtr<sciter::value(CPtr<const sciter::value>)>;
+
+        // -=(Undocumented)=-
+        using OnScriptDraw = FPtr<void(CStr ID, Ptr<DRAW_PARAMS> Parameters)>;
 
     public:
 
@@ -60,7 +63,7 @@ namespace UI
         Bool Eval(CStr16 Script, Ptr<sciter::value> Return);
 
         // -=(Undocumented)=-
-        void CreateFunction(CStr Name, Function Method);
+        void CreateFunction(CStr Name, OnScriptCall Method);
 
         // -=(Undocumented)=-
         void DeleteFunction(CStr Name);
@@ -80,6 +83,9 @@ namespace UI
         void OnSciterRender(LPCBYTE Bytes, INT X, INT Y, UINT Width, UINT Height);
 
         // -=(Undocumented)=-
+        Bool OnSciterRenderElement(HELEMENT Element, Ptr<DRAW_PARAMS> Parameters);
+
+        // -=(Undocumented)=-
         UInt OnSciterAttachBehaviour(LPSCN_ATTACH_BEHAVIOR Behavior);
 
         // -=(Undocumented)=-
@@ -90,19 +96,20 @@ namespace UI
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Platform::Window>  mDisplay;
-        Bool                    mDisplayIsDirty;
+        SPtr<Platform::Window>      mDisplay;
+        Bool                        mDisplayIsDirty;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        StringTable<Function>   mFunctions;
+        StringTable<OnScriptCall>   mFunctions;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Graphic::Renderer> mRenderer;
-        SPtr<Graphic::Material> mMaterial;
-        SPtr<Graphic::Pipeline> mPipeline;
+        Graphic::Object             mDevice;       // TODO: Class?
+        SPtr<Graphic::Renderer>     mRenderer;
+        SPtr<Graphic::Material>     mMaterial;
+        SPtr<Graphic::Pipeline>     mPipeline;
     };
 }

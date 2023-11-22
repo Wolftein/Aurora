@@ -63,7 +63,16 @@ namespace UI
             SciterPaintEvent.target.receiver.param    = this;
             SciterPaintEvent.target.receiver.callback = OnDrawCallback;
             SciterGetRootElement(WINDOW_HANDLE, & SciterPaintEvent.element);
-            SciterProcX(WINDOW_HANDLE, SciterPaintEvent);
+
+            // Draw function enclosed by our graphics device to be able to render custom element(s) using Aurora
+            const Vector2i Size = mDisplay->GetSize();
+            const Rectf    Viewport(0.0f, 0.0f, Size.GetX(), Size.GetY());
+
+            GetSubsystem<Graphic::Service>()->Prepare(mDevice, Viewport, Graphic::Clear::Auxiliary, -1, 1.0f, 0);
+
+            mRenderer->Begin(Matrix4f::CreateOrthographic(0.0f, Size.GetX(), Size.GetY(), 0.0f, -1000.0f, 1000.0f));
+                SciterProcX(WINDOW_HANDLE, SciterPaintEvent);
+            mRenderer->End();
         }
     }
 
@@ -135,13 +144,22 @@ namespace UI
 
         // Initialize the texture that will be used to render the ui
         const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>(Content::Uri { "_SciterTexture" });
-        Texture->Load(Graphic::TextureFormat::BGRA8UIntNorm, Graphic::TextureLayout::Source, Size.GetX(), Size.GetY(), 1);
+        Texture->Load(Graphic::TextureFormat::BGRA8UIntNorm, Graphic::TextureLayout::Dual, Size.GetX(), Size.GetY(), 1);
         Texture->Create(GetContext());
 
         // Initialize the material that will be used to render the ui
         mMaterial = NewPtr<Graphic::Material>(Content::Uri { "_SciterMaterial" });
         mMaterial->SetTexture(0, Texture);
         mMaterial->Create(GetContext());
+
+        // Initialize the pass that will be used to render the custom element(s).
+        const Graphic::Object DepthTexture = GetSubsystem<Graphic::Service>()->CreateTexture(
+            Graphic::TextureFormat::D24S8UIntNorm, Graphic::TextureLayout::Destination, Size.GetX(), Size.GetY(), 1);
+
+        Array<Graphic::Object, 1> Colors {
+            Texture->GetID()
+        };
+        mDevice = GetSubsystem<Graphic::Service>()->CreatePass(Colors, DepthTexture);
 
         // Create the input listener and attach window event(s)
         const auto OnDocumentResize = [this](SInt Width, SInt Height)
@@ -212,7 +230,7 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void SciterHost::CreateFunction(CStr Name, Function Method)
+    void SciterHost::CreateFunction(CStr Name, OnScriptCall Method)
     {
         mFunctions.try_emplace(SStr(Name), Method);
     }
@@ -276,14 +294,56 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    Bool SciterHost::OnSciterRenderElement(HELEMENT Element, Ptr<DRAW_PARAMS> Parameters)
+    {
+        if(Parameters->cmd != DRAW_CONTENT)
+        {
+            return false;
+        }
+
+        LOG_INFO("OnSciterRenderElement");
+
+        sciter::string OnRenderCallbackName;
+        SciterGetAttributeByNameCB(Element, "onRender", & _LPCWSTR2STRING, & OnRenderCallbackName);
+
+        sciter::string ID;
+        SciterGetAttributeByNameCB(Element, "id", & _LPCWSTR2STRING, & ID);
+
+        Array<SCITER_VALUE, 5> Arguments;
+        Arguments[0] = ID;
+        Arguments[1] = sciter::value(Parameters->area.left);
+        Arguments[2] = sciter::value(Parameters->area.top);
+        Arguments[3] = sciter::value(Parameters->area.right);
+        Arguments[4] = sciter::value(Parameters->area.bottom);
+
+        SCRIPTING_METHOD_PARAMS Script;
+        Script.name = aux::w2a(OnRenderCallbackName);
+        Script.argc = Arguments.size();
+        Script.argv = Arguments.data();
+
+        return OnSciterCall(& Script);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     UInt SciterHost::OnSciterAttachBehaviour(LPSCN_ATTACH_BEHAVIOR Behavior)
     {
-        Ptr<sciter::event_handler> Handler = sciter::behavior_factory::create(Behavior->behaviorName, Behavior->element);
-
-        if (Handler)
+        constexpr auto OnElementProc = [](LPVOID Tag, HELEMENT Element, UINT Event, LPVOID Parameters) -> SBOOL
         {
-            Behavior->elementTag  = Handler;
-            Behavior->elementProc = sciter::event_handler::element_proc;
+            Ptr<SciterHost> Host = static_cast<Ptr<SciterHost>>(Tag);
+
+            if (Event == HANDLE_DRAW)
+            {
+                return Host->OnSciterRenderElement(Element, static_cast<Ptr<DRAW_PARAMS>>(Parameters));
+            }
+            return false;
+        };
+
+        if (strcmp(Behavior->behaviorName, "custom-widget") == 0)
+        {
+            Behavior->elementTag  = this;
+            Behavior->elementProc = OnElementProc;
             return 1;
         }
         return 0;
