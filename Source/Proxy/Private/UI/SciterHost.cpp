@@ -70,7 +70,7 @@ namespace UI
 
             GetSubsystem<Graphic::Service>()->Prepare(mDevice, Viewport, Graphic::Clear::Auxiliary, -1, 1.0f, 0);
 
-            mRenderer->Begin(Matrix4f::CreateOrthographic(0.0f, Size.GetX(), Size.GetY(), 0.0f, -1000.0f, 1000.0f));
+            mRenderer->Begin(Matrix4f::CreateOrthographic(0.0f, Size.GetX(), Size.GetY(), 0.0f, 1.0f, -1.0f));
                 SciterProcX(WINDOW_HANDLE, SciterPaintEvent);
             mRenderer->End();
         }
@@ -184,8 +184,8 @@ namespace UI
         const Rectf Source      { 0.0f, 0.0f, 1.0f, 1.0f };
 
         mRenderer->Begin(
-            Matrix4f::CreateOrthographic(0, Size.GetX(), Size.GetY(), 0, -1000.0f, 1000.0f));
-        mRenderer->DrawTexture(Destination, Source, 1.0f, 0.0f, Graphic::Renderer::Order::Normal, -1, mPipeline, mMaterial);
+            Matrix4f::CreateOrthographic(0, Size.GetX(), Size.GetY(), 0, 1.0f, -1.0f));
+        mRenderer->DrawTexture(Destination, Source, 0.0f, 0.0f, Graphic::Renderer::Order::Normal, -1, mPipeline, mMaterial);
         mRenderer->End();
     }
 
