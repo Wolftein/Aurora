@@ -46,7 +46,7 @@ inline namespace COM
     [object, uuid("9B74E017-7A81-11EE-ADD5-1418C3A8EDB8"), pointer_default(unique)]
     __interface Sciter_Service_
     {
-        HRESULT Draw();
+        HRESULT Present();
 
         HRESULT Load([in] vbStr16 Uri, [out, retval] vbBool * Result);
 
@@ -73,8 +73,8 @@ inline namespace COM
     {
     public:
 
-        // \see Sciter_Service_::Draw
-        HRESULT Draw();
+        // \see Sciter_Service_::Present
+        HRESULT Present();
 
         // \see Sciter_Service_::Load
         HRESULT Load(vbStr16 Uri, vbBool * Result) override;

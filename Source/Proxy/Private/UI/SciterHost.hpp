@@ -51,7 +51,7 @@ namespace UI
         Bool Initialise(ConstSPtr<Platform::Window> Window, ConstSPtr<Graphic::Renderer> Renderer);
 
         // -=(Undocumented)=-
-        void Draw();
+        void Present();
 
         // -=(Undocumented)=-
         Bool Load(CStr16 Uri);

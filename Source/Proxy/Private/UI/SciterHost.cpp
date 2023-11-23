@@ -176,7 +176,7 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void SciterHost::Draw()
+    void SciterHost::Present()
     {
         const Vector2i Size = mDisplay->GetSize();
 
@@ -301,8 +301,8 @@ namespace UI
             return false;
         }
 
-        sciter::string OnRenderCallbackName;
-        SciterGetAttributeByNameCB(Element, "onRender", & _LPCWSTR2STRING, & OnRenderCallbackName);
+        sciter::string OnRenderCallbackAddress;
+        SciterGetAttributeByNameCB(Element, "onRender", & _LPCWSTR2STRING, & OnRenderCallbackAddress);
 
         sciter::string ID;
         SciterGetAttributeByNameCB(Element, "id", & _LPCWSTR2STRING, & ID);
@@ -315,7 +315,7 @@ namespace UI
         Arguments[4] = sciter::value(Parameters->area.bottom);
 
         SCRIPTING_METHOD_PARAMS Script;
-        Script.name = aux::w2a(OnRenderCallbackName);
+        Script.name = aux::w2a(OnRenderCallbackAddress);
         Script.argc = Arguments.size();
         Script.argv = Arguments.data();
 
