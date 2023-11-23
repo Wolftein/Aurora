@@ -259,9 +259,11 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Sciter_Service::CreateFunction(vbStr16 Name, vbBool Procedure, vbInt32 Address)
+    HRESULT Sciter_Service::CreateFunction(vbStr16 Name, Sciter_Function_Type Type, vbInt32 Address)
     {
-        if (Procedure)
+        switch (Type)
+        {
+        case eSciterFunctionTypeProcedure:
         {
             const auto OnTrampoline = [Address](CPtr<const sciter::value> Parameters) -> sciter::value
             {
@@ -269,13 +271,35 @@ inline namespace COM
             };
             mWrapper->CreateFunction(VBString16ToString8(Name), OnTrampoline);
         }
-        else
+        break;
+        case eSciterFunctionTypeFunction:
         {
             const auto OnTrampoline = [Address](CPtr<const sciter::value> Parameters) -> sciter::value
             {
                 return CallAssemblyFunction(Address, Parameters);
             };
             mWrapper->CreateFunction(VBString16ToString8(Name), OnTrampoline);
+        }
+        break;
+        case eSciterFunctionTypeRender:
+        {
+            const auto OnTrampoline = [Address](CPtr<const sciter::value> Parameters) -> sciter::value
+            {
+                using Declaration = HRESULT (STDAPICALLTYPE *)(Ptr<Sciter_Render_Args>);
+
+                Sciter_Render_Args Arguments;
+                Arguments.ID = CopyToVariant(Parameters[0]).bstrVal;
+                Arguments.X1 = CopyToVariant(Parameters[1]).lVal;
+                Arguments.Y1 = CopyToVariant(Parameters[2]).lVal;
+                Arguments.X2 = CopyToVariant(Parameters[3]).lVal;
+                Arguments.Y2 = CopyToVariant(Parameters[4]).lVal;
+                reinterpret_cast<Declaration>(Address)(& Arguments);
+
+                return sciter::value::nothing();
+            };
+            mWrapper->CreateFunction(VBString16ToString8(Name), OnTrampoline);
+        }
+        break;
         }
         return S_OK;
     }

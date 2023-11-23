@@ -301,8 +301,6 @@ namespace UI
             return false;
         }
 
-        LOG_INFO("OnSciterRenderElement");
-
         sciter::string OnRenderCallbackName;
         SciterGetAttributeByNameCB(Element, "onRender", & _LPCWSTR2STRING, & OnRenderCallbackName);
 
