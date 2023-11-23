@@ -55,19 +55,26 @@ inline namespace COM
 
         HRESULT Tick();
 
-        HRESULT GetDisplay([out, retval] Window_ ** Result);
+        [propget]
+        HRESULT Audio([out, retval] Audio_Service_ ** Result);
 
-        HRESULT GetPlatformService([out, retval] Platform_Service_ ** Result);
+        [propget]
+        HRESULT Content([out, retval] Content_Service_ ** Result);
 
-        HRESULT GetAudioService([out, retval] Audio_Service_ ** Result);
+        [propget]
+        HRESULT Display([out, retval] Window_ ** Result);
 
-        HRESULT GetContentService([out, retval] Content_Service_ ** Result);
+        [propget]
+        HRESULT Graphics([out, retval] Graphic_Service_ ** Result);
 
-        HRESULT GetGraphicService([out, retval] Graphic_Service_ ** Result);
+        [propget]
+        HRESULT Platform([out, retval] Platform_Service_ ** Result);
 
-        HRESULT GetGraphicRenderer([out, retval] Graphic_Renderer_ ** Result);
+        [propget]
+        HRESULT Renderer([out, retval] Graphic_Renderer_ ** Result);
 
-        HRESULT GetSciterService([out, retval] Sciter_Service_ ** Result);
+        [propget]
+        HRESULT Sciter([out, retval] Sciter_Service_ ** Result);
     };
 
     // -=(Undocumented)=-
@@ -82,26 +89,31 @@ inline namespace COM
         // \see Engine_::Tick
         HRESULT Tick() override;
 
-        // \see Engine_::GetDisplay
-        HRESULT GetDisplay(Window_ ** Result) override;
+        // \see Engine_::get_Audio
+        HRESULT get_Audio(Audio_Service_ ** Result);
 
-        // \see Engine_::GetPlatformService
-        HRESULT GetPlatformService(Platform_Service_ ** Result) override;
+        // \see Engine_::get_Content
+        HRESULT get_Content( Content_Service_ ** Result);
 
-        // \see Engine_::GetAudioService
-        HRESULT GetAudioService(Audio_Service_ ** Result) override;
+        // \see Engine_::get_Display
+        HRESULT get_Display(Window_ ** Result);
 
-        // \see Engine_::GetContentService
-        HRESULT GetContentService(Content_Service_ ** Result) override;
+        // \see Engine_::get_Graphics
+        HRESULT get_Graphics(Graphic_Service_ ** Result);
 
-        // \see Engine_::GetGraphicService
-        HRESULT GetGraphicService(Graphic_Service_ ** Result) override;
+        // \see Engine_::get_Platform
+        HRESULT get_Platform(Platform_Service_ ** Result);
 
-        // \see Engine_::GetGraphicRenderer
-        HRESULT GetGraphicRenderer(Graphic_Renderer_ ** Result) override;
+        // \see Engine_::get_Renderer
+        HRESULT get_Renderer(Graphic_Renderer_ ** Result);
 
-        // \see Engine_::GetSciterService
-        HRESULT GetSciterService(Sciter_Service_ ** Result) override;
+        // \see Engine_::get_Sciter
+        HRESULT get_Sciter(Sciter_Service_ ** Result);
+
+    private:
+
+        // -=(Undocumented)=-
+        SPtr<Graphic::Renderer> GetOrCreateRenderer();
 
     private:
 
