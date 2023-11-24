@@ -48,7 +48,9 @@ inline namespace COM
     {
         HRESULT Present();
 
-        HRESULT Load([in] vbStr16 Uri, [out, retval] vbBool * Result);
+        HRESULT SetDocument([in] vbStr16 Uri, [out, retval] vbBool * Result);
+
+        HRESULT SetStyle([in] vbStr16 Uri, [out, retval] vbBool * Result);
 
         [vararg]
         HRESULT Call([in] vbStr16 Function, [in, satype(vbVariant)] SAFEARRAY ** Parameters, [out, retval] vbVariant * Result);
@@ -76,8 +78,11 @@ inline namespace COM
         // \see Sciter_Service_::Present
         HRESULT Present();
 
-        // \see Sciter_Service_::Load
-        HRESULT Load(vbStr16 Uri, vbBool * Result) override;
+        // \see Sciter_Service_::SetDocument
+        HRESULT SetDocument(vbStr16 Uri, vbBool * Result) override;
+
+        // \see Sciter_Service_::SetStyle
+        HRESULT SetStyle(vbStr16 Uri, vbBool * Result) override;
 
         // \see Sciter_Service_::Call
         HRESULT Call(vbStr16 Function, SAFEARRAY ** Parameters, vbVariant * Result) override;

@@ -211,9 +211,18 @@ inline namespace COM
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    HRESULT Sciter_Service::Load(vbStr16 Uri, vbBool * Result)
+    HRESULT Sciter_Service::SetDocument(vbStr16 Uri, vbBool * Result)
     {
-        (* Result) = mWrapper->Load(VBString16ToString16(Uri)) ? VBTrue : VBFalse;
+        (* Result) = mWrapper->SetDocument(VBString16ToString16(Uri)) ? VBTrue : VBFalse;
+        return S_OK;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    HRESULT Sciter_Service::SetStyle(vbStr16 Uri, vbBool * Result)
+    {
+        (* Result) = mWrapper->SetStyle(VBString16ToString8(Uri));
         return S_OK;
     }
 

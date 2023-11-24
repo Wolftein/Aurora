@@ -54,7 +54,10 @@ namespace UI
         void Present();
 
         // -=(Undocumented)=-
-        Bool Load(CStr16 Uri);
+        Bool SetDocument(CStr16 Uri);
+
+        // -=(Undocumented)=-
+        Bool SetStyle(CStr Uri);
 
         // -=(Undocumented)=-
         Bool Call(CStr16 Function, CPtr<const sciter::value> Parameters, Ptr<sciter::value> Return);
