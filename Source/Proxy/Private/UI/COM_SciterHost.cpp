@@ -23,57 +23,142 @@ inline namespace COM
 
     static auto CopyToValue(Ref<const vbVariant> Value)
     {
-        // TODO: Map, Object, Array
+        const Bool ByReference = ((Value.vt & VT_BYREF) != 0);
 
+        // TODO: Map, Object, Array
         switch (Value.vt & ~(VT_VECTOR | VT_ARRAY | VT_BYREF))
         {
         case VT_BOOL:
         {
-            return sciter::value(VBIsTrue(Value.boolVal));
+            if (ByReference)
+            {
+                return sciter::value(VBIsTrue(* Value.pboolVal));
+            }
+            else
+            {
+                return sciter::value(VBIsTrue(Value.boolVal));
+            }
         }
         case VT_I1:
         {
-            return sciter::value(static_cast<SInt32>(Value.bVal));
+            if (ByReference)
+            {
+                return sciter::value(static_cast<SInt32>(* Value.pbVal));
+            }
+            else
+            {
+                return sciter::value(static_cast<SInt32>(Value.bVal));
+            }
         }
         case VT_I2:
         {
-            return sciter::value(static_cast<SInt32>(Value.iVal));
+            if (ByReference)
+            {
+                return sciter::value(static_cast<SInt32>(* Value.piVal));
+            }
+            else
+            {
+                return sciter::value(static_cast<SInt32>(Value.iVal));
+            }
         }
         case VT_I4:
         {
-            return sciter::value(static_cast<SInt32>(Value.lVal));
+            if (ByReference)
+            {
+                return sciter::value(static_cast<SInt32>(* Value.plVal));
+            }
+            else
+            {
+                return sciter::value(static_cast<SInt32>(Value.lVal));
+            }
         }
         case VT_I8:
         {
-            return sciter::value(static_cast<SInt32>(Value.llVal));
+            if (ByReference)
+            {
+                return sciter::value(static_cast<SInt32>(* Value.pllVal));
+            }
+            else
+            {
+                return sciter::value(static_cast<SInt32>(Value.llVal));
+            }
         }
         case VT_UI1:
         {
-            return sciter::value(static_cast<SInt32>(Value.bVal));
+            if (ByReference)
+            {
+                return sciter::value(static_cast<SInt32>(* Value.pbVal));
+            }
+            else
+            {
+                return sciter::value(static_cast<SInt32>(Value.bVal));
+            }
         }
         case VT_UI2:
         {
-            return sciter::value(static_cast<SInt32>(Value.uiVal));
+            if (ByReference)
+            {
+                return sciter::value(static_cast<SInt32>(* Value.puiVal));
+            }
+            else
+            {
+                return sciter::value(static_cast<SInt32>(Value.uiVal));
+            }
         }
         case VT_UI4:
         {
-            return sciter::value(static_cast<SInt32>(Value.ulVal));
+            if (ByReference)
+            {
+                return sciter::value(static_cast<SInt32>(* Value.pulVal));
+            }
+            else
+            {
+                return sciter::value(static_cast<SInt32>(Value.ulVal));
+            }
         }
         case VT_UI8:
         {
-            return sciter::value(static_cast<SInt32>(Value.ullVal));
+            if (ByReference)
+            {
+                return sciter::value(static_cast<SInt32>(* Value.pullVal));
+            }
+            else
+            {
+                return sciter::value(static_cast<SInt32>(Value.ullVal));
+            }
         }
         case VT_R4:
         {
-            return sciter::value(Value.fltVal);
+            if (ByReference)
+            {
+                return sciter::value(* Value.pfltVal);
+            }
+            else
+            {
+                return sciter::value(Value.fltVal);
+            }
         }
         case VT_R8:
         {
-            return sciter::value(Value.dblVal);
+            if (ByReference)
+            {
+                return sciter::value(* Value.pdblVal);
+            }
+            else
+            {
+                return sciter::value(Value.dblVal);
+            }
         }
         case VT_BSTR:
         {
-            return sciter::value(Value.bstrVal, ::SysStringLen(Value.bstrVal));
+            if (ByReference)
+            {
+                return sciter::value(* Value.pbstrVal, ::SysStringLen(* Value.pbstrVal));
+            }
+            else
+            {
+                return sciter::value(Value.bstrVal, ::SysStringLen(Value.bstrVal));
+            }
         }
         case VT_SAFEARRAY: // @NOTE: only support byte array for now
         {
