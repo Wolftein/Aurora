@@ -167,7 +167,7 @@ namespace UI
             ConstSPtr<Graphic::Texture> Texture = mMaterial->GetTexture(0);
 
             Texture->Dispose(GetContext());
-            Texture->Load(Graphic::TextureFormat::BGRA8UIntNorm, Graphic::TextureLayout::Source, Width, Height, 1);
+            Texture->Load(Texture->GetFormat(), Texture->GetLayout(), Width, Height, Texture->GetLayer());
             Texture->Create(GetContext());
         };
         GetSubsystem<Input::Service>()->AddListener(NewPtr<SciterInput>(WINDOW_HANDLE, OnDocumentResize));

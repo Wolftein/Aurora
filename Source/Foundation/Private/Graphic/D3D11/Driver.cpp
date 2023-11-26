@@ -213,9 +213,9 @@ namespace Graphic
             DXGI_FORMAT_R32_TYPELESS,        // TextureFormat::D24Float
             DXGI_FORMAT_R32_TYPELESS,        // TextureFormat::D32Float
             DXGI_FORMAT_R16_TYPELESS,        // TextureFormat::D16X0UIntNorm
-            DXGI_FORMAT_R24G8_TYPELESS,      // TextureFormat::D24X0UIntNorm
-            DXGI_FORMAT_R24G8_TYPELESS,      // TextureFormat::D24S8UIntNorm
-            DXGI_FORMAT_R24G8_TYPELESS,      // TextureFormat::D32X0UIntNorm
+            DXGI_FORMAT_D24_UNORM_S8_UINT,   // TextureFormat::D24X0UIntNorm
+            DXGI_FORMAT_D24_UNORM_S8_UINT,   // TextureFormat::D24S8UIntNorm
+            DXGI_FORMAT_D24_UNORM_S8_UINT,   // TextureFormat::D32X0UIntNorm
         };
 
         if constexpr (Resource)
