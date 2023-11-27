@@ -80,19 +80,16 @@ namespace UI
     private:
 
         // -=(Undocumented)=-
+        UInt OnSciterAttach(LPSCN_ATTACH_BEHAVIOR Behavior);
+
+        // -=(Undocumented)=-
         void OnSciterLoad(LPSCN_LOAD_DATA Data);
 
         // -=(Undocumented)=-
-        void OnSciterRender(LPCBYTE Bytes, INT X, INT Y, UINT Width, UINT Height);
-
-        // -=(Undocumented)=-
-        Bool OnSciterRenderElement(HELEMENT Element, Ptr<DRAW_PARAMS> Parameters);
-
-        // -=(Undocumented)=-
-        UInt OnSciterAttachBehaviour(LPSCN_ATTACH_BEHAVIOR Behavior);
-
-        // -=(Undocumented)=-
         Bool OnSciterCall(Ptr<SCRIPTING_METHOD_PARAMS> Parameters);
+
+        // -=(Undocumented)=-
+        Bool OnSciterRender(HELEMENT Element, Ptr<DRAW_PARAMS> Parameters);
 
     private:
 

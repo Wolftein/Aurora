@@ -63,12 +63,21 @@ namespace Engine
         // Create the graphic service
         LOG_INFO("Kernel: Creating graphics service");
         SPtr<Graphic::Service> GraphicService = AddSubsystem<Graphic::Service>();
-        GraphicService->Initialise(Graphic::Backend::Direct3D11, DisplayHandle, DisplaySize.GetX(), DisplaySize.GetY());
+        if (! GraphicService->Initialise(
+            Graphic::Backend::Direct3D11, DisplayHandle, DisplaySize.GetX(), DisplaySize.GetY()))
+        {
+            LOG_WARNING("Kernel: Failed to create graphics service, disabling service.");
+            GraphicService->Initialise(Graphic::Backend::None, nullptr, 0, 0);
+        }
 
         // Create the audio service
         LOG_INFO("Kernel: Creating audio service");
         SPtr<Audio::Service> AudioService = AddSubsystem<Audio::Service>();
-        AudioService->Initialise(Audio::Backend::XAudio2, Audio::k_MaxSubmixes);
+        if (! AudioService->Initialise(Audio::Backend::XAudio2, Audio::k_MaxSubmixes))
+        {
+            LOG_WARNING("Kernel: Failed to create audio service, disabling service.");
+            AudioService->Initialise(Audio::Backend::None, Audio::k_MaxSubmixes);
+        }
 
         // Create the content service
         LOG_INFO("Kernel: Creating content service");

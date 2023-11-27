@@ -56,7 +56,7 @@ inline namespace Core
         template<typename T, typename ... Args>
         SPtr<T> AddSubsystem(Args && ... Arguments)
         {
-            mContext.AddSubsystem<T>(Arguments...);
+            return mContext.AddSubsystem<T>(Arguments...);
         }
 
         // -=(Undocumented)=-

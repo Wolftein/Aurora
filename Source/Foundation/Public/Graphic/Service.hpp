@@ -116,6 +116,13 @@ namespace Graphic
         UPtr<UInt08[]> ReadTexture(Object ID, UInt Level, Recti Offset);
 
         // -=(Undocumented)=-
+        template<typename Type>
+        Type QueryTexture(Object ID)
+        {
+            return std::any_cast<Type>(mDriver->QueryTexture(ID));
+        }
+
+        // -=(Undocumented)=-
         void DeleteTexture(Object ID);
 
         // -=(Undocumented)=-

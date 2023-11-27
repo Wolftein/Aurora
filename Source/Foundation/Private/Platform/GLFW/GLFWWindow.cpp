@@ -91,14 +91,14 @@ namespace Platform
 
         glfwSetWindowUserPointer(mHandle, this);
 
-        glfwSetKeyCallback(mHandle,  [](Ptr<GLFWwindow> Window, int Key, int Scancode, int Action, int Mods)
+        glfwSetKeyCallback(mHandle,  [](Ptr<GLFWwindow> Window, SInt32 Key, SInt32 Scancode, SInt32 Action, SInt32 Mods)
         {
             Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
 
             (Self->mKeyboard)->OnKeyAction(Key, Scancode, Action, Mods);
         });
 
-        glfwSetCharCallback(mHandle, [](Ptr<GLFWwindow> Window, unsigned int Codepoint)
+        glfwSetCharCallback(mHandle, [](Ptr<GLFWwindow> Window, UInt32 Codepoint)
         {
             Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
 
@@ -112,7 +112,7 @@ namespace Platform
             (Self->mMouse)->OnMouseMove(X, Y);
         });
 
-        glfwSetMouseButtonCallback(mHandle, [](Ptr<GLFWwindow> Window, int Button, int Action, int Mods)
+        glfwSetMouseButtonCallback(mHandle, [](Ptr<GLFWwindow> Window, SInt32 Button, SInt32 Action, SInt32 Mods)
         {
             Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
 
@@ -126,7 +126,7 @@ namespace Platform
             (Self->mMouse)->OnMouseScroll(X, Y);
         });
 
-        glfwSetWindowFocusCallback(mHandle, [](Ptr<GLFWwindow> Window, SInt GotFocus)
+        glfwSetWindowFocusCallback(mHandle, [](Ptr<GLFWwindow> Window, SInt32 GotFocus)
         {
             Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
 
@@ -136,7 +136,7 @@ namespace Platform
             Self->Invoke(Event);
         });
 
-        glfwSetFramebufferSizeCallback(mHandle, [](Ptr<GLFWwindow> Window, SInt Width, SInt Height)
+        glfwSetFramebufferSizeCallback(mHandle, [](Ptr<GLFWwindow> Window, SInt32 Width, SInt32 Height)
         {
             Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
 

@@ -74,6 +74,9 @@ namespace Graphic
         virtual UPtr<UInt08[]> ReadTexture(Object ID, UInt Level, Recti Offset) = 0;
 
         // -=(Undocumented)=-
+        virtual Any QueryTexture(Object ID) = 0;
+
+        // -=(Undocumented)=-
         virtual void DeleteTexture(Object ID) = 0;
 
         // -=(Undocumented)=-
