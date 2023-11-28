@@ -84,11 +84,6 @@ namespace Platform
             glfwSetWindowPos(mHandle, (VideoMode->width - Width ) / 2, (VideoMode->height - Height) / 2);
         }
 
-        if (glfwRawMouseMotionSupported())
-        {
-            glfwSetInputMode(mHandle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-        }
-
         glfwSetWindowUserPointer(mHandle, this);
 
         glfwSetKeyCallback(mHandle,  [](Ptr<GLFWwindow> Window, SInt32 Key, SInt32 Scancode, SInt32 Action, SInt32 Mods)

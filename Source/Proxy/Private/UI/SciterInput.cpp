@@ -275,19 +275,19 @@ namespace UI
     {
         if (Key == Input::Key::LeftShift)
         {
-            mStates &= ~SHIFT_KEY_PRESSED;
+            mStates |= SHIFT_KEY_PRESSED;
         }
         else if (Key == Input::Key::RightShift)
         {
-            mStates &= ~RIGHT_SHIFT_KEY_PRESSED;
+            mStates |= RIGHT_SHIFT_KEY_PRESSED;
         }
         else if (Key == Input::Key::LeftCtrl || Key == Input::Key::RightCtrl)
         {
-            mStates &= ~CONTROL_KEY_PRESSED;
+            mStates |= CONTROL_KEY_PRESSED;
         }
         else if (Key == Input::Key::LeftAlt || Key == Input::Key::RightAlt)
         {
-            mStates &= ~ALT_KEY_PRESSED;
+            mStates |= ALT_KEY_PRESSED;
         }
 
         if (SciterProcX(mHandle, SCITER_X_MSG_KEY(KEY_DOWN, GetKey(Key), KEYBOARD_STATES(mStates))))
@@ -305,19 +305,19 @@ namespace UI
     {
         if (Key == Input::Key::LeftShift)
         {
-            mStates |= SHIFT_KEY_PRESSED;
+            mStates &= ~SHIFT_KEY_PRESSED;
         }
         else if (Key == Input::Key::RightShift)
         {
-            mStates |= RIGHT_SHIFT_KEY_PRESSED;
+            mStates &= ~RIGHT_SHIFT_KEY_PRESSED;
         }
         else if (Key == Input::Key::LeftCtrl || Key == Input::Key::RightCtrl)
         {
-            mStates |= CONTROL_KEY_PRESSED;
+            mStates &= ~CONTROL_KEY_PRESSED;
         }
         else if (Key == Input::Key::LeftAlt || Key == Input::Key::RightAlt)
         {
-            mStates |= ALT_KEY_PRESSED;
+            mStates &= ~ALT_KEY_PRESSED;
         }
 
         if (SciterProcX(mHandle, SCITER_X_MSG_KEY(KEY_UP, GetKey(Key), KEYBOARD_STATES(mStates))))

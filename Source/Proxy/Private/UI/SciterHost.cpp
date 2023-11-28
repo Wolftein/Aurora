@@ -324,13 +324,15 @@ namespace UI
 
     Bool SciterHost::OnSciterCall(Ptr<SCRIPTING_METHOD_PARAMS> Parameters)
     {
-        const auto Iterator = mFunctions.find(Parameters->name);
-        if (Iterator != mFunctions.end())
+        if (const auto Iterator = mFunctions.find(Parameters->name); Iterator != mFunctions.end())
         {
             Parameters->result = (Iterator->second)(CPtr<const sciter::value>(Parameters->argv, Parameters->argc));
-            return true;
         }
-        return false;
+        else
+        {
+            LOG_WARNING("Can't find function '{}'", Parameters->name);
+        }
+        return true;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
