@@ -35,6 +35,9 @@ namespace UI
 
     private:
 
+        // \see Input::Listener::OnEvent
+        Bool OnEvent(Ref<const Input::Event> Event) override;
+
         // \see Input::Listener::OnKeyType
         Bool OnKeyType(UInt Codepoint) override;
 
@@ -76,5 +79,11 @@ namespace UI
         POINT                   mMousePosition;
         MOUSE_BUTTONS           mMouseButtons;
         UINT                    mStates;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Real64                  mMouseClickTime;
+        MOUSE_BUTTONS           mMouseClickButton;
     };
 }

@@ -263,6 +263,30 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    Bool SciterInput::OnEvent(Ref<const Input::Event> Event)
+    {
+        if (Event.Type == Input::Event::Type::MouseUp) // Handle Double Click Event
+        {
+            const MOUSE_BUTTONS SciterButton = GetButton(Event.MouseAction.Button);
+
+            if (mMouseClickButton == SciterButton && Event.Time - mMouseClickTime <= 0.4)
+            {
+                SciterProcX(mHandle, SCITER_X_MSG_MOUSE(MOUSE_DCLICK, mMouseClickButton, KEYBOARD_STATES(mStates), mMousePosition));
+                mMouseClickButton = MOUSE_BUTTONS(0);
+            }
+            else
+            {
+                mMouseClickTime   = Event.Time;
+                mMouseClickButton = SciterButton;
+            }
+        }
+
+        return Input::Listener::OnEvent(Event);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     Bool SciterInput::OnKeyType(UInt Codepoint)
     {
         return SciterProcX(mHandle, SCITER_X_MSG_KEY(KEY_CHAR, Codepoint, KEYBOARD_STATES(mStates)));
@@ -333,6 +357,8 @@ namespace UI
 
     Bool SciterInput::OnMouseMove(UInt X, UInt Y)
     {
+        mMouseClickButton = MOUSE_BUTTONS(0); // reset double click
+
         mMousePosition.x = X;
         mMousePosition.y = Y;
         return SciterProcX(
