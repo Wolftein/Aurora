@@ -265,22 +265,23 @@ namespace UI
 
     Bool SciterInput::OnEvent(Ref<const Input::Event> Event)
     {
-        if (Event.Type == Input::Event::Type::MouseUp) // Handle Double Click Event
+        if (Event.Type == Input::Event::Type::MouseMove)       // Handle reset double click event
         {
-            const MOUSE_BUTTONS SciterButton = GetButton(Event.MouseAction.Button);
-
-            if (mMouseClickButton == SciterButton && Event.Time - mMouseClickTime <= 0.4)
+            mMouseClickButton = Input::Button::Unknown;
+        }
+        else if (Event.Type == Input::Event::Type::MouseUp)    // Handle double click event
+        {
+            if (mMouseClickButton == Event.MouseAction.Button && Event.Time - mMouseClickTime <= 0.5)
             {
-                SciterProcX(mHandle, SCITER_X_MSG_MOUSE(MOUSE_DCLICK, mMouseClickButton, KEYBOARD_STATES(mStates), mMousePosition));
-                mMouseClickButton = MOUSE_BUTTONS(0);
+                OnMouseDoubleClick(Event.MouseAction.Button);
+                mMouseClickButton = Input::Button::Unknown;
             }
             else
             {
                 mMouseClickTime   = Event.Time;
-                mMouseClickButton = SciterButton;
+                mMouseClickButton = Event.MouseAction.Button;
             }
         }
-
         return Input::Listener::OnEvent(Event);
     }
 
@@ -357,8 +358,6 @@ namespace UI
 
     Bool SciterInput::OnMouseMove(UInt X, UInt Y)
     {
-        mMouseClickButton = MOUSE_BUTTONS(0); // reset double click
-
         mMousePosition.x = X;
         mMousePosition.y = Y;
         return SciterProcX(
@@ -414,5 +413,14 @@ namespace UI
         mCbDocumentResize(Width, Height);
 
         return false;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool SciterInput::OnMouseDoubleClick(Input::Button Button)
+    {
+        return SciterProcX(
+            mHandle, SCITER_X_MSG_MOUSE(MOUSE_DCLICK, mMouseButtons, KEYBOARD_STATES(mStates), mMousePosition));
     }
 }

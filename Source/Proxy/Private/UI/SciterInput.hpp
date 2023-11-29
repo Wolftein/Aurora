@@ -29,7 +29,11 @@ namespace UI
         template<typename Callback>
         SciterInput(HWND Handle, Callback OnDocumentResize)
             : mHandle           { Handle },
-              mCbDocumentResize { OnDocumentResize }
+              mCbDocumentResize { OnDocumentResize },
+              mMouseButtons     { MOUSE_BUTTONS(0) },
+              mStates           { 0 },
+              mMouseClickTime   { 0 },
+              mMouseClickButton { Input::Button::Unknown }
         {
         }
 
@@ -67,6 +71,11 @@ namespace UI
 
     private:
 
+        // -=(Undocumented)=-
+        Bool OnMouseDoubleClick(Input::Button Button);
+
+    private:
+
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -84,6 +93,6 @@ namespace UI
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Real64                  mMouseClickTime;
-        MOUSE_BUTTONS           mMouseClickButton;
+        Input::Button           mMouseClickButton;
     };
 }
