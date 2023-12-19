@@ -27,7 +27,7 @@ namespace Content
 
 	SystemLocator::SystemLocator(CStr Path)
 		: mPath(Path)
-	{
+    {
 	}
 
 	// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -41,7 +41,7 @@ namespace Content
         constexpr UInt Access     = GENERIC_READ;
         constexpr UInt Attributes = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN;
 
-        const HANDLE Handle = ::CreateFile((mPath + Path.data()).c_str(), Access, 0, 0, OPEN_EXISTING, Attributes, 0);
+        const HANDLE Handle = ::CreateFile((mPath + "/" + Path.data()).c_str(), Access, 0, 0, OPEN_EXISTING, Attributes, 0);
 
         if (Handle != INVALID_HANDLE_VALUE)
         {
