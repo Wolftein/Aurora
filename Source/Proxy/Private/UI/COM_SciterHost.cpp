@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021-2023 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2024 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -160,6 +160,19 @@ inline namespace COM
                 return sciter::value(Value.bstrVal, ::SysStringLen(Value.bstrVal));
             }
         }
+        /*
+        case VT_CY:
+        case VT_DECIMAL:
+        {
+            if (ByReference)
+            {
+                return sciter::value(Value.pcyVal->int64);
+            }
+            else
+            {
+                return sciter::value(Value.cyVal.int64);
+            }
+        }*/
         case VT_SAFEARRAY: // @NOTE: only support byte array for now
         {
             const LPSAFEARRAY Array = Value.parray;
@@ -172,6 +185,7 @@ inline namespace COM
         }
         default:
         {
+            LOG_WARNING("Invalid value type {}", Value.vt & ~(VT_VECTOR | VT_ARRAY | VT_BYREF));
             return sciter::value(static_cast<SInt32>(0));
         }
         }
