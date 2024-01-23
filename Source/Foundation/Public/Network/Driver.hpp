@@ -12,51 +12,30 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace Network
 {
     // -=(Undocumented)=-
-    class Kernel final : public Core::Subsystem::Context
+    class Driver
     {
     public:
 
         // -=(Undocumented)=-
-        ~Kernel();
+        virtual Bool Initialize() = 0;
 
         // -=(Undocumented)=-
-        void Initialize(Ref<const Properties> Properties);
+        virtual void Poll() = 0;
 
         // -=(Undocumented)=-
-        void Tick();
+        virtual SPtr<Server> Listen(UInt Capacity, CStr Address, CStr Service) = 0;
 
         // -=(Undocumented)=-
-        SPtr<Platform::Window> GetDisplay() const
-        {
-            return mDisplay;
-        }
-
-    private:
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        SPtr<Platform::Window> mDisplay;
+        virtual SPtr<Client> Connect(CStr Address, CStr Service) = 0;
     };
 }

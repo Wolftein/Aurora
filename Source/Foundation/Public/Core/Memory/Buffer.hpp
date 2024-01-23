@@ -12,51 +12,52 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
+#include "Core/Types.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+inline namespace Core
 {
     // -=(Undocumented)=-
-    class Kernel final : public Core::Subsystem::Context
+    class Buffer final
     {
     public:
 
         // -=(Undocumented)=-
-        ~Kernel();
+        Buffer(UInt Capacity);
 
         // -=(Undocumented)=-
-        void Initialize(Ref<const Properties> Properties);
+        void Reset();
 
         // -=(Undocumented)=-
-        void Tick();
+        CPtr<UInt08> Reserve(UInt Length);
 
         // -=(Undocumented)=-
-        SPtr<Platform::Window> GetDisplay() const
-        {
-            return mDisplay;
-        }
+        void Commit(UInt Length);
+
+        // -=(Undocumented)=-
+        CPtr<UInt08> Read();
+
+        // -=(Undocumented)=-
+        void Consume(UInt Length);
+
+        // -=(Undocumented)=-
+        Bool IsEmpty() const;
+
+        // -=(Undocumented)=-
+        Bool IsFull() const;
 
     private:
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Platform::Window> mDisplay;
+        Vector<UInt08> mBuffer;
+        UInt           mReader;
+        UInt           mWriter;
+        UInt           mMarker;
+        Bool           mFlip;
     };
 }

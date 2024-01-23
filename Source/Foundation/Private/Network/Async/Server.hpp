@@ -12,51 +12,38 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
+#include "Session.hpp"
+#include "Network/Server.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace Network
 {
     // -=(Undocumented)=-
-    class Kernel final : public Core::Subsystem::Context
+    class AsyncServer final : public Server
     {
     public:
 
         // -=(Undocumented)=-
-        ~Kernel();
+        AsyncServer(Ref<asio::io_context> Context);
 
         // -=(Undocumented)=-
-        void Initialize(Ref<const Properties> Properties);
+        Bool Listen(UInt Capacity, CStr Address, CStr Service);
+
+        // \see Server::Close
+        void Close() override;
 
         // -=(Undocumented)=-
-        void Tick();
-
-        // -=(Undocumented)=-
-        SPtr<Platform::Window> GetDisplay() const
-        {
-            return mDisplay;
-        }
+        void WhenAccept(Ref<const std::error_code> Error);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Platform::Window> mDisplay;
+        asio::ip::tcp::acceptor mAcceptor;
+        asio::ip::tcp::socket   mConnector;
     };
 }

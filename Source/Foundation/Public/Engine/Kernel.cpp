@@ -82,6 +82,10 @@ namespace Engine
         // Create the content service
         LOG_INFO("Kernel: Creating content service");
         AddSubsystem<Content::Service>();
+
+        // Create the network service
+        LOG_INFO("Kernel: Creating network service");
+        AddSubsystem<Network::Service>();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

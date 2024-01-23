@@ -12,51 +12,41 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
+#include "Core/Serialization/Binary/Stream.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace Network
 {
     // -=(Undocumented)=-
-    class Kernel final : public Core::Subsystem::Context
+    template<typename Derived, UInt ID>
+    class Packet
     {
     public:
 
         // -=(Undocumented)=-
-        ~Kernel();
+        constexpr static inline UInt k_ID = ID;
+
+    public:
 
         // -=(Undocumented)=-
-        void Initialize(Ref<const Properties> Properties);
-
-        // -=(Undocumented)=-
-        void Tick();
-
-        // -=(Undocumented)=-
-        SPtr<Platform::Window> GetDisplay() const
+        UInt GetID() const
         {
-            return mDisplay;
+            return k_ID;
         }
 
-    private:
+        // -=(Undocumented)=-
+        void Encode(Ref<Writer> Archive)
+        {
+            static_cast<Ptr<Derived>>(this)->OnSerialize(Stream<Writer>(Archive));
+        }
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        SPtr<Platform::Window> mDisplay;
+        // -=(Undocumented)=-
+        void Decode(Ref<Reader> Archive)
+        {
+            static_cast<Ptr<Derived>>(this)->OnSerialize(Stream<Reader>(Archive));
+        }
     };
 }

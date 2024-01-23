@@ -12,51 +12,38 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
+#include "Network/Driver.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace Network
 {
     // -=(Undocumented)=-
-    class Kernel final : public Core::Subsystem::Context
+    class AsyncDriver final : public Driver
     {
     public:
 
-        // -=(Undocumented)=-
-        ~Kernel();
+        // \see Driver::Initialize
+        Bool Initialize() override;
 
-        // -=(Undocumented)=-
-        void Initialize(Ref<const Properties> Properties);
+        // \see Driver::Poll
+        void Poll() override;
 
-        // -=(Undocumented)=-
-        void Tick();
+        // \see Driver::Listen
+        SPtr<Server> Listen(UInt Capacity, CStr Address, CStr Service) override;
 
-        // -=(Undocumented)=-
-        SPtr<Platform::Window> GetDisplay() const
-        {
-            return mDisplay;
-        }
+        // \see Driver::Connect
+        SPtr<Client> Connect(CStr Address, CStr Service) override;
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Platform::Window> mDisplay;
+        asio::io_context mReactor;
     };
 }

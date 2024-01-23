@@ -12,51 +12,43 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
+#include "Core/System/Subsystem.hpp"
+#include "Driver.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace Network
 {
     // -=(Undocumented)=-
-    class Kernel final : public Core::Subsystem::Context
+    class Service final : public Subsystem
     {
     public:
 
         // -=(Undocumented)=-
-        ~Kernel();
+        Service(Ref<Context> System);
 
         // -=(Undocumented)=-
-        void Initialize(Ref<const Properties> Properties);
+        ~Service();
 
         // -=(Undocumented)=-
-        void Tick();
+        void OnTick() override;
 
         // -=(Undocumented)=-
-        SPtr<Platform::Window> GetDisplay() const
-        {
-            return mDisplay;
-        }
+        Bool Initialise();
+
+        // -=(Undocumented)=-
+        SPtr<Server> Listen(UInt Capacity, CStr Address, CStr Service);
+
+        // -=(Undocumented)=-
+        SPtr<Client> Connect(CStr Address, CStr Service);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Platform::Window> mDisplay;
+        UPtr<Driver> mDriver;
     };
 }

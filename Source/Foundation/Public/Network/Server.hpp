@@ -12,44 +12,62 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
+#include "Session.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace Network
 {
     // -=(Undocumented)=-
-    class Kernel final : public Core::Subsystem::Context
+    class Server : public EnableSmartPointer<Server>
     {
     public:
 
         // -=(Undocumented)=-
-        ~Kernel();
+        virtual void Close() = 0;
 
         // -=(Undocumented)=-
-        void Initialize(Ref<const Properties> Properties);
-
-        // -=(Undocumented)=-
-        void Tick();
-
-        // -=(Undocumented)=-
-        SPtr<Platform::Window> GetDisplay() const
+        void Disconnect(Bool Forcibly)
         {
-            return mDisplay;
+            for (ConstSPtr<Session> Session : mDatabase)
+            {
+                Session->Close(Forcibly);
+            }
+        }
+
+        // -=(Undocumented)=-
+        template<typename Message>
+        void Broadcast(Message && Packet)
+        {
+            for (ConstSPtr<Session> Session : mDatabase)
+            {
+                Session->template Write(Packet);
+            }
+        }
+
+        // -=(Undocumented)=-
+        void Flush()
+        {
+            for (ConstSPtr<Session> Session : mDatabase)
+            {
+                Session->Flush();
+            }
+        }
+
+    protected:
+
+        // -=(Undocumented)=-
+        void OnAttach(ConstSPtr<Session> Session)
+        {
+            mDatabase.emplace_back(Session);
+        }
+
+        // -=(Undocumented)=-
+        void OnDetach(ConstSPtr<Session> Session)
+        {
+            mDatabase.erase(std::find(mDatabase.begin(), mDatabase.end(), Session));
         }
 
     private:
@@ -57,6 +75,6 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Platform::Window> mDisplay;
+        Vector<SPtr<Session>> mDatabase;
     };
 }

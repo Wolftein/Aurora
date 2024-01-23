@@ -62,6 +62,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Bool HasData() const
+        {
+            return (mOffset > 0);
+        }
+
+        // -=(Undocumented)=-
         Bool Ensure(UInt Length)
         {
             if (mOffset + Length >= GetCapacity())

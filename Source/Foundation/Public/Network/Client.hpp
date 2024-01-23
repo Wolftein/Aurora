@@ -12,16 +12,17 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Log/Service.hpp"
+#include "Session.hpp"
 
-#include "Math/Color.hpp"
-#include "Math/Rect.hpp"
-#include "Math/Transform.hpp"
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// [   CODE   ]
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Memory/Buffer.hpp"
-#include "Memory/Chunk.hpp"
-#include "Memory/Handle.hpp"
-
-#include "Serialization/TOML/Parser.hpp"
-
-#include "System/Subsystem.hpp"
+namespace Network
+{
+    // -=(Undocumented)=-
+    class Client : public Session
+    {
+    public:
+    };
+}
