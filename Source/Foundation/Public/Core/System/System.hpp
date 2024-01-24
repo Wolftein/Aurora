@@ -47,6 +47,16 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename T>
+        void RemoveSubsystem()
+        {
+            std::erase_if(mSubsystems, [](ConstSPtr<Subsystem> SubsystemPtr)
+            {
+                return (typeid(T) == typeid(* SubsystemPtr));
+            });
+        }
+
+        // -=(Undocumented)=-
+        template<typename T>
         SPtr<T> GetSubsystem()
         {
             for (ConstSPtr<Subsystem> SubsystemPtr : mSubsystems)

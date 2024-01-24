@@ -48,11 +48,7 @@ ENDIF ()
 ## Dependency (CMRC)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-ExternalProject_Add(EP_CMRC
-        GIT_REPOSITORY https://github.com/vector-of-bool/cmrc
-        UPDATE_COMMAND "" BUILD_COMMAND "" INSTALL_COMMAND "")
-ExternalProject_Get_Property(EP_CMRC SOURCE_DIR)
-INCLUDE(${SOURCE_DIR}/CMakeRC.cmake)
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/Scripts/CMakeRC.cmake)
 CMRC_ADD_RESOURCE_LIBRARY(Engine-Resources ALIAS Engine::RC NAMESPACE Resources WHENCE ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${PROJECT_RESOURCE})
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

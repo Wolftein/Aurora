@@ -36,7 +36,7 @@ namespace Engine
 
         // Creates the platform service
         LOG_INFO("Kernel: Creating platform service");
-        SPtr<Platform::Service> PlatformService = AddSubsystem<Platform::Service>();
+        ConstSPtr<Platform::Service> PlatformService = AddSubsystem<Platform::Service>();
 
         // Creates the input service
         LOG_INFO("Kernel: Creating input service");
@@ -62,7 +62,7 @@ namespace Engine
 
         // Create the graphic service
         LOG_INFO("Kernel: Creating graphics service");
-        SPtr<Graphic::Service> GraphicService = AddSubsystem<Graphic::Service>();
+        ConstSPtr<Graphic::Service> GraphicService = AddSubsystem<Graphic::Service>();
         if (! GraphicService->Initialise(
             Graphic::Backend::Direct3D11, DisplayHandle, DisplaySize.GetX(), DisplaySize.GetY()))
         {
@@ -72,7 +72,7 @@ namespace Engine
 
         // Create the audio service
         LOG_INFO("Kernel: Creating audio service");
-        SPtr<Audio::Service> AudioService = AddSubsystem<Audio::Service>();
+        ConstSPtr<Audio::Service> AudioService = AddSubsystem<Audio::Service>();
         if (! AudioService->Initialise(Audio::Backend::XAudio2, Audio::k_MaxSubmixes))
         {
             LOG_WARNING("Kernel: Failed to create audio service, disabling service.");
@@ -85,7 +85,12 @@ namespace Engine
 
         // Create the network service
         LOG_INFO("Kernel: Creating network service");
-        AddSubsystem<Network::Service>();
+        ConstSPtr<Network::Service> NetworkService = AddSubsystem<Network::Service>();
+        if (! NetworkService->Initialise())
+        {
+            LOG_WARNING("Kernel: Failed to create network service, disabling service.");
+            RemoveSubsystem<Network::Service>();
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
