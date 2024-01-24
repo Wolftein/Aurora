@@ -49,7 +49,8 @@ ENDIF ()
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/Scripts/CMakeRC.cmake)
-CMRC_ADD_RESOURCE_LIBRARY(Engine-Resources ALIAS Engine::RC NAMESPACE Resources WHENCE ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${PROJECT_RESOURCE})
+CMRC_ADD_RESOURCE_LIBRARY(Engine-Resources
+        ALIAS Engine::RC NAMESPACE Resources WHENCE ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${PROJECT_RESOURCE})
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (EASTL in-drop replacement for STL)
@@ -75,6 +76,7 @@ LIST(APPEND PROJECT_INCLUDE
         ${SOURCE_DIR}/test/packages/EAStdC/include
         ${SOURCE_DIR}/test/packages/EAThread/include)
 LIST(APPEND PROJECT_LIBRARY ${BINARY_DIR}${CONFIGURATION_SUFFIX}/EASTL.lib)
+LIST(APPEND PROJECT_DEPENDS EP_EASTL)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (ASIO)
@@ -84,14 +86,15 @@ ExternalProject_Add(EP_ASIO
         GIT_REPOSITORY https://github.com/chriskohlhoff/asio
         GIT_SUBMODULES_RECURSE OFF
         CMAKE_ARGS
-        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-        -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+            -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         CONFIGURE_COMMAND "" BUILD_COMMAND "" UPDATE_COMMAND "" INSTALL_COMMAND "")
 ExternalProject_Get_Property(EP_ASIO SOURCE_DIR)
 ExternalProject_Get_Property(EP_ASIO BINARY_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR}/asio/include)
+LIST(APPEND PROJECT_DEPENDS EP_ASIO)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (GLFW)
@@ -111,6 +114,7 @@ ExternalProject_Get_Property(EP_GLFW SOURCE_DIR)
 ExternalProject_Get_Property(EP_GLFW BINARY_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR}/include)
 LIST(APPEND PROJECT_LIBRARY ${BINARY_DIR}${CONFIGURATION_SUFFIX}/src/GLFW3.lib)
+LIST(APPEND PROJECT_DEPENDS EP_GLFW)
 
 IF    (WIN32)
     ADD_DEFINITIONS(-DGLFW_EXPOSE_NATIVE_WIN32)
@@ -131,6 +135,7 @@ ExternalProject_Add(EP_DRLIBS
         UPDATE_COMMAND "" BUILD_COMMAND "" CONFIGURE_COMMAND "" INSTALL_COMMAND "")
 ExternalProject_Get_Property(EP_DRLIBS SOURCE_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR})
+LIST(APPEND PROJECT_DEPENDS EP_DRLIBS)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (STB for reading images)
@@ -147,6 +152,7 @@ ExternalProject_Add(EP_STB
         UPDATE_COMMAND "" BUILD_COMMAND "" CONFIGURE_COMMAND "" INSTALL_COMMAND "")
 ExternalProject_Get_Property(EP_STB SOURCE_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR})
+LIST(APPEND PROJECT_DEPENDS EP_STB)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (TOML)
@@ -164,6 +170,7 @@ ExternalProject_Add(EP_TOML
 ExternalProject_Get_Property(EP_TOML SOURCE_DIR)
 ExternalProject_Get_Property(EP_TOML BINARY_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR})
+LIST(APPEND PROJECT_DEPENDS EP_TOML)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (QUILL)
@@ -182,6 +189,7 @@ ExternalProject_Get_Property(EP_QUILL SOURCE_DIR)
 ExternalProject_Get_Property(EP_QUILL BINARY_DIR)
 LIST(APPEND PROJECT_INCLUDE ${SOURCE_DIR}/quill/include)
 LIST(APPEND PROJECT_LIBRARY ${BINARY_DIR}/quill/quill.lib)
+LIST(APPEND PROJECT_DEPENDS EP_QUILL)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Configuration
@@ -198,6 +206,12 @@ ADD_DEFINITIONS(-DAE_CONTENT_LOADER_ARTERY)     # .arfont
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${PROJECT_SOURCE})
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Dependencies
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+ADD_DEPENDENCIES(${PROJECT_NAME} ${PROJECT_DEPENDS})
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Libraries
