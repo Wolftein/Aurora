@@ -21,7 +21,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Client : public Session
+    class Client : public virtual Session
     {
     public:
     };
