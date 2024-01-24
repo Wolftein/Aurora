@@ -43,9 +43,9 @@ inline namespace Core
 
     CPtr<UInt08> Buffer::Reserve(UInt Length)
     {
-        const UInt Consumed = (mFlip ? mReader - mMarker : mBuffer.size() - mWriter);
+        const UInt Available = (mFlip ? mReader - mMarker : mBuffer.size() - mWriter);
 
-        if (Consumed > Length)
+        if (Available > Length)
         {
             if (mFlip)
             {

@@ -39,7 +39,7 @@ namespace Engine
         ConstSPtr<Platform::Service> PlatformService = AddSubsystem<Platform::Service>();
 
         // Creates multimedia services (if running in client mode)
-        if constexpr (IsClientMode())
+        if constexpr (! IsHeadless())
         {
             // Creates the input service
             LOG_INFO("Kernel: Creating input service");
