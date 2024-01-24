@@ -21,12 +21,18 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Server : public EnableSmartPointer<Server>
+    class Server : public EnableSmartPointer<Server>, public Protocol
     {
     public:
 
         // -=(Undocumented)=-
         virtual void Close() = 0;
+
+        // -=(Undocumented)=-
+        void Attach(ConstSPtr<Protocol> Protocol)
+        {
+            mProtocol = Protocol;
+        }
 
         // -=(Undocumented)=-
         void Disconnect(Bool Forcibly)
@@ -56,25 +62,29 @@ namespace Network
             }
         }
 
-    protected:
+    private:
 
         // -=(Undocumented)=-
-        void OnAttach(ConstSPtr<Session> Session)
-        {
-            mDatabase.emplace_back(Session);
-        }
+        void OnAttach(ConstSPtr<class Session> Session) override;
 
         // -=(Undocumented)=-
-        void OnDetach(ConstSPtr<Session> Session)
-        {
-            mDatabase.erase(std::find(mDatabase.begin(), mDatabase.end(), Session));
-        }
+        void OnDetach(ConstSPtr<class Session> Session) override;
+
+        // -=(Undocumented)=-
+        void OnError(ConstSPtr<class Session> Session, UInt Error, CStr Description) override;
+
+        // -=(Undocumented)=-
+        void OnRead(ConstSPtr<class Session> Session,  CPtr<UInt08> Bytes) override;
+
+        // -=(Undocumented)=-
+        void OnWrite(ConstSPtr<class Session> Session, CPtr<UInt08> Bytes) override;
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        SPtr<Protocol>        mProtocol;
         Vector<SPtr<Session>> mDatabase;
     };
 }

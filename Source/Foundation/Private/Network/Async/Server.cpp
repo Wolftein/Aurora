@@ -74,8 +74,7 @@ namespace Network
         else
         {
             SPtr<AsyncSession> Connection = std::make_shared<AsyncSession>(Move(mConnector));
-            OnAttach(Connection);
-
+            Connection->Attach(shared_from_this());
             Connection->Start();
 
             const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error) {
