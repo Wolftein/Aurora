@@ -39,7 +39,9 @@ namespace Network
 
     SPtr<Server> AsyncDriver::Listen(UInt Capacity, CStr Address, CStr Service)
     {
-        return NewPtr<AsyncServer>(mReactor);
+        ConstSPtr<AsyncServer> Server = NewPtr<AsyncServer>(mReactor);
+        Server->Listen(Capacity, Address, Service);
+        return Server;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -47,6 +49,8 @@ namespace Network
 
     SPtr<Client> AsyncDriver::Connect(CStr Address, CStr Service)
     {
-        return NewPtr<AsyncClient>(mReactor);
+        ConstSPtr<AsyncClient> Client = NewPtr<AsyncClient>(mReactor);
+        Client->Connect(Address, Service);
+        return Client;
     }
 }

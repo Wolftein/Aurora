@@ -30,28 +30,20 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool AsyncServer::Listen(UInt Capacity, CStr Address, CStr Service)
+    void AsyncServer::Listen(UInt Capacity, CStr Address, CStr Service)
     {
-        try
-        {
-            const asio::ip::tcp::endpoint Endpoint
-                = (* asio::ip::tcp::resolver(mAcceptor.get_executor()).resolve(Address.data(), Service.data()));
+        const asio::ip::tcp::endpoint Endpoint
+            = (* asio::ip::tcp::resolver(mAcceptor.get_executor()).resolve(Address.data(), Service.data()));
 
-            mAcceptor.open(Endpoint.protocol());
-            mAcceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-            mAcceptor.bind(Endpoint);
-            mAcceptor.listen();
+        mAcceptor.open(Endpoint.protocol());
+        mAcceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+        mAcceptor.bind(Endpoint);
+        mAcceptor.listen(Capacity);
 
-            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error) {
-                CastPtr<AsyncServer>(Self)->WhenAccept(Error);
-            };
-            mAcceptor.async_accept(mConnector, OnCompletion);
-        }
-        catch (Ref<asio::system_error> Exception)
-        {
-            return false;
-        }
-        return true;
+        const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error) {
+            CastPtr<AsyncServer>(Self)->WhenAccept(Error);
+        };
+        mAcceptor.async_accept(mConnector, OnCompletion);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

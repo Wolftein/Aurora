@@ -30,7 +30,7 @@ namespace Network
         AsyncServer(Ref<asio::io_context> Context);
 
         // -=(Undocumented)=-
-        Bool Listen(UInt Capacity, CStr Address, CStr Service);
+        void Listen(UInt Capacity, CStr Address, CStr Service);
 
         // \see Server::Close
         void Close() override;
