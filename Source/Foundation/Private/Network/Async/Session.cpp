@@ -40,7 +40,7 @@ namespace Network
 
         DoRead(false, sizeof(Header));
 
-        OnAttach();
+        mProtocol->OnAttach(shared_from_this());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -59,7 +59,7 @@ namespace Network
             = NewPtr<asio::ip::tcp::resolver>(mChannel.get_executor());
 
         const auto OnCompletion = [Self = shared_from_this(), Resolver](const auto Error, auto Result) {
-            CastPtr<AsyncSession>(Self)->WhenResolve(Error, Result);
+            Self->WhenResolve(Error, Result);
         };
         Resolver->async_resolve(Address.data(), Service.data(), OnCompletion);
     }
@@ -102,7 +102,7 @@ namespace Network
 
                 std::copy(Block.begin(), Block.begin() + Block.size(), Chunk.data() + sizeof(Header));
 
-                OnWrite(Chunk.subspan(sizeof(Header), mAccumulator.GetOffset()));
+                mProtocol->OnWrite(shared_from_this(), Chunk.subspan(sizeof(Header), mAccumulator.GetOffset()));
 
                 mEncoder.Commit(Chunk.size());
 
@@ -135,7 +135,7 @@ namespace Network
         mEncoder.Reset();
         mDecoder.Reset();
 
-        OnDetach();
+        mProtocol->OnDetach(shared_from_this());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -152,7 +152,7 @@ namespace Network
         else
         {
             const auto OnCompletion = [Self = shared_from_this(), Body](const auto Error, auto Transferred) {
-                CastPtr<AsyncSession>(Self)->WhenRead(Error, Transferred, Body);
+                Self->WhenRead(Error, Transferred, Body);
             };
             asio::async_read(mChannel, asio::mutable_buffer(Chunk.data(), Chunk.size()), OnCompletion);
         }
@@ -166,7 +166,7 @@ namespace Network
         if (const CPtr<UInt08> Chunk = mEncoder.Read(); !Chunk.empty())
         {
             const auto OnCompletion = [Self = shared_from_this()](const auto Error, auto Transferred) {
-                CastPtr<AsyncSession>(Self)->WhenWrite(Error, Transferred);
+                Self->WhenWrite(Error, Transferred);
             };
             asio::async_write(mChannel, asio::const_buffer(Chunk.data(), Chunk.size()), OnCompletion);
         }
@@ -193,7 +193,7 @@ namespace Network
             const asio::ip::tcp::endpoint Endpoint = (* Result);
 
             const auto OnCompletion = [Self = shared_from_this(), Result = ++Result](const auto Error) {
-                CastPtr<AsyncSession>(Self)->WhenConnect(eastl::forward<decltype(Error)>(Error), Result);
+                Self->WhenConnect(eastl::forward<decltype(Error)>(Error), Result);
             };
             mChannel.async_connect(Endpoint, OnCompletion);
         }
@@ -232,7 +232,7 @@ namespace Network
     {
         if (Error)
         {
-            OnError(Error.value(), Error.message());
+            mProtocol->OnError(shared_from_this(), Error.value(), Error.message());
         }
         DoClose();
     }
@@ -259,7 +259,7 @@ namespace Network
             {
                 if (Body)
                 {
-                    OnRead(Chunk);
+                    mProtocol->OnRead(shared_from_this(), Chunk);
                 }
 
                 mDecoder.Consume(Chunk.size());

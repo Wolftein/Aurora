@@ -23,7 +23,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class AsyncSession : public Session
+    class AsyncSession : public EnableSmartPointer<AsyncSession>, public virtual Session
     {
     public:
 

@@ -22,7 +22,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Session : public EnableSmartPointer<Session>
+    class Session
     {
     public:
 
@@ -61,59 +61,12 @@ namespace Network
     protected:
 
         // -=(Undocumented)=-
-        void OnAttach()
-        {
-            if (mProtocol)
-            {
-                mProtocol->OnAttach(shared_from_this());
-            }
-        }
-
-        // -=(Undocumented)=-
-        void OnDetach()
-        {
-            if (mProtocol)
-            {
-                mProtocol->OnDetach(shared_from_this());
-            }
-        }
-
-        // -=(Undocumented)=-
-        void OnError(UInt Error, CStr Description)
-        {
-            if (mProtocol)
-            {
-                mProtocol->OnError(shared_from_this(), Error, Description);
-            }
-        }
-
-        // -=(Undocumented)=-
-        void OnRead(CPtr<UInt08> Bytes)
-        {
-            if (mProtocol)
-            {
-                mProtocol->OnRead(shared_from_this(), Bytes);
-            }
-        }
-
-        // -=(Undocumented)=-
-        void OnWrite(CPtr<UInt08> Bytes)
-        {
-            if (mProtocol)
-            {
-                mProtocol->OnWrite(shared_from_this(), Bytes);
-            }
-        }
-
-    protected:
-
-        // -=(Undocumented)=-
         virtual void OnClose(Bool Immediately) = 0;
 
         // -=(Undocumented)=-
         virtual void OnFlush(Ref<Writer> Accumulator) = 0;
 
-    private:
+    protected:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
