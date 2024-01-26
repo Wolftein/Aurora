@@ -45,18 +45,12 @@ inline namespace Core
     {
         const UInt Available = (mFlip ? mReader - mMarker : mBuffer.size() - mWriter);
 
-        if (Available > Length)
+        if (Available < Length)
         {
-            if (mFlip)
-            {
-                return { mBuffer.data() + mMarker, Length };
-            }
-            else
-            {
-                return { mBuffer.data() + mWriter, Length };
-            }
+            return { };
         }
-        return { };
+
+        return { mBuffer.data() + (mFlip ? mMarker : mWriter), Length};
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
