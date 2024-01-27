@@ -100,6 +100,5 @@ namespace Network
 
         Buffer         mEncoder;
         Buffer         mDecoder;
-        Writer         mAccumulator;
     };
 }
