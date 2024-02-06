@@ -28,21 +28,21 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        Vector2()
+        constexpr Vector2()
             : mX { 0 },
               mY { 0 }
         {
         }
 
         // -=(Undocumented)=-
-        Vector2(Base X, Base Y)
+        constexpr Vector2(Base X, Base Y)
             : mX { X },
               mY { Y }
         {
         }
 
         // -=(Undocumented)=-
-        Vector2(Ref<const Vector2> Other)
+        constexpr Vector2(Ref<const Vector2> Other)
             : mX { Other.GetX() },
               mY { Other.GetY() }
         {

@@ -28,7 +28,7 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        Vector3()
+        constexpr Vector3()
             : mX { 0 },
               mY { 0 },
               mZ { 0 }
@@ -36,7 +36,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Vector3(Base X, Base Y, Base Z)
+        constexpr Vector3(Base X, Base Y, Base Z)
             : mX { X },
               mY { Y },
               mZ { Z }
@@ -44,7 +44,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Vector3(Ref<const Vector3> Other)
+        constexpr Vector3(Ref<const Vector3> Other)
             : mX { Other.GetX() },
               mY { Other.GetY() },
               mZ { Other.GetZ() }

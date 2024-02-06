@@ -27,7 +27,7 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        Rect()
+        constexpr Rect()
             : mX1 { 0 },
               mY1 { 0 },
               mX2 { 0 },
@@ -36,7 +36,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Rect(Base Left, Base Top, Base Right, Base Bottom)
+        constexpr Rect(Base Left, Base Top, Base Right, Base Bottom)
             : mX1 { Left },
               mY1 { Top },
               mX2 { Right },
@@ -46,7 +46,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Type>
-        Rect(Vector2<Type> Minimum, Vector2<Type> Maximum)
+        constexpr Rect(Vector2<Type> Minimum, Vector2<Type> Maximum)
             : mX1 { Minimum.GetX() },
               mY1 { Minimum.GetY() },
               mX2 { Maximum.GetX() },
@@ -55,7 +55,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Rect(Ref<const Rect<Base>> Other)
+        constexpr Rect(Ref<const Rect<Base>> Other)
             : mX1 { Other.mX1 },
               mY1 { Other.mY1 },
               mX2 { Other.mX2 },

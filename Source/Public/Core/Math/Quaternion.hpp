@@ -27,21 +27,21 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        Quaternion(Base X = 0, Base Y = 0, Base Z = 0, Base W = 1)
+        constexpr Quaternion(Base X = 0, Base Y = 0, Base Z = 0, Base W = 1)
             : mComplexes { X, Y, Z },
               mReal      { W }
         {
         }
 
         // -=(Undocumented)=-
-        Quaternion(Ref<const Vector3<Base>> Complexes, Base Real)
+        constexpr Quaternion(Ref<const Vector3<Base>> Complexes, Base Real)
             : mComplexes { Complexes },
               mReal      { Real }
         {
         }
 
         // -=(Undocumented)=-
-        Quaternion(Ref<const Quaternion> Other)
+        constexpr Quaternion(Ref<const Quaternion> Other)
             : mComplexes { Other.mComplexes },
               mReal      { Other.mReal }
         {
@@ -173,7 +173,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Quaternion<Base> FromAngles(Base Angle, Ref<const Vector3<Base>> Axis)
+        static constexpr Quaternion<Base> FromAngles(Base Angle, Ref<const Vector3<Base>> Axis)
         {
             const Base HalfAngle = 0.5 * Angle;
 
@@ -181,7 +181,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Quaternion<Base> FromEulerAngles(Ref<const Vector3<Base>> Angles)
+        static constexpr Quaternion<Base> FromEulerAngles(Ref<const Vector3<Base>> Angles)
         {
             const Vector3<Base> HalfAngles = Angles * static_cast<Base>(0.5);
 

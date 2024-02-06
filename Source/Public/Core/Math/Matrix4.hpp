@@ -35,14 +35,17 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        Matrix4(Ref<const Column> C1, Ref<const Column> C2, Ref<const Column> C3, Ref<const Column> C4)
+        constexpr Matrix4(Ref<const Column> C1, Ref<const Column> C2, Ref<const Column> C3, Ref<const Column> C4)
             : mColumns { C1, C2, C3, C4 }
         {
         }
 
         // -=(Undocumented)=-
-        Matrix4(Base S00, Base S10, Base S20, Base S30, Base S01, Base S11, Base S21, Base S31, Base S02,
-                Base S12, Base S22, Base S32, Base S03, Base S13, Base S23, Base S33)
+        constexpr Matrix4(
+            Base S00, Base S10, Base S20, Base S30,
+            Base S01, Base S11, Base S21, Base S31,
+            Base S02, Base S12, Base S22, Base S32,
+            Base S03, Base S13, Base S23, Base S33)
         {
             mColumns[0].Set(S00, S10, S20, S30);
             mColumns[1].Set(S01, S11, S21, S31);
@@ -51,12 +54,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Matrix4() : Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+        constexpr Matrix4() : Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
         {
         }
 
         // -=(Undocumented)=-
-        Matrix4(Ref<const Matrix4<Base>> Other)
+        constexpr Matrix4(Ref<const Matrix4<Base>> Other)
         {
             mColumns[0] = Other.GetColumn(0);
             mColumns[1] = Other.GetColumn(1);
@@ -346,7 +349,7 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        static Matrix4<Base> CreatePerspective(Base Eyes, Base Aspect, Base ZNear, Base ZFar)
+        static constexpr Matrix4<Base> CreatePerspective(Base Eyes, Base Aspect, Base ZNear, Base ZFar)
         {
             const Base Y = 1 / Tangent(Eyes * 0.5);
             const Base X = Y / Aspect;
@@ -358,7 +361,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Matrix4<Base> CreateOrthographic(Base Left, Base Right, Base Bottom, Base Top, Base ZNear, Base ZFar)
+        static constexpr Matrix4<Base> CreateOrthographic(Base Left, Base Right, Base Bottom, Base Top, Base ZNear, Base ZFar)
         {
             const Real32 Width  = (Right - Left);
             const Real32 Height = (Top - Bottom);
@@ -383,7 +386,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Matrix4<Base> CreateLook(Ref<const Vector3<Base>> At, Ref<const Vector3<Base>> Eye, Ref<const Vector3<Base>> Up)
+        static constexpr Matrix4<Base> CreateLook(Ref<const Vector3<Base>> At, Ref<const Vector3<Base>> Eye, Ref<const Vector3<Base>> Up)
         {
             Vector3<Base> Axes[4];
             Axes[2] = Vector3<Base>::Normalize(At - Eye);
@@ -400,7 +403,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Matrix4<Base> CreateTransform(Ref<const Vector3<Base>> Position, Ref<const Quaternion<Base>> Rotation, Ref<const Vector3<Base>> Scale)
+        static constexpr Matrix4<Base> CreateTransform(Ref<const Vector3<Base>> Position, Ref<const Quaternion<Base>> Rotation, Ref<const Vector3<Base>> Scale)
         {
             const Matrix4<Base> Matrix = Matrix4<Base>::FromRotation(Quaternion<Base>::Normalize(Rotation));
 
@@ -417,7 +420,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Matrix4<Base> FromTranslation(Ref<const Vector2<Base>> Vector)
+        static constexpr Matrix4<Base> FromTranslation(Ref<const Vector2<Base>> Vector)
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -429,7 +432,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Matrix4<Base> FromTranslation(Ref<const Vector3<Base>> Vector)
+        static constexpr Matrix4<Base> FromTranslation(Ref<const Vector3<Base>> Vector)
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -442,7 +445,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Matrix4<Base> FromScale(Ref<const Vector2<Base>> Vector)
+        static constexpr Matrix4<Base> FromScale(Ref<const Vector2<Base>> Vector)
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -454,7 +457,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Matrix4<Base> FromScale(Ref<const Vector3<Base>> Vector)
+        static constexpr Matrix4<Base> FromScale(Ref<const Vector3<Base>> Vector)
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -467,7 +470,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Matrix4<Base> FromRotation(Ref<const Quaternion<Base>> Rotation)
+        static constexpr Matrix4<Base> FromRotation(Ref<const Quaternion<Base>> Rotation)
         {
             const auto Vector = Vector3<Base>(Rotation.GetX(), Rotation.GetY(), Rotation.GetZ());
             const auto Scalar = Rotation.GetW();
