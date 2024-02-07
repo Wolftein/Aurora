@@ -42,6 +42,100 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    Bool Encoder::Ensure(UInt VerticesInBytes, UInt IndicesInBytes, UInt AmountOfUniforms)
+    {
+        const Bool FitsVertices
+            = mInFlyBuffers[0].Writer + VerticesInBytes <= mInFlyBuffers[0].Capacity;
+        const Bool FitsIndices
+            = mInFlyBuffers[1].Writer + IndicesInBytes  <= mInFlyBuffers[1].Capacity;
+        const Bool FitsUniforms
+            = mInFlyBuffers[2].Writer + Align<256>(AmountOfUniforms * sizeof(Vector4f)) <= mInFlyBuffers[2].Capacity;
+
+        if (! FitsVertices || ! FitsIndices || ! FitsUniforms)
+        {
+            Flush();
+
+            if (! FitsVertices)
+            {
+                mInFlyBuffers[0].Reader = mInFlyBuffers[0].Writer = mInFlyBuffers[0].Marker = 0;
+            }
+
+            if (! FitsIndices)
+            {
+                mInFlyBuffers[1].Reader = mInFlyBuffers[1].Writer = mInFlyBuffers[1].Marker = 0;
+            }
+
+            if (! FitsUniforms)
+            {
+                mInFlyBuffers[2].Reader = mInFlyBuffers[2].Writer = mInFlyBuffers[2].Marker = 0;
+
+                ReallocateTransientUniforms(mInFlyRanges[k_UniformBlockPerScene]);
+                ReallocateTransientUniforms(mInFlyRanges[k_UniformBlockPerTechnique]);
+            }
+
+            return false;
+        }
+        return true;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Encoder::Draw(UInt VerticesFormatStride, UInt IndicesFormatStride)
+    {
+        // Apply draw parameter(s)
+        if (IndicesFormatStride > 0)
+        {
+            mInFlyBatch.Primitive.Count  = (mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker) / IndicesFormatStride;
+            mInFlyBatch.Primitive.Base   = (mInFlyBuffers[1].Marker - mInFlyBuffers[1].Reader) / IndicesFormatStride;
+            mInFlyBatch.Primitive.Offset = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VerticesFormatStride;
+        }
+        else
+        {
+            mInFlyBatch.Primitive.Count  = (mInFlyBuffers[0].Writer - mInFlyBuffers[0].Marker) / VerticesFormatStride;
+            mInFlyBatch.Primitive.Base   = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VerticesFormatStride;
+        }
+
+        // Apply batch's vertices range
+        SetVertices(
+            mInFlyBuffers[0].ID,
+            mInFlyBuffers[0].Reader,
+            mInFlyBuffers[0].Writer - mInFlyBuffers[0].Marker,
+            VerticesFormatStride);
+        mInFlyBuffers[0].Marker = mInFlyBuffers[0].Writer;
+
+        // Apply batch's indices range
+        if (IndicesFormatStride > 0)
+        {
+            SetIndices(
+                mInFlyBuffers[1].ID,
+                mInFlyBuffers[1].Reader,
+                mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker,
+                IndicesFormatStride);
+            mInFlyBuffers[1].Marker = mInFlyBuffers[1].Writer;
+        }
+
+        // Apply batch's uniforms range
+        for (UInt Block = 0; Block < Graphic::k_MaxUniforms; ++Block)
+        {
+            if (mInFlyRanges[Block].Length > 0)
+            {
+                SetUniforms(
+                    Block,
+                    mInFlyBuffers[2].ID,
+                    mInFlyRanges[Block].Offset,
+                    mInFlyRanges[Block].Length);
+            }
+        }
+
+        // Add the batch into submission
+        mInFlySubmission.emplace_back(mInFlyBatch);
+        mInFlyBatch = Submission();
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void Encoder::Flush()
     {
         // Flush all pending transient data to the GPU buffer
@@ -60,9 +154,10 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Ptr<void> Encoder::AllocateTransientBuffer(Ref<TransientBuffer> Buffer, UInt Size)
+    Ptr<void> Encoder::AllocateTransientBuffer(Ref<TransientBuffer> Buffer, UInt Size, UInt Stride)
     {
-        const UInt Offset = (Buffer.Writer + Size > Buffer.Capacity ? 0 : Buffer.Writer);
+        const UInt Base   = Align(Buffer.Writer, Stride);
+        const UInt Offset = (Base + Size > Buffer.Capacity ? 0 : Base);
 
         if (Offset == 0 && Buffer.Writer > 0)
         {
@@ -91,7 +186,7 @@ namespace Graphic
             ReallocateTransientUniforms(mInFlyRanges[k_UniformBlockPerTechnique]);
         }
 
-        const Ptr<void> Memory = AllocateTransientBuffer(mInFlyBuffers[2], Length);
+        const Ptr<void> Memory = AllocateTransientBuffer(mInFlyBuffers[2], Length, 1);
 
         Range.Offset = (mInFlyBuffers[2].Writer - Length) / sizeof(Vector4f);
         Range.Length = Length / sizeof(Vector4f);

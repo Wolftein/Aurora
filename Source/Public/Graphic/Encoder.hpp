@@ -51,8 +51,7 @@ namespace Graphic
         template<typename Type>
         Ptr<Type> AllocateTransientVertices(UInt Length)
         {
-            // TODO: Alignment
-            return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[0], Length * sizeof(Type)));
+            return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[0], Length, sizeof(Type)));
         }
 
         // -=(Undocumented)=-
@@ -65,8 +64,7 @@ namespace Graphic
         template<typename Type = SInt16>
         Ptr<Type> AllocateTransientIndices(UInt Length)
         {
-            // TODO: Alignment
-            return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[1], Length * sizeof(Type)));
+            return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[1], Length, sizeof(Type)));
         }
 
         // -=(Undocumented)=-
@@ -157,96 +155,24 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        template<typename Vertex, typename Index = SInt16>
-        Bool Ensure(UInt Vertices, UInt Indices, UInt Uniforms)
+        template<typename Vertices, typename Indices = SInt16>
+        Bool Ensure(UInt AmountOfVertices, UInt AmountOfIndices, UInt AmountOfUniforms)
         {
-            const Bool FitsVertices
-                = mInFlyBuffers[0].Writer + Vertices * sizeof(Vertex) <= mInFlyBuffers[0].Capacity;
-            const Bool FitsIndices
-                = mInFlyBuffers[1].Writer + Indices * sizeof(Index)  <= mInFlyBuffers[1].Capacity;
-            const Bool FitsUniforms
-                = mInFlyBuffers[2].Writer + Align<256>(Uniforms * sizeof(Vector4f)) <= mInFlyBuffers[2].Capacity;
-
-            if (! FitsVertices || ! FitsIndices || ! FitsUniforms)
-            {
-                Flush();
-
-                if (! FitsVertices)
-                {
-                    mInFlyBuffers[0].Reader = mInFlyBuffers[0].Writer = mInFlyBuffers[0].Marker = 0;
-                }
-
-                if (! FitsIndices)
-                {
-                    mInFlyBuffers[1].Reader = mInFlyBuffers[1].Writer = mInFlyBuffers[1].Marker = 0;
-                }
-
-                if (! FitsUniforms)
-                {
-                    mInFlyBuffers[2].Reader = mInFlyBuffers[2].Writer = mInFlyBuffers[2].Marker = 0;
-
-                    ReallocateTransientUniforms(mInFlyRanges[k_UniformBlockPerScene]);
-                    ReallocateTransientUniforms(mInFlyRanges[k_UniformBlockPerTechnique]);
-                }
-
-                return false;
-            }
-            return true;
+            return Ensure(AmountOfVertices * sizeof(Vertices), AmountOfIndices * sizeof(Indices), AmountOfUniforms);
         }
 
         // -=(Undocumented)=-
-        template<typename Vertex, typename Index = SInt16>
+        Bool Ensure(UInt VerticesInBytes, UInt IndicesInBytes, UInt AmountOfUniforms);
+
+        // -=(Undocumented)=-
+        template<typename Vertices, typename Indices = SInt16>
         void Draw()
         {
-            // Apply draw parameter(s)
-            if (std::is_base_of_v<Index, void>)
-            {
-                mInFlyBatch.Primitive.Count  = (mInFlyBuffers[0].Writer - mInFlyBuffers[0].Marker) / sizeof(Vertex);
-                mInFlyBatch.Primitive.Base   = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / sizeof(Vertex);
-            }
-            else
-            {
-                mInFlyBatch.Primitive.Count  = (mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker) / sizeof(Index);
-                mInFlyBatch.Primitive.Base   = (mInFlyBuffers[1].Marker - mInFlyBuffers[1].Reader) / sizeof(Index);
-                mInFlyBatch.Primitive.Offset = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / sizeof(Vertex);
-            }
-
-            // Apply batch's vertices range
-            SetVertices(
-                mInFlyBuffers[0].ID,
-                mInFlyBuffers[0].Reader,
-                mInFlyBuffers[0].Writer - mInFlyBuffers[0].Marker,
-                sizeof(Vertex));
-            mInFlyBuffers[0].Marker = mInFlyBuffers[0].Writer;
-
-            // Apply batch's indices range
-            if (!std::is_base_of_v<Index, void>)
-            {
-                SetIndices(
-                    mInFlyBuffers[1].ID,
-                    mInFlyBuffers[1].Reader,
-                    mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker,
-                    sizeof(Index));
-                mInFlyBuffers[1].Marker = mInFlyBuffers[1].Writer;
-            }
-
-            // Apply batch's uniforms range
-            for (UInt Block = 0; Block < Graphic::k_MaxUniforms; ++Block)
-            {
-                if (mInFlyRanges[Block].Length > 0)
-                {
-                    SetUniforms(
-                        Block,
-                        mInFlyBuffers[2].ID,
-                        mInFlyRanges[Block].Offset,
-                        mInFlyRanges[Block].Length);
-                }
-            }
-
-            // Add the batch into submission
-            mInFlySubmission.emplace_back(mInFlyBatch);
-            mInFlyBatch = Submission();
+            Draw(sizeof(Vertices), sizeof(Indices));
         }
+
+        // -=(Undocumented)=-
+        void Draw(UInt VerticesFormatStride, UInt IndicesFormatStride);
 
         // -=(Undocumented)=-
         void Flush();
@@ -274,7 +200,7 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
-        Ptr<void> AllocateTransientBuffer(Ref<TransientBuffer> Buffer, UInt Size);
+        Ptr<void> AllocateTransientBuffer(Ref<TransientBuffer> Buffer, UInt Size, UInt Stride);
 
         // -=(Undocumented)=-
         Ptr<void> AllocateTransientUniforms(Ref<TransientRange> Range, UInt Size);

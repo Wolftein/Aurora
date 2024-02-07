@@ -110,4 +110,22 @@ inline namespace Core
             return asinl(Angle);
         }
     }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    Type Sqrt(Type Number)
+    {
+        if constexpr (std::is_base_of_v<Real64, Type>)
+        {
+            return sqrt(Number);
+        }
+        else if constexpr (std::is_base_of_v<Real32, Type>)
+        {
+            return sqrtf(Number);
+        }
+        else
+        {
+            return sqrtl(Number);
+        }
+    }
 }

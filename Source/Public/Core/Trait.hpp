@@ -37,6 +37,12 @@ inline namespace Core
     }
 
     // -=(Undocumented)=-
+    inline constexpr UInt Align(UInt Value, UInt Alignment)
+    {
+        return (Value + (Alignment - 1)) & ~(Alignment - 1);
+    }
+
+    // -=(Undocumented)=-
     template<typename Type>
     inline constexpr UInt Hash(Type String, UInt Length = UINT_MAX)
     {
