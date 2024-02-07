@@ -30,5 +30,8 @@ namespace Content
 
 		// -=(Undocumented)=-
 		virtual Chunk Open(CStr Path) = 0;
+
+        // -=(Undocumented)=-
+        virtual void Write(CStr Path, Ref<const Chunk> Data) = 0;
 	};
 }

@@ -55,4 +55,24 @@ namespace Content
 
 		return Output;
 	}
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void SystemLocator::Write(CStr Path, Ref<const Chunk> Data)
+    {
+#ifdef EA_PLATFORM_WINDOWS
+        constexpr UInt Access     = GENERIC_WRITE;
+        constexpr UInt Attributes = FILE_ATTRIBUTE_NORMAL;
+
+        const HANDLE Handle = ::CreateFile((mPath + "/" + Path.data()).c_str(), Access, 0, 0, CREATE_ALWAYS, Attributes, 0);
+
+        if (Handle != INVALID_HANDLE_VALUE)
+        {
+            ::WriteFile(Handle, Data.GetData(), Data.GetSize(), nullptr, 0);
+
+            ::CloseHandle(Handle);
+        }
+#endif // EA_PLATFORM_WINDOWS
+    }
 }

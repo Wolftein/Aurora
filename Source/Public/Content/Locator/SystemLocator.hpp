@@ -34,6 +34,9 @@ namespace Content
 		// -=(Undocumented)=-
 		Chunk Open(CStr Path) override;
 
+        // -=(Undocumented)=-
+        void Write(CStr Path, Ref<const Chunk> Data) override;
+
 	private:
 
 		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -104,6 +104,9 @@ namespace Content
         }
 
         // -=(Undocumented)=-
+        Bool Save(Ref<const Uri> Key, Ref<const Chunk> Data);
+
+        // -=(Undocumented)=-
         template<typename Type>
         SPtr<Type> Load(Ref<const Uri> Key)
         {
