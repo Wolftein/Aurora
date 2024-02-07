@@ -93,7 +93,7 @@ inline namespace Core
                 return;
             }
 
-            if constexpr (eastl::is_pointer_v<Type>)
+            if constexpr (std::is_pointer_v<Type>)
             {
                 FastCopyMemory(& mBuffer[mOffset], Data, Length);
             }

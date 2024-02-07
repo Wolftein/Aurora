@@ -12,8 +12,9 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Session.hpp"
+#include "Core/Memory/Buffer.hpp"
 #include "Network/Client.hpp"
+#include <asio.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,12 +23,35 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class AsyncClient final : public Client, public AsyncSession
+    class AsyncClient : public EnableSmartPointer<AsyncClient>, public Client
     {
     public:
 
         // -=(Undocumented)=-
-        AsyncClient(Ref<asio::io_context> Context);
+        using Socket = asio::ip::tcp::socket;
+
+        // -=(Undocumented)=-
+        using Header = UInt16;
+
+        // -=(Undocumented)=-
+        enum class State
+        {
+            Connecting,
+            Connected,
+            Closing,
+            Closed,
+        };
+
+    public:
+
+        // -=(Undocumented)=-
+        explicit AsyncClient(Socket && Channel);
+
+        // -=(Undocumented)=-
+        void Start();
+
+        // -=(Undocumented)=-
+        void Connect(CStr Address, CStr Service);
 
     protected:
 
@@ -36,5 +60,45 @@ namespace Network
 
         // \see Session::OnFlush
         void OnFlush(Ref<Writer> Accumulator) override;
+
+    private:
+
+        // -=(Undocumented)=-
+        void DoClose();
+
+        // -=(Undocumented)=-
+        void DoRead(Bool Body, UInt32 Quantity);
+
+        // -=(Undocumented)=-
+        void DoFlush();
+
+        // -=(Undocumented)=-
+        void WhenResolve(Ref<const std::error_code> Error, asio::ip::tcp::resolver::iterator Result);
+
+        // -=(Undocumented)=-
+        void WhenConnect(Ref<const std::error_code> Error, asio::ip::tcp::resolver::iterator Result);
+
+        // -=(Undocumented)=-
+        void WhenError(Ref<const std::error_code> Error);
+
+        // -=(Undocumented)=-
+        void WhenRead(Ref<const std::error_code> Error, UInt32 Transferred, Bool Body);
+
+        // -=(Undocumented)=-
+        void WhenWrite(Ref<const std::error_code> Error, UInt32 Transferred);
+
+    private:
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        State  mState;
+        Socket mChannel;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Buffer mEncoder;
+        Buffer mDecoder;
     };
 }

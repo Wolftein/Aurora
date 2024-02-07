@@ -40,7 +40,8 @@ namespace Network
         mAcceptor.bind(Endpoint);
         mAcceptor.listen(Capacity);
 
-        const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error) {
+        const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
+        {
             CastPtr<AsyncServer>(Self)->WhenAccept(Error);
         };
         mAcceptor.async_accept(mConnector, OnCompletion);
@@ -65,11 +66,12 @@ namespace Network
         }
         else
         {
-            SPtr<AsyncSession> Connection = std::make_shared<AsyncSession>(Move(mConnector));
+            SPtr<AsyncClient> Connection = NewPtr<AsyncClient>(Move(mConnector));
             Connection->Attach(shared_from_this());
             Connection->Start();
 
-            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error) {
+            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
+            {
                 CastPtr<AsyncServer>(Self)->WhenAccept(Error);
             };
             mAcceptor.async_accept(mConnector = asio::ip::tcp::socket(mAcceptor.get_executor()), OnCompletion);

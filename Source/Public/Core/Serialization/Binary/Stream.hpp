@@ -37,11 +37,11 @@ inline namespace Core
         template<typename Data, UInt Size>
         void SerializeArray(Ref<Array<Data, Size>> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 const auto Chunk = mArchive.template Read<Ptr<Data>>(Size * sizeof(Data));
 
-                eastl::copy(Chunk, Chunk + Size, Value.data());
+                std::copy(Chunk, Chunk + Size, Value.data());
             }
             else
             {
@@ -52,7 +52,7 @@ inline namespace Core
         // -=(Undocumented)=-
         void SerializeBool(Ref<Bool> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = mArchive.ReadBool();
             }
@@ -66,7 +66,7 @@ inline namespace Core
         template<typename Int>
         void SerializeInt(Ref<Int> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = mArchive.template ReadInt<Int>();
             }
@@ -80,7 +80,7 @@ inline namespace Core
         template<typename Int>
         void SerializeInt8(Ref<Int> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = static_cast<Int>(mArchive.ReadInt8());
             }
@@ -94,7 +94,7 @@ inline namespace Core
         template<typename Int>
         void SerializeUInt8(Ref<Int> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = static_cast<Int>(mArchive.ReadUInt8());
             }
@@ -108,7 +108,7 @@ inline namespace Core
         template<typename Int>
         void SerializeInt16(Ref<Int> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = static_cast<Int>(mArchive.ReadInt16());
             }
@@ -122,7 +122,7 @@ inline namespace Core
         template<typename Int>
         void SerializeUInt16(Ref<Int> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = static_cast<Int>(mArchive.ReadUInt16());
             }
@@ -136,7 +136,7 @@ inline namespace Core
         template<typename Int>
         void SerializeInt32(Ref<Int> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = static_cast<Int>(mArchive.ReadInt32());
             }
@@ -150,7 +150,7 @@ inline namespace Core
         template<typename Int>
         void SerializeUInt32(Ref<Int> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = static_cast<Int>(mArchive.ReadUInt32());
             }
@@ -164,7 +164,7 @@ inline namespace Core
         template<typename Int>
         void SerializeInt64(Ref<Int> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = static_cast<Int>(mArchive.ReadInt64());
             }
@@ -178,7 +178,7 @@ inline namespace Core
         template<typename Int>
         void SerializeUInt64(Ref<Int> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = static_cast<Int>(mArchive.ReadUInt64());
             }
@@ -191,7 +191,7 @@ inline namespace Core
         // -=(Undocumented)=-
         void SerializeReal32(Ref<Real32> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = mArchive.ReadReal32();
             }
@@ -204,7 +204,7 @@ inline namespace Core
         // -=(Undocumented)=-
         void SerializeReal64(Ref<Real64> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = mArchive.ReadReal64();
             }
@@ -217,7 +217,7 @@ inline namespace Core
         // -=(Undocumented)=-
         void SerializeString8(Ref<SStr> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = mArchive.ReadString8();
             }
@@ -231,7 +231,7 @@ inline namespace Core
         template<typename Enum>
         void SerializeEnum(Ref<Enum> Value)
         {
-            if constexpr (eastl::is_same<T, Reader>::value)
+            if constexpr (std::is_same<T, Reader>::value)
             {
                 Value = static_cast<Enum>(mArchive.template ReadInt<SInt>());
             }

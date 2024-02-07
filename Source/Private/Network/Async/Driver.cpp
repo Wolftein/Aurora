@@ -49,7 +49,7 @@ namespace Network
 
     SPtr<Client> AsyncDriver::Connect(CStr Address, CStr Service)
     {
-        ConstSPtr<AsyncClient> Client = NewPtr<AsyncClient>(mReactor);
+        ConstSPtr<AsyncClient> Client = NewPtr<AsyncClient>(AsyncClient::Socket(mReactor));
         Client->Connect(Address, Service);
         return Client;
     }

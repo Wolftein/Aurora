@@ -91,7 +91,7 @@ inline namespace Core
             });
 
         // Merge with the next space if possible
-        auto OtherSpaceIterator = eastl::find_if(mSpaces.begin(), mSpaces.end(), [&](Ref<const Rectangle> Other)
+        auto OtherSpaceIterator = std::find_if(mSpaces.begin(), mSpaces.end(), [&](Ref<const Rectangle> Other)
         {
             return Other.X == Space.X + Space.Width
                 && Other.Y == Space.Y

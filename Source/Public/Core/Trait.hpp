@@ -47,14 +47,14 @@ inline namespace Core
     template<typename Type, typename... Args>
     inline SPtr<Type> NewPtr(Args && ... Arguments)
     {
-        return std::make_shared<Type>(Arguments...);
+        return std::make_shared<Type>(std::forward<Args>(Arguments)...);
     }
 
     // -=(Undocumented)=-
     template<typename Type, typename... Args>
     inline UPtr<Type> NewUniquePtr(Args && ... Arguments)
     {
-        return std::make_unique<Type>(Arguments...);
+        return std::make_unique<Type>(std::forward<Args>(Arguments)...);
     }
 
     // -=(Undocumented)=-

@@ -21,7 +21,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Server::OnAttach(ConstSPtr<class Session> Session)
+    void Server::OnAttach(ConstSPtr<class Client> Session)
     {
         mDatabase.emplace_back(Session);
 
@@ -34,7 +34,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Server::OnDetach(ConstSPtr<class Session> Session)
+    void Server::OnDetach(ConstSPtr<class Client> Session)
     {
         mDatabase.erase(std::find(mDatabase.begin(), mDatabase.end(), Session));
 
@@ -47,7 +47,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Server::OnError(ConstSPtr<class Session> Session, UInt Error, CStr Description)
+    void Server::OnError(ConstSPtr<class Client> Session, UInt Error, CStr Description)
     {
         if (mProtocol)
         {
@@ -58,7 +58,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Server::OnRead(ConstSPtr<class Session> Session,  CPtr<UInt08> Bytes)
+    void Server::OnRead(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes)
     {
         if (mProtocol)
         {
@@ -69,12 +69,11 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Server::OnWrite(ConstSPtr<class Session> Session, CPtr<UInt08> Bytes)
+    void Server::OnWrite(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes)
     {
         if (mProtocol)
         {
             mProtocol->OnWrite(Session, Bytes);
         }
     }
-
 }

@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Session.hpp"
+#include "Client.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -37,7 +37,7 @@ namespace Network
         // -=(Undocumented)=-
         void Disconnect(Bool Forcibly)
         {
-            for (ConstSPtr<Session> Session : mDatabase)
+            for (ConstSPtr<Client> Session : mDatabase)
             {
                 Session->Close(Forcibly);
             }
@@ -47,7 +47,7 @@ namespace Network
         template<typename Message>
         void Broadcast(Message && Packet)
         {
-            for (ConstSPtr<Session> Session : mDatabase)
+            for (ConstSPtr<Client> Session : mDatabase)
             {
                 Session->template Write(Packet);
             }
@@ -56,7 +56,7 @@ namespace Network
         // -=(Undocumented)=-
         void Flush()
         {
-            for (ConstSPtr<Session> Session : mDatabase)
+            for (ConstSPtr<Client> Session : mDatabase)
             {
                 Session->Flush();
             }
@@ -65,26 +65,26 @@ namespace Network
     private:
 
         // -=(Undocumented)=-
-        void OnAttach(ConstSPtr<class Session> Session) override;
+        void OnAttach(ConstSPtr<class Client> Session) override;
 
         // -=(Undocumented)=-
-        void OnDetach(ConstSPtr<class Session> Session) override;
+        void OnDetach(ConstSPtr<class Client> Session) override;
 
         // -=(Undocumented)=-
-        void OnError(ConstSPtr<class Session> Session, UInt Error, CStr Description) override;
+        void OnError(ConstSPtr<class Client> Session, UInt Error, CStr Description) override;
 
         // -=(Undocumented)=-
-        void OnRead(ConstSPtr<class Session> Session,  CPtr<UInt08> Bytes) override;
+        void OnRead(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes) override;
 
         // -=(Undocumented)=-
-        void OnWrite(ConstSPtr<class Session> Session, CPtr<UInt08> Bytes) override;
+        void OnWrite(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes) override;
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Protocol>        mProtocol;
-        Vector<SPtr<Session>> mDatabase;
+        SPtr<Protocol>       mProtocol;
+        Vector<SPtr<Client>> mDatabase;
     };
 }

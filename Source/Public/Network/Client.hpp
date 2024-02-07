@@ -12,7 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Session.hpp"
+#include "Packet.hpp"
+#include "Protocol.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,8 +22,56 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Client : public virtual Session
+    class Client
     {
     public:
+
+        // -=(Undocumented)=-
+        void Attach(ConstSPtr<Protocol> Protocol)
+        {
+            mProtocol = Protocol;
+        }
+
+        // -=(Undocumented)=-
+        template<typename Message>
+        void Write(Message && Packet)
+        {
+            // write message's id
+            mAccumulator.WriteInt(Packet.GetID());
+
+            // write message's body
+            Packet.Encode(mAccumulator);
+        }
+
+        // -=(Undocumented)=-
+        void Close(Bool Forcibly)
+        {
+            OnClose(Forcibly);
+        }
+
+        // -=(Undocumented)=-
+        void Flush()
+        {
+            if (mAccumulator.HasData())
+            {
+                OnFlush(mAccumulator);
+            }
+        }
+
+    protected:
+
+        // -=(Undocumented)=-
+        virtual void OnClose(Bool Immediately) = 0;
+
+        // -=(Undocumented)=-
+        virtual void OnFlush(Ref<Writer> Accumulator) = 0;
+
+    protected:
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        SPtr<Protocol> mProtocol;
+        Writer         mAccumulator;
     };
 }

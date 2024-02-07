@@ -82,7 +82,7 @@ inline namespace Core
                 return {};
             }
 
-            if constexpr (eastl::is_pointer_v<Type>)
+            if constexpr (std::is_pointer_v<Type>)
             {
                 return reinterpret_cast<Type>(mBuffer + mOffset);
             }
