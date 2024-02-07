@@ -161,7 +161,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Save(Ref<const Uri> Key, Ref<const Chunk> Data)
+    Bool Service::Save(Ref<const Uri> Key, CPtr<const UInt08> Data)
     {
         if (const auto It = mLocators.find(Key.GetSchema()); It != mLocators.end())
         {

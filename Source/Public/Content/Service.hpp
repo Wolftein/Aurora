@@ -104,7 +104,7 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        Bool Save(Ref<const Uri> Key, Ref<const Chunk> Data);
+        Bool Save(Ref<const Uri> Key, CPtr<const UInt08> Data);
 
         // -=(Undocumented)=-
         template<typename Type>

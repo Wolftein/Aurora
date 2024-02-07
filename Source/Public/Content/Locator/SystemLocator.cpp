@@ -59,7 +59,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void SystemLocator::Write(CStr Path, Ref<const Chunk> Data)
+    void SystemLocator::Write(CStr Path, CPtr<const UInt08> Data)
     {
 #ifdef EA_PLATFORM_WINDOWS
         constexpr UInt Access     = GENERIC_WRITE;
@@ -69,7 +69,7 @@ namespace Content
 
         if (Handle != INVALID_HANDLE_VALUE)
         {
-            ::WriteFile(Handle, Data.GetData(), Data.GetSize(), nullptr, 0);
+            ::WriteFile(Handle, Data.data(), Data.size_bytes(), nullptr, 0);
 
             ::CloseHandle(Handle);
         }
