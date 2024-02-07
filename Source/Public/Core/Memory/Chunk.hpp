@@ -51,6 +51,13 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Chunk(CStr String)
+            : Chunk(String.size())
+        {
+            FastCopyMemory(mData.get(), String.data(), String.size());
+        }
+
+        // -=(Undocumented)=-
         Chunk(Pointer Data, UInt Size)
             : mData { Move(Data) },
               mSize { Size }
