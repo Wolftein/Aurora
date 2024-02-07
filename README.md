@@ -1,4 +1,4 @@
-! Soon !
+Game engine for https://github.com/Online-MMO-Engine
 
 # Note
 
