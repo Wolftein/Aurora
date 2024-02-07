@@ -14,6 +14,7 @@
 
 #include "Types.hpp"
 #include <algorithm>
+#include <format>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -82,5 +83,12 @@ inline namespace Core
     inline auto FastCopyMemory(Ptr<void> Destination, Ptr<const void> Source, UInt Size)
     {
         memcpy(Destination, Source, Size);
+    }
+
+    // -=(Undocumented)=-
+    template<typename... Args>
+    inline auto Format(CStr Format, Args&&... Arguments)
+    {
+        return std::vformat(Format, std::make_format_args(Arguments...));
     }
 }
