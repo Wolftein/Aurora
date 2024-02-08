@@ -51,7 +51,8 @@ namespace Graphic
         template<typename Type>
         Ptr<Type> AllocateTransientVertices(UInt Length)
         {
-            return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[0], Length, sizeof(Type)));
+            // TODO: Alignment
+            return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[0], Length * sizeof(Type)));
         }
 
         // -=(Undocumented)=-
@@ -64,7 +65,8 @@ namespace Graphic
         template<typename Type = SInt16>
         Ptr<Type> AllocateTransientIndices(UInt Length)
         {
-            return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[1], Length, sizeof(Type)));
+            // TODO: Alignment
+            return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[1], Length * sizeof(Type)));
         }
 
         // -=(Undocumented)=-
@@ -200,7 +202,7 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
-        Ptr<void> AllocateTransientBuffer(Ref<TransientBuffer> Buffer, UInt Size, UInt Stride);
+        Ptr<void> AllocateTransientBuffer(Ref<TransientBuffer> Buffer, UInt Size);
 
         // -=(Undocumented)=-
         Ptr<void> AllocateTransientUniforms(Ref<TransientRange> Range, UInt Size);

@@ -154,10 +154,9 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Ptr<void> Encoder::AllocateTransientBuffer(Ref<TransientBuffer> Buffer, UInt Size, UInt Stride)
+    Ptr<void> Encoder::AllocateTransientBuffer(Ref<TransientBuffer> Buffer, UInt Size)
     {
-        const UInt Base   = Align(Buffer.Writer, Stride);
-        const UInt Offset = (Base + Size > Buffer.Capacity ? 0 : Base);
+        const UInt Offset = (Buffer.Writer + Size > Buffer.Capacity ? 0 : Buffer.Writer);
 
         if (Offset == 0 && Buffer.Writer > 0)
         {
@@ -186,7 +185,7 @@ namespace Graphic
             ReallocateTransientUniforms(mInFlyRanges[k_UniformBlockPerTechnique]);
         }
 
-        const Ptr<void> Memory = AllocateTransientBuffer(mInFlyBuffers[2], Length, 1);
+        const Ptr<void> Memory = AllocateTransientBuffer(mInFlyBuffers[2], Length);
 
         Range.Offset = (mInFlyBuffers[2].Writer - Length) / sizeof(Vector4f);
         Range.Length = Length / sizeof(Vector4f);
