@@ -960,7 +960,10 @@ namespace Graphic
 
     void D3D11Driver::Commit(Object ID, Bool Synchronised)
     {
-        mPasses[ID].Display->Present(Synchronised ? 1 : 0, 0);
+        if (mPasses[ID].Display)
+        {
+            mPasses[ID].Display->Present(Synchronised ? 1 : 0, 0);
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
