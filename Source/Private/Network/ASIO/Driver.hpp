@@ -22,7 +22,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class AsyncDriver final : public Driver
+    class AsioDriver final : public Driver
     {
     public:
 

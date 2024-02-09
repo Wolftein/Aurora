@@ -13,7 +13,7 @@
 #include "Service.hpp"
 
 #ifdef    EA_PLATFORM_DESKTOP
-    #include <Network/Async/Driver.hpp>
+    #include <Network/Asio/Driver.hpp>
 #endif // EA_PLATFORM_DESKTOP
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -55,7 +55,7 @@ namespace Network
         if (!mDriver)
         {
 #ifdef    EA_PLATFORM_DESKTOP
-            mDriver = NewUniquePtr<AsyncDriver>();
+            mDriver = NewUniquePtr<AsioDriver>();
 #endif // EA_PLATFORM_DESKTOP
 
             Successful = mDriver->Initialize();

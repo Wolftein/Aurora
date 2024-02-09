@@ -21,7 +21,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Server : public EnableSmartPointer<Server>, public Protocol
+    class Server : public Protocol
     {
     public:
 

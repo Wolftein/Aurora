@@ -22,12 +22,12 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class AsyncServer final : public Server
+    class AsioServer final : public Server, public EnableSmartPointer<AsioServer>
     {
     public:
 
         // -=(Undocumented)=-
-        AsyncServer(Ref<asio::io_context> Context);
+        AsioServer(Ref<asio::io_context> Context);
 
         // -=(Undocumented)=-
         void Listen(UInt Capacity, CStr Address, CStr Service);

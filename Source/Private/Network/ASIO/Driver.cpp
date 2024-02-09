@@ -10,7 +10,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Server.hpp"
+#include "Driver.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,60 +21,36 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    AsyncServer::AsyncServer(Ref<asio::io_context> Context)
-        : mAcceptor  { Context },
-          mConnector { Context }
+    Bool AsioDriver::Initialize()
     {
+        return true;    // TODO: Multithreaden?
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void AsyncServer::Listen(UInt Capacity, CStr Address, CStr Service)
+    void AsioDriver::Poll()
     {
-        const asio::ip::tcp::endpoint Endpoint
-            = (* asio::ip::tcp::resolver(mAcceptor.get_executor()).resolve(Address.data(), Service.data()));
-
-        mAcceptor.open(Endpoint.protocol());
-        mAcceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-        mAcceptor.bind(Endpoint);
-        mAcceptor.listen(Capacity);
-
-        const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
-        {
-            CastPtr<AsyncServer>(Self)->WhenAccept(Error);
-        };
-        mAcceptor.async_accept(mConnector, OnCompletion);
+        mReactor.poll();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void AsyncServer::Close()
+    SPtr<Server> AsioDriver::Listen(UInt Capacity, CStr Address, CStr Service)
     {
-        mAcceptor.close();
+        ConstSPtr<AsioServer> Server = NewPtr<AsioServer>(mReactor);
+        Server->Listen(Capacity, Address, Service);
+        return Server;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void AsyncServer::WhenAccept(Ref<const std::error_code> Error)
+    SPtr<Client> AsioDriver::Connect(CStr Address, CStr Service)
     {
-        if (Error)
-        {
-            Close();
-        }
-        else
-        {
-            SPtr<AsyncClient> Connection = NewPtr<AsyncClient>(Move(mConnector));
-            Connection->Attach(shared_from_this());
-            Connection->Start();
-
-            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
-            {
-                CastPtr<AsyncServer>(Self)->WhenAccept(Error);
-            };
-            mAcceptor.async_accept(mConnector = asio::ip::tcp::socket(mAcceptor.get_executor()), OnCompletion);
-        }
+        ConstSPtr<AsioClient> Client = NewPtr<AsioClient>(AsioClient::Socket(mReactor));
+        Client->Connect(Address, Service);
+        return Client;
     }
 }

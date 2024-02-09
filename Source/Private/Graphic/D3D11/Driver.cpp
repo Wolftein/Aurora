@@ -960,9 +960,11 @@ namespace Graphic
 
     void D3D11Driver::Commit(Object ID, Bool Synchronised)
     {
-        if (mPasses[ID].Display)
+        const ComPtr<IDXGISwapChain> Display = mPasses[ID].Display;
+
+        if (Display)
         {
-            mPasses[ID].Display->Present(Synchronised ? 1 : 0, 0);
+            Display->Present(Synchronised ? 1 : 0, 0);
         }
     }
 

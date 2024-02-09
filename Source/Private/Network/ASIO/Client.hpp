@@ -23,7 +23,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class AsyncClient : public EnableSmartPointer<AsyncClient>, public Client
+    class AsioClient : public EnableSmartPointer<AsioClient>, public Client
     {
     public:
 
@@ -45,7 +45,7 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
-        explicit AsyncClient(Socket && Channel);
+        explicit AsioClient(Socket && Channel);
 
         // -=(Undocumented)=-
         void Start();

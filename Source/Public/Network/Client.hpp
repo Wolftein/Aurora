@@ -44,6 +44,13 @@ namespace Network
         }
 
         // -=(Undocumented)=-
+        template<typename Type>
+        void Write(CPtr<const Type> Bytes)
+        {
+            mAccumulator.Write(Bytes.data(), Bytes.size_bytes());
+        }
+
+        // -=(Undocumented)=-
         void Close(Bool Forcibly)
         {
             OnClose(Forcibly);
