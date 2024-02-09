@@ -47,7 +47,7 @@ namespace Audio
 
         Output = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(mBuffer), Frames * mDescription.channels * sizeof(Real32));
 
-        if (mDescription.atEnd)
+        if (mDescription.pcmFramesRemainingInMP3Frame == 0)
         {
             drmp3_seek_to_start_of_stream(& mDescription);
             return false;

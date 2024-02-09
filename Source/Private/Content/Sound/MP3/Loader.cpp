@@ -24,11 +24,11 @@ namespace Content
 
     Bool MP3Loader::Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Audio::Sound> Asset)
     {
-        UPtr<Audio::MP3Decoder> Decoder = NewUniquePtr<Audio::MP3Decoder>(Data);
+        SPtr<Audio::MP3Decoder> Decoder = NewUniquePtr<Audio::MP3Decoder>(Data);
 
         if (Decoder->GetSize() > 0)
         {
-            Asset->Load(Decoder->GetSize(), Decoder->GetDepth(), Decoder->GetChannel(), Decoder->GetFrequency(), Move(Decoder));
+            Asset->Load(Decoder->GetSize(), Decoder->GetDepth(), Decoder->GetChannel(), Decoder->GetFrequency(), Decoder);
             return true;
         }
         return false;

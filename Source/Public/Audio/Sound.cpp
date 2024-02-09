@@ -29,10 +29,10 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Sound::Load(UInt Size, UInt Depth, UInt Channel, UInt Frequency, UPtr<Decoder> Decoder)
+    void Sound::Load(UInt Size, UInt Depth, UInt Channel, UInt Frequency, ConstSPtr<Decoder> Decoder)
     {
         mSize       = Size;
-        mDecoder    = Move(Decoder);
+        mDecoder    = Decoder;
         mDepth      = Depth;
         mChannel    = Channel;
         mFrequency  = Frequency;
