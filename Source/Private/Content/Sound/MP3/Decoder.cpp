@@ -28,6 +28,7 @@ namespace Audio
         : mChunk { Move(Chunk) }
     {
         drmp3_init_memory(& mDescription, mChunk.GetData(), mChunk.GetSize(), nullptr);
+        mSize = drmp3_get_pcm_frame_count(& mDescription);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -47,7 +48,7 @@ namespace Audio
 
         Output = CPtr<UInt08>(reinterpret_cast<Ptr<UInt08>>(mBuffer), Frames * mDescription.channels * sizeof(Real32));
 
-        if (mDescription.pcmFramesRemainingInMP3Frame == 0)
+        if (mDescription.currentPCMFrame >= mSize)
         {
             drmp3_seek_to_start_of_stream(& mDescription);
             return false;
