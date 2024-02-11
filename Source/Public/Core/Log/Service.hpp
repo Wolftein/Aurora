@@ -120,22 +120,27 @@ namespace Log
     };
 
     // -=(Undocumented)=-
-    #define LOG_DEBUG(Format, ...)      \
-        QUILL_LOG_DEBUG(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_DEBUG(Format, ...)                                              \
+        if (Log::Service::GetSingleton().GetLogger())                           \
+            QUILL_LOG_DEBUG(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
 
     // -=(Undocumented)=-
-    #define LOG_INFO(Format, ...)       \
-        QUILL_LOG_INFO(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_INFO(Format, ...)                                               \
+        if (Log::Service::GetSingleton().GetLogger())                           \
+            QUILL_LOG_INFO(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
 
     // -=(Undocumented)=-
-    #define LOG_WARNING(Format, ...)    \
-        QUILL_LOG_WARNING(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_WARNING(Format, ...)                                            \
+        if (Log::Service::GetSingleton().GetLogger())                           \
+            QUILL_LOG_WARNING(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
 
     // -=(Undocumented)=-
-    #define LOG_ERROR(Format, ...)      \
-        QUILL_LOG_ERROR(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_ERROR(Format, ...)                                              \
+        if (Log::Service::GetSingleton().GetLogger())                           \
+            QUILL_LOG_ERROR(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
 
     // -=(Undocumented)=-
-    #define LOG_CRITICAL(Format, ...)   \
-        QUILL_LOG_CRITICAL(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_CRITICAL(Format, ...)                                           \
+        if (Log::Service::GetSingleton().GetLogger())                           \
+            QUILL_LOG_CRITICAL(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
 }
