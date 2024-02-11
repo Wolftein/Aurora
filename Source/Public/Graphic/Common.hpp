@@ -384,6 +384,9 @@ namespace Graphic
         Language Language = Language::Version_1;
 
         // -=(Undocumented)=-
+        Bool     ConstantBufferDynamicSupport = false;
+
+        // -=(Undocumented)=-
         Stack<Adapter, k_MaxAdapters> Adapters;
     };
 

@@ -439,6 +439,7 @@ namespace Graphic
 
             LoadCapabilities();
             LoadAdapters();
+            LoadFallbacks();
 
             if (Display.has_value())
             {
@@ -493,7 +494,16 @@ namespace Graphic
         };
         Ptr<D3D11_SUBRESOURCE_DATA> Pointer = (Data.empty() ? nullptr : & Content);
 
-        ThrowIfFail(mDevice->CreateBuffer(& Descriptor, Pointer, mBuffers[ID].Object.GetAddressOf()));
+        mBuffers[ID].Fallback = (Type == Usage::Uniform && !mCapabilities.ConstantBufferDynamicSupport);
+
+        if (mBuffers[ID].Fallback)
+        {
+            Fallback_CreateDynamicConstantBuffer(ID, Descriptor.ByteWidth);
+        }
+        else
+        {
+            ThrowIfFail(mDevice->CreateBuffer(& Descriptor, Pointer, mBuffers[ID].Object.GetAddressOf()));
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -504,8 +514,15 @@ namespace Graphic
         const D3D11_BOX Destination  = CD3D11_BOX(Offset, 0, 0, Offset + Data.size(), 1, 1);
         const D3D11_COPY_FLAGS Flags = (Discard ? D3D11_COPY_DISCARD : D3D11_COPY_NO_OVERWRITE);
 
-        // TODO: Investigate if creating a staging buffer and do CopySubResource is better
-        mDeviceImmediate->UpdateSubresource1(mBuffers[ID].Object.Get(), 0, & Destination, Data.data(), 0, 0, Flags);
+        if (mBuffers[ID].Fallback)
+        {
+            Fallback_UpdateDynamicConstantBuffer(ID, Offset, Data);
+        }
+        else
+        {
+            // TODO: Investigate if creating a staging buffer and do CopySubResource is better
+            mDeviceImmediate->UpdateSubresource1(mBuffers[ID].Object.Get(), 0, & Destination, Data.data(), 0, 0, Flags);
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -1001,6 +1018,16 @@ namespace Graphic
         default:
             break;
         }
+
+        D3D11_FEATURE_DATA_D3D11_OPTIONS Description;;
+        const HRESULT Result
+            = mDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, & Description, sizeof(Description));
+
+        if (SUCCEEDED(Result))
+        {
+            mCapabilities.ConstantBufferDynamicSupport =
+                Description.ConstantBufferOffsetting && Description.ConstantBufferPartialUpdate;
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -1046,6 +1073,39 @@ namespace Graphic
                 }
             }
         }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::LoadFallbacks()
+    {
+        if (! mCapabilities.ConstantBufferDynamicSupport)
+        {
+            const D3D11_BUFFER_DESC Descriptor
+                = CD3D11_BUFFER_DESC(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT, D3D11_BIND_CONSTANT_BUFFER);
+
+            for (Ref<ComPtr<ID3D11Buffer>> Buffer : mFallback_CBOs)
+            {
+                ThrowIfFail(mDevice->CreateBuffer(& Descriptor, nullptr, Buffer.GetAddressOf()));
+            }
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::Fallback_CreateDynamicConstantBuffer(Object ID, UInt Capacity)
+    {
+        mBuffers[ID].Fallback_Data = NewUniquePtr<UInt08[]>(Capacity);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::Fallback_UpdateDynamicConstantBuffer(Object ID, UInt Offset, CPtr<const UInt08> Data)
+    {
+        FastCopyMemory(mBuffers[ID].Fallback_Data.get() + Offset, Data.data(), Data.size());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -1162,6 +1222,7 @@ namespace Graphic
     void D3D11Driver::ApplyUniformResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
     {
         Ptr<ID3D11Buffer> Array[k_MaxUniforms];
+        UINT   ArrayIDs[k_MaxUniforms];
         UINT   ArrayOffset[k_MaxUniforms];
         UINT   ArrayLength[k_MaxUniforms];
         UInt   Min = k_MaxUniforms;
@@ -1179,16 +1240,44 @@ namespace Graphic
             }
 
             Array[Element]       = mBuffers[New.Buffer].Object.Get();
+            ArrayIDs[Element]    = New.Buffer;
             ArrayOffset[Element] = Align<16>(New.Offset);
             ArrayLength[Element] = Align<16>(New.Length);
         }
 
         if (Min != k_MaxUniforms && Max > 0)
         {
-            const UInt Count = Max - Min; // TODO: Do we also need other stages?
-            mDeviceImmediate->VSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
-            mDeviceImmediate->PSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
-            mDeviceImmediate->GSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
+            const UInt Count = Max - Min;
+
+            if (mCapabilities.ConstantBufferDynamicSupport)
+            {
+                // TODO: Do we also need other stages?
+                mDeviceImmediate->VSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
+                mDeviceImmediate->PSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
+                mDeviceImmediate->GSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
+            }
+            else
+            {
+                for (UInt Element = Min; Element < Max; ++Element)
+                {
+                    if (ArrayLength[Element] > 0)
+                    {
+                        mDeviceImmediate->UpdateSubresource(
+                            mFallback_CBOs[Element].Get(),
+                            0,
+                            nullptr,
+                            & mBuffers[ArrayIDs[Element]].Fallback_Data[ArrayOffset[Element] * sizeof(Vector4f)],
+                            0,
+                            0);
+                    }
+                    Array[Element] = mFallback_CBOs[Element].Get();
+                }
+
+                // TODO: Do we also need other stages?
+                mDeviceImmediate->VSSetConstantBuffers(Min, Count, Array + Min);
+                mDeviceImmediate->PSSetConstantBuffers(Min, Count, Array + Min);
+                mDeviceImmediate->GSSetConstantBuffers(Min, Count, Array + Min);
+            }
         }
     }
 }

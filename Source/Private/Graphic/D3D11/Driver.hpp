@@ -97,6 +97,9 @@ namespace Graphic
         struct D3D11Buffer
         {
             ComPtr<ID3D11Buffer>             Object;
+
+            Bool                             Fallback;
+            UPtr<UInt08[]>                   Fallback_Data;
         };
 
         // -=(Undocumented)=-
@@ -142,6 +145,15 @@ namespace Graphic
         void LoadAdapters();
 
         // -=(Undocumented)=-
+        void LoadFallbacks();
+
+        // -=(Undocumented)=-
+        void Fallback_CreateDynamicConstantBuffer(Object ID, UInt Capacity);
+
+        // -=(Undocumented)=-
+        void Fallback_UpdateDynamicConstantBuffer(Object ID, UInt Offset, CPtr<const UInt08> Data);
+
+        // -=(Undocumented)=-
         void CreateSwapchainResources(Ref<D3D11Pass> Pass, UInt Width, UInt Height);
 
         // -=(Undocumented)=-
@@ -174,5 +186,10 @@ namespace Graphic
         D3D11Pipeline                mPipelines[k_MaxPipelines];
         D3D11Sampler                 mSamplers[k_MaxSamplers];
         D3D11Texture                 mTextures[k_MaxTextures];
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        ComPtr<ID3D11Buffer>         mFallback_CBOs[k_MaxUniforms];
     };
 }
