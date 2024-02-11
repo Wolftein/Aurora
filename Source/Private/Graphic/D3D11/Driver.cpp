@@ -494,7 +494,7 @@ namespace Graphic
         };
         Ptr<D3D11_SUBRESOURCE_DATA> Pointer = (Data.empty() ? nullptr : & Content);
 
-        mBuffers[ID].Fallback = (Type == Usage::Uniform && !mCapabilities.ConstantBufferDynamicSupport);
+        mBuffers[ID].Fallback = (Type == Usage::Uniform && mFallback_CBO);
 
         if (mBuffers[ID].Fallback)
         {
@@ -1023,11 +1023,9 @@ namespace Graphic
         const HRESULT Result
             = mDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, & Description, sizeof(Description));
 
-        if (SUCCEEDED(Result))
-        {
-            mCapabilities.ConstantBufferDynamicSupport =
-                Description.ConstantBufferOffsetting && Description.ConstantBufferPartialUpdate;
-        }
+        mFallback_CBO = FAILED(Result)
+            || ! Description.ConstantBufferOffsetting
+            || ! Description.ConstantBufferPartialUpdate;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -1077,10 +1075,7 @@ namespace Graphic
         if (  !mCapabilities.Adapters.empty()
             && mCapabilities.Adapters[0].Description.starts_with("Intel(R) HD Graphics"))
         {
-            if (mCapabilities.Language <= Language::Version_4)
-            {
-                mCapabilities.ConstantBufferDynamicSupport = false;
-            }
+            mFallback_CBO = (mCapabilities.Language <= Language::Version_4);
         }
     }
 
@@ -1089,7 +1084,7 @@ namespace Graphic
 
     void D3D11Driver::LoadFallbacks()
     {
-        if (! mCapabilities.ConstantBufferDynamicSupport)
+        if (mFallback_CBO)
         {
             const D3D11_BUFFER_DESC Descriptor
                 = CD3D11_BUFFER_DESC(D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT, D3D11_BIND_CONSTANT_BUFFER);
@@ -1258,14 +1253,7 @@ namespace Graphic
         {
             const UInt Count = Max - Min;
 
-            if (mCapabilities.ConstantBufferDynamicSupport)
-            {
-                // TODO: Do we also need other stages?
-                mDeviceImmediate->VSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
-                mDeviceImmediate->PSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
-                mDeviceImmediate->GSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
-            }
-            else
+            if (mFallback_CBO)
             {
                 for (UInt Element = Min; Element < Max; ++Element)
                 {
@@ -1286,6 +1274,13 @@ namespace Graphic
                 mDeviceImmediate->VSSetConstantBuffers(Min, Count, Array + Min);
                 mDeviceImmediate->PSSetConstantBuffers(Min, Count, Array + Min);
                 mDeviceImmediate->GSSetConstantBuffers(Min, Count, Array + Min);
+            }
+            else
+            {
+                // TODO: Do we also need other stages?
+                mDeviceImmediate->VSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
+                mDeviceImmediate->PSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
+                mDeviceImmediate->GSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
             }
         }
     }

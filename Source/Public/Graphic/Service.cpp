@@ -70,8 +70,7 @@ namespace Graphic
             {
                 Ref<const Capabilities> Capabilities = mDriver->GetCapabilities();
                 LOG_INFO("Graphics: Detected shader model {}", CastEnum(Capabilities.Language) + 1);
-                LOG_INFO("Graphics: - Dynamic CB: {}", Capabilities.ConstantBufferDynamicSupport);
-                
+
                 for (Ref<const Adapter> Adapter : Capabilities.Adapters)
                 {
                     LOG_INFO("Graphics: Found GPU '{}'", Adapter.Description);
