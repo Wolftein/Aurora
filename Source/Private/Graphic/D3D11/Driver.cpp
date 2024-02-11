@@ -1073,6 +1073,15 @@ namespace Graphic
                 }
             }
         }
+
+        if (  !mCapabilities.Adapters.empty()
+            && mCapabilities.Adapters[0].Description.starts_with("Intel(R) HD Graphics"))
+        {
+            if (mCapabilities.Language <= Language::Version_4)
+            {
+                mCapabilities.ConstantBufferDynamicSupport = false;
+            }
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

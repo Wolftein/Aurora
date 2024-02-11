@@ -150,11 +150,12 @@ LIST(APPEND PROJECT_DEPENDENCIES "Toml")
 ## Dependency (QUILL)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-FetchContent_Declare(External_QUILL
-        GIT_REPOSITORY https://github.com/odygrd/quill)
-FetchContent_MakeAvailable(External_QUILL)
+FetchContent_Declare(External_SPDLOG
+        GIT_REPOSITORY https://github.com/gabime/spdlog
+        GIT_TAG v2.x)
+FetchContent_MakeAvailable(External_SPDLOG)
 
-LIST(APPEND PROJECT_DEPENDENCIES "quill")
+LIST(APPEND PROJECT_DEPENDENCIES "spdlog")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Configuration

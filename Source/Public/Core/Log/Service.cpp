@@ -11,6 +11,10 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Service.hpp"
+#include "Core/Trait.hpp"
+#include <spdlog/async.h>
+#include <spdlog/sinks/stdout_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -23,7 +27,7 @@ namespace Log
 
     Service::Service()
         : mLogger  { nullptr },
-          mAdapter { std::make_shared<CustomHandlerAdapter>() }
+          mAdapter { NewPtr<CustomHandlerAdapter<spdlog::details::null_mutex>>() }
     {
     }
 
@@ -32,40 +36,33 @@ namespace Log
 
     void Service::Initialise(CStr Filename)
     {
-        quill::Config Configuration;
-        Configuration.default_logger_name = "Aurora";
+        Vector<spdlog::sink_ptr> Sinks;
 
 #ifdef    EASTL_DEBUG
-        Configuration.default_handlers.emplace_back(quill::stdout_handler());
+        Sinks.emplace_back(NewPtr<spdlog::sinks::stdout_sink_mt>());
 #endif // EASTL_DEBUG
-        Configuration.default_handlers.emplace_back(mAdapter);
 
-        if (!Filename.empty())
+        if (! Filename.empty())
         {
-            quill::FileHandlerConfig Settings;
-            Settings.set_open_mode('w');
-
-            Configuration.default_handlers.emplace_back(quill::file_handler(Filename.data(), Settings));
+            Sinks.emplace_back(NewPtr<spdlog::sinks::basic_file_sink_mt>(Filename.data(), true));
         }
-
-        // Configure the pattern of all handlers
-        for (const auto Handler : Configuration.default_handlers)
-        {
-            Handler->set_pattern(
-                "%(ascii_time) [%(thread)] - %(level_name) - %(message)", "%D %H:%M:%S.%Qms", quill::Timezone::GmtTime);
-        }
+        Sinks.emplace_back(mAdapter);
 
         // Create the backend logging thread
-        quill::configure(Configuration);
-        quill::start();
+        spdlog::init_thread_pool(8192, 1);
+        spdlog::flush_every(std::chrono::seconds(3));
 
-        // Cache the default logger
-        mLogger = quill::get_logger("Aurora");
+        // Create the logger
+        mLogger = NewPtr<spdlog::async_logger>("Aurora", Sinks.begin(), Sinks.end(), spdlog::thread_pool());
+        spdlog::register_logger(mLogger);
 
-#ifdef    EASTL_DEBUG
-        mLogger->set_log_level(quill::LogLevel::Debug);
+        // Configure the pattern of all handlers
+        mLogger->set_pattern("%D %H:%M:%S.%e [%t] - %L - %v");
+
+#if     EASTL_DEBUG == 1
+        mLogger->set_level(spdlog::level::debug);
 #else
-        mLogger->set_log_level(quill::LogLevel::Info);
+        mLogger->set_level(spdlog::level::info);
 #endif // EASTL_DEBUG
     }
 
@@ -74,15 +71,7 @@ namespace Log
 
     void Service::Shutdown()
     {
-        quill::detail::LogManagerSingleton::instance().log_manager().stop_backend_worker();
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Service::SetRouter(const SPtr<Sink> Router)
-    {
-        mAdapter->SetRouter(Router);
+        spdlog::drop_all();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -93,22 +82,22 @@ namespace Log
         switch (Value)
         {
         case Verbosity::None:
-            mLogger->set_log_level(quill::LogLevel::None);
+            mLogger->set_level(spdlog::level::off);
             break;
         case Verbosity::Debug:
-            mLogger->set_log_level(quill::LogLevel::Debug);
+            mLogger->set_level(spdlog::level::debug);
             break;
         case Verbosity::Information:
-            mLogger->set_log_level(quill::LogLevel::Info);
+            mLogger->set_level(spdlog::level::info);
             break;
         case Verbosity::Warning:
-            mLogger->set_log_level(quill::LogLevel::Warning);
+            mLogger->set_level(spdlog::level::warn);
             break;
         case Verbosity::Error:
-            mLogger->set_log_level(quill::LogLevel::Error);
+            mLogger->set_level(spdlog::level::err);
             break;
         case Verbosity::Critical:
-            mLogger->set_log_level(quill::LogLevel::Critical);
+            mLogger->set_level(spdlog::level::critical);
             break;
         }
     }

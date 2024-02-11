@@ -14,10 +14,9 @@
 
 #include "Core/Log/Log.hpp"
 #include "Core/Log/Sink.hpp"
-
-#define QUILL_DISABLE_NON_PREFIXED_MACROS
-#define QUILL_ROOT_LOGGER_ONLY
-#include <quill/Quill.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/base_sink.h>
+#include <spdlog/details/null_mutex.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -33,8 +32,8 @@ namespace Log
         // -=(Undocumented)=-
         static Ref<Service> GetSingleton()
         {
-            static Service _Implementation;
-            return _Implementation;
+            static Service sImplementation;
+            return sImplementation;
         }
 
     public:
@@ -49,13 +48,10 @@ namespace Log
         void Shutdown();
 
         // -=(Undocumented)=-
-        void SetRouter(const SPtr<Sink> Router);
-
-        // -=(Undocumented)=-
         void SetVerbosity(Verbosity Value);
 
         // -=(Undocumented)=-
-        Ptr<quill::Logger> GetLogger()
+        SPtr<spdlog::logger> GetLogger()
         {
             return mLogger;
         }
@@ -63,7 +59,8 @@ namespace Log
     private:
 
         // -=(Undocumented)=-
-        class CustomHandlerAdapter : public quill::Handler
+        template<typename Mutex>
+        class CustomHandlerAdapter : public spdlog::sinks::base_sink<Mutex>
         {
         public:
 
@@ -77,24 +74,24 @@ namespace Log
             ~CustomHandlerAdapter() override = default;
 
             // -=(Undocumented)=-
-            void SetRouter(const SPtr<Sink> Router)
+            void SetRouter(ConstSPtr<Sink> Router)
             {
                 mRouter = Router;
             }
 
-        public:
+        protected:
 
-            // \see quill::Handler::write
-            void write(Ref<quill::fmt_buffer_t const> Message, Ref<quill::TransitEvent const> Event) override
+            // \see base_sink::sink_it_
+            void sink_it_(Ref<const spdlog::details::log_msg> Message) override
             {
                 if (mRouter)
                 {
-                    mRouter->Write(CStr(Message.data(), Message.size()));
+                    mRouter->Write(CStr(Message.payload.data(), Message.payload.size()));
                 }
             }
 
-            // \see quill::Handler::flush
-            void flush() noexcept override
+            // \see base_sink::flush_
+            void flush_() override
             {
                 if (mRouter)
                 {
@@ -115,32 +112,32 @@ namespace Log
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Ptr<quill::Logger>                    mLogger;
-        std::shared_ptr<CustomHandlerAdapter> mAdapter;
+        SPtr<spdlog::logger>                                    mLogger;
+        SPtr<CustomHandlerAdapter<spdlog::details::null_mutex>> mAdapter;
     };
 
     // -=(Undocumented)=-
-    #define LOG_DEBUG(Format, ...)                                              \
-        if (Log::Service::GetSingleton().GetLogger())                           \
-            QUILL_LOG_DEBUG(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_DEBUG(Format, ...)                    \
+        if (Log::Service::GetSingleton().GetLogger()) \
+            Log::Service::GetSingleton().GetLogger()->debug(Format, ##__VA_ARGS__)
 
     // -=(Undocumented)=-
-    #define LOG_INFO(Format, ...)                                               \
-        if (Log::Service::GetSingleton().GetLogger())                           \
-            QUILL_LOG_INFO(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_INFO(Format, ...)                     \
+        if (Log::Service::GetSingleton().GetLogger()) \
+            Log::Service::GetSingleton().GetLogger()->info(Format, ##__VA_ARGS__)
 
     // -=(Undocumented)=-
-    #define LOG_WARNING(Format, ...)                                            \
-        if (Log::Service::GetSingleton().GetLogger())                           \
-            QUILL_LOG_WARNING(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_WARNING(Format, ...)                  \
+        if (Log::Service::GetSingleton().GetLogger()) \
+            Log::Service::GetSingleton().GetLogger()->warn(Format, ##__VA_ARGS__)
 
     // -=(Undocumented)=-
-    #define LOG_ERROR(Format, ...)                                              \
-        if (Log::Service::GetSingleton().GetLogger())                           \
-            QUILL_LOG_ERROR(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_ERROR(Format, ...)                    \
+        if (Log::Service::GetSingleton().GetLogger()) \
+            Log::Service::GetSingleton().GetLogger()->error(Format, ##__VA_ARGS__)
 
     // -=(Undocumented)=-
-    #define LOG_CRITICAL(Format, ...)                                           \
-        if (Log::Service::GetSingleton().GetLogger())                           \
-            QUILL_LOG_CRITICAL(Log::Service::GetSingleton().GetLogger(), Format, ##__VA_ARGS__)
+    #define LOG_CRITICAL(Format, ...)                 \
+        if (Log::Service::GetSingleton().GetLogger()) \
+            Log::Service::GetSingleton().GetLogger()->critical(Format, ##__VA_ARGS__)
 }
