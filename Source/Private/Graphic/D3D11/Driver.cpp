@@ -21,7 +21,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    inline void ThrowIfFail(HRESULT Result) // TODO: Improve
+    inline Bool ThrowIfFail(HRESULT Result)
     {
         if (FAILED(Result))
         {
@@ -29,7 +29,9 @@ namespace Graphic
             ::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, Result, 0, Buffer, 1024, NULL);
 
             LOG_CRITICAL("D3D11Driver: {}", Buffer);
+            return false;
         }
+        return true;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -408,7 +410,7 @@ namespace Graphic
             CreateDXGIFactoryPtr = (decltype(& CreateDXGIFactory1)) GetProcAddress(Dll, "CreateDXGIFactory1");
         }
 
-        const Bool Successful = (D3D11CreateDevicePtr && CreateDXGIFactoryPtr);
+        Bool Successful = (D3D11CreateDevicePtr && CreateDXGIFactoryPtr);
 
         if (Successful)
         {
@@ -443,7 +445,7 @@ namespace Graphic
 
             if (FAILED(Result))
             {
-                ThrowIfFail(D3D11CreateDevicePtr(
+                Result = D3D11CreateDevicePtr(
                     nullptr,
                     D3D_DRIVER_TYPE_HARDWARE,
                     nullptr,
@@ -453,21 +455,28 @@ namespace Graphic
                     D3D11_SDK_VERSION,
                     Device.GetAddressOf(),
                     nullptr,
-                    DeviceImmediate.GetAddressOf()));
+                    DeviceImmediate.GetAddressOf());
             }
 
-            ThrowIfFail(Device.As<ID3D11Device1>(& mDevice));
-            ThrowIfFail(DeviceImmediate.As<ID3D11DeviceContext1>(& mDeviceImmediate));
+            Successful = ThrowIfFail(Result);
 
-            ThrowIfFail(CreateDXGIFactoryPtr(IID_PPV_ARGS(& mDisplayFactory)));
-
-            LoadAdapters();
-            LoadCapabilities();
-            LoadFallbacks();
-
-            if (Display.has_value())
+            if (Successful)
             {
-                CreatePass(k_Default, Display, Width, Height);
+                Successful = ThrowIfFail(Device.As<ID3D11Device1>(& mDevice));
+                Successful = Successful && ThrowIfFail(DeviceImmediate.As<ID3D11DeviceContext1>(& mDeviceImmediate));
+                Successful = Successful && ThrowIfFail(CreateDXGIFactoryPtr(IID_PPV_ARGS(& mDisplayFactory)));
+
+                if (Successful)
+                {
+                    LoadAdapters();
+                    LoadCapabilities();
+                    LoadFallbacks();
+
+                    if (Display.has_value())
+                    {
+                        CreatePass(k_Default, Display, Width, Height);
+                    }
+                }
             }
         }
         return Successful;
