@@ -58,12 +58,7 @@ namespace Log
 
         // Configure the pattern of all handlers
         mLogger->set_pattern("%D %H:%M:%S.%e [%t] - %L - %v");
-
-#if     EASTL_DEBUG == 1
         mLogger->set_level(spdlog::level::debug);
-#else
-        mLogger->set_level(spdlog::level::info);
-#endif // EASTL_DEBUG
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
