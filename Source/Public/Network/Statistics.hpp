@@ -21,26 +21,24 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Protocol
+    struct Statistics final
     {
-    public:
+        // -=(Undocumented)=-
+        SStr   Address;
 
         // -=(Undocumented)=-
-        virtual ~Protocol() = default;
+        UInt64 TotalBytesSent;
 
         // -=(Undocumented)=-
-        virtual void OnAttach(ConstSPtr<class Client> Session) = 0;
+        UInt64 TotalBytesReceived;
 
         // -=(Undocumented)=-
-        virtual void OnDetach(ConstSPtr<class Client> Session) = 0;
+        UInt64 TotalBytesPending;
 
         // -=(Undocumented)=-
-        virtual void OnError(ConstSPtr<class Client> Session, UInt Error, CStr Description) = 0;
+        UInt64 TotalPacketSent;
 
         // -=(Undocumented)=-
-        virtual void OnRead(ConstSPtr<class Client> Session,  CPtr<UInt08> Bytes) = 0;
-
-        // -=(Undocumented)=-
-        virtual void OnWrite(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes) = 0;
+        UInt64 TotalPacketReceived;
     };
 }

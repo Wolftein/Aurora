@@ -46,6 +46,5 @@ namespace Content
 
     void MemoryLocator::Write(CStr Path, CPtr<const UInt08> Data)
     {
-
     }
 }

@@ -23,7 +23,7 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    class Renderer
+    class Renderer final
     {
     public:
 

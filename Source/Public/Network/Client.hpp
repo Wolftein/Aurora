@@ -14,6 +14,7 @@
 
 #include "Packet.hpp"
 #include "Protocol.hpp"
+#include "Statistics.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -25,6 +26,9 @@ namespace Network
     class Client
     {
     public:
+
+        // -=(Undocumented)=-
+        virtual ~Client() = default;
 
         // -=(Undocumented)=-
         void Attach(ConstSPtr<Protocol> Protocol)
@@ -65,6 +69,12 @@ namespace Network
             }
         }
 
+        // -=(Undocumented)=-
+        Statistics GetStatistics() const
+        {
+            return mStatistics;
+        }
+
     protected:
 
         // -=(Undocumented)=-
@@ -78,6 +88,7 @@ namespace Network
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        Statistics     mStatistics;
         SPtr<Protocol> mProtocol;
         Writer         mAccumulator;
     };

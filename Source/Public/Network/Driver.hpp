@@ -26,6 +26,9 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
+        virtual ~Driver() = default;
+
+        // -=(Undocumented)=-
         virtual Bool Initialize() = 0;
 
         // -=(Undocumented)=-

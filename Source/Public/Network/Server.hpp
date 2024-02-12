@@ -26,13 +26,16 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
-        virtual void Close() = 0;
+        virtual ~Server() = default;
 
         // -=(Undocumented)=-
         void Attach(ConstSPtr<Protocol> Protocol)
         {
             mProtocol = Protocol;
         }
+
+        // -=(Undocumented)=-
+        virtual void Close() = 0;
 
         // -=(Undocumented)=-
         void Disconnect(Bool Forcibly)

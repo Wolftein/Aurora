@@ -34,7 +34,9 @@ namespace Network
 
     void AsioClient::Start()
     {
-        mState = State::Connected;
+        mState      = State::Connected;
+        mStatistics = { 0 };
+        mStatistics.Address = mChannel.remote_endpoint().address().to_v4().to_string();
 
         mChannel.set_option(asio::ip::tcp::no_delay(true));
 
@@ -106,6 +108,9 @@ namespace Network
                 mProtocol->OnWrite(shared_from_this(), Chunk.subspan(sizeof(Header), mAccumulator.GetOffset()));
 
                 mEncoder.Commit(Chunk.size());
+
+                mStatistics.TotalPacketSent   += 1;
+                mStatistics.TotalBytesPending += Block.size() + sizeof(Header);
 
                 DoFlush();
             }
@@ -259,10 +264,14 @@ namespace Network
         {
             mDecoder.Commit(Transferred);
 
+            mStatistics.TotalBytesReceived += Transferred;
+
             if (const CPtr<UInt08> Chunk = mDecoder.Read(); !Chunk.empty())
             {
                 if (Body)
                 {
+                    mStatistics.TotalPacketReceived += 1;
+
                     mProtocol->OnRead(shared_from_this(), Chunk);
                 }
 
@@ -289,6 +298,9 @@ namespace Network
         }
         else
         {
+            mStatistics.TotalBytesSent    += Transferred;
+            mStatistics.TotalBytesPending -= Transferred;
+
             mEncoder.Consume(Transferred);
 
             DoFlush();

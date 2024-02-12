@@ -30,7 +30,8 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Properties::Properties()
-        : mWindowTitle      { DEFAULT_TITLE  },
+        : mWindowHandle     { nullptr },
+          mWindowTitle      { DEFAULT_TITLE  },
           mWindowWidth      { DEFAULT_WIDTH  },
           mWindowHeight     { DEFAULT_HEIGHT },
           mWindowFullscreen { false },
@@ -46,7 +47,9 @@ namespace Engine
     {
         const TOMLSection Root = Parser.GetRoot();
 
-        mWindowWidth  = Root.GetNumber("Width",  DEFAULT_WIDTH);
-        mWindowHeight = Root.GetNumber("Height", DEFAULT_HEIGHT);
+        mWindowWidth      = Root.GetNumber("Width",  DEFAULT_WIDTH);
+        mWindowHeight     = Root.GetNumber("Height", DEFAULT_HEIGHT);
+        mWindowFullscreen = Root.GetBool("Fullscreen", false);
+        mWindowBorderless = Root.GetBool("Borderless", false);
     }
 }

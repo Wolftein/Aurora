@@ -23,7 +23,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class AsioClient : public EnableSmartPointer<AsioClient>, public Client
+    class AsioClient final : public EnableSmartPointer<AsioClient>, public Client
     {
     public:
 
