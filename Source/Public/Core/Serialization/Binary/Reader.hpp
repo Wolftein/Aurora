@@ -26,6 +26,14 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        explicit Reader()
+            : mBuffer { nullptr },
+              mLength { 0 },
+              mOffset { 0 }
+        {
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         explicit Reader(Ptr<Type> Pointer, UInt Length)
             : mBuffer { reinterpret_cast<Ptr<UInt08>>(Pointer) },
