@@ -192,6 +192,17 @@ inline namespace Core
             }
         }
 
+        // -=(Undocumented)=-
+        void WriteString16(CStr16 Data)
+        {
+            WriteInt(Data.size());
+
+            if (!Data.empty())
+            {
+                Write<CStr16::const_pointer>(Data.data(), Data.size() * sizeof(CStr16::value_type));
+            }
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

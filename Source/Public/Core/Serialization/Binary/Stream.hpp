@@ -228,6 +228,19 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        void SerializeString16(Ref<SStr16> Value)
+        {
+            if constexpr (std::is_same<T, Reader>::value)
+            {
+                Value = mArchive.ReadString16();
+            }
+            else
+            {
+                mArchive.WriteString16(Value);
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Enum>
         void SerializeEnum(Ref<Enum> Value)
         {

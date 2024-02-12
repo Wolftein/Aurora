@@ -191,6 +191,15 @@ inline namespace Core
             return CStr(Data, Size);
         }
 
+        // -=(Undocumented)=-
+        CStr16 ReadString16()
+        {
+            const auto Size = ReadInt<UInt>();
+            const auto Data = Read<CStr16::const_pointer>(Size * sizeof(CStr::value_type));
+
+            return CStr16(Data, Size);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
