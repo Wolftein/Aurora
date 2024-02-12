@@ -47,7 +47,8 @@ namespace Content
         {
             Output = Chunk(::GetFileSize(Handle, nullptr));
 
-            ::ReadFile(Handle, Output.GetData(), Output.GetSize(), nullptr, 0);
+            DWORD lpNumberOfBytesRead;
+            ::ReadFile(Handle, Output.GetData(), Output.GetSize(), & lpNumberOfBytesRead, 0);
 
             ::CloseHandle(Handle);
         }
@@ -69,7 +70,8 @@ namespace Content
 
         if (Handle != INVALID_HANDLE_VALUE)
         {
-            ::WriteFile(Handle, Data.data(), Data.size_bytes(), nullptr, 0);
+            DWORD lpNumberOfBytesWritten;
+            ::WriteFile(Handle, Data.data(), Data.size_bytes(), & lpNumberOfBytesWritten, 0);
 
             ::CloseHandle(Handle);
         }
