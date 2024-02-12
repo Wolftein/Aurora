@@ -49,7 +49,7 @@ namespace Network
         {
             for (ConstSPtr<Client> Session : mDatabase)
             {
-                Session->template Write(Bytes);
+                Session->Write(Bytes);
             }
         }
 
@@ -59,7 +59,7 @@ namespace Network
         {
             for (ConstSPtr<Client> Session : mDatabase)
             {
-                Session->template Write(Packet);
+                Session->Write(Packet);
             }
         }
 
