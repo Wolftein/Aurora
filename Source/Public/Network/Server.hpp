@@ -44,6 +44,16 @@ namespace Network
         }
 
         // -=(Undocumented)=-
+        template<typename Type>
+        void Broadcast(CPtr<const Type> Bytes)
+        {
+            for (ConstSPtr<Client> Session : mDatabase)
+            {
+                Session->template Write(Bytes);
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Message>
         void Broadcast(Message && Packet)
         {
