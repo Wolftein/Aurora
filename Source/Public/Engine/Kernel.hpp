@@ -33,7 +33,7 @@
 namespace Engine
 {
     // -=(Undocumented)=-
-    class Kernel final : public Core::Subsystem::Context
+    class Kernel final : public Subsystem::Context
     {
     public:
 
@@ -41,7 +41,7 @@ namespace Engine
         ~Kernel();
 
         // -=(Undocumented)=-
-        void Initialize(Ref<const Properties> Properties);
+        void Initialize(Mode Mode, Ref<const Properties> Properties);
 
         // -=(Undocumented)=-
         void Tick();
