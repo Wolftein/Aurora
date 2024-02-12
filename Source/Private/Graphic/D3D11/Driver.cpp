@@ -420,25 +420,49 @@ namespace Graphic
             Flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-            ThrowIfFail(D3D11CreateDevicePtr(
+            const D3D_FEATURE_LEVEL Direct3DFeatureLevels[] = {
+                D3D_FEATURE_LEVEL_11_1,
+                D3D_FEATURE_LEVEL_11_0,
+                D3D_FEATURE_LEVEL_10_1,
+                D3D_FEATURE_LEVEL_10_0,
+                D3D_FEATURE_LEVEL_9_3,
+                D3D_FEATURE_LEVEL_9_2,
+            };
+
+            HRESULT Result = D3D11CreateDevicePtr(
                 nullptr,
                 D3D_DRIVER_TYPE_HARDWARE,
                 nullptr,
                 Flags,
-                nullptr,
-                0,
+                Direct3DFeatureLevels,
+                _countof(Direct3DFeatureLevels),
                 D3D11_SDK_VERSION,
                 Device.GetAddressOf(),
                 nullptr,
-                DeviceImmediate.GetAddressOf()));
+                DeviceImmediate.GetAddressOf());
+
+            if (FAILED(Result))
+            {
+                ThrowIfFail(D3D11CreateDevicePtr(
+                    nullptr,
+                    D3D_DRIVER_TYPE_HARDWARE,
+                    nullptr,
+                    Flags,
+                    Direct3DFeatureLevels + 1,
+                    _countof(Direct3DFeatureLevels) - 1,
+                    D3D11_SDK_VERSION,
+                    Device.GetAddressOf(),
+                    nullptr,
+                    DeviceImmediate.GetAddressOf()));
+            }
 
             ThrowIfFail(Device.As<ID3D11Device1>(& mDevice));
             ThrowIfFail(DeviceImmediate.As<ID3D11DeviceContext1>(& mDeviceImmediate));
 
             ThrowIfFail(CreateDXGIFactoryPtr(IID_PPV_ARGS(& mDisplayFactory)));
 
-            LoadCapabilities();
             LoadAdapters();
+            LoadCapabilities();
             LoadFallbacks();
 
             if (Display.has_value())
@@ -988,49 +1012,6 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::LoadCapabilities()
-    {
-        mCapabilities.Backend = Backend::Direct3D11;
-
-        switch (mDevice->GetFeatureLevel())
-        {
-        case D3D_FEATURE_LEVEL_12_1:
-        case D3D_FEATURE_LEVEL_12_0:
-            mCapabilities.Language = Language::Version_6;
-            break;
-        case D3D_FEATURE_LEVEL_11_1:
-        case D3D_FEATURE_LEVEL_11_0:
-            mCapabilities.Language = Language::Version_5;
-            break;
-        case D3D_FEATURE_LEVEL_10_1:
-        case D3D_FEATURE_LEVEL_10_0:
-            mCapabilities.Language = Language::Version_4;
-            break;
-        case D3D_FEATURE_LEVEL_9_3:
-            mCapabilities.Language = Language::Version_3;
-            break;
-        case D3D_FEATURE_LEVEL_9_2:
-            mCapabilities.Language = Language::Version_2;
-            break;
-        case D3D_FEATURE_LEVEL_9_1:
-            mCapabilities.Language = Language::Version_1;
-            break;
-        default:
-            break;
-        }
-
-        D3D11_FEATURE_DATA_D3D11_OPTIONS Description;;
-        const HRESULT Result
-            = mDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, & Description, sizeof(Description));
-
-        mFallback_CBO = FAILED(Result)
-            || ! Description.ConstantBufferOffsetting
-            || ! Description.ConstantBufferPartialUpdate;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
     void D3D11Driver::LoadAdapters()
     {
         ComPtr<IDXGIAdapter1> DXGIAdapter;
@@ -1071,11 +1052,55 @@ namespace Graphic
                 }
             }
         }
+    }
 
-        if (  !mCapabilities.Adapters.empty()
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::LoadCapabilities()
+    {
+        mCapabilities.Backend = Backend::Direct3D11;
+
+        switch (mDevice->GetFeatureLevel())
+        {
+        case D3D_FEATURE_LEVEL_12_1:
+        case D3D_FEATURE_LEVEL_12_0:
+            mCapabilities.Language = Language::Version_6;
+            break;
+        case D3D_FEATURE_LEVEL_11_1:
+        case D3D_FEATURE_LEVEL_11_0:
+            mCapabilities.Language = Language::Version_5;
+            break;
+        case D3D_FEATURE_LEVEL_10_1:
+        case D3D_FEATURE_LEVEL_10_0:
+            mCapabilities.Language = Language::Version_4;
+            break;
+        case D3D_FEATURE_LEVEL_9_3:
+            mCapabilities.Language = Language::Version_3;
+            break;
+        case D3D_FEATURE_LEVEL_9_2:
+            mCapabilities.Language = Language::Version_2;
+            break;
+        case D3D_FEATURE_LEVEL_9_1:
+            mCapabilities.Language = Language::Version_1;
+            break;
+        default:
+            break;
+        }
+
+        D3D11_FEATURE_DATA_D3D11_OPTIONS Description;;
+        const HRESULT Result
+            = mDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, & Description, sizeof(Description));
+
+        mFallback_CBO = FAILED(Result)
+            || ! Description.ConstantBufferOffsetting
+            || ! Description.ConstantBufferPartialUpdate;
+
+        if (! mFallback_CBO
+            && !mCapabilities.Adapters.empty()
             && mCapabilities.Adapters[0].Description.starts_with("Intel(R) HD Graphics"))
         {
-            mFallback_CBO = (mCapabilities.Language <= Language::Version_4);
+            mFallback_CBO = (mDevice->GetFeatureLevel() < D3D_FEATURE_LEVEL_11_1);
         }
     }
 

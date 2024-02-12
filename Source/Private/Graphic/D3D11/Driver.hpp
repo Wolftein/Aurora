@@ -139,10 +139,10 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
-        void LoadCapabilities();
+        void LoadAdapters();
 
         // -=(Undocumented)=-
-        void LoadAdapters();
+        void LoadCapabilities();
 
         // -=(Undocumented)=-
         void LoadFallbacks();
