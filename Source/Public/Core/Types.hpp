@@ -194,14 +194,4 @@ inline namespace Core
     // -=(Undocumented)=-
     template<typename Value>
     using StringTable = Table<SStr, Value, StringHash>;
-
-    // -=(Undocumented)=-
-    inline static constexpr Bool IsHeadless()
-    {
-#ifdef AURORA_HEADLESS_MODE
-        return true;
-#else
-        return false;
-#endif
-    }
 }

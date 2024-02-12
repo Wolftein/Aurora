@@ -28,6 +28,45 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        enum class Mode
+        {
+            // -=(Undocumented)=-
+            Client,
+
+            // -=(Undocumented)=-
+            Server,
+
+            // -=(Undocumented)=-
+            Both,
+        };
+
+    public:
+
+        // -=(Undocumented)=-
+        System()
+            : mMode { Mode::Client }
+        {
+        }
+
+        // -=(Undocumented)=-
+        void SetMode(Mode Mode)
+        {
+            mMode = Mode;
+        }
+
+        // -=(Undocumented)=-
+        Bool IsClientMode() const
+        {
+            return (mMode != Mode::Server);
+        }
+
+        // -=(Undocumented)=-
+        Bool IsServerMode() const
+        {
+            return (mMode != Mode::Client);
+        }
+
+        // -=(Undocumented)=-
         template<typename T>
         void Execute(T Functor)
         {
@@ -74,6 +113,7 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        Mode                    mMode;
         Vector<SPtr<Subsystem>> mSubsystems;
     };
 }

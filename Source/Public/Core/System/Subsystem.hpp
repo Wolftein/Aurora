@@ -53,6 +53,18 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Bool IsClientMode() const
+        {
+            return mContext.IsClientMode();
+        }
+
+        // -=(Undocumented)=-
+        Bool IsServerMode() const
+        {
+            return mContext.IsServerMode();
+        }
+
+        // -=(Undocumented)=-
         template<typename T, typename ... Args>
         SPtr<T> AddSubsystem(Args && ... Arguments)
         {

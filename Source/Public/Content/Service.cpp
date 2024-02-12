@@ -242,7 +242,7 @@ namespace Content
     {
         AddLocator("Engine://", NewPtr<Content::MemoryLocator>());
 
-        if (! IsHeadless())
+        if (IsClientMode())
         {
 #ifdef    AE_CONTENT_LOADER_MP3
             AddLoader(NewPtr<Content::MP3Loader>());
@@ -261,9 +261,12 @@ namespace Content
 #endif // AE_CONTENT_LOADER_EFFECT
 
 #ifdef    AE_CONTENT_LOADER_EFFECT
-            Ref<const Graphic::Capabilities> GraphicCapabilities = GetSubsystem<Graphic::Service>()->GetCapabilities();
-            AddLoader(NewPtr<Content::PipelineLoader>(
-                GraphicCapabilities.Backend, GraphicCapabilities.Language));
+            if (ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>())
+            {
+                Ref<const Graphic::Capabilities> GraphicCapabilities = Graphics->GetCapabilities();
+                AddLoader(NewPtr<Content::PipelineLoader>(
+                    GraphicCapabilities.Backend, GraphicCapabilities.Language));
+            }
 #endif // AE_CONTENT_LOADER_EFFECT
 
 #ifdef    AE_CONTENT_LOADER_ARTERY
