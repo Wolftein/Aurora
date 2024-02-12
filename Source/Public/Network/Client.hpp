@@ -70,7 +70,7 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        Statistics GetStatistics() const
+        Ref<const Statistics> GetStatistics() const
         {
             return mStatistics;
         }
