@@ -178,6 +178,27 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#ifdef    EA_PLATFORM_WINDOWS
+
+    static pD3DCompile GetD3DCompileFunction()
+    {
+        static pD3DCompile FunctionPtr = nullptr;
+
+        if (FunctionPtr == nullptr)
+        {
+            if (const HMODULE Module = ::LoadLibraryW(L"D3DCompiler_47"))
+            {
+                FunctionPtr = (pD3DCompile) GetProcAddress(Module, "D3DCompile");
+            }
+        }
+        return FunctionPtr;
+    }
+
+#endif // EA_PLATFORM_WINDOWS
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     PipelineLoader::PipelineLoader(Graphic::Backend Backend, Graphic::Language Target)
         : mBackend { Backend },
           mTarget  { Target }
@@ -326,35 +347,42 @@ namespace Content
 
         Ref<const CStr> Profile = kShaderProfiles[CastEnum(mTarget)][CastEnum(Stage)];
 
-        const HRESULT Result   = D3DCompile(
-            Code.data(),
-            Code.size(),
-            nullptr,
-            Defines,
-            nullptr,
-            Entry.data(),
-            Profile.data(),
-            D3DCOMPILE_OPTIMIZATION_LEVEL3,
-            0,
-            & Bytecode,
-            & Error);
-
-        Chunk Compilation;
-
-        if (SUCCEEDED(Result))
+        if (const pD3DCompile D3DCompile = GetD3DCompileFunction())
         {
-            Compilation = Chunk(Bytecode->GetBufferSize());
-            FastCopyMemory(Compilation.GetData(), Bytecode->GetBufferPointer(), Bytecode->GetBufferSize());
-            Bytecode->Release();
+            const HRESULT Result   = D3DCompile(
+                Code.data(),
+                Code.size(),
+                nullptr,
+                Defines,
+                nullptr,
+                Entry.data(),
+                Profile.data(),
+                D3DCOMPILE_OPTIMIZATION_LEVEL3,
+                0,
+                & Bytecode,
+                & Error);
+
+            Chunk Compilation;
+
+            if (SUCCEEDED(Result))
+            {
+                Compilation = Chunk(Bytecode->GetBufferSize());
+                FastCopyMemory(Compilation.GetData(), Bytecode->GetBufferPointer(), Bytecode->GetBufferSize());
+                Bytecode->Release();
+            }
+            else
+            {
+                LOG_ERROR("Failed to compile shader: {}", reinterpret_cast<Ptr<Char>>(Error->GetBufferPointer()));
+            }
+
+            return Compilation;
         }
         else
         {
-            LOG_ERROR("Failed to compile shader: {}", reinterpret_cast<Ptr<Char>>(Error->GetBufferPointer()));
+            LOG_ERROR("Can't find D3DCompile function");
         }
-
-        return Compilation;
-#else  // EA_PLATFORM_WINDOWS
-        return Chunk();
 #endif // EA_PLATFORM_WINDOWS
+
+        return Chunk();
     }
 }
