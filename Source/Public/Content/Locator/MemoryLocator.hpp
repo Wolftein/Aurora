@@ -25,10 +25,13 @@ namespace Content
     {
     public:
 
-        // -=(Undocumented)=-
+        // \see Locator::Open
         Chunk Open(CStr Path) override;
 
-        // -=(Undocumented)=-
+        // \see Locator::Write
         void Write(CStr Path, CPtr<const UInt08> Data) override;
+
+        // \see Locator::Delete
+        void Delete(CStr Path) override;
     };
 }

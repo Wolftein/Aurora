@@ -79,4 +79,16 @@ namespace Content
         }
 #endif // EA_PLATFORM_WINDOWS
     }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void SystemLocator::Delete(CStr Path)
+    {
+#ifdef EA_PLATFORM_WINDOWS
+        const SStr   File   = Format("{}/{}", mPath, Path);
+
+        ::DeleteFileA(File.c_str());
+#endif // EA_PLATFORM_WINDOWS
+    }
 }

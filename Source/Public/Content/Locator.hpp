@@ -33,5 +33,8 @@ namespace Content
 
         // -=(Undocumented)=-
         virtual void Write(CStr Path, CPtr<const UInt08> Data) = 0;
-	};
+
+        // -=(Undocumented)=-
+        virtual void Delete(CStr Path) = 0;
+    };
 }

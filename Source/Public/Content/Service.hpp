@@ -107,6 +107,9 @@ namespace Content
         Bool Save(Ref<const Uri> Key, CPtr<const UInt08> Data);
 
         // -=(Undocumented)=-
+        Bool Delete(Ref<const Uri> Key);
+
+        // -=(Undocumented)=-
         template<typename Type>
         SPtr<Type> Load(Ref<const Uri> Key)
         {
