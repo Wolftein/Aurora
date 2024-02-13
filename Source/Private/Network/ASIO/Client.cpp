@@ -35,7 +35,7 @@ namespace Network
     void AsioClient::Start()
     {
         mState      = State::Connected;
-        mStatistics = { 0 };
+        mStatistics = { };
         mStatistics.Address = mChannel.remote_endpoint().address().to_v4().to_string();
 
         mChannel.set_option(asio::ip::tcp::no_delay(true));

@@ -27,18 +27,18 @@ namespace Network
         SStr   Address;
 
         // -=(Undocumented)=-
-        UInt64 TotalBytesSent;
+        UInt64 TotalBytesSent      = 0;
 
         // -=(Undocumented)=-
-        UInt64 TotalBytesReceived;
+        UInt64 TotalBytesReceived  = 0;
 
         // -=(Undocumented)=-
-        UInt64 TotalBytesPending;
+        UInt64 TotalBytesPending   = 0;
 
         // -=(Undocumented)=-
-        UInt64 TotalPacketSent;
+        UInt64 TotalPacketSent     = 0;
 
         // -=(Undocumented)=-
-        UInt64 TotalPacketReceived;
+        UInt64 TotalPacketReceived = 0;
     };
 }
