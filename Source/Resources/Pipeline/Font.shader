@@ -18,6 +18,7 @@ SamplerState ColorSampler : register(s0);
 cbuffer SceneConstantBuffer : register(b0)
 {
     float4x4 uCamera;
+    float    uTime;
 };
 
 cbuffer MaterialConstantBuffer : register(b2)
