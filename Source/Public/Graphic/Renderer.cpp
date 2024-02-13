@@ -31,9 +31,15 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Begin(Ref<const Matrix4f> Projection)
+    void Renderer::Begin(Ref<const Matrix4f> Projection, Real32 Time)
     {
-        mEncoder.SetScene<Matrix4f>(Projection);
+        struct
+        {
+            const Matrix4f uProjection;
+            const Real32   uTime;
+        } Scene { Projection, Time };
+
+        mEncoder.SetScene<decltype(Scene)>(Scene);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

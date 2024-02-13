@@ -101,7 +101,7 @@ namespace Graphic
         Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        void Begin(Ref<const Matrix4f> Projection);
+        void Begin(Ref<const Matrix4f> Projection, Real32 Time);
 
         // -=(Undocumented)=-
         template<typename Type>
