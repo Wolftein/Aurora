@@ -104,6 +104,12 @@ namespace Content
         }
 
         // -=(Undocumented)=-
+        Bool Save(Ref<const Uri> Key, CStr Data)
+        {
+            return Save(Key, CPtr<const UInt08> { reinterpret_cast<Ptr<const UInt08>>(Data.data()), Data.size() });
+        }
+
+        // -=(Undocumented)=-
         Bool Save(Ref<const Uri> Key, CPtr<const UInt08> Data);
 
         // -=(Undocumented)=-
