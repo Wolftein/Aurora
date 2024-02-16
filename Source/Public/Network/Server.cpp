@@ -23,7 +23,7 @@ namespace Network
 
     void Server::OnAttach(ConstSPtr<class Client> Session)
     {
-        mDatabase.emplace_back(Session);
+        mConnections.emplace_back(Session);
 
         if (mProtocol)
         {
@@ -36,7 +36,7 @@ namespace Network
 
     void Server::OnDetach(ConstSPtr<class Client> Session)
     {
-        mDatabase.erase(std::find(mDatabase.begin(), mDatabase.end(), Session));
+        mConnections.erase(std::find(mConnections.begin(), mConnections.end(), Session));
 
         if (mProtocol)
         {

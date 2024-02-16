@@ -72,22 +72,25 @@ namespace Network
 
     void AsioClient::OnClose(Bool Immediately)
     {
-        if (Immediately || mEncoder.IsEmpty())
+        if (mState == State::Connected || mState == State::Connecting)
         {
-            DoClose();
-        }
-        else
-        {
-            DoFlush();
+            if (Immediately || mEncoder.IsEmpty())
+            {
+                DoClose();
+            }
+            else
+            {
+                DoFlush();
 
-            mState = State::Closing;
+                mState = State::Closing;
+            }
         }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void AsioClient::OnFlush(Ref<Writer> Accumulator)
+    void AsioClient::OnFlush()
     {
         if (mState == State::Connected)
         {
@@ -137,7 +140,6 @@ namespace Network
         mChannel.close(Error);
 
         // reset all buffer(s)
-        mAccumulator.Clear();
         mEncoder.Reset();
         mDecoder.Reset();
 

@@ -40,8 +40,7 @@ namespace Network
     SPtr<Server> AsioDriver::Listen(UInt Capacity, CStr Address, CStr Service)
     {
         ConstSPtr<AsioServer> Server = NewPtr<AsioServer>(mReactor);
-        Server->Listen(Capacity, Address, Service);
-        return Server;
+        return Server->Listen(Capacity, Address, Service) ? Server : nullptr;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

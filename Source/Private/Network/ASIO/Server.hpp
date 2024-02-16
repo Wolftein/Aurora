@@ -30,10 +30,7 @@ namespace Network
         AsioServer(Ref<asio::io_context> Context);
 
         // -=(Undocumented)=-
-        void Listen(UInt Capacity, CStr Address, CStr Service);
-
-        // \see Server::Close
-        void Close() override;
+        Bool Listen(UInt Capacity, CStr Address, CStr Service);
 
         // -=(Undocumented)=-
         void WhenAccept(Ref<const std::error_code> Error);

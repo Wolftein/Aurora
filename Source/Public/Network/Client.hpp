@@ -31,9 +31,40 @@ namespace Network
         virtual ~Client() = default;
 
         // -=(Undocumented)=-
-        void Attach(ConstSPtr<Protocol> Protocol)
+        void SetAttachment(UInt Attachment)
+        {
+            mAttachment = Attachment;
+        }
+
+        // -=(Undocumented)=-
+        UInt GetAttachment() const
+        {
+            return mAttachment;
+        }
+
+        // -=(Undocumented)=-
+        void SetProtocol(ConstSPtr<Protocol> Protocol)
         {
             mProtocol = Protocol;
+        }
+
+        // -=(Undocumented)=-
+        void Close(Bool Forcibly)
+        {
+            OnClose(Forcibly);
+        }
+
+        // -=(Undocumented)=-
+        Ref<const Statistics> GetStatistics() const
+        {
+            return mStatistics;
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void Write(CPtr<const Type> Bytes)
+        {
+            mAccumulator.Write(Bytes.data(), Bytes.size_bytes());
         }
 
         // -=(Undocumented)=-
@@ -48,46 +79,28 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void Write(CPtr<const Type> Bytes)
-        {
-            mAccumulator.Write(Bytes.data(), Bytes.size_bytes());
-        }
-
-        // -=(Undocumented)=-
-        void Close(Bool Forcibly)
-        {
-            OnClose(Forcibly);
-        }
-
-        // -=(Undocumented)=-
         void Flush()
         {
             if (mAccumulator.HasData())
             {
-                OnFlush(mAccumulator);
+                OnFlush();
             }
         }
 
-        // -=(Undocumented)=-
-        Ref<const Statistics> GetStatistics() const
-        {
-            return mStatistics;
-        }
-
-    protected:
+    private:
 
         // -=(Undocumented)=-
-        virtual void OnClose(Bool Immediately) = 0;
+        virtual void OnClose(Bool Forcibly) = 0;
 
         // -=(Undocumented)=-
-        virtual void OnFlush(Ref<Writer> Accumulator) = 0;
+        virtual void OnFlush() = 0;
 
     protected:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        UInt           mAttachment;
         Statistics     mStatistics;
         SPtr<Protocol> mProtocol;
         Writer         mAccumulator;

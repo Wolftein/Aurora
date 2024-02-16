@@ -29,18 +29,15 @@ namespace Network
         virtual ~Server() = default;
 
         // -=(Undocumented)=-
-        void Attach(ConstSPtr<Protocol> Protocol)
+        void SetProtocol(ConstSPtr<Protocol> Protocol)
         {
             mProtocol = Protocol;
         }
 
         // -=(Undocumented)=-
-        virtual void Close() = 0;
-
-        // -=(Undocumented)=-
         void Disconnect(Bool Forcibly)
         {
-            for (ConstSPtr<Client> Session : mDatabase)
+            for (ConstSPtr<Client> Session : mConnections)
             {
                 Session->Close(Forcibly);
             }
@@ -50,7 +47,7 @@ namespace Network
         template<typename Type>
         void Broadcast(CPtr<const Type> Bytes)
         {
-            for (ConstSPtr<Client> Session : mDatabase)
+            for (ConstSPtr<Client> Session : mConnections)
             {
                 Session->Write(Bytes);
             }
@@ -60,7 +57,7 @@ namespace Network
         template<typename Message>
         void Broadcast(Message && Packet)
         {
-            for (ConstSPtr<Client> Session : mDatabase)
+            for (ConstSPtr<Client> Session : mConnections)
             {
                 Session->Write(Packet);
             }
@@ -69,7 +66,7 @@ namespace Network
         // -=(Undocumented)=-
         void Flush()
         {
-            for (ConstSPtr<Client> Session : mDatabase)
+            for (ConstSPtr<Client> Session : mConnections)
             {
                 Session->Flush();
             }
@@ -98,6 +95,6 @@ namespace Network
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         SPtr<Protocol>       mProtocol;
-        Vector<SPtr<Client>> mDatabase;
+        Vector<SPtr<Client>> mConnections;
     };
 }

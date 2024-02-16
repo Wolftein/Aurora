@@ -59,7 +59,7 @@ namespace Network
         void OnClose(Bool Immediately) override;
 
         // \see Session::OnFlush
-        void OnFlush(Ref<Writer> Accumulator) override;
+        void OnFlush() override;
 
     private:
 
