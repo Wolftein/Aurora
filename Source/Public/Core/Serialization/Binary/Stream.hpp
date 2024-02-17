@@ -244,13 +244,15 @@ inline namespace Core
         template<typename Enum>
         void SerializeEnum(Ref<Enum> Value)
         {
+            using Type = std::underlying_type_t<Enum>;
+
             if constexpr (std::is_same<T, Reader>::value)
             {
-                Value = static_cast<Enum>(mArchive.template ReadInt<SInt>());
+                Value = static_cast<Enum>(mArchive.template ReadInt<Type>());
             }
             else
             {
-                mArchive.WriteInt(static_cast<SInt>(Value));
+                mArchive.WriteInt(static_cast<Type>(Value));
             }
         }
 
