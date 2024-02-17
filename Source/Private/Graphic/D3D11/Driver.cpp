@@ -429,6 +429,7 @@ namespace Graphic
                 D3D_FEATURE_LEVEL_10_0,
                 D3D_FEATURE_LEVEL_9_3,
                 D3D_FEATURE_LEVEL_9_2,
+                D3D_FEATURE_LEVEL_9_1,
             };
 
             HRESULT Result = D3D11CreateDevicePtr(
@@ -437,7 +438,7 @@ namespace Graphic
                 nullptr,
                 Flags,
                 Direct3DFeatureLevels,
-                _countof(Direct3DFeatureLevels),
+                _countof(Direct3DFeatureLevels) - 3, // 11.1 ... 10.0
                 D3D11_SDK_VERSION,
                 Device.GetAddressOf(),
                 nullptr,
@@ -451,11 +452,31 @@ namespace Graphic
                     nullptr,
                     Flags,
                     Direct3DFeatureLevels + 1,
-                    _countof(Direct3DFeatureLevels) - 1,
+                    _countof(Direct3DFeatureLevels) - 4, // 11.0 ... 10.0
                     D3D11_SDK_VERSION,
                     Device.GetAddressOf(),
                     nullptr,
                     DeviceImmediate.GetAddressOf());
+            }
+
+            if (FAILED(Result))
+            {
+                Result = D3D11CreateDevicePtr(
+                    nullptr,
+                    D3D_DRIVER_TYPE_WARP,
+                    nullptr,
+                    Flags,
+                    Direct3DFeatureLevels,
+                    _countof(Direct3DFeatureLevels),
+                    D3D11_SDK_VERSION,
+                    Device.GetAddressOf(),
+                    nullptr,
+                    DeviceImmediate.GetAddressOf());
+
+                if (SUCCEEDED(Result))
+                {
+                    LOG_INFO("D3D11Driver: Enabling software mode (WARP)");
+                }
             }
 
             Successful = ThrowIfFail(Result);
@@ -1034,6 +1055,7 @@ namespace Graphic
                     Ref<Graphic::Adapter> AdapterInfo = mCapabilities.Adapters.emplace_back();
 
                     AdapterInfo.Description          = As(DXGIDescription.Description);
+
                     AdapterInfo.DedicatedMemoryInMBs = DXGIDescription.DedicatedVideoMemory >> 20;
                     AdapterInfo.SharedMemoryInMBs    = DXGIDescription.SharedSystemMemory >> 20;
                     AdapterInfo.SystemMemoryInMBs    = DXGIDescription.DedicatedSystemMemory >> 20;
