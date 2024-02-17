@@ -242,7 +242,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Enum>
-        void SerializeEnum(Ref<Enum> Value)
+        void SerializeEnum(Enum & Value)
         {
             using Type = std::underlying_type_t<Enum>;
 
