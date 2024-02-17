@@ -45,7 +45,7 @@ namespace Log
         if (! Filename.empty())
         {
             constexpr SInt kMaxFileSize = 32 * 1024 * 1024;
-            constexpr SInt kMaxFiles    = 256;
+            constexpr SInt kMaxFiles    = 10;
             Sinks.emplace_back(NewPtr<spdlog::sinks::rotating_file_sink_mt>(Filename.data(), kMaxFileSize, kMaxFiles));
         }
         Sinks.emplace_back(mAdapter);
