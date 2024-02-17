@@ -14,7 +14,7 @@
 #include "Core/Trait.hpp"
 #include <spdlog/async.h>
 #include <spdlog/sinks/stdout_sinks.h>
-#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -44,7 +44,9 @@ namespace Log
 
         if (! Filename.empty())
         {
-            Sinks.emplace_back(NewPtr<spdlog::sinks::basic_file_sink_mt>(Filename.data(), true));
+            constexpr SInt kMaxFileSize = 32 * 1024 * 1024;
+            constexpr SInt kMaxFiles    = 256;
+            Sinks.emplace_back(NewPtr<spdlog::sinks::rotating_file_sink_mt>(Filename.data(), kMaxFileSize, kMaxFiles));
         }
         Sinks.emplace_back(mAdapter);
 
