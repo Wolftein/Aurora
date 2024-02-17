@@ -88,6 +88,19 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    static auto As(Format Value)
+    {
+        static constexpr SInt32 k_Mapping[] = {
+            WAVE_FORMAT_ADPCM,                      // Format::ADPCM
+            WAVE_FORMAT_PCM,                        // Format::PCM
+            WAVE_FORMAT_IEEE_FLOAT,                 // Format::IEEE
+        };
+        return k_Mapping[CastEnum(Value)];
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     XAudio2Driver::XAudio2Driver()
         : mDevice { nullptr },
           mMaster { nullptr }
@@ -442,7 +455,7 @@ namespace Audio
         {
             WAVEFORMATEX Description { 0 };
 
-            Description.wFormatTag      = (Sound->GetDepth() >= 32 ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM);
+            Description.wFormatTag      = As(Sound->GetFormat());
             Description.wBitsPerSample  = Sound->GetDepth();
             Description.nChannels       = Sound->GetChannel();
             Description.nSamplesPerSec  = Sound->GetFrequency();

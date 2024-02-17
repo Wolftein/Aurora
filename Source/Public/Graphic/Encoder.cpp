@@ -21,12 +21,12 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Encoder::Encoder(ConstSPtr<Graphic::Service> Graphics, UInt VertexCapacity, UInt IndexCapacity, UInt UniformCapacity)
+    Encoder::Encoder(ConstSPtr<Graphic::Service> Graphics, UInt Vertices, UInt Indices, UInt Uniforms)
         : mGraphics { Graphics }
     {
-        CreateTransientBuffer(mInFlyBuffers[0], Usage::Vertex, VertexCapacity);
-        CreateTransientBuffer(mInFlyBuffers[1], Usage::Index, IndexCapacity);
-        CreateTransientBuffer(mInFlyBuffers[2], Usage::Uniform, UniformCapacity);
+        CreateTransientBuffer(mInFlyBuffers[0], Usage::Vertex, Vertices);
+        CreateTransientBuffer(mInFlyBuffers[1], Usage::Index, Indices);
+        CreateTransientBuffer(mInFlyBuffers[2], Usage::Uniform, Uniforms);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

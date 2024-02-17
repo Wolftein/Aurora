@@ -106,7 +106,9 @@ namespace Content
         // -=(Undocumented)=-
         Bool Save(Ref<const Uri> Key, CStr Data)
         {
-            return Save(Key, CPtr<const UInt08> { reinterpret_cast<Ptr<const UInt08>>(Data.data()), Data.size() });
+            CPtr<const UInt08> Bytes(reinterpret_cast<Ptr<const UInt08>>(Data.data()), Data.size());
+
+            return Save(Key, Bytes);
         }
 
         // -=(Undocumented)=-

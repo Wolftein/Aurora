@@ -30,13 +30,19 @@ namespace Audio
         Sound(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(UInt Size, UInt Depth, UInt Channel, UInt Frequency, ConstSPtr<Decoder> Decoder);
+        void Load(Format Format, UInt Size, UInt Depth, UInt Channel, UInt Frequency, ConstSPtr<Decoder> Decoder);
 
         // -=(Undocumented)=-
         void Seek(UInt Frame);
 
         // -=(Undocumented)=-
         Bool Read(Ref<CPtr<UInt08>> Output);
+
+        // -=(Undocumented)=-
+        Format GetFormat() const
+        {
+            return mFormat;
+        }
 
         // -=(Undocumented)=-
         UInt GetDepth() const
@@ -70,6 +76,7 @@ namespace Audio
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         SPtr<Decoder> mDecoder;
+        Format        mFormat;
         UInt          mSize;
         UInt          mDepth;
         UInt          mChannel;

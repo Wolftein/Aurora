@@ -132,7 +132,7 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
-    using WPtr      = std::weak_ptr<Type>;
+    using WPtr   = std::weak_ptr<Type>;
 
     // -=(Undocumented)=-
     template<typename Type>

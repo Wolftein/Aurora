@@ -28,7 +28,7 @@ namespace Content
 
         if (Decoder->GetSize() > 0)
         {
-            Asset->Load(Decoder->GetSize(), Decoder->GetDepth(), Decoder->GetChannel(), Decoder->GetFrequency(), Decoder);
+            Asset->Load(Decoder->GetFormat(), Decoder->GetSize(), Decoder->GetDepth(), Decoder->GetChannel(), Decoder->GetFrequency(), Decoder);
             return true;
         }
         return false;

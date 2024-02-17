@@ -49,15 +49,15 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        void Close(Bool Forcibly)
-        {
-            OnClose(Forcibly);
-        }
-
-        // -=(Undocumented)=-
         Ref<const Statistics> GetStatistics() const
         {
             return mStatistics;
+        }
+
+        // -=(Undocumented)=-
+        void Close(Bool Forcibly)
+        {
+            OnClose(Forcibly);
         }
 
         // -=(Undocumented)=-

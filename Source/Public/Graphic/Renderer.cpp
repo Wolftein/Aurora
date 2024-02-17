@@ -361,27 +361,15 @@ namespace Graphic
                 const UInt Count = Element - Start + 1;
 
                 // Ensure we have enough space for the batch otherwise flush previous batches
-                if (This->Material)
-                {
-                    mEncoder.Ensure<PosColorTextureLayout>(Count * 4, Count * 6, This->Material->GetParameters().size());
-                }
-                else
-                {
-                    mEncoder.Ensure<PosColorLayout>(Count * 4, Count * 6, 0);
-                }
+                mEncoder.Ensure<PosColorTextureLayout>(
+                    Count * 4,
+                    Count * 6,
+                    This->Material ? This->Material->GetParameters().size() : 0);
 
                 for (UInt Drawable = Start, Index = 0; Drawable <= Element; ++Drawable, Index += 4)
                 {
-                    if (This->Material)
-                    {
-                        Ptr<PosColorTextureLayout> Vertices = mEncoder.AllocateTransientVertices<PosColorTextureLayout>(4);
-                        WriteGeometry(mDrawablesPtr[Drawable], Vertices);
-                    }
-                    else
-                    {
-                        Ptr<PosColorLayout> Vertices = mEncoder.AllocateTransientVertices<PosColorLayout>(4);
-                        WriteGeometry(mDrawablesPtr[Drawable], Vertices);
-                    }
+                    Ptr<PosColorTextureLayout> Vertices = mEncoder.AllocateTransientVertices<PosColorTextureLayout>(4);
+                    WriteGeometry(mDrawablesPtr[Drawable], Vertices);
 
                     const Ptr<UInt16> Indices = mEncoder.AllocateTransientIndices<UInt16>(6);
                     Indices[0] = Index;
@@ -397,12 +385,9 @@ namespace Graphic
                 if (This->Material)
                 {
                     mEncoder.SetMaterial(This->Material);
-                    mEncoder.Draw<PosColorTextureLayout>();
                 }
-                else
-                {
-                    mEncoder.Draw<PosColorLayout>();
-                }
+
+                mEncoder.Draw<PosColorTextureLayout>();
 
                 // Continue with the next batch
                 Start = Element + 1;
@@ -435,21 +420,6 @@ namespace Graphic
         Drawable.Pipeline       = Pipeline;
         Drawable.Material       = Material;
         mDrawablesPtr.push_back(& Drawable);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Renderer::WriteGeometry(Ptr<const Drawable> Drawable, Ptr<PosColorLayout> Buffer)
-    {
-        Buffer[0].Position.Set(Drawable->Position[0].GetX(), Drawable->Position[0].GetY(), Drawable->Depth);
-        Buffer[1].Position.Set(Drawable->Position[1].GetX(), Drawable->Position[1].GetY(), Drawable->Depth);
-        Buffer[2].Position.Set(Drawable->Position[2].GetX(), Drawable->Position[2].GetY(), Drawable->Depth);
-        Buffer[3].Position.Set(Drawable->Position[3].GetX(), Drawable->Position[3].GetY(), Drawable->Depth);
-        Buffer[0].Color = Drawable->Color[0].AsPacked();
-        Buffer[1].Color = Drawable->Color[1].AsPacked();
-        Buffer[2].Color = Drawable->Color[2].AsPacked();
-        Buffer[3].Color = Drawable->Color[3].AsPacked();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -36,6 +36,12 @@ namespace Audio
         Bool Read(Ref<CPtr<UInt08>> Output) override;
 
         // -=(Undocumented)=-
+        Format GetFormat() const
+        {
+            return mFormat;
+        }
+
+        // -=(Undocumented)=-
         UInt GetDepth() const
         {
             return mDepth;
@@ -65,6 +71,7 @@ namespace Audio
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         UPtr<UInt08[]> mData;
+        Format         mFormat;
         UInt           mFrames;
         UInt           mDepth;
         UInt           mChannel;

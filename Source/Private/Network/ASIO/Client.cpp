@@ -98,6 +98,8 @@ namespace Network
 
             if (Chunk.empty())
             {
+                mProtocol->OnError(shared_from_this(), ENOBUFS, "Can't reserve more data in the write buffer");
+
                 DoClose();
             }
             else
@@ -155,6 +157,8 @@ namespace Network
 
         if (Chunk.empty())
         {
+            mProtocol->OnError(shared_from_this(), ENOBUFS, "Can't reserve more data in the read buffer");
+
             DoClose();
         }
         else

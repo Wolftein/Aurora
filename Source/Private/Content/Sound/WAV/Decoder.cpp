@@ -34,6 +34,20 @@ namespace Audio
 
         if (drwav_init_memory(& Description, Chunk.GetData(), Chunk.GetSize(), nullptr))
         {
+            switch (Description.fmt.formatTag)
+            {
+            case DR_WAVE_FORMAT_ADPCM:
+            case DR_WAVE_FORMAT_DVI_ADPCM:
+                mFormat = Format::ADPCM;
+                break;
+            case DR_WAVE_FORMAT_IEEE_FLOAT:
+                mFormat = Format::IEEE;
+                break;
+            default:
+                mFormat = Format::PCM;
+                break;
+            }
+
             mFrames     = Description.totalPCMFrameCount;
             mDepth      = Description.bitsPerSample;
             mChannel    = Description.channels;

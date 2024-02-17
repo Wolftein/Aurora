@@ -41,6 +41,12 @@ namespace Audio
         Bool Read(Ref<CPtr<UInt08>> Output) override;
 
         // -=(Undocumented)=-
+        Format GetFormat() const
+        {
+            return Format::IEEE;
+        }
+
+        // -=(Undocumented)=-
         UInt GetDepth() const
         {
             return sizeof(Real32) * 8;

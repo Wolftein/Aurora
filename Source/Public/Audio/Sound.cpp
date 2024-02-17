@@ -29,8 +29,9 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Sound::Load(UInt Size, UInt Depth, UInt Channel, UInt Frequency, ConstSPtr<Decoder> Decoder)
+    void Sound::Load(Format Format, UInt Size, UInt Depth, UInt Channel, UInt Frequency, ConstSPtr<Decoder> Decoder)
     {
+        mFormat     = Format;
         mSize       = Size;
         mDecoder    = Decoder;
         mDepth      = Depth;

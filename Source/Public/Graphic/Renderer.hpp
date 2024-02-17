@@ -31,13 +31,13 @@ namespace Graphic
         inline constexpr static UInt k_MaxDrawables = 16384;
 
         // -=(Undocumented)=-
-        inline constexpr static UInt k_MaxVertices  = 64 * 1024 * 1024; // 64mb
+        inline constexpr static UInt k_MaxVertices  = 24 * 1024 * 1024; // 24mb
 
         // -=(Undocumented)=-
-        inline constexpr static UInt k_MaxIndices   =  8 * 1024 * 1024; // 8mb
+        inline constexpr static UInt k_MaxIndices   =  4 * 1024 * 1024; // 4mb
 
         // -=(Undocumented)=-
-        inline constexpr static UInt k_MaxUniform   = 16 * 1024 * 1024; // 16mb
+        inline constexpr static UInt k_MaxUniform   =  8 * 1024 * 1024; // 8mb
 
         // -=(Undocumented)=-
         enum class Order
@@ -159,16 +159,6 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
-        struct PosColorLayout
-        {
-            // -=(Undocumented)=-
-            Vector3f Position;
-
-            // -=(Undocumented)=-
-            UInt32   Color;
-        };
-
-        // -=(Undocumented)=-
         struct PosColorTextureLayout
         {
             // -=(Undocumented)=-
@@ -220,9 +210,6 @@ namespace Graphic
             Ref<const Array<Color, 4>> Tint,
             Ref<const Array<Vector2f, 4>> Texture,
             Order Order, Real32 Depth, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
-
-        // -=(Undocumented)=-
-        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<PosColorLayout> Buffer);
 
         // -=(Undocumented)=-
         void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<PosColorTextureLayout> Buffer);

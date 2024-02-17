@@ -41,5 +41,13 @@ namespace Audio
     };
 
     // -=(Undocumented)=-
+    enum class Format
+    {
+        ADPCM,
+        PCM,
+        IEEE,
+    };
+
+    // -=(Undocumented)=-
     using Object = UInt;
 }

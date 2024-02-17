@@ -46,7 +46,8 @@ namespace Log
         {
             constexpr SInt kMaxFileSize = 32 * 1024 * 1024;
             constexpr SInt kMaxFiles    = 10;
-            Sinks.emplace_back(NewPtr<spdlog::sinks::rotating_file_sink_mt>(Filename.data(), kMaxFileSize, kMaxFiles));
+            Sinks.emplace_back(
+                NewPtr<spdlog::sinks::rotating_file_sink_mt>(Filename.data(), kMaxFileSize, kMaxFiles, true));
         }
         Sinks.emplace_back(mAdapter);
 
@@ -68,7 +69,7 @@ namespace Log
 
     void Service::Shutdown()
     {
-        spdlog::drop_all();
+        spdlog::shutdown();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
