@@ -58,6 +58,9 @@ namespace Network
         // \see Session::OnClose
         void OnClose(Bool Immediately) override;
 
+        // \see Session::OnWrite
+        void OnWrite(CPtr<const UInt08> Bytes) override;
+
         // \see Session::OnFlush
         void OnFlush() override;
 

@@ -61,10 +61,9 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void Write(CPtr<const Type> Bytes)
+        void Write(CPtr<const UInt08> Bytes)
         {
-            mAccumulator.Write(Bytes.data(), Bytes.size_bytes());
+            OnWrite(Bytes);
         }
 
         // -=(Undocumented)=-
@@ -83,14 +82,21 @@ namespace Network
         {
             if (mAccumulator.HasData())
             {
-                OnFlush();
+                OnWrite(mAccumulator.GetData());
+
+                mAccumulator.Clear();
             }
+
+            OnFlush();
         }
 
     private:
 
         // -=(Undocumented)=-
         virtual void OnClose(Bool Forcibly) = 0;
+
+        // -=(Undocumented)=-
+        virtual void OnWrite(CPtr<const UInt08> Bytes) = 0;
 
         // -=(Undocumented)=-
         virtual void OnFlush() = 0;

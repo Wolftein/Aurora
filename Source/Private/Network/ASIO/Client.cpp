@@ -90,11 +90,11 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void AsioClient::OnFlush()
+    void AsioClient::OnWrite(CPtr<const UInt08> Bytes)
     {
         if (mState == State::Connected)
         {
-            const CPtr<UInt08> Chunk = mEncoder.Reserve(mAccumulator.GetOffset() + sizeof(Header));
+            const CPtr<UInt08> Chunk = mEncoder.Reserve(Bytes.size() + sizeof(Header));
 
             if (Chunk.empty())
             {
@@ -104,23 +104,28 @@ namespace Network
             }
             else
             {
-                const CPtr<const UInt08> Block = mAccumulator.GetData();
+                * reinterpret_cast<Ptr<Header>>(Chunk.data()) = static_cast<Header>(Bytes.size());
 
-                * reinterpret_cast<Ptr<Header>>(Chunk.data()) = static_cast<Header>(Block.size());
+                FastCopyMemory(Chunk.data() + sizeof(Header), Bytes.data(), Bytes.size());
 
-                std::copy(Block.begin(), Block.begin() + Block.size(), Chunk.data() + sizeof(Header));
-
-                mProtocol->OnWrite(shared_from_this(), Chunk.subspan(sizeof(Header), mAccumulator.GetOffset()));
+                mProtocol->OnWrite(shared_from_this(), Chunk.subspan(sizeof(Header), Bytes.size()));
 
                 mEncoder.Commit(Chunk.size());
 
                 mStatistics.TotalPacketSent   += 1;
-                mStatistics.TotalBytesPending += Block.size() + sizeof(Header);
-
-                DoFlush();
+                mStatistics.TotalBytesPending += Bytes.size() + sizeof(Header);
             }
+        }
+    }
 
-            mAccumulator.Clear();
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void AsioClient::OnFlush()
+    {
+        if (mState == State::Connected)
+        {
+            DoFlush();
         }
     }
 
