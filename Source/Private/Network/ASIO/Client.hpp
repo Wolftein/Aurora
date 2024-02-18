@@ -103,5 +103,6 @@ namespace Network
 
         Buffer mEncoder;
         Buffer mDecoder;
+        Bool   mFlushable;
     };
 }

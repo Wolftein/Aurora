@@ -57,6 +57,7 @@ namespace Network
         // -=(Undocumented)=-
         void Close(Bool Forcibly)
         {
+            Flush();
             OnClose(Forcibly);
         }
 

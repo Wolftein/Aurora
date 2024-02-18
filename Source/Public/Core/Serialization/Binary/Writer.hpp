@@ -32,9 +32,9 @@ inline namespace Core
 
         // -=(Undocumented)=-
         explicit Writer(UInt Capacity = kDefaultCapacity)
-            : mBuffer ( Capacity ),
-              mOffset { 0 }
+            : mOffset { 0 }
         {
+            mBuffer.resize(Capacity);
         }
 
         // -=(Undocumented)=-

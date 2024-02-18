@@ -22,10 +22,11 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     AsioClient::AsioClient(Socket && Channel)
-        : mState   { State::Closed },
-          mChannel { Move(Channel) },
-          mEncoder { 65'536 },
-          mDecoder { 65'536 }
+        : mState     { State::Closed },
+          mChannel   { Move(Channel) },
+          mEncoder   { 65'536 },
+          mDecoder   { 65'536 },
+          mFlushable { true }
     {
     }
 
@@ -74,18 +75,19 @@ namespace Network
     {
         if (mState == State::Connected || mState == State::Connecting)
         {
-            if (Immediately || mEncoder.IsEmpty())
+            if (Immediately || (mFlushable && mEncoder.IsEmpty()))
             {
                 DoClose();
             }
             else
             {
-                DoFlush();
+                Flush();
 
                 mState = State::Closing;
             }
         }
     }
+
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -123,7 +125,7 @@ namespace Network
 
     void AsioClient::OnFlush()
     {
-        if (mState == State::Connected)
+        if (mState == State::Connected && mFlushable)
         {
             DoFlush();
         }
@@ -149,6 +151,7 @@ namespace Network
         // reset all buffer(s)
         mEncoder.Reset();
         mDecoder.Reset();
+        mFlushable = true;
 
         mProtocol->OnDetach(shared_from_this());
     }
@@ -183,6 +186,8 @@ namespace Network
     {
         if (const CPtr<UInt08> Chunk = mEncoder.Read(); !Chunk.empty())
         {
+            mFlushable = false;
+
             const auto OnCompletion = [Self = shared_from_this()](const auto Error, auto Transferred)
             {
                 Self->WhenWrite(Error, Transferred);
@@ -191,6 +196,8 @@ namespace Network
         }
         else
         {
+            mFlushable = true;
+
             if (mState == State::Closing)
             {
                 DoClose();
