@@ -21,7 +21,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Server : public Protocol
+    class Server : public Channel, public Protocol
     {
     public:
 
@@ -64,7 +64,7 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        void Flush()
+        void Flush() override
         {
             for (ConstSPtr<Client> Session : mConnections)
             {

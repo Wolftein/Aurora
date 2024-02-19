@@ -43,6 +43,7 @@ namespace Network
     void Service::OnTick()
     {
         mDriver->Poll();
+        Flush();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -73,7 +74,13 @@ namespace Network
 
     SPtr<Server> Service::Listen(UInt Capacity, CStr Address, CStr Service)
     {
-        return mDriver->Listen(Capacity, Address, Service);
+        SPtr<Server> Server = mDriver->Listen(Capacity, Address, Service);
+
+        if (Server)
+        {
+            mChannels.emplace_back(Server);
+        }
+        return Server;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -81,6 +88,31 @@ namespace Network
 
     SPtr<Client> Service::Connect(CStr Address, CStr Service)
     {
-        return mDriver->Connect(Address, Service);
+        SPtr<Client> Client = mDriver->Connect(Address, Service);
+
+        if (Client)
+        {
+            mChannels.emplace_back(Client);
+        }
+        return Client;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Service::Flush()
+    {
+        for (auto Iterator = mChannels.begin(); Iterator != mChannels.end(); )
+        {
+            if (Iterator->expired())
+            {
+                Iterator = mChannels.erase(Iterator);
+            }
+            else
+            {
+                Iterator->lock()->Flush();
+                ++Iterator;
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Channel.hpp"
 #include "Packet.hpp"
 #include "Protocol.hpp"
 #include "Statistics.hpp"
@@ -23,7 +24,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Client
+    class Client : public Channel
     {
     public:
 
@@ -79,7 +80,7 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        void Flush()
+        void Flush() override
         {
             if (mAccumulator.HasData())
             {

@@ -12,8 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/System/Subsystem.hpp"
-#include "Driver.hpp"
+#include "Core/Types.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,39 +21,11 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Service final : public Subsystem
+    class Channel
     {
     public:
 
         // -=(Undocumented)=-
-        Service(Ref<Context> System);
-
-        // -=(Undocumented)=-
-        ~Service();
-
-        // -=(Undocumented)=-
-        void OnTick() override;
-
-        // -=(Undocumented)=-
-        Bool Initialise();
-
-        // -=(Undocumented)=-
-        SPtr<Server> Listen(UInt Capacity, CStr Address, CStr Service);
-
-        // -=(Undocumented)=-
-        SPtr<Client> Connect(CStr Address, CStr Service);
-
-    private:
-
-        // -=(Undocumented)=-
-        void Flush();
-
-    private:
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        UPtr<Driver>          mDriver;
-        Vector<WPtr<Channel>> mChannels;
+        virtual void Flush() = 0;
     };
 }
