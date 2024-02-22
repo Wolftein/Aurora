@@ -13,6 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Core/Trait.hpp"
+#include <Core/Log/Service.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -32,31 +33,21 @@ inline namespace Core
 
         // -=(Undocumented)=-
         explicit Writer(UInt Capacity = kDefaultCapacity)
-            : mBuffer   { new UInt08[Capacity] },
-              mCapacity { Capacity },
+            : mBuffer   ( Capacity, 0 ),
               mOffset   { 0 }
         {
         }
 
         // -=(Undocumented)=-
-        ~Writer()
-        {
-            if (mBuffer)
-            {
-                delete[] mBuffer;
-            }
-        }
-
-        // -=(Undocumented)=-
         CPtr<UInt08> GetData()
         {
-            return { mBuffer, mOffset };
+            return CPtr<UInt08>(mBuffer.data(), mOffset);
         }
 
         // -=(Undocumented)=-
         UInt GetCapacity() const
         {
-            return mCapacity;
+            return mBuffer.capacity();
         }
 
         // -=(Undocumented)=-
@@ -85,9 +76,7 @@ inline namespace Core
             if (mOffset + Length >= Capacity)
             {
                 const UInt Amount = (mOffset + Length - Capacity);
-
-                mCapacity = Capacity + (Amount / kDefaultCapacity + 1) * kDefaultCapacity;
-                mBuffer   = FastReallocateMemory(mBuffer, mCapacity);
+                mBuffer.resize(Capacity + (Amount / kDefaultCapacity + 1) * kDefaultCapacity);
             }
         }
 
@@ -218,8 +207,7 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Ptr<UInt08>    mBuffer;
-        UInt           mCapacity;
+        Vector<UInt08> mBuffer;
         UInt           mOffset;
     };
 }

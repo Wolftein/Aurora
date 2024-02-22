@@ -34,6 +34,10 @@ inline namespace Core
         // -=(Undocumented)=-
         static constexpr Deleter EMPTY_DELETER  = [](Ptr<void>) {};
 
+        // -=(Undocumented)=-
+        template<typename Type>
+        static constexpr Deleter BASIC_DELETER  = [](Ptr<void> Address) { delete reinterpret_cast<Ptr<Type>>(Address); };
+
     public:
 
         // -=(Undocumented)=-
@@ -45,7 +49,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         Chunk(UInt Size)
-            : mData { new UInt08[Size], [](auto Data) { delete[] reinterpret_cast<Ptr<UInt08>>(Data); } },
+            : mData { new UInt08[Size], BASIC_DELETER<UInt08> },
               mSize { Size }
         {
         }
@@ -90,13 +94,13 @@ inline namespace Core
         template<typename Type>
         CPtr<Type> GetSpan(UInt Offset = 0) const
         {
-            return CPtr<Type> { reinterpret_cast<Ptr<Type>>(mData.get()) + Offset, mSize / sizeof(Type) };
+            return CPtr<Type>(reinterpret_cast<Ptr<Type>>(mData.get()) + Offset, mSize / sizeof(Type));
         }
 
         // -=(Undocumented)=-
         CStr GetText() const
         {
-            return CStr { reinterpret_cast<CStr::pointer>(mData.get()), mSize };
+            return CStr(reinterpret_cast<CStr::pointer>(mData.get()), mSize);
         }
 
         // -=(Undocumented)=-
