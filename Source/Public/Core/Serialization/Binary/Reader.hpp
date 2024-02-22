@@ -203,7 +203,7 @@ inline namespace Core
         CStr16 ReadString16()
         {
             const auto Size = ReadInt<UInt>();
-            const auto Data = Read<CStr16::const_pointer>(Size * sizeof(CStr::value_type));
+            const auto Data = Read<CStr16::const_pointer>(Size * sizeof(CStr16::value_type));
 
             return CStr16(Data, Size);
         }

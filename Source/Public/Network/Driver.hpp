@@ -35,9 +35,9 @@ namespace Network
         virtual void Poll() = 0;
 
         // -=(Undocumented)=-
-        virtual SPtr<Server> Listen(UInt Capacity, CStr Address, CStr Service) = 0;
+        virtual SPtr<Server> Listen(CStr Address, UInt16 Port) = 0;
 
         // -=(Undocumented)=-
-        virtual SPtr<Client> Connect(CStr Address, CStr Service) = 0;
+        virtual SPtr<Client> Connect(CStr Address, UInt16 Port) = 0;
     };
 }

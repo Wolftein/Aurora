@@ -29,6 +29,12 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
+        Client()
+            : mAttachment { 0 }
+        {
+        }
+
+        // -=(Undocumented)=-
         virtual ~Client() = default;
 
         // -=(Undocumented)=-
@@ -65,7 +71,7 @@ namespace Network
         // -=(Undocumented)=-
         void Write(CPtr<const UInt08> Bytes)
         {
-            OnWrite(Bytes);
+			mAccumulator.Write(Bytes.data(), Bytes.size());
         }
 
         // -=(Undocumented)=-

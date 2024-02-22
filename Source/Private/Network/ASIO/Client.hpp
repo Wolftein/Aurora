@@ -51,7 +51,7 @@ namespace Network
         void Start();
 
         // -=(Undocumented)=-
-        void Connect(CStr Address, CStr Service);
+        void Connect(CStr Address, UInt16 Port);
 
     protected:
 

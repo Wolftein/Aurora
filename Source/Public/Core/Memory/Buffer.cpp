@@ -11,6 +11,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Buffer.hpp"
+#include "Core/Log/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,7 +23,7 @@ inline namespace Core
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Buffer::Buffer(UInt Capacity)
-        : mBuffer ( Capacity ),
+        : mBuffer (Capacity, 0),
           mReader { 0 },
           mWriter { 0 },
           mMarker { 0 },
@@ -43,14 +44,39 @@ inline namespace Core
 
     CPtr<UInt08> Buffer::Reserve(UInt Length)
     {
-        const UInt Available = (mFlip ? mReader - mMarker : mBuffer.size() - mWriter);
+        CPtr<UInt08> Chunk;
 
-        if (Available < Length)
+        if (mFlip)
         {
-            return { };
+            if (mReader - mWriter > Length)
+            {
+                Chunk = CPtr<UInt08>(mBuffer.data() + mWriter, Length);
+            }
         }
+        else
+        {
+            if (mBuffer.capacity() - mWriter > Length)
+            {
+                Chunk = CPtr<UInt08>(mBuffer.data() + mWriter, Length);
+            }
+            else if (mReader > Length)
+            {
+                if (mReader == mWriter)
+                {
+                    mReader = 0;
+                    mWriter = 0;
+                }
+                else
+                {
+                    mFlip   = true;
+                    mMarker = mWriter;
+                    mWriter = 0;
+                }
 
-        return { mBuffer.data() + (mFlip ? mMarker : mWriter), Length};
+                Chunk = CPtr<UInt08>(mBuffer.data() , Length);
+            }
+        }
+        return Chunk;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -58,19 +84,7 @@ inline namespace Core
 
     void Buffer::Commit(UInt Length)
     {
-        if (mFlip)
-        {
-            mMarker += Length;
-        }
-        else
-        {
-            mWriter += Length;
-        }
-
-        if (mBuffer.size() - mWriter < mReader - mMarker)
-        {
-            mFlip = true;
-        }
+        mWriter += Length;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -78,13 +92,7 @@ inline namespace Core
 
     CPtr<UInt08> Buffer::Read()
     {
-        const UInt Length = (mWriter - mReader) + mMarker;
-
-        if (mBuffer.size() < mReader + Length || mReader == mWriter)
-        {
-            return { };
-        }
-        return { mBuffer.data() + mReader, Length };
+        return CPtr<UInt08>(mBuffer.data() + mReader, (mFlip ? mMarker : mWriter) - mReader);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -94,23 +102,11 @@ inline namespace Core
     {
         mReader += Length;
 
-        if (mReader == mWriter)
+        if (mFlip && mReader >= mMarker)
         {
-            if (mFlip)
-            {
-                mWriter = mMarker;
-                mReader = mMarker = 0;
-                mFlip   = false;
-            }
-            else
-            {
-                mReader = mWriter = 0;
-            }
-        }
-
-        if (mBuffer.size() - mWriter < mReader - mMarker)
-        {
-            mFlip = true;
+            mReader -= mMarker;
+            mFlip    = false;
+            mMarker  = mBuffer.size();
         }
     }
 
@@ -119,7 +115,7 @@ inline namespace Core
 
     Bool Buffer::IsEmpty() const
     {
-        return !((mWriter - mReader) + mMarker);
+        return (!mFlip && mWriter == mReader);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -127,6 +123,6 @@ inline namespace Core
 
     Bool Buffer::IsFull() const
     {
-        return (mWriter == mReader);
+        return (mFlip && mWriter == mReader);
     }
 }

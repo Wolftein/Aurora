@@ -104,11 +104,11 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
-    using Ptr    = typename std::add_pointer<Type>::type;
+    using Ptr    = Type *;
 
     // -=(Undocumented)=-
     template<typename Type>
-    using Ref    = typename std::add_lvalue_reference<Type>::type;
+    using Ref    = Type &;
 
     // -=(Undocumented)=-
     template<typename Type>

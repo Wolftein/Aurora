@@ -30,7 +30,7 @@ namespace Network
         AsioServer(Ref<asio::io_context> Context);
 
         // -=(Undocumented)=-
-        Bool Listen(UInt Capacity, CStr Address, CStr Service);
+        Bool Listen(CStr Address, UInt16 Port);
 
         // -=(Undocumented)=-
         void WhenAccept(Ref<const std::error_code> Error);

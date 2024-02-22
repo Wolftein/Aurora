@@ -39,10 +39,10 @@ namespace Network
         Bool Initialise();
 
         // -=(Undocumented)=-
-        SPtr<Server> Listen(UInt Capacity, CStr Address, CStr Service);
+        SPtr<Server> Listen(CStr Address, UInt16 Port);
 
         // -=(Undocumented)=-
-        SPtr<Client> Connect(CStr Address, CStr Service);
+        SPtr<Client> Connect(CStr Address, UInt16 Port);
 
     private:
 

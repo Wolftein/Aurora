@@ -31,17 +31,17 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool AsioServer::Listen(UInt Capacity, CStr Address, CStr Service)
+    Bool AsioServer::Listen(CStr Address, UInt16 Port)
     {
         try
         {
             const asio::ip::tcp::endpoint Endpoint
-                = (* asio::ip::tcp::resolver(mAcceptor.get_executor()).resolve(Address.data(), Service.data()));
+                = (* asio::ip::tcp::resolver(mAcceptor.get_executor()).resolve(Address.data(), std::to_string(Port)));
 
             mAcceptor.open(Endpoint.protocol());
             mAcceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
             mAcceptor.bind(Endpoint);
-            mAcceptor.listen(Capacity);
+            mAcceptor.listen();
 
             const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
             {

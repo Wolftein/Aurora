@@ -26,27 +26,37 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        static constexpr inline UInt32 kDefaultCapacity = 256;
+        static constexpr inline UInt32 kDefaultCapacity = 1024;
 
     public:
 
         // -=(Undocumented)=-
         explicit Writer(UInt Capacity = kDefaultCapacity)
-            : mOffset { 0 }
+            : mBuffer   { new UInt08[Capacity] },
+              mCapacity { Capacity },
+              mOffset   { 0 }
         {
-            mBuffer.resize(Capacity);
+        }
+
+        // -=(Undocumented)=-
+        ~Writer()
+        {
+            if (mBuffer)
+            {
+                delete[] mBuffer;
+            }
         }
 
         // -=(Undocumented)=-
         CPtr<UInt08> GetData()
         {
-            return { mBuffer.data(), mOffset };
+            return { mBuffer, mOffset };
         }
 
         // -=(Undocumented)=-
         UInt GetCapacity() const
         {
-            return mBuffer.size();
+            return mCapacity;
         }
 
         // -=(Undocumented)=-
@@ -68,14 +78,17 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Bool Ensure(UInt Length)
+        void Ensure(UInt Length)
         {
-            if (mOffset + Length >= GetCapacity())
+            const UInt Capacity = GetCapacity();
+
+            if (mOffset + Length >= Capacity)
             {
-                const UInt Amount = (mOffset + Length - GetCapacity());
-                mBuffer.resize(GetCapacity() + (Amount / kDefaultCapacity + 1) * kDefaultCapacity);
+                const UInt Amount = (mOffset + Length - Capacity);
+
+                mCapacity = Capacity + (Amount / kDefaultCapacity + 1) * kDefaultCapacity;
+                mBuffer   = FastReallocateMemory(mBuffer, mCapacity);
             }
-            return true;
         }
 
         // -=(Undocumented)=-
@@ -88,10 +101,7 @@ inline namespace Core
         template<typename Type>
         void Write(Type Data, UInt Length = sizeof(Type))
         {
-            if (!Ensure(Length))
-            {
-                return;
-            }
+            Ensure(Length);
 
             if constexpr (std::is_pointer_v<Type>)
             {
@@ -208,7 +218,8 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Vector<UInt08> mBuffer;
+        Ptr<UInt08>    mBuffer;
+        UInt           mCapacity;
         UInt           mOffset;
     };
 }

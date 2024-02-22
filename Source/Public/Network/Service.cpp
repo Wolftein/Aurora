@@ -72,9 +72,9 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Server> Service::Listen(UInt Capacity, CStr Address, CStr Service)
+    SPtr<Server> Service::Listen(CStr Address, UInt16 Port)
     {
-        SPtr<Server> Server = mDriver->Listen(Capacity, Address, Service);
+        SPtr<Server> Server = mDriver->Listen(Address, Port);
 
         if (Server)
         {
@@ -86,9 +86,9 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Client> Service::Connect(CStr Address, CStr Service)
+    SPtr<Client> Service::Connect(CStr Address, UInt16 Port)
     {
-        SPtr<Client> Client = mDriver->Connect(Address, Service);
+        SPtr<Client> Client = mDriver->Connect(Address, Port);
 
         if (Client)
         {

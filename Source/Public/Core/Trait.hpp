@@ -86,9 +86,16 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<Bool Cacheable = true>
-    inline auto FastCopyMemory(Ptr<void> Destination, Ptr<const void> Source, UInt Size)
+    inline void FastCopyMemory(Ptr<void> Destination, Ptr<const void> Source, UInt Size)
     {
         memcpy(Destination, Source, Size);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type, Bool Cacheable = true>
+    inline auto FastReallocateMemory(Ptr<Type> Source, UInt Size)
+    {
+        return reinterpret_cast<Ptr<Type>>(std::realloc(Source, Size));
     }
 
     // -=(Undocumented)=-

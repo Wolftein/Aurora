@@ -37,19 +37,19 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Server> AsioDriver::Listen(UInt Capacity, CStr Address, CStr Service)
+    SPtr<Server> AsioDriver::Listen(CStr Address, UInt16 Port)
     {
         ConstSPtr<AsioServer> Server = NewPtr<AsioServer>(mReactor);
-        return Server->Listen(Capacity, Address, Service) ? Server : nullptr;
+        return Server->Listen(Address, Port) ? Server : nullptr;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Client> AsioDriver::Connect(CStr Address, CStr Service)
+    SPtr<Client> AsioDriver::Connect(CStr Address, UInt16 Port)
     {
         ConstSPtr<AsioClient> Client = NewPtr<AsioClient>(AsioClient::Socket(mReactor));
-        Client->Connect(Address, Service);
+        Client->Connect(Address, Port);
         return Client;
     }
 }

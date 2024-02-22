@@ -33,10 +33,10 @@ namespace Network
         void Poll() override;
 
         // \see Driver::Listen
-        SPtr<Server> Listen(UInt Capacity, CStr Address, CStr Service) override;
+        SPtr<Server> Listen(CStr Address, UInt16 Port) override;
 
         // \see Driver::Connect
-        SPtr<Client> Connect(CStr Address, CStr Service) override;
+        SPtr<Client> Connect(CStr Address, UInt16 Port) override;
 
     private:
 
