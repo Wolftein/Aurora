@@ -23,7 +23,7 @@ namespace Graphic
 
     void Camera::Compute()
     {
-        mWorld = (mView = mTransformation.AsMatrix()) * mProjection;
+        mWorld = mProjection * (mView = mTransformation.AsMatrix());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
