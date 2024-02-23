@@ -104,4 +104,11 @@ inline namespace Core
     {
         return std::vformat(Format, std::make_format_args(Arguments...));
     }
+
+    // -=(Undocumented)=-
+    template<typename... Args>
+    inline auto Format(CStr16 Format, Args&&... Arguments)
+    {
+        return std::vformat(Format, std::make_wformat_args(Arguments...));
+    }
 }

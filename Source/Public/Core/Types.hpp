@@ -85,10 +85,10 @@ inline namespace Core
     using Char   = SStr::value_type;
 
     // -=(Undocumented)=-
-    using SStr16 = std::u16string;
+    using SStr16 = std::wstring;
 
     // -=(Undocumented)=-
-    using CStr16 = std::u16string_view;
+    using CStr16 = std::wstring_view;
 
     // -=(Undocumented)=-
     using Char16 = SStr16::value_type;
