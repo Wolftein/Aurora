@@ -126,6 +126,12 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        Vector3f GetPosition() const
+        {
+            return mTransformation.GetPosition();
+        }
+
+        // -=(Undocumented)=-
         void SetScale(Ref<const Vector3f> Scale)
         {
             mTransformation.SetScale(Scale);
@@ -150,6 +156,12 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        Vector3f GetScale() const
+        {
+            return mTransformation.GetScale();
+        }
+
+        // -=(Undocumented)=-
         void SetRotation(Real32 Angle, Ref<const Vector3f> Axis)
         {
             mTransformation.SetRotation(Quaternionf::FromAngles(Angle, Axis));
@@ -165,6 +177,12 @@ namespace Graphic
         void SetRotation(Ref<const Vector3f> Angles)
         {
             mTransformation.SetRotation(Quaternionf::FromEulerAngles(Angles));
+        }
+
+        // -=(Undocumented)=-
+        Quaternionf GetRotation() const
+        {
+            return mTransformation.GetRotation();
         }
 
         // -=(Undocumented)=-
