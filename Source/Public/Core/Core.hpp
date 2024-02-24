@@ -22,6 +22,8 @@
 #include "Memory/Chunk.hpp"
 #include "Memory/Handle.hpp"
 
+#include "Serialization/Binary/Reader.hpp"
+#include "Serialization/Binary/Writer.hpp"
 #include "Serialization/TOML/Parser.hpp"
 
 #include "System/Subsystem.hpp"
