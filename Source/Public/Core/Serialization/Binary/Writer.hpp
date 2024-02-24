@@ -46,7 +46,7 @@ inline namespace Core
         // -=(Undocumented)=-
         UInt GetCapacity() const
         {
-            return mBuffer.capacity();
+            return mBuffer.size();
         }
 
         // -=(Undocumented)=-
