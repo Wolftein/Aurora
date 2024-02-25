@@ -25,8 +25,8 @@ namespace Content
     {
     public:
 
-        // \see Locator::Open
-        Chunk Open(CStr Path) override;
+        // \see Locator::Read
+        Chunk Read(CStr Path) override;
 
         // \see Locator::Write
         void Write(CStr Path, CPtr<const UInt08> Data) override;

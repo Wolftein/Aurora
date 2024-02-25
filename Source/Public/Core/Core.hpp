@@ -15,10 +15,15 @@
 #include "Log/Service.hpp"
 
 #include "Math/Color.hpp"
+#include "Math/Matrix4.hpp"
+#include "Math/Quaternion.hpp"
 #include "Math/Rect.hpp"
 #include "Math/Transform.hpp"
+#include "Math/Trigonometry.hpp"
+#include "Math/Vector2.hpp"
+#include "Math/Vector3.hpp"
+#include "Math/Vector4.hpp"
 
-#include "Memory/Buffer.hpp"
 #include "Memory/Chunk.hpp"
 #include "Memory/Handle.hpp"
 

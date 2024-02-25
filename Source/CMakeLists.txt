@@ -76,15 +76,15 @@ SET(GLFW_BUILD_TESTS    OFF CACHE INTERNAL "")
 SET(GLFW_BUILD_DOCS     OFF CACHE INTERNAL "")
 SET(GLFW_BUILD_INSTALL  OFF CACHE INTERNAL "")
 
-IF    (WIN32)
-    ADD_DEFINITIONS(-DGLFW_EXPOSE_NATIVE_WIN32)
-ENDIF ()
-
 FetchContent_Declare(External_GLFW
         GIT_REPOSITORY https://github.com/glfw/glfw)
 FetchContent_MakeAvailable(External_GLFW)
 
 LIST(APPEND PROJECT_DEPENDENCIES "glfw")
+
+IF    (WIN32)
+    ADD_DEFINITIONS(-DGLFW_EXPOSE_NATIVE_WIN32)
+ENDIF ()
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (ASIO)

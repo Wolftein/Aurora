@@ -23,6 +23,20 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
+    template<typename Type>
+    inline constexpr Type Min(Type First, Type Second)
+    {
+        return First < Second ? First : Second;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    inline constexpr Type Max(Type First, Type Second)
+    {
+        return First > Second ? First : Second;
+    }
+
+    // -=(Undocumented)=-
     template<typename Enum>
     inline constexpr auto CastEnum(Enum Value)
     {
@@ -89,13 +103,6 @@ inline namespace Core
     inline void FastCopyMemory(Ptr<void> Destination, Ptr<const void> Source, UInt Size)
     {
         memcpy(Destination, Source, Size);
-    }
-
-    // -=(Undocumented)=-
-    template<typename Type, Bool Cacheable = true>
-    inline auto FastReallocateMemory(Ptr<Type> Source, UInt Size)
-    {
-        return reinterpret_cast<Ptr<Type>>(std::realloc(Source, Size));
     }
 
     // -=(Undocumented)=-

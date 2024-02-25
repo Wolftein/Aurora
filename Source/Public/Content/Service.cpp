@@ -122,12 +122,12 @@ namespace Content
     {
         if (const auto It = mLocators.find(Key.GetSchema()); It != mLocators.end())
         {
-            return It->second->Open(Key.GetPath());
+            return It->second->Read(Key.GetPath());
         }
 
         for (const auto Iterator : mLocators)
         {
-            if (Chunk Data = Iterator.second->Open(Key.GetPath()); Data.HasData())
+            if (Chunk Data = Iterator.second->Read(Key.GetPath()); Data.HasData())
             {
                 return Move(Data);
             }

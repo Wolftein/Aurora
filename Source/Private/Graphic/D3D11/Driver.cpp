@@ -1237,8 +1237,8 @@ namespace Graphic
 
             if (PrevSampler.Resource != NextSampler.Resource)
             {
-                Min = min(Element, Min);
-                Max = max(Element + 1, Max);
+                Min = Core::Min(Element, Min);
+                Max = Core::Max(Element + 1, Max);
             }
             Array[Element] = NextSampler.Resource.Get();
         }
@@ -1263,8 +1263,8 @@ namespace Graphic
         {
             if (Oldest.Textures[Element] != Newest.Textures[Element])
             {
-                Min = min(Element, Min);
-                Max = max(Element + 1, Max);
+                Min = Core::Min(Element, Min);
+                Max = Core::Max(Element + 1, Max);
             }
             Array[Element] = mTextures[Newest.Textures[Element]].Resource.Get();
         }
@@ -1295,8 +1295,8 @@ namespace Graphic
 
             if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Length != New.Length)
             {
-                Min = min(Element, Min);
-                Max = max(Element + 1, Max);
+                Min = Core::Min(Element, Min);
+                Max = Core::Max(Element + 1, Max);
             }
 
             Array[Element]       = mBuffers[New.Buffer].Object.Get();

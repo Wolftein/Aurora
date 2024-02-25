@@ -11,13 +11,12 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Buffer.hpp"
-#include "Core/Log/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Core
+namespace Network
 {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -48,32 +47,23 @@ inline namespace Core
 
         if (mFlip)
         {
-            if (mReader - mWriter > Length)
+            if (mMarker - mWriter >= Length)
             {
                 Chunk = CPtr<UInt08>(mBuffer.data() + mWriter, Length);
             }
         }
         else
         {
-            if (mBuffer.capacity() - mWriter > Length)
+            if (mBuffer.size() - mWriter >= Length)
             {
                 Chunk = CPtr<UInt08>(mBuffer.data() + mWriter, Length);
             }
             else if (mReader > Length)
             {
-                if (mReader == mWriter)
-                {
-                    mReader = 0;
-                    mWriter = 0;
-                }
-                else
-                {
-                    mFlip   = true;
-                    mMarker = mWriter;
-                    mWriter = 0;
-                }
-
-                Chunk = CPtr<UInt08>(mBuffer.data() , Length);
+                mFlip = true;
+                mMarker = mWriter;
+                mWriter = 0;
+                Chunk = CPtr<UInt08>(mBuffer.data(), Length);
             }
         }
         return Chunk;
@@ -85,6 +75,11 @@ inline namespace Core
     void Buffer::Commit(UInt Length)
     {
         mWriter += Length;
+
+        if (mWriter >= mBuffer.size())
+        {
+            mWriter -= mBuffer.size();
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -92,7 +87,16 @@ inline namespace Core
 
     CPtr<UInt08> Buffer::Read()
     {
-        return CPtr<UInt08>(mBuffer.data() + mReader, (mFlip ? mMarker : mWriter) - mReader);
+        if (mFlip)
+        {
+            // If buffer flipped, return data from mReader to mMarker
+            return CPtr<UInt08>(mBuffer.data() + mReader, mMarker - mReader);
+        }
+        else
+        {
+            // If buffer not flipped, return data from mReader to mWriter
+            return CPtr<UInt08>(mBuffer.data() + mReader, mWriter - mReader);
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -102,11 +106,21 @@ inline namespace Core
     {
         mReader += Length;
 
-        if (mFlip && mReader >= mMarker)
+        if (mFlip)
         {
-            mReader -= mMarker;
-            mFlip    = false;
-            mMarker  = mBuffer.size();
+            if (mReader >= mMarker)
+            {
+                mReader -= mMarker;
+                mFlip = false;
+                mMarker = mBuffer.size();
+            }
+        }
+        else
+        {
+            if (mReader >= mWriter)
+            {
+                mReader = mWriter = 0;
+            }
         }
     }
 
@@ -115,7 +129,14 @@ inline namespace Core
 
     Bool Buffer::IsEmpty() const
     {
-        return (!mFlip && mWriter == mReader);
+        if (mFlip)
+        {
+            return (mReader == mMarker);
+        }
+        else
+        {
+            return (mReader == mWriter);
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -123,6 +144,13 @@ inline namespace Core
 
     Bool Buffer::IsFull() const
     {
-        return (mFlip && mWriter == mReader);
+        if (mFlip)
+        {
+            return (mWriter == mReader);
+        }
+        else
+        {
+            return (mWriter == mBuffer.size());
+        }
     }
 }
