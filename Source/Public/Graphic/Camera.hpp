@@ -27,6 +27,9 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
+        Camera();
+
+        // -=(Undocumented)=-
         void Compute();
 
         // -=(Undocumented)=-
@@ -87,12 +90,14 @@ namespace Graphic
         void SetPerspective(Real32 Eyes, Real32 Aspect, Real32 ZNear, Real32 ZFar)
         {
             mProjection = Matrix4f::CreatePerspective(Eyes, Aspect, ZNear, ZFar);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void SetOrthographic(Real32 Left, Real32 Right, Real32 Bottom, Real32 Top, Real32 ZNear, Real32 ZFar)
         {
             mProjection = Matrix4f::CreateOrthographic(Left, Right, Bottom, Top, ZNear, ZFar);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
@@ -105,28 +110,32 @@ namespace Graphic
         void SetPosition(Ref<const Vector3f> Position)
         {
             mTransformation.SetPosition(Position);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void SetPosition(Ref<const Vector2f> Position)
         {
             mTransformation.SetPosition(Position);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void SetPosition(Real32 X, Real32 Y, Real32 Z)
         {
             mTransformation.SetPosition(Vector3f(X, Y, Z));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void SetPosition(Real32 X, Real32 Y)
         {
             mTransformation.SetPosition(Vector2f(X, Y));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
-        Vector3f GetPosition() const
+        Ref<const Vector3f> GetPosition() const
         {
             return mTransformation.GetPosition();
         }
@@ -135,28 +144,32 @@ namespace Graphic
         void SetScale(Ref<const Vector3f> Scale)
         {
             mTransformation.SetScale(Scale);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void SetScale(Ref<const Vector2f> Scale)
         {
             mTransformation.SetScale(Scale);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void SetScale(Real32 X, Real32 Y, Real32 Z)
         {
             mTransformation.SetScale(Vector3f(X, Y, Z));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void SetScale(Real32 X, Real32 Y)
         {
             mTransformation.SetScale(Vector2f(X, Y));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
-        Vector3f GetScale() const
+        Ref<const Vector3f> GetScale() const
         {
             return mTransformation.GetScale();
         }
@@ -165,22 +178,25 @@ namespace Graphic
         void SetRotation(Real32 Angle, Ref<const Vector3f> Axis)
         {
             mTransformation.SetRotation(Quaternionf::FromAngles(Angle, Axis));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void SetRotation(Real32 Angle, Ref<const Vector2f> Axis)
         {
             mTransformation.SetRotation(Quaternionf::FromAngles(Angle, Vector3f(Axis.GetX(), Axis.GetY(), 0)));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void SetRotation(Ref<const Vector3f> Angles)
         {
             mTransformation.SetRotation(Quaternionf::FromEulerAngles(Angles));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
-        Quaternionf GetRotation() const
+        Ref<const Quaternionf> GetRotation() const
         {
             return mTransformation.GetRotation();
         }
@@ -189,72 +205,84 @@ namespace Graphic
         void Translate(Ref<const Vector3f> Translation)
         {
             mTransformation.Translate(Translation);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Translate(Ref<const Vector2f> Translation)
         {
             mTransformation.Translate(Translation);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Translate(Real32 X, Real32 Y, Real32 Z)
         {
             mTransformation.Translate(Vector3f(X, Y, Z));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Translate(Real32 X, Real32 Y)
         {
             mTransformation.Translate(Vector2f(X, Y));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Scale(Ref<const Vector3f> Scale)
         {
             mTransformation.Scale(Scale);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Scale(Ref<const Vector2f> Scale)
         {
             mTransformation.Scale(Scale);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Scale(Real32 X, Real32 Y, Real32 Z)
         {
             mTransformation.Scale(Vector3f(X, Y, Z));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Scale(Real32 X, Real32 Y)
         {
             mTransformation.Scale(Vector2f(X, Y));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Rotate(Real32 Angle, Ref<const Vector3f> Axis)
         {
             mTransformation.Rotate(Angle, Axis);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Rotate(Real32 Angle, Ref<const Vector2f> Axis)
         {
             mTransformation.Rotate(Angle, Vector3f(Axis.GetX(), Axis.GetY(), 0));
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Rotate(Ref<const Vector3f> Angles)
         {
             mTransformation.Rotate(Angles);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
         void Rotate(Ref<const Vector2f> Angles)
         {
             mTransformation.Rotate(Angles);
+            mDirty = true;
         }
 
         // -=(Undocumented)=-
@@ -274,6 +302,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        Bool       mDirty;
         Matrix4f   mProjection;
         Matrix4f   mView;
         Matrix4f   mWorld;
