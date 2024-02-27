@@ -48,6 +48,9 @@ namespace Network
         explicit AsioClient(Socket && Channel);
 
         // -=(Undocumented)=-
+        ~AsioClient();
+
+        // -=(Undocumented)=-
         void Start();
 
         // -=(Undocumented)=-

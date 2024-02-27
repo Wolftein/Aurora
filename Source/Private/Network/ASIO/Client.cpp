@@ -33,6 +33,15 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    AsioClient::~AsioClient()
+    {
+        mProtocol = nullptr;
+        Close(true);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void AsioClient::Start()
     {
         mState      = State::Connected;
@@ -43,7 +52,10 @@ namespace Network
 
         DoRead(false, sizeof(Header));
 
-        mProtocol->OnAttach(shared_from_this());
+        if (mProtocol)
+        {
+            mProtocol->OnAttach(shared_from_this());
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -109,7 +121,10 @@ namespace Network
 
                 FastCopyMemory(Chunk.data() + sizeof(Header), Bytes.data(), Bytes.size());
 
-                mProtocol->OnWrite(shared_from_this(), Chunk.subspan(sizeof(Header), Bytes.size()));
+                if (mProtocol)
+                {
+                    mProtocol->OnWrite(shared_from_this(), Chunk.subspan(sizeof(Header), Bytes.size()));
+                }
 
                 mEncoder.Commit(Chunk.size());
 
@@ -152,7 +167,10 @@ namespace Network
         mDecoder.Reset();
         mFlushable = true;
 
-        mProtocol->OnDetach(shared_from_this());
+        if (mProtocol)
+        {
+            mProtocol->OnDetach(shared_from_this());
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -258,7 +276,10 @@ namespace Network
     {
         if (Error)
         {
-            mProtocol->OnError(shared_from_this(), Error.value(), Error.message());
+            if (mProtocol)
+            {
+                mProtocol->OnError(shared_from_this(), Error.value(), Error.message());
+            }
         }
         DoClose();
     }
@@ -289,7 +310,10 @@ namespace Network
                 {
                     mStatistics.TotalPacketReceived += 1;
 
-                    mProtocol->OnRead(shared_from_this(), Chunk);
+                    if (mProtocol)
+                    {
+                        mProtocol->OnRead(shared_from_this(), Chunk);
+                    }
                 }
 
                 mDecoder.Consume(Chunk.size());
