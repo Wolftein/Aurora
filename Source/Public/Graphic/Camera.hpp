@@ -30,7 +30,7 @@ namespace Graphic
         Camera();
 
         // -=(Undocumented)=-
-        void Compute();
+        Bool Compute();
 
         // -=(Undocumented)=-
         Ref<const Matrix4f> GetProjection() const
