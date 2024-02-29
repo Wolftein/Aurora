@@ -145,6 +145,24 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Bool Contains(Ref<const Rect<Base>> Other) const
+        {
+            return (mX1 <= Other.mX1 && Other.mX2 >= mX2 && mY1 <= Other.mY1 && Other.mY1 >= mY2);
+        }
+
+        // -=(Undocumented)=-
+        Bool Contains(Base X, Base Y) const
+        {
+            return X >= mX1 && Y >= mY1 && X <= mX2 && Y <= mY2;
+        }
+
+        // -=(Undocumented)=-
+        Bool Intersects(Ref<const Rect<Base>> Other) const
+        {
+            return (mX1 <= Other.mX2 && Other.mX1 <= mX2 && mY1 <= Other.mY2 && Other.mY1 <= mY2);
+        }
+
+        // -=(Undocumented)=-
         Bool operator==(Ref<const Rect<Base>> Other) const
         {
             return (mX1 == Other.mX1 && mY1 == Other.mY1 && mX2 == Other.mX2 && mY2 == Other.mY2);
