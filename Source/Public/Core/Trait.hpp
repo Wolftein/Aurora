@@ -37,6 +37,13 @@ inline namespace Core
     }
 
     // -=(Undocumented)=-
+    template<typename Type>
+    inline constexpr Type Within(Type Value, Type Min, Type Max)
+    {
+        return Min(Max(Value, Min), Max);
+    }
+
+    // -=(Undocumented)=-
     template<typename Enum>
     inline constexpr auto CastEnum(Enum Value)
     {
