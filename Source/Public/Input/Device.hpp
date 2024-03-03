@@ -40,7 +40,8 @@ namespace Input
         }
 
         // -=(Undocumented)=-
-        void Poll(Ref<Vector<Event>> Collector)
+        template<UInt Limit>
+        void Poll(Ref<Stack<Event, Limit>> Collector)
         {
             OnDevicePoll(mBuffer);
 

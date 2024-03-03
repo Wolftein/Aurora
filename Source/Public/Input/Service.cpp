@@ -32,7 +32,7 @@ namespace Input
     void Service::OnTick()
     {
         // Poll all raw-input event(s) from the input-devices.
-        Vector<Event> Collector;
+        Stack<Event, 128> Collector;
 
         for(ConstSPtr<Device> Device : mDevices)
         {
