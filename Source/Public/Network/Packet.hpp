@@ -21,6 +21,19 @@
 namespace Network
 {
     // -=(Undocumented)=-
+    enum class Channel
+    {
+        // -=(Undocumented)=-
+        Reliable,
+
+        // -=(Undocumented)=-
+        Unreliable,
+
+        // -=(Undocumented)=-
+        Unsequenced,
+    };
+
+    // -=(Undocumented)=-
     template<typename Derived, UInt ID>
     class Packet
     {

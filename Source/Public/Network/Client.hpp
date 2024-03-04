@@ -79,14 +79,14 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        void Write(CPtr<const UInt08> Bytes, UInt32 Channel, Bool Reliable)
+        void Write(CPtr<const UInt08> Bytes, Channel Mode)
         {
-            OnWrite(Bytes, Channel, Reliable);
+            OnWrite(Bytes, Mode);
         }
 
         // -=(Undocumented)=-
         template<typename Message>
-        void Write(Message && Packet, UInt32 Channel, Bool Reliable) // TODO: Implement memory pool for packets
+        void Write(Message && Packet, Channel Mode) // TODO: Implement memory pool for packets
         {
             // write message's id
             mAccumulator.WriteInt(Packet.GetID());
@@ -95,7 +95,7 @@ namespace Network
             Packet.Encode(mAccumulator);
 
             // push intermediate buffer to channel
-            OnWrite(mAccumulator.GetData(), Channel, Reliable);
+            OnWrite(mAccumulator.GetData(), Mode);
 
             // clear
             mAccumulator.Clear();
@@ -113,7 +113,7 @@ namespace Network
         virtual void OnClose(Bool Forcibly) = 0;
 
         // -=(Undocumented)=-
-        virtual void OnWrite(CPtr<const UInt08> Bytes, UInt32 Channel, Bool Reliable) = 0;
+        virtual void OnWrite(CPtr<const UInt08> Bytes, Channel Mode) = 0;
 
     protected:
 

@@ -106,7 +106,7 @@ namespace Network
     {
         ENetEvent Event;
 
-        while (mHost && enet_host_service (mHost, & Event, 0) > 0)
+        while (mHost && enet_host_service(mHost, & Event, 0) > 0)
         {
             Handle(Event);
         }
@@ -144,18 +144,23 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void EnetClient::OnWrite(CPtr<const UInt08> Bytes, UInt32 Channel, Bool Reliable)
+    void EnetClient::OnWrite(CPtr<const UInt08> Bytes, Channel Mode)
     {
         if (mPeer)
         {
             if (mProtocol)
             {
-                mProtocol->OnWrite(shared_from_this(), CPtr<UInt08>(const_cast<Ptr<UInt08>>(Bytes.data()), Bytes.size()));
+                mProtocol->OnWrite(
+                    shared_from_this(), CPtr<UInt08>(const_cast<Ptr<UInt08>>(Bytes.data()), Bytes.size()));
             }
 
-            Ptr<ENetPacket> Packet = enet_packet_create(Bytes.data(), Bytes.size(),
-                Reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED);
-            enet_peer_send(mPeer, Channel, Packet);
+            const UInt32 Flag = (Mode == Channel::Reliable
+                ? ENET_PACKET_FLAG_RELIABLE
+                : (Mode == Channel::Unsequenced ? ENET_PACKET_FLAG_UNSEQUENCED : 0));
+            const UInt32 Slot = (Mode == Channel::Reliable ? 1 : 0);
+
+            Ptr<ENetPacket> Packet = enet_packet_create(Bytes.data(), Bytes.size(), Flag); // TODO: Zero Copy
+            enet_peer_send(mPeer, Slot, Packet);
         }
     }
 }

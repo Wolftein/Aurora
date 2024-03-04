@@ -50,7 +50,7 @@ namespace Network
         void OnClose(Bool Immediately) override;
 
         // \see Session::OnWrite
-        void OnWrite(CPtr<const UInt08> Bytes, UInt32 Channel, Bool Reliable) override;
+        void OnWrite(CPtr<const UInt08> Bytes, Channel Mode) override;
 
     private:
 
