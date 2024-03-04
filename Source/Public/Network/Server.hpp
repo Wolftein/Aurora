@@ -51,21 +51,21 @@ namespace Network
 
         // -=(Undocumented)=-
         template<typename Type>
-        void Broadcast(CPtr<const Type> Bytes)
+        void Broadcast(CPtr<const Type> Bytes, UInt32 Channel, Bool Reliable)
         {
             for (ConstSPtr<Client> Session : mConnections)
             {
-                Session->Write(Bytes);
+                Session->Write(Bytes, Channel, Reliable);
             }
         }
 
         // -=(Undocumented)=-
         template<typename Message>
-        void Broadcast(Message && Packet)
+        void Broadcast(Message && Packet, UInt32 Channel, Bool Reliable)
         {
             for (ConstSPtr<Client> Session : mConnections)
             {
-                Session->Write(Packet);
+                Session->Write(Packet, Channel, Reliable);
             }
         }
 
