@@ -87,17 +87,19 @@ IF    (WIN32)
 ENDIF ()
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (ASIO)
+## Dependency (ENET)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-FetchContent_Declare(External_ASIO
-        GIT_REPOSITORY https://github.com/chriskohlhoff/asio)
-FetchContent_MakeAvailable(External_ASIO)
+SET(ENET_STATIC ON CACHE INTERNAL "")
 
-ADD_LIBRARY(Asio INTERFACE)
-TARGET_INCLUDE_DIRECTORIES(Asio INTERFACE ${external_asio_SOURCE_DIR}/asio/include)
+FetchContent_Declare(External_ENET
+        GIT_REPOSITORY https://github.com/zpl-c/enet)
+FetchContent_MakeAvailable(External_ENET)
 
-LIST(APPEND PROJECT_DEPENDENCIES "Asio")
+#ADD_LIBRARY(Enet INTERFACE)
+#TARGET_INCLUDE_DIRECTORIES(Enet INTERFACE ${external_enet_SOURCE_DIR}/include)
+
+LIST(APPEND PROJECT_DEPENDENCIES "enet_static")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (DrLibs for reading WAV and MP3)

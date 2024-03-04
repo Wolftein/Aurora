@@ -39,22 +39,16 @@ namespace Network
         Bool Initialise();
 
         // -=(Undocumented)=-
-        SPtr<Server> Listen(CStr Address, UInt16 Port);
+        SPtr<Server> Listen(CStr Address, UInt16 Port, UInt32 Capacity, UInt32 InBandwidth, UInt32 OutBandwidth);
 
         // -=(Undocumented)=-
-        SPtr<Client> Connect(CStr Address, UInt16 Port);
-
-    private:
-
-        // -=(Undocumented)=-
-        void Flush();
+        SPtr<Client> Connect(CStr Address, UInt16 Port, UInt32 InBandwidth, UInt32 OutBandwidth);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UPtr<Driver>          mDriver;
-        Vector<WPtr<Channel>> mChannels;
+        UPtr<Driver> mDriver;
     };
 }

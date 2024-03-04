@@ -13,7 +13,7 @@
 #include "Service.hpp"
 
 #ifdef    EA_PLATFORM_DESKTOP
-    #include <Network/Asio/Driver.hpp>
+    #include <Network/ENET/Driver.hpp>
 #endif // EA_PLATFORM_DESKTOP
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -43,7 +43,6 @@ namespace Network
     void Service::OnTick()
     {
         mDriver->Poll();
-        Flush();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -56,7 +55,7 @@ namespace Network
         if (!mDriver)
         {
 #ifdef    EA_PLATFORM_DESKTOP
-            mDriver = NewUniquePtr<AsioDriver>();
+            mDriver = NewUniquePtr<EnetDriver>();
 #endif // EA_PLATFORM_DESKTOP
 
             Successful = mDriver->Initialize();
@@ -72,47 +71,16 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Server> Service::Listen(CStr Address, UInt16 Port)
+    SPtr<Server> Service::Listen(CStr Address, UInt16 Port, UInt32 Capacity, UInt32 InBandwidth, UInt32 OutBandwidth)
     {
-        SPtr<Server> Server = mDriver->Listen(Address, Port);
-
-        if (Server)
-        {
-            mChannels.emplace_back(Server);
-        }
-        return Server;
+        return mDriver->Listen(Address, Port, Capacity, InBandwidth, OutBandwidth);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Client> Service::Connect(CStr Address, UInt16 Port)
+    SPtr<Client> Service::Connect(CStr Address, UInt16 Port, UInt32 InBandwidth, UInt32 OutBandwidth)
     {
-        SPtr<Client> Client = mDriver->Connect(Address, Port);
-
-        if (Client)
-        {
-            mChannels.emplace_back(Client);
-        }
-        return Client;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Service::Flush()
-    {
-        for (auto Iterator = mChannels.begin(); Iterator != mChannels.end(); )
-        {
-            if (Iterator->expired())
-            {
-                Iterator = mChannels.erase(Iterator);
-            }
-            else
-            {
-                Iterator->lock()->Flush();
-                ++Iterator;
-            }
-        }
+        return mDriver->Connect(Address, Port, InBandwidth, OutBandwidth);
     }
 }

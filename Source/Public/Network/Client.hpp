@@ -12,7 +12,6 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Channel.hpp"
 #include "Packet.hpp"
 #include "Protocol.hpp"
 #include "Statistics.hpp"
@@ -24,7 +23,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Client : public Channel
+    class Client
     {
     public:
 
@@ -36,6 +35,12 @@ namespace Network
 
         // -=(Undocumented)=-
         virtual ~Client() = default;
+
+        // -=(Undocumented)=-
+        void Poll()
+        {
+            OnPoll();
+        }
 
         // -=(Undocumented)=-
         void SetAttachment(UInt Attachment)
@@ -50,64 +55,56 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        void SetProtocol(ConstSPtr<Protocol> Protocol)
-        {
-            mProtocol = Protocol;
-        }
-
-        // -=(Undocumented)=-
         Ref<const Statistics> GetStatistics() const
         {
             return mStatistics;
         }
 
         // -=(Undocumented)=-
+        void SetProtocol(ConstSPtr<Protocol> Protocol)
+        {
+            mProtocol = Protocol;
+        }
+
+        // -=(Undocumented)=-
         void Close(Bool Forcibly)
         {
-            Flush();
             OnClose(Forcibly);
         }
 
         // -=(Undocumented)=-
-        void Write(CPtr<const UInt08> Bytes)
+        void Write(CPtr<const UInt08> Bytes, UInt32 Channel, Bool Reliable)
         {
-			mAccumulator.Write(Bytes.data(), Bytes.size());
+            OnWrite(Bytes, Channel, Reliable);
         }
 
         // -=(Undocumented)=-
         template<typename Message>
-        void Write(Message && Packet)
+        void Write(Message && Packet, UInt32 Channel, Bool Reliable) // TODO: Implement memory pool for packets
         {
             // write message's id
             mAccumulator.WriteInt(Packet.GetID());
 
             // write message's body
             Packet.Encode(mAccumulator);
-        }
 
-        // -=(Undocumented)=-
-        void Flush() override
-        {
-            if (mAccumulator.HasData())
-            {
-                OnWrite(mAccumulator.GetData());
+            // push intermediate buffer to channel
+            OnWrite(mAccumulator.GetData(), Channel, Reliable);
 
-                mAccumulator.Clear();
-            }
-
-            OnFlush();
+            // clear
+            mAccumulator.Clear();
         }
 
     private:
 
         // -=(Undocumented)=-
+        virtual void OnPoll() = 0;
+
+        // -=(Undocumented)=-
         virtual void OnClose(Bool Forcibly) = 0;
 
         // -=(Undocumented)=-
-        virtual void OnWrite(CPtr<const UInt08> Bytes) = 0;
-
-        // -=(Undocumented)=-
-        virtual void OnFlush() = 0;
+        virtual void OnWrite(CPtr<const UInt08> Bytes, UInt32 Channel, Bool Reliable) = 0;
 
     protected:
 

@@ -12,7 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Types.hpp"
+#include "Client.hpp"
+#include "Network/Server.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,43 +22,27 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Buffer final
+    class EnetServer final : public EnableSmartPointer<EnetServer>, public Server
     {
     public:
 
         // -=(Undocumented)=-
-        Buffer(UInt Capacity);
+        ~EnetServer() override;
 
         // -=(Undocumented)=-
-        void Reset();
-
-        // -=(Undocumented)=-
-        CPtr<UInt08> Reserve(UInt Length);
-
-        // -=(Undocumented)=-
-        void Commit(UInt Length);
-
-        // -=(Undocumented)=-
-        CPtr<UInt08> Read();
-
-        // -=(Undocumented)=-
-        void Consume(UInt Length);
-
-        // -=(Undocumented)=-
-        Bool IsEmpty() const;
-
-        // -=(Undocumented)=-
-        Bool IsFull() const;
+        Bool Listen(CStr Address, UInt16 Port, UInt32 Capacity, UInt32 InBandwidth, UInt32 OutBandwidth);
 
     private:
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // \see Server::OnPoll
+        void OnPoll() override;
 
-        Vector<UInt08> mBuffer;
-        UInt           mReader;
-        UInt           mWriter;
-        UInt           mMarker;
-        Bool           mFlip;
+    private:
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Ptr<ENetHost>                 mHost;
+        Table<UInt, SPtr<EnetClient>> mDatabase;
     };
 }

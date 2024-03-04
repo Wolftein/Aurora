@@ -38,13 +38,13 @@ namespace Content
 
     Chunk SystemLocator::Read(CStr Path)
     {
+        const SStr File = Format("{}/{}", mPath, Path);
         Chunk Output;
 
 #ifdef EA_PLATFORM_WINDOWS
         constexpr UInt Access     = GENERIC_READ;
         constexpr UInt Attributes = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN;
 
-        const SStr   File   = Format("{}/{}", mPath, Path);
         const HANDLE Handle = ::CreateFile(File.c_str(), Access, 0, 0, OPEN_EXISTING, Attributes, 0);
 
         if (Handle != INVALID_HANDLE_VALUE)
@@ -66,11 +66,12 @@ namespace Content
 
     void SystemLocator::Write(CStr Path, CPtr<const UInt08> Data)
     {
+        const SStr File = Format("{}/{}", mPath, Path);
+
 #ifdef EA_PLATFORM_WINDOWS
         constexpr UInt Access     = GENERIC_WRITE;
         constexpr UInt Attributes = FILE_ATTRIBUTE_NORMAL;
 
-        const SStr   File   = Format("{}/{}", mPath, Path);
         const HANDLE Handle = ::CreateFile(File.c_str(), Access, 0, 0, CREATE_ALWAYS, Attributes, 0);
 
         if (Handle != INVALID_HANDLE_VALUE)
@@ -88,9 +89,9 @@ namespace Content
 
     void SystemLocator::Delete(CStr Path)
     {
-#ifdef    EA_PLATFORM_WINDOWS
-        const SStr   File   = Format("{}/{}", mPath, Path);
+        const SStr File = Format("{}/{}", mPath, Path);
 
+#ifdef    EA_PLATFORM_WINDOWS
         ::DeleteFileA(File.c_str());
 #endif // EA_PLATFORM_WINDOWS
     }

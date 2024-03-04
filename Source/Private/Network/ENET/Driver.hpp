@@ -12,8 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Client.hpp"
-#include "Network/Server.hpp"
+#include "Network/Driver.hpp"
+#include "Server.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,25 +22,28 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class AsioServer final : public Server, public EnableSmartPointer<AsioServer>
+    class EnetDriver final : public Driver
     {
     public:
 
         // -=(Undocumented)=-
-        AsioServer(Ref<asio::io_context> Context);
+        ~EnetDriver() override;
 
-        // -=(Undocumented)=-
-        Bool Listen(CStr Address, UInt16 Port);
+        // \see Driver::Initialize
+        Bool Initialize() override;
 
-        // -=(Undocumented)=-
-        void WhenAccept(Ref<const std::error_code> Error);
+        // \see Driver::Poll
+        void Poll() override;
+
+        // \see Driver::Listen
+        SPtr<Server> Listen(CStr Address, UInt16 Port, UInt32 Capacity, UInt32 InBandwidth, UInt32 OutBandwidth) override;
+
+        // \see Driver::Connect
+        SPtr<Client> Connect(CStr Address, UInt16 Port, UInt32 InBandwidth, UInt32 OutBandwidth) override;
 
     private:
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        asio::ip::tcp::acceptor mAcceptor;
-        asio::ip::tcp::socket   mConnector;
+        Vector<WPtr<EnetServer>> mServers;
+        Vector<WPtr<EnetClient>> mClients;
     };
 }

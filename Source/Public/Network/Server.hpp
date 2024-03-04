@@ -21,12 +21,18 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Server : public Channel, public Protocol
+    class Server : public Protocol
     {
     public:
 
         // -=(Undocumented)=-
         virtual ~Server() = default;
+
+        // -=(Undocumented)=-
+        void Poll()
+        {
+            OnPoll();
+        }
 
         // -=(Undocumented)=-
         void SetProtocol(ConstSPtr<Protocol> Protocol)
@@ -63,30 +69,26 @@ namespace Network
             }
         }
 
-        // -=(Undocumented)=-
-        void Flush() override
-        {
-            for (ConstSPtr<Client> Session : mConnections)
-            {
-                Session->Flush();
-            }
-        }
-
     private:
 
         // -=(Undocumented)=-
+        virtual void OnPoll() = 0;
+
+    private:
+
+        // \see Protocol::OnAttach
         void OnAttach(ConstSPtr<class Client> Session) override;
 
-        // -=(Undocumented)=-
+        // \see Protocol::OnDetach
         void OnDetach(ConstSPtr<class Client> Session) override;
 
-        // -=(Undocumented)=-
+        // \see Protocol::OnError
         void OnError(ConstSPtr<class Client> Session, UInt Error, CStr Description) override;
 
-        // -=(Undocumented)=-
+        // \see Protocol::OnRead
         void OnRead(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes) override;
 
-        // -=(Undocumented)=-
+        // \see Protocol::OnWrite
         void OnWrite(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes) override;
 
     private:

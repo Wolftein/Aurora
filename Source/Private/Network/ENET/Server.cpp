@@ -11,7 +11,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Server.hpp"
-#include "Core/Log/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,61 +21,54 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    AsioServer::AsioServer(Ref<asio::io_context> Context)
-        : mAcceptor  { Context },
-          mConnector { Context }
+    EnetServer::~EnetServer()
     {
+        enet_host_destroy(mHost);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool AsioServer::Listen(CStr Address, UInt16 Port)
+    Bool EnetServer::Listen(CStr Address, UInt16 Port, UInt32 Capacity, UInt32 InBandwidth, UInt32 OutBandwidth)
     {
-        try
-        {
-            const asio::ip::tcp::endpoint Endpoint
-                = (* asio::ip::tcp::resolver(mAcceptor.get_executor()).resolve(Address.data(), std::to_string(Port)));
+        ENetAddress SocketAddress { { 0 }, Port, 0 };
+        enet_address_set_host(& SocketAddress, Address.data());
 
-            mAcceptor.open(Endpoint.protocol());
-            mAcceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-            mAcceptor.bind(Endpoint);
-            mAcceptor.listen();
-
-            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
-            {
-                Self->WhenAccept(Error);
-            };
-            mAcceptor.async_accept(mConnector, OnCompletion);
-        }
-        catch (Ref<std::exception const> Exception)
-        {
-            LOG_WARNING("Error creating a server: '{}'", Exception.what());
-            return false;
-        }
-        return true;
+        mHost = enet_host_create(& SocketAddress, Capacity, 0, InBandwidth, OutBandwidth);
+        return (mHost != nullptr);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void AsioServer::WhenAccept(Ref<const std::error_code> Error)
+    void EnetServer::OnPoll()
     {
-        if (Error)
-        {
-            mAcceptor.close();
-        }
-        else
-        {
-            SPtr<AsioClient> Connection = NewPtr<AsioClient>(Move(mConnector));
-            Connection->SetProtocol(shared_from_this());
-            Connection->Start();
+        ENetEvent Event;
 
-            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
+        while (enet_host_service (mHost, & Event, 0) > 0)
+        {
+            switch (Event.type)
             {
-                CastPtr<AsioServer>(Self)->WhenAccept(Error);
-            };
-            mAcceptor.async_accept(mConnector = asio::ip::tcp::socket(mAcceptor.get_executor()), OnCompletion);
+            case ENET_EVENT_TYPE_NONE:
+                break;
+            case ENET_EVENT_TYPE_CONNECT:
+                {
+                    ConstSPtr<EnetClient> Client = NewPtr<EnetClient>(Event.peer);
+                    mDatabase.emplace(Event.peer->connectID, Client);
+
+                    Client->SetProtocol(shared_from_this());
+                    Client->Handle(Event);
+                }
+                break;
+            case ENET_EVENT_TYPE_DISCONNECT:
+            case ENET_EVENT_TYPE_RECEIVE:
+            case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
+                {
+                    ConstSPtr<EnetClient> Client = mDatabase.find(Event.peer->connectID)->second;
+                    Client->Handle(Event);
+                }
+                break;
+            }
         }
     }
 }
