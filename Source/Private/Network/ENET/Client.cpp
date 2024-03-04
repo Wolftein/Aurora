@@ -33,7 +33,6 @@ namespace Network
     EnetClient::~EnetClient()
     {
         OnClose(true);
-        OnPoll();
 
         enet_host_destroy(mHost);
     }
@@ -116,15 +115,29 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    void EnetClient::OnFlush()
+    {
+        if (mHost)
+        {
+            enet_host_flush(mHost);
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void EnetClient::OnClose(Bool Immediately)
     {
-        if (Immediately)
+        if (mPeer)
         {
-            enet_peer_disconnect(mPeer, 0);
-        }
-        else
-        {
-            enet_peer_disconnect_later(mPeer, 0);
+            if (Immediately)
+            {
+                enet_peer_disconnect(mPeer, 0);
+            }
+            else
+            {
+                enet_peer_disconnect_later(mPeer, 0);
+            }
         }
     }
 
@@ -133,13 +146,16 @@ namespace Network
 
     void EnetClient::OnWrite(CPtr<const UInt08> Bytes, UInt32 Channel, Bool Reliable)
     {
-        if (mProtocol)
+        if (mPeer)
         {
-            mProtocol->OnWrite(shared_from_this(), CPtr<UInt08>(const_cast<Ptr<UInt08>>(Bytes.data()), Bytes.size()));
-        }
+            if (mProtocol)
+            {
+                mProtocol->OnWrite(shared_from_this(), CPtr<UInt08>(const_cast<Ptr<UInt08>>(Bytes.data()), Bytes.size()));
+            }
 
-        Ptr<ENetPacket> Packet = enet_packet_create(Bytes.data(), Bytes.size(),
-            Reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED);
-        enet_peer_send(mPeer, Channel, Packet);
+            Ptr<ENetPacket> Packet = enet_packet_create(Bytes.data(), Bytes.size(),
+                Reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED);
+            enet_peer_send(mPeer, Channel, Packet);
+        }
     }
 }

@@ -27,15 +27,19 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
+        EnetServer();
+
+        // -=(Undocumented)=-
         ~EnetServer() override;
+
+        // \see Server::Poll
+        void Poll() override;
+
+        // \see Server::Flush
+        void Flush() override;
 
         // -=(Undocumented)=-
         Bool Listen(CStr Address, UInt16 Port, UInt32 Capacity, UInt32 InBandwidth, UInt32 OutBandwidth);
-
-    private:
-
-        // \see Server::OnPoll
-        void OnPoll() override;
 
     private:
 

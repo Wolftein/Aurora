@@ -43,6 +43,12 @@ namespace Network
         }
 
         // -=(Undocumented)=-
+        void Flush()
+        {
+            OnFlush();
+        }
+
+        // -=(Undocumented)=-
         void SetAttachment(UInt Attachment)
         {
             mAttachment = Attachment;
@@ -99,6 +105,9 @@ namespace Network
 
         // -=(Undocumented)=-
         virtual void OnPoll() = 0;
+
+        // -=(Undocumented)=-
+        virtual void OnFlush() = 0;
 
         // -=(Undocumented)=-
         virtual void OnClose(Bool Forcibly) = 0;

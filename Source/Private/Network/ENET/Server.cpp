@@ -21,9 +21,69 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    EnetServer::EnetServer()
+        : mHost { nullptr }
+    {
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     EnetServer::~EnetServer()
     {
         enet_host_destroy(mHost);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void EnetServer::Poll()
+    {
+        ENetEvent Event;
+
+        while (mHost && enet_host_service (mHost, & Event, 0) > 0)
+        {
+            switch (Event.type)
+            {
+            case ENET_EVENT_TYPE_NONE:
+                break;
+            case ENET_EVENT_TYPE_CONNECT:
+            {
+                ConstSPtr<EnetClient> Client = NewPtr<EnetClient>(Event.peer);
+                mDatabase.emplace(Event.peer->connectID, Client);
+
+                Client->SetProtocol(mProtocol);
+                Client->Handle(Event);
+            }
+                break;
+            case ENET_EVENT_TYPE_RECEIVE:
+            {
+                ConstSPtr<EnetClient> Client = mDatabase.find(Event.peer->connectID)->second;
+                Client->Handle(Event);
+            }
+                break;
+            case ENET_EVENT_TYPE_DISCONNECT:
+            case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
+            {
+                ConstSPtr<EnetClient> Client = mDatabase.find(Event.peer->connectID)->second;
+                Client->Handle(Event);
+
+                mDatabase.erase(Event.peer->connectID);
+            }
+                break;
+            }
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void EnetServer::Flush()
+    {
+        if (mHost)
+        {
+            enet_host_flush(mHost);
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -36,39 +96,5 @@ namespace Network
 
         mHost = enet_host_create(& SocketAddress, Capacity, 0, InBandwidth, OutBandwidth);
         return (mHost != nullptr);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void EnetServer::OnPoll()
-    {
-        ENetEvent Event;
-
-        while (enet_host_service (mHost, & Event, 0) > 0)
-        {
-            switch (Event.type)
-            {
-            case ENET_EVENT_TYPE_NONE:
-                break;
-            case ENET_EVENT_TYPE_CONNECT:
-                {
-                    ConstSPtr<EnetClient> Client = NewPtr<EnetClient>(Event.peer);
-                    mDatabase.emplace(Event.peer->connectID, Client);
-
-                    Client->SetProtocol(shared_from_this());
-                    Client->Handle(Event);
-                }
-                break;
-            case ENET_EVENT_TYPE_DISCONNECT:
-            case ENET_EVENT_TYPE_RECEIVE:
-            case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-                {
-                    ConstSPtr<EnetClient> Client = mDatabase.find(Event.peer->connectID)->second;
-                    Client->Handle(Event);
-                }
-                break;
-            }
-        }
     }
 }

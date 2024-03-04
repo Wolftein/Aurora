@@ -43,6 +43,9 @@ namespace Network
         // \see Session::OnPoll
         void OnPoll() override;
 
+        // \see Session::OnFlush
+        void OnFlush() override;
+
         // \see Session::OnClose
         void OnClose(Bool Immediately) override;
 
