@@ -46,25 +46,25 @@ namespace Network
         switch (Event.type)
         {
         case ENET_EVENT_TYPE_CONNECT:
-            if (mProtocol)
-            {
-                mProtocol->OnAttach(shared_from_this());
-            }
-
             Char Buffer[MAX_PATH];
             enet_peer_get_ip(mPeer, Buffer, MAX_PATH);
 
             mStatistics         = { };
             mStatistics.Address = Buffer;
             mStatistics.Port    = enet_peer_get_port(mPeer);
+
+            if (mProtocol)
+            {
+                mProtocol->OnAttach(shared_from_this());
+            }
             break;
         case ENET_EVENT_TYPE_RECEIVE:
+            ++mStatistics.TotalPacketReceived;
+
             if (mProtocol)
             {
                 mProtocol->OnRead(shared_from_this(), CPtr<UInt08>(Event.packet->data, Event.packet->dataLength));
             }
-
-            ++mStatistics.TotalPacketReceived;
 
             enet_packet_destroy(Event.packet);
             break;
