@@ -57,7 +57,7 @@ namespace Audio
         virtual Real32 GetSubmixVolume(UInt Submix) = 0;
 
         // -=(Undocumented)=-
-        virtual Object Play(UInt Submix, ConstSPtr<Sound> Sound, Ref<const SPtr<Emitter>> Emitter, Bool Repeat) = 0;
+        virtual Object Play(UInt Submix, ConstSPtr<Sound> Sound, ConstSPtr<Emitter> Emitter, Bool Repeat) = 0;
 
         // -=(Undocumented)=-
         virtual void SetGain(Object Instance, Real32 Gain) = 0;
