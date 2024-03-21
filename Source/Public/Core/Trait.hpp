@@ -125,4 +125,18 @@ inline namespace Core
     {
         return std::vformat(Format, std::make_wformat_args(Arguments...));
     }
+
+    // -=(Undocumented)=-
+    template<typename Type, Type Mask, Type Shift>
+    inline auto GetBit(Type Field)
+    {
+        return (Field & Mask) >> Shift;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type, Type Mask, Type Shift>
+    inline auto SetBit(Type Field, Type Value)
+    {
+        return (Field & ~Mask) | ((Value << Shift) & Mask);
+    }
 }
