@@ -141,7 +141,7 @@ namespace Content
         // -=(Undocumented)=-
         virtual Bool OnCreate(Ref<Subsystem::Context> Context)
         {
-            return false;
+            return true;
         }
 
         // -=(Undocumented)=-

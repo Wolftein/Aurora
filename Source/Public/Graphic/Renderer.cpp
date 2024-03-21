@@ -411,6 +411,11 @@ namespace Graphic
         Ref<const Array<Vector2f, 4>> Texture,
         Order Order, Real32 Depth, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
+        if (mDrawables.size() == k_MaxDrawables)
+        {
+            Flush();
+        }
+
         Ref<Drawable> Drawable  = mDrawables.emplace_back();
         Drawable.ID             = GenerateUniqueID(Order, Pipeline->GetID(), Material ? Material->GetID() : 0, Depth);
         Drawable.Depth          = Depth;
