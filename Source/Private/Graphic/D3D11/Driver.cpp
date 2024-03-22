@@ -1182,7 +1182,7 @@ namespace Graphic
         Description.Height     = Height;
         Description.MipLevels  = 1;
         Description.ArraySize  = 1;
-        Description.Format     = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        Description.Format     = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
         Description.SampleDesc = { 1, 0 };
         Description.Usage      = D3D11_USAGE_DEFAULT;
         Description.BindFlags  = D3D11_BIND_DEPTH_STENCIL;
