@@ -139,4 +139,13 @@ inline namespace Core
     {
         return (Field & ~Mask) | ((Value << Shift) & Mask);
     }
+
+    // -=(Undocumented)=-
+    template<typename Type, Type Count>
+    inline auto GetMask()
+    {
+        return static_cast<Type>(-(Count != 0))
+            & (static_cast<Type>(-1) >> ((sizeof(Type) * CHAR_BIT) - Count));
+    }
+
 }
