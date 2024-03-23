@@ -128,21 +128,21 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type, Type Mask, Type Shift>
-    inline auto GetBit(Type Field)
+    inline constexpr Type GetBit(Type Field)
     {
         return (Field & Mask) >> Shift;
     }
 
     // -=(Undocumented)=-
     template<typename Type, Type Mask, Type Shift>
-    inline auto SetBit(Type Field, Type Value)
+    inline constexpr Type SetBit(Type Field, Type Value)
     {
         return (Field & ~Mask) | ((Value << Shift) & Mask);
     }
 
     // -=(Undocumented)=-
-    template<typename Type, Type Count>
-    inline auto GetMask()
+    template<typename Type>
+    inline constexpr Type GetMask(Type Count)
     {
         return static_cast<Type>(-(Count != 0))
             & (static_cast<Type>(-1) >> ((sizeof(Type) * CHAR_BIT) - Count));
