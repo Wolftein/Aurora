@@ -365,7 +365,7 @@ inline namespace Core
         {
             const Real32 ReciprocalWidth  = 1.0f / (Right - Left);
             const Real32 ReciprocalHeight = 1.0f / (Top - Bottom);
-            const Real32 Range            = 1.0f / (ZNear - ZFar);
+            const Real32 Range            = 1.0f / (ZFar - ZNear);
 
             return Matrix4<Base>(ReciprocalWidth + ReciprocalWidth,
                                  0,
@@ -381,7 +381,7 @@ inline namespace Core
                                  0,
                                  -(Left + Right) * ReciprocalWidth,
                                  -(Top + Bottom) * ReciprocalHeight,
-                                 Range * ZNear,
+                                 -Range * ZNear,
                                  1);
         }
 
