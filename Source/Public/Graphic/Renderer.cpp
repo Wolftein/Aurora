@@ -470,7 +470,7 @@ namespace Graphic
                 UInt64 iDepth        : 32;
                 UInt64 iTranslucency : 8;
             } Transparent;
-        } ID;
+        } ID { 0 }; // @TODO: Refactor with proper masking
 
         switch (Order)
         {
