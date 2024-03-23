@@ -363,25 +363,25 @@ inline namespace Core
         // -=(Undocumented)=-
         static constexpr Matrix4<Base> CreateOrthographic(Base Left, Base Right, Base Bottom, Base Top, Base ZNear, Base ZFar)
         {
-            const Real32 Width  = (Right - Left);
-            const Real32 Height = (Top - Bottom);
-            const Real32 Depth  = (ZFar - ZNear);
+            const Real32 ReciprocalWidth  = 1.0f / (Right - Left);
+            const Real32 ReciprocalHeight = 1.0f / (Top - Bottom);
+            const Real32 Range            = 1.0f / (ZNear - ZFar);
 
-            return Matrix4<Base>(2 / Width,
+            return Matrix4<Base>(ReciprocalWidth + ReciprocalWidth,
                                  0,
                                  0,
                                  0,
                                  0,
-                                 2 / Height,
+                                 ReciprocalHeight + ReciprocalHeight,
                                  0,
                                  0,
                                  0,
                                  0,
-                                 2 / Depth,
+                                 Range,
                                  0,
-                                 -(Right + Left) / Width,
-                                 -(Top + Bottom) / Height,
-                                 -(ZFar + ZNear) / Depth,
+                                 -(Left + Right) * ReciprocalWidth,
+                                 -(Top + Bottom) * ReciprocalHeight,
+                                 Range * ZNear,
                                  1);
         }
 
