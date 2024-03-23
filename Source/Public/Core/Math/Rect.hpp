@@ -329,6 +329,28 @@ inline namespace Core
             return (* this);
         }
 
+    public:
+
+        // -=(Undocumented)=-
+        static Rect<Base> Min(Ref<const Rect<Base>> Lhs, Ref<const Rect<Base>> Rhs)
+        {
+            const Base X1 = (Lhs.mX1 < Rhs.mX1 ? Lhs.mX1 : Rhs.mX1);
+            const Base Y1 = (Lhs.mY1 < Rhs.mY1 ? Lhs.mY1 : Rhs.mY1);
+            const Base X2 = (Lhs.mX2 < Rhs.mX2 ? Lhs.mX2 : Rhs.mX2);
+            const Base Y2 = (Lhs.mY2 < Rhs.mY2 ? Lhs.mY2 : Rhs.mY2);
+            return Rect<Base>(X1, Y1, X2, Y2);
+        }
+
+        // -=(Undocumented)=-
+        static Rect<Base> Max(Ref<const Rect<Base>> Lhs, Ref<const Rect<Base>> Rhs)
+        {
+            const Base X1 = (Lhs.mX1 < Rhs.mX1 ? Rhs.mX1 : Lhs.mX1);
+            const Base Y1 = (Lhs.mY1 < Rhs.mY1 ? Rhs.mY1 : Lhs.mY1);
+            const Base X2 = (Lhs.mX2 < Rhs.mX2 ? Rhs.mX2 : Lhs.mX2);
+            const Base Y2 = (Lhs.mY2 < Rhs.mY2 ? Rhs.mY2 : Lhs.mY2);
+            return Rect<Base>(X1, Y1, X2, Y2);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
