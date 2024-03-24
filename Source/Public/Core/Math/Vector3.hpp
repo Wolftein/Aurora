@@ -294,9 +294,7 @@ inline namespace Core
 
             if (Length > 0)
             {
-                const Real32 InvLength = 1.0f / Length;
-
-                return Vector * Length;
+                return Vector * (1.0f / Length);
             }
             return Vector;
         }
@@ -332,7 +330,7 @@ inline namespace Core
         // -=(Undocumented)=-
         static Vector3<Base> Lerp(Ref<const Vector3<Base>> Start, Ref<const Vector3<Base>> End, Real32 Percentage)
         {
-            return (Start + Percentage * (End - Start));
+            return (Start + (End - Start) * Percentage);
         }
 
         // -=(Undocumented)=-

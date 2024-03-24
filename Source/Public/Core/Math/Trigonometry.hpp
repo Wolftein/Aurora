@@ -128,4 +128,11 @@ inline namespace Core
             return sqrtl(Number);
         }
     }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    Type Lerp(Type Start, Type End, Real32 Percentage)
+    {
+        return (Start + Percentage * (End - Start));
+    }
 }

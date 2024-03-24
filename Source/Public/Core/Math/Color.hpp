@@ -100,6 +100,18 @@ inline namespace Core
                   | static_cast<UInt32>(GetAlpha() * UINT8_MAX));
         }
 
+    public:
+
+        // -=(Undocumented)=-
+        static Color Lerp(Ref<const Color> Start, Ref<const Color> End, Real32 Percentage)
+        {
+            const Real32 Red   = Start.GetRed()   + (End.GetRed()   - Start.GetRed())   * Percentage;
+            const Real32 Green = Start.GetGreen() + (End.GetGreen() - Start.GetGreen()) * Percentage;
+            const Real32 Blue  = Start.GetBlue()  + (End.GetBlue()  - Start.GetBlue())  * Percentage;
+            const Real32 Alpha = Start.GetAlpha() + (End.GetAlpha() - Start.GetAlpha()) * Percentage;
+            return Color(Red, Green, Blue, Alpha);
+        }
+
     private:
 
         // -=(Undocumented)=-
@@ -111,8 +123,6 @@ inline namespace Core
             const Real32 Alpha = (Value      ) & 0xFF;
             return Array<Real32, 4> { Red / UINT8_MAX, Green / UINT8_MAX, Blue / UINT8_MAX, Alpha / UINT8_MAX };
         }
-
-        // TODO: Lerp, SLerp
 
     private:
 
