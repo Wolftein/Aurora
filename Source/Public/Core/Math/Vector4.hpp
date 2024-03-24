@@ -46,7 +46,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Any>
-        constexpr Vector4(Ref<const Vector3<Any>> Other)
+        constexpr Vector4(Ref<const Vector4<Any>> Other)
             : mX { static_cast<Base>(Other.GetX()) },
               mY { static_cast<Base>(Other.GetY()) },
               mZ { static_cast<Base>(Other.GetZ()) },
