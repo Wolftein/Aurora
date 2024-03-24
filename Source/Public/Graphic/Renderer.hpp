@@ -154,6 +154,9 @@ namespace Graphic
         void DrawFont(ConstSPtr<Font> Font, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Alignment Alignment);
 
         // -=(Undocumented)=-
+        void Flush();
+
+        // -=(Undocumented)=-
         void End();
 
     private:
@@ -200,9 +203,6 @@ namespace Graphic
 
         // -=(Undocumented)=-
         void CreateDefaultResources(Ref<Core::Subsystem::Context> Context);
-
-        // -=(Undocumented)=-
-        void Flush();
 
         // -=(Undocumented)=-
         void Push(
