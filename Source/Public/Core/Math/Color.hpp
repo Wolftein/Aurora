@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Types.hpp"
+#include "Trigonometry.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -105,10 +105,10 @@ inline namespace Core
         // -=(Undocumented)=-
         static Color Lerp(Ref<const Color> Start, Ref<const Color> End, Real32 Percentage)
         {
-            const Real32 Red   = Start.GetRed()   + (End.GetRed()   - Start.GetRed())   * Percentage;
-            const Real32 Green = Start.GetGreen() + (End.GetGreen() - Start.GetGreen()) * Percentage;
-            const Real32 Blue  = Start.GetBlue()  + (End.GetBlue()  - Start.GetBlue())  * Percentage;
-            const Real32 Alpha = Start.GetAlpha() + (End.GetAlpha() - Start.GetAlpha()) * Percentage;
+            const Real32 Red   = Core::Lerp(Start.GetRed(),   End.GetRed(),   Percentage);
+            const Real32 Green = Core::Lerp(Start.GetGreen(), End.GetGreen(), Percentage);
+            const Real32 Blue  = Core::Lerp(Start.GetBlue(),  End.GetBlue(),  Percentage);
+            const Real32 Alpha = Core::Lerp(Start.GetAlpha(), End.GetAlpha(), Percentage);
             return Color(Red, Green, Blue, Alpha);
         }
 

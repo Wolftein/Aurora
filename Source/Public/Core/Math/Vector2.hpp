@@ -42,9 +42,10 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        constexpr Vector2(Ref<const Vector2> Other)
-            : mX { Other.GetX() },
-              mY { Other.GetY() }
+        template<typename Any>
+        constexpr Vector2(Ref<const Vector2<Any>> Other)
+            : mX { static_cast<Base>(Other.GetX()) },
+              mY { static_cast<Base>(Other.GetY()) }
         {
         }
 

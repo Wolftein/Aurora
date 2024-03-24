@@ -45,8 +45,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        constexpr Rect(Vector2<Type> Minimum, Vector2<Type> Maximum)
+        constexpr Rect(Ref<const Vector2<Base>> Minimum, Ref<const Vector2<Base>> Maximum)
             : mX1 { Minimum.GetX() },
               mY1 { Minimum.GetY() },
               mX2 { Maximum.GetX() },

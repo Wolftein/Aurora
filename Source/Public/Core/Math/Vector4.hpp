@@ -45,11 +45,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        constexpr Vector4(Ref<const Vector4> Other)
-            : mX { Other.GetX() },
-              mY { Other.GetY() },
-              mZ { Other.GetZ() },
-              mW { Other.GetW() }
+        template<typename Any>
+        constexpr Vector4(Ref<const Vector3<Any>> Other)
+            : mX { static_cast<Base>(Other.GetX()) },
+              mY { static_cast<Base>(Other.GetY()) },
+              mZ { static_cast<Base>(Other.GetZ()) },
+              mW { static_cast<Base>(Other.GetW()) }
         {
         }
 
