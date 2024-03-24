@@ -15,6 +15,7 @@
 #include "Log/Service.hpp"
 
 #include "Math/Color.hpp"
+#include "Math/Interpolator.hpp"
 #include "Math/Matrix4.hpp"
 #include "Math/Quaternion.hpp"
 #include "Math/Rect.hpp"
