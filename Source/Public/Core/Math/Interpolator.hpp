@@ -41,7 +41,7 @@ inline namespace Core
         {
             mAccumulator = Min(mAccumulator + Delta, mTime);
 
-            if (std::is_arithmetic_v<Type>())
+            if (std::is_arithmetic_v<Type>)
             {
                 return Lerp<Type>(mStart, mEnd, mAccumulator / mTime);
             }
