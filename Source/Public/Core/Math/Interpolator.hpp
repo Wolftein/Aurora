@@ -28,6 +28,13 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        Interpolator()
+            : mTime        { 0.0f },
+              mAccumulator { 0.0f }
+        {
+        }
+
+        // -=(Undocumented)=-
         Interpolator(Type Start, Type End, Real32 Time)
             : mStart       { Start },
               mEnd         { End },
@@ -41,7 +48,7 @@ inline namespace Core
         {
             mAccumulator = Min(mAccumulator + Delta, mTime);
 
-            if (std::is_arithmetic_v<Type>)
+            if constexpr (std::is_arithmetic_v<Type>)
             {
                 return Lerp<Type>(mStart, mEnd, mAccumulator / mTime);
             }
