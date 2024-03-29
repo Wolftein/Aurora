@@ -1,4 +1,4 @@
-Game engine for https://github.com/Online-MMO-Engine
+Game engine for https://github.com/Online2D
 
 # Note
 
