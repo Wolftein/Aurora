@@ -54,11 +54,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        constexpr Rect(Ref<const Rect<Base>> Other)
-            : mX1 { Other.mX1 },
-              mY1 { Other.mY1 },
-              mX2 { Other.mX2 },
-              mY2 { Other.mY2 }
+        template<typename Any>
+        constexpr Rect(Ref<const Rect<Any>> Other)
+            : mX1 { static_cast<Base>(Other.GetLeft()) },
+              mY1 { static_cast<Base>(Other.GetTop()) },
+              mX2 { static_cast<Base>(Other.GetRight()) },
+              mY2 { static_cast<Base>(Other.GetBottom()) }
         {
         }
 
