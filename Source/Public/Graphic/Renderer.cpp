@@ -184,7 +184,7 @@ namespace Graphic
         {
             const Real Radians = (Angle * 3.141592654f) / 180.0f;
 
-            const Vector3f    Translation(Rectangle.GetX(), Rectangle.GetY(), Depth);
+            const Vector3f    Translation(Origin.GetX(), Origin.GetY(), Depth);
             const Vector3f    Scale(1.0f, 1.0f, 1.0f);
             const Quaternionf Rotation = Quaternionf::FromAngles(Radians, Vector3f(0.0f, 0.0f, 1.0f));
 
