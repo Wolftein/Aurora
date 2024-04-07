@@ -139,14 +139,22 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Real32 Depth, Real32 Angle,
+        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Ref<const Vector2f> Origin, Real32 Depth, Real32 Angle,
             Order Order, Ref<const Array<Color, 4>> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
 
         // -=(Undocumented)=-
-        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Real32 Depth, Real32 Angle,
+        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Ref<const Vector2f> Origin, Real32 Depth, Real32 Angle,
             Order Order, Ref<const Color> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
         {
-            DrawTexture(Rectangle, Source, Depth, Angle, Order, Array<Color, 4> { Tint, Tint, Tint, Tint }, Pipeline, Material);
+            DrawTexture(Rectangle, Source, Origin, Depth, Angle, Order, Array<Color, 4> { Tint, Tint, Tint, Tint }, Pipeline, Material);
+        }
+
+        // -=(Undocumented)=-
+        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Real32 Depth, Real32 Angle,
+                         Order Order, Ref<const Color> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+        {
+            const Vector2f Origin(Rectangle.GetX(), Rectangle.GetY());
+            DrawTexture(Rectangle, Source, Origin, Depth, Angle, Order, Array<Color, 4> { Tint, Tint, Tint, Tint }, Pipeline, Material);
         }
 
         // -=(Undocumented)=-

@@ -403,14 +403,15 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> CreateTransform(Ref<const Vector3<Base>> Position, Ref<const Quaternion<Base>> Rotation, Ref<const Vector3<Base>> Scale)
+        static constexpr Matrix4<Base> CreateTransform(
+            Ref<const Vector3<Base>> Position, Ref<const Quaternion<Base>> Rotation, Ref<const Vector3<Base>> Scale)
         {
             const Matrix4<Base> Matrix = Matrix4<Base>::FromRotation(Quaternion<Base>::Normalize(Rotation));
 
             Vector4f C0(Matrix.GetComponent(0), Matrix.GetComponent(1), Matrix.GetComponent(2),  0);
             Vector4f C1(Matrix.GetComponent(4), Matrix.GetComponent(5), Matrix.GetComponent(6),  0);
             Vector4f C2(Matrix.GetComponent(8), Matrix.GetComponent(9), Matrix.GetComponent(10), 0);
-            Vector4f C3(-Position.GetX(), -Position.GetY(), Position.GetZ(), 1);
+            Vector4f C3(Position.GetX(), Position.GetY(), Position.GetZ(), 1);
 
             C0 *= Scale.GetX();
             C1 *= Scale.GetY();

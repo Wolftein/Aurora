@@ -160,7 +160,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Real32 Depth, Real32 Angle,
+    void Renderer::DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Ref<const Vector2f> Origin, Real32 Depth, Real32 Angle,
         Order Order, Ref<const Array<Color, 4>> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
         if (!Pipeline->HasLoaded() || !Material->HasLoaded())
@@ -185,15 +185,19 @@ namespace Graphic
             const Real Radians = (Angle * 3.141592654f) / 180.0f;
 
             const Vector3f    Translation(Rectangle.GetX(), Rectangle.GetY(), Depth);
-            const Vector3f    Size(Rectangle.GetWidth(), Rectangle.GetHeight(), 1.0f);
+            const Vector3f    Scale(1.0f, 1.0f, 1.0f);
             const Quaternionf Rotation = Quaternionf::FromAngles(Radians, Vector3f(0.0f, 0.0f, 1.0f));
 
-            const Matrix4f Transformation = Matrix4f::CreateTransform(Translation, Rotation, Size);
+            const Matrix4f Transformation =
+                  Matrix4f::FromTranslation(Translation)
+                * Matrix4f::FromRotation(Quaternionf::Normalize(Rotation))
+                * Matrix4f::FromScale(Scale)
+                * Matrix4f::FromTranslation(- Translation);
 
-            Position[0] = Transformation * Vector2f(-0.5f, -0.5f);
-            Position[1] = Transformation * Vector2f( 0.5f, -0.5f);
-            Position[2] = Transformation * Vector2f(-0.5f,  0.5f);
-            Position[3] = Transformation * Vector2f( 0.5f,  0.5f);
+            Position[0] = Transformation * Vector2f(DestinationX1, DestinationY1);
+            Position[1] = Transformation * Vector2f(DestinationX2, DestinationY1);
+            Position[2] = Transformation * Vector2f(DestinationX1, DestinationY3);
+            Position[3] = Transformation * Vector2f(DestinationX2, DestinationY3);
         }
         else
         {
