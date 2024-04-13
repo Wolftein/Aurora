@@ -29,18 +29,18 @@ namespace Network
         virtual ~Protocol() = default;
 
         // -=(Undocumented)=-
-        virtual void OnAttach(ConstSPtr<class Client> Session) = 0;
+        virtual void OnAttach(ConstSPtr<class Client> Session);
 
         // -=(Undocumented)=-
-        virtual void OnDetach(ConstSPtr<class Client> Session) = 0;
+        virtual void OnDetach(ConstSPtr<class Client> Session);
 
         // -=(Undocumented)=-
-        virtual void OnError(ConstSPtr<class Client> Session, UInt Error, CStr Description) = 0;
+        virtual void OnError(ConstSPtr<class Client> Session, UInt Error, CStr Description);
 
         // -=(Undocumented)=-
-        virtual void OnRead(ConstSPtr<class Client> Session,  CPtr<UInt08> Bytes) = 0;
+        virtual void OnRead(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes);
 
         // -=(Undocumented)=-
-        virtual void OnWrite(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes) = 0;
+        virtual void OnWrite(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes);
     };
 }

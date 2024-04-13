@@ -32,6 +32,18 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
+        Packet() = default;
+
+        // -=(Undocumented)=-
+        Packet(Ref<Reader> Archive)
+        {
+            Decode(Archive);
+        }
+
+        // -=(Undocumented)=-
+        virtual ~Packet() = default;
+
+        // -=(Undocumented)=-
         UInt GetID() const
         {
             return k_ID;
