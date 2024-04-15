@@ -326,22 +326,22 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Vector4<Base> Min(Ref<const Vector4<Base>> Lhs, Ref<const Vector4<Base>> Rhs)
+        static Vector4<Base> Min(Ref<const Vector4<Base>> P0, Ref<const Vector4<Base>> P1)
         {
-            const Base X = (Lhs.GetX() < Rhs.GetX() ? Lhs.GetX() : Rhs.GetX());
-            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Lhs.GetY() : Rhs.GetY());
-            const Base Z = (Lhs.GetZ() < Rhs.GetZ() ? Lhs.GetZ() : Rhs.GetZ());
-            const Base W = (Lhs.GetW() < Rhs.GetW() ? Lhs.GetW() : Rhs.GetW());
+            const Base X = (P0.GetX() < P1.GetX() ? P0.GetX() : P1.GetX());
+            const Base Y = (P0.GetY() < P1.GetY() ? P0.GetY() : P1.GetY());
+            const Base Z = (P0.GetZ() < P1.GetZ() ? P0.GetZ() : P1.GetZ());
+            const Base W = (P0.GetW() < P1.GetW() ? P0.GetW() : P1.GetW());
             return Vector4<Base>(X, Y, Z, W);
         }
 
         // -=(Undocumented)=-
-        static Vector4<Base> Max(Ref<const Vector4<Base>> Lhs, Ref<const Vector4<Base>> Rhs)
+        static Vector4<Base> Max(Ref<const Vector4<Base>> P0, Ref<const Vector4<Base>> P1)
         {
-            const Base X = (Lhs.GetX() < Rhs.GetX() ? Rhs.GetX() : Lhs.GetX());
-            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Rhs.GetY() : Lhs.GetY());
-            const Base Z = (Lhs.GetZ() < Rhs.GetZ() ? Rhs.GetZ() : Lhs.GetZ());
-            const Base W = (Lhs.GetW() < Rhs.GetW() ? Rhs.GetW() : Lhs.GetW());
+            const Base X = (P0.GetX() < P1.GetX() ? P1.GetX() : P0.GetX());
+            const Base Y = (P0.GetY() < P1.GetY() ? P1.GetY() : P0.GetY());
+            const Base Z = (P0.GetZ() < P1.GetZ() ? P1.GetZ() : P0.GetZ());
+            const Base W = (P0.GetW() < P1.GetW() ? P1.GetW() : P0.GetW());
             return Vector4<Base>(X, Y, Z, W);
         }
 

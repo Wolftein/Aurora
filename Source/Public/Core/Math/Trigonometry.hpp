@@ -22,6 +22,9 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
+    static constexpr Real32 kMathPI = 3.141592653589793238462643383279502884e+00f;
+
+    // -=(Undocumented)=-
     template<typename Type>
     Type Cosine(Type Angle)
     {

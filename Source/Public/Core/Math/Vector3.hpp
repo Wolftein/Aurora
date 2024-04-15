@@ -301,30 +301,30 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Vector3<Base> Cross(Ref<const Vector3<Base>> Lhs, Ref<const Vector3<Base>> Rhs)
+        static Vector3<Base> Cross(Ref<const Vector3<Base>> P0, Ref<const Vector3<Base>> P1)
         {
-            const Base X = Lhs.GetY() * Rhs.GetZ() - Lhs.GetZ() * Rhs.GetY();
-            const Base Y = Lhs.GetZ() * Rhs.GetX() - Lhs.GetX() * Rhs.GetZ();
-            const Base Z = Lhs.GetX() * Rhs.GetY() - Lhs.GetY() * Rhs.GetX();
+            const Base X = P0.GetY() * P1.GetZ() - P0.GetZ() * P1.GetY();
+            const Base Y = P0.GetZ() * P1.GetX() - P0.GetX() * P1.GetZ();
+            const Base Z = P0.GetX() * P1.GetY() - P0.GetY() * P1.GetX();
 
             return Vector3<Base>(X, Y, Z);
         }
 
         // -=(Undocumented)=-
-        static Vector3<Base> Min(Ref<const Vector3<Base>> Lhs, Ref<const Vector3<Base>> Rhs)
+        static Vector3<Base> Min(Ref<const Vector3<Base>> P0, Ref<const Vector3<Base>> P1)
         {
-            const Base X = (Lhs.GetX() < Rhs.GetX() ? Lhs.GetX() : Rhs.GetX());
-            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Lhs.GetY() : Rhs.GetY());
-            const Base Z = (Lhs.GetZ() < Rhs.GetZ() ? Lhs.GetZ() : Rhs.GetZ());
+            const Base X = (P0.GetX() < P1.GetX() ? P0.GetX() : P1.GetX());
+            const Base Y = (P0.GetY() < P1.GetY() ? P0.GetY() : P1.GetY());
+            const Base Z = (P0.GetZ() < P1.GetZ() ? P0.GetZ() : P1.GetZ());
             return Vector3<Base>(X, Y, Z);
         }
 
         // -=(Undocumented)=-
-        static Vector3<Base> Max(Ref<const Vector3<Base>> Lhs, Ref<const Vector3<Base>> Rhs)
+        static Vector3<Base> Max(Ref<const Vector3<Base>> P0, Ref<const Vector3<Base>> P1)
         {
-            const Base X = (Lhs.GetX() < Rhs.GetX() ? Rhs.GetX() : Lhs.GetX());
-            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Rhs.GetY() : Lhs.GetY());
-            const Base Z = (Lhs.GetZ() < Rhs.GetZ() ? Rhs.GetZ() : Lhs.GetZ());
+            const Base X = (P0.GetX() < P1.GetX() ? P1.GetX() : P0.GetX());
+            const Base Y = (P0.GetY() < P1.GetY() ? P1.GetY() : P0.GetY());
+            const Base Z = (P0.GetZ() < P1.GetZ() ? P1.GetZ() : P0.GetZ());
             return Vector3<Base>(X, Y, Z);
         }
 

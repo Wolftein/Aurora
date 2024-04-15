@@ -260,6 +260,18 @@ inline namespace Core
             return (* this);
         }
 
+        // -=(Undocumented)=-
+        Bool operator<(Ref<const Vector2<Base>> Vector) const
+        {
+            return mX < Vector.mX || (mX == Vector.mX && mY < Vector.mY);
+        }
+
+        // -=(Undocumented)=-
+        Bool operator>(Ref<const Vector2<Base>> Vector) const
+        {
+            return mX > Vector.mX || (mX == Vector.mX && mY > Vector.mY);
+        }
+
     public:
 
         // -=(Undocumented)=-
@@ -275,18 +287,24 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        static Vector2<Base> Min(Ref<const Vector2<Base>> Lhs, Ref<const Vector2<Base>> Rhs)
+        static Base Cross(Ref<const Vector2<Base>> P0, Ref<const Vector2<Base>> P1)
         {
-            const Base X = (Lhs.GetX() < Rhs.GetX() ? Lhs.GetX() : Rhs.GetX());
-            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Lhs.GetY() : Rhs.GetY());
+            return P0.GetX() * P1.GetY() - P0.GetY() * P1.GetX();
+        }
+
+        // -=(Undocumented)=-
+        static Vector2<Base> Min(Ref<const Vector2<Base>> P0, Ref<const Vector2<Base>> P1)
+        {
+            const Base X = (P0.GetX() < P1.GetX() ? P0.GetX() : P1.GetX());
+            const Base Y = (P0.GetY() < P1.GetY() ? P0.GetY() : P1.GetY());
             return Vector2<Base>(X, Y);
         }
 
         // -=(Undocumented)=-
-        static Vector2<Base> Max(Ref<const Vector2<Base>> Lhs, Ref<const Vector2<Base>> Rhs)
+        static Vector2<Base> Max(Ref<const Vector2<Base>> P0, Ref<const Vector2<Base>> P1)
         {
-            const Base X = (Lhs.GetX() < Rhs.GetX() ? Rhs.GetX() : Lhs.GetX());
-            const Base Y = (Lhs.GetY() < Rhs.GetY() ? Rhs.GetY() : Lhs.GetY());
+            const Base X = (P0.GetX() < P1.GetX() ? P1.GetX() : P0.GetX());
+            const Base Y = (P0.GetY() < P1.GetY() ? P1.GetY() : P0.GetY());
             return Vector2<Base>(X, Y);
         }
 
