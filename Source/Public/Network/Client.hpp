@@ -15,7 +15,6 @@
 #include "Channel.hpp"
 #include "Packet.hpp"
 #include "Protocol.hpp"
-#include "Statistics.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -24,7 +23,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Client : public Channel
+    class Client
     {
     public:
 
@@ -36,6 +35,12 @@ namespace Network
 
         // -=(Undocumented)=-
         virtual ~Client() = default;
+
+        // -=(Undocumented)=-
+        void SetProtocol(ConstSPtr<Protocol> Protocol)
+        {
+            mProtocol = Protocol;
+        }
 
         // -=(Undocumented)=-
         void SetAttachment(UInt Attachment)
@@ -50,33 +55,20 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        void SetProtocol(ConstSPtr<Protocol> Protocol)
-        {
-            mProtocol = Protocol;
-        }
-
-        // -=(Undocumented)=-
-        Ref<const Statistics> GetStatistics() const
-        {
-            return mStatistics;
-        }
-
-        // -=(Undocumented)=-
         void Close(Bool Forcibly)
         {
-            Flush();
             OnClose(Forcibly);
         }
 
         // -=(Undocumented)=-
-        void Write(CPtr<const UInt08> Bytes)
+        void Append(CPtr<const UInt08> Bytes)
         {
 			mAccumulator.Write(Bytes.data(), Bytes.size());
         }
 
         // -=(Undocumented)=-
         template<typename Message>
-        void Write(Message && Packet)
+        void Append(Message && Packet)
         {
             // write message's id
             mAccumulator.WriteInt(Packet.GetID());
@@ -86,16 +78,22 @@ namespace Network
         }
 
         // -=(Undocumented)=-
-        void Flush() override
+        void Flush(Channel Mode)
         {
             if (mAccumulator.HasData())
             {
-                OnWrite(mAccumulator.GetData());
+                OnWrite(mAccumulator.GetData(), Mode);
 
                 mAccumulator.Clear();
             }
+        }
 
-            OnFlush();
+        // -=(Undocumented)=-
+        template<typename Message>
+        void Write(Message && Packet, Channel Mode)
+        {
+            this->template Append<Message>(Packet);
+            Flush(Mode);
         }
 
     private:
@@ -104,10 +102,7 @@ namespace Network
         virtual void OnClose(Bool Forcibly) = 0;
 
         // -=(Undocumented)=-
-        virtual void OnWrite(CPtr<const UInt08> Bytes) = 0;
-
-        // -=(Undocumented)=-
-        virtual void OnFlush() = 0;
+        virtual void OnWrite(CPtr<const UInt08> Bytes, Channel Mode) = 0;
 
     protected:
 
@@ -115,7 +110,6 @@ namespace Network
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         UInt           mAttachment;
-        Statistics     mStatistics;
         SPtr<Protocol> mProtocol;
         Writer         mAccumulator;
     };

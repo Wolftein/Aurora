@@ -21,35 +21,81 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool AsioDriver::Initialize()
+    EnetDriver::~EnetDriver()
     {
-        return true;    // TODO: Multithreaden?
+        enet_deinitialize();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void AsioDriver::Poll()
+    Bool EnetDriver::Initialize()
     {
-        mReactor.poll();
+        return enet_initialize() == 0;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Server> AsioDriver::Listen(CStr Address, UInt16 Port)
+    void EnetDriver::Poll()
     {
-        ConstSPtr<AsioServer> Server = NewPtr<AsioServer>(mReactor);
-        return Server->Listen(Address, Port) ? Server : nullptr;
+        for (auto Iterator = mClients.begin(); Iterator != mClients.end(); )
+        {
+            if (Iterator->expired())
+            {
+                Iterator = mClients.erase(Iterator);
+            }
+            else
+            {
+
+                Iterator->lock()->Poll();
+
+                ++Iterator;
+            }
+        }
+        for (auto Iterator = mServers.begin(); Iterator != mServers.end(); )
+        {
+            if (Iterator->expired())
+            {
+                Iterator = mServers.erase(Iterator);
+            }
+            else
+            {
+
+                Iterator->lock()->Poll();
+
+                ++Iterator;
+            }
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Client> AsioDriver::Connect(CStr Address, UInt16 Port)
+    SPtr<Server> EnetDriver::Listen(CStr Address, UInt16 Port, UInt32 Capacity)
     {
-        ConstSPtr<AsioClient> Client = NewPtr<AsioClient>(AsioClient::Socket(mReactor));
-        Client->Connect(Address, Port);
-        return Client;
+        ConstSPtr<EnetServer> Server = NewPtr<EnetServer>();
+
+        if (Server->Listen(Address, Port, Capacity))
+        {
+            mServers.emplace_back(Server);
+            return Server;
+        }
+        return nullptr;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    SPtr<Client> EnetDriver::Connect(CStr Address, UInt16 Port)
+    {
+        ConstSPtr<EnetClient> Client = NewPtr<EnetClient>(nullptr);
+
+        if (Client->Connect(Address, Port))
+        {
+            mClients.emplace_back(Client);
+            return Client;
+        }
+        return nullptr;
     }
 }

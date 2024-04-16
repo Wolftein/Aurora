@@ -21,11 +21,15 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Channel
+    enum class Channel
     {
-    public:
+        // -=(Undocumented)=-
+        Reliable,
 
         // -=(Undocumented)=-
-        virtual void Flush() = 0;
+        Unreliable,
+
+        // -=(Undocumented)=-
+        Unsequenced,
     };
 }

@@ -11,7 +11,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Server.hpp"
-#include "Core/Log/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,61 +21,69 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    AsioServer::AsioServer(Ref<asio::io_context> Context)
-        : mAcceptor  { Context },
-          mConnector { Context }
+    EnetServer::EnetServer()
+        : mHost { nullptr }
     {
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool AsioServer::Listen(CStr Address, UInt16 Port)
+    EnetServer::~EnetServer()
     {
-        try
-        {
-            const asio::ip::tcp::endpoint Endpoint
-                = (* asio::ip::tcp::resolver(mAcceptor.get_executor()).resolve(Address.data(), std::to_string(Port)));
-
-            mAcceptor.open(Endpoint.protocol());
-            mAcceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-            mAcceptor.bind(Endpoint);
-            mAcceptor.listen();
-
-            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
-            {
-                Self->WhenAccept(Error);
-            };
-            mAcceptor.async_accept(mConnector, OnCompletion);
-        }
-        catch (Ref<std::exception const> Exception)
-        {
-            LOG_WARNING("Error creating a server: '{}'", Exception.what());
-            return false;
-        }
-        return true;
+        enet_host_destroy(mHost);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void AsioServer::WhenAccept(Ref<const std::error_code> Error)
+    Bool EnetServer::Listen(CStr Address, UInt16 Port, UInt32 Capacity)
     {
-        if (Error)
-        {
-            mAcceptor.close();
-        }
-        else
-        {
-            SPtr<AsioClient> Connection = NewPtr<AsioClient>(Move(mConnector));
-            Connection->SetProtocol(shared_from_this());
-            Connection->Start();
+        ENetAddress SocketAddress { { 0 }, Port, 0 };
+        enet_address_set_host(& SocketAddress, Address.data());
 
-            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
+        mHost = enet_host_create(& SocketAddress, Capacity, 0, 0, 0);
+        return (mHost != nullptr);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void EnetServer::Poll()
+    {
+        ENetEvent Event;
+
+        while (mHost && enet_host_service (mHost, & Event, 0) > 0)
+        {
+            switch (Event.type)
             {
-                CastPtr<AsioServer>(Self)->WhenAccept(Error);
-            };
-            mAcceptor.async_accept(mConnector = asio::ip::tcp::socket(mAcceptor.get_executor()), OnCompletion);
+            case ENET_EVENT_TYPE_NONE:
+                break;
+            case ENET_EVENT_TYPE_CONNECT:
+            {
+                ConstSPtr<EnetClient> Client = NewPtr<EnetClient>(Event.peer);
+                mDatabase.emplace(Event.peer->connectID, Client);
+
+                Client->SetProtocol(mProtocol);
+                Client->Handle(Event);
+            }
+                break;
+            case ENET_EVENT_TYPE_RECEIVE:
+            {
+                ConstSPtr<EnetClient> Client = mDatabase.find(Event.peer->connectID)->second;
+                Client->Handle(Event);
+            }
+                break;
+            case ENET_EVENT_TYPE_DISCONNECT:
+            case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
+            {
+                ConstSPtr<EnetClient> Client = mDatabase.find(Event.peer->connectID)->second;
+                Client->Handle(Event);
+
+                mDatabase.erase(Event.peer->connectID);
+            }
+                break;
+            }
         }
     }
 }

@@ -10,7 +10,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Buffer.hpp"
+#include "Client.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,105 +21,99 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Buffer::Buffer(UInt Capacity)
-        : mBuffer (Capacity, 0),
-          mReader { 0 },
-          mWriter { 0 },
-          mMarker { 0 },
-          mFlip   { false }
+    EnetClient::EnetClient(Ptr<ENetPeer> Peer)
+        : mHost { nullptr },
+          mPeer { Peer }
     {
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Buffer::Reset()
+    EnetClient::~EnetClient()
     {
-        mReader = mWriter = mMarker = mFlip = 0;
+        OnClose(true);
+
+        enet_host_destroy(mHost);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    CPtr<UInt08> Buffer::Reserve(UInt Length)
+    void EnetClient::Handle(Ref<ENetEvent> Event)
     {
-        CPtr<UInt08> Chunk;
-
-        if (mFlip)
+        switch (Event.type)
         {
-            if (mMarker - mWriter >= Length)
+        case ENET_EVENT_TYPE_CONNECT:
+            Char Buffer[MAX_PATH];
+            enet_peer_get_ip(mPeer, Buffer, MAX_PATH);
+
+            if (mProtocol)
             {
-                Chunk = CPtr<UInt08>(mBuffer.data() + mWriter, Length);
+                mProtocol->OnConnect(shared_from_this());
             }
-        }
-        else
-        {
-            if (mBuffer.size() - mWriter >= Length)
+            break;
+        case ENET_EVENT_TYPE_RECEIVE:
+            if (mProtocol)
             {
-                Chunk = CPtr<UInt08>(mBuffer.data() + mWriter, Length);
+                mProtocol->OnRead(shared_from_this(), CPtr<UInt08>(Event.packet->data, Event.packet->dataLength));
             }
-            else if (mReader > Length)
+
+            enet_packet_destroy(Event.packet);
+            break;
+        case ENET_EVENT_TYPE_DISCONNECT:
+        case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
+            if (mProtocol)
             {
-                mFlip = true;
-                mMarker = mWriter;
-                mWriter = 0;
-                Chunk = CPtr<UInt08>(mBuffer.data(), Length);
+                mProtocol->OnDisconnect(shared_from_this());
             }
-        }
-        return Chunk;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Buffer::Commit(UInt Length)
-    {
-        mWriter += Length;
-
-        if (mWriter >= mBuffer.size())
-        {
-            mWriter -= mBuffer.size();
+            break;
+        case ENET_EVENT_TYPE_NONE:
+            break;
         }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    CPtr<UInt08> Buffer::Read()
+    Bool EnetClient::Connect(CStr Address, UInt16 Port)
     {
-        if (mFlip)
+        mHost = enet_host_create(nullptr, 1, 0, 0, 0);
+
+        ENetAddress SocketAddress { { 0 }, Port, 0 };
+        enet_address_set_host(& SocketAddress, Address.data());
+
+        mPeer = enet_host_connect(mHost, & SocketAddress, 2, 0);
+        return (mPeer != nullptr);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void EnetClient::Poll()
+    {
+        ENetEvent Event;
+
+        while (mHost && enet_host_service(mHost, & Event, 0) > 0)
         {
-            // If buffer flipped, return data from mReader to mMarker
-            return CPtr<UInt08>(mBuffer.data() + mReader, mMarker - mReader);
-        }
-        else
-        {
-            // If buffer not flipped, return data from mReader to mWriter
-            return CPtr<UInt08>(mBuffer.data() + mReader, mWriter - mReader);
+            Handle(Event);
         }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Buffer::Consume(UInt Length)
+    void EnetClient::OnClose(Bool Immediately)
     {
-        mReader += Length;
-
-        if (mFlip)
+        if (mPeer)
         {
-            if (mReader >= mMarker)
+            if (Immediately)
             {
-                mReader -= mMarker;
-                mFlip = false;
-                mMarker = mBuffer.size();
+                enet_peer_disconnect(mPeer, 0);
             }
-        }
-        else
-        {
-            if (mReader >= mWriter)
+            else
             {
-                mReader = mWriter = 0;
+                enet_peer_disconnect_later(mPeer, 0);
             }
         }
     }
@@ -127,30 +121,22 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Buffer::IsEmpty() const
+    void EnetClient::OnWrite(CPtr<const UInt08> Bytes, Channel Mode)
     {
-        if (mFlip)
+        if (mPeer)
         {
-            return (mReader == mMarker);
-        }
-        else
-        {
-            return (mReader == mWriter);
-        }
-    }
+            if (mProtocol)
+            {
+                mProtocol->OnWrite(
+                    shared_from_this(), CPtr<UInt08>(const_cast<Ptr<UInt08>>(Bytes.data()), Bytes.size()));
+            }
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+            const UInt32 Flag = (Mode == Channel::Reliable ? ENET_PACKET_FLAG_RELIABLE
+                              : (Mode == Channel::Unsequenced ? ENET_PACKET_FLAG_UNSEQUENCED : 0));
+            const UInt32 Slot = (Mode == Channel::Reliable ? 1 : 0);
 
-    Bool Buffer::IsFull() const
-    {
-        if (mFlip)
-        {
-            return (mWriter == mReader);
-        }
-        else
-        {
-            return (mWriter == mBuffer.size());
+            Ptr<ENetPacket> Packet = enet_packet_create(Bytes.data(), Bytes.size(), Flag);
+            enet_peer_send(mPeer, Slot, Packet);
         }
     }
 }

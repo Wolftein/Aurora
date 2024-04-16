@@ -22,25 +22,28 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class AsioServer final : public Server, public EnableSmartPointer<AsioServer>
+    class EnetServer final : public EnableSmartPointer<EnetServer>, public Server
     {
     public:
 
         // -=(Undocumented)=-
-        AsioServer(Ref<asio::io_context> Context);
+        EnetServer();
 
         // -=(Undocumented)=-
-        Bool Listen(CStr Address, UInt16 Port);
+        ~EnetServer() override;
 
         // -=(Undocumented)=-
-        void WhenAccept(Ref<const std::error_code> Error);
+        Bool Listen(CStr Address, UInt16 Port, UInt32 Capacity);
+
+        // -=(Undocumented)=-
+        void Poll();
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        asio::ip::tcp::acceptor mAcceptor;
-        asio::ip::tcp::socket   mConnector;
+        Ptr<ENetHost>                 mHost;
+        Table<UInt, SPtr<EnetClient>> mDatabase;
     };
 }

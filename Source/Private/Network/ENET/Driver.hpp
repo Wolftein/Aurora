@@ -12,7 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Types.hpp"
+#include "Network/Driver.hpp"
+#include "Server.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,43 +22,31 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Buffer final
+    class EnetDriver final : public Driver
     {
     public:
 
         // -=(Undocumented)=-
-        Buffer(UInt Capacity);
+        ~EnetDriver() override;
 
-        // -=(Undocumented)=-
-        void Reset();
+        // \see Driver::Initialize
+        Bool Initialize() override;
 
-        // -=(Undocumented)=-
-        CPtr<UInt08> Reserve(UInt Length);
+        // \see Driver::Poll
+        void Poll() override;
 
-        // -=(Undocumented)=-
-        void Commit(UInt Length);
+        // \see Driver::Listen
+        SPtr<Server> Listen(CStr Address, UInt16 Port, UInt32 Capacity) override;
 
-        // -=(Undocumented)=-
-        CPtr<UInt08> Read();
-
-        // -=(Undocumented)=-
-        void Consume(UInt Length);
-
-        // -=(Undocumented)=-
-        Bool IsEmpty() const;
-
-        // -=(Undocumented)=-
-        Bool IsFull() const;
+        // \see Driver::Connect
+        SPtr<Client> Connect(CStr Address, UInt16 Port) override;
 
     private:
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Vector<UInt08> mBuffer;
-        UInt           mReader;
-        UInt           mWriter;
-        UInt           mMarker;
-        Bool           mFlip;
+        Vector<WPtr<EnetServer>> mServers;
+        Vector<WPtr<EnetClient>> mClients;
     };
 }

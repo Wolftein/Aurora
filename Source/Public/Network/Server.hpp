@@ -21,7 +21,7 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class Server : public Channel, public Protocol
+    class Server
     {
     public:
 
@@ -34,67 +34,11 @@ namespace Network
             mProtocol = Protocol;
         }
 
-        // -=(Undocumented)=-
-        void Disconnect(Bool Forcibly)
-        {
-            for (ConstSPtr<Client> Session : mConnections)
-            {
-                Session->Close(Forcibly);
-            }
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type>
-        void Broadcast(CPtr<const Type> Bytes)
-        {
-            for (ConstSPtr<Client> Session : mConnections)
-            {
-                Session->Write(Bytes);
-            }
-        }
-
-        // -=(Undocumented)=-
-        template<typename Message>
-        void Broadcast(Message && Packet)
-        {
-            for (ConstSPtr<Client> Session : mConnections)
-            {
-                Session->Write(Packet);
-            }
-        }
-
-        // -=(Undocumented)=-
-        void Flush() override
-        {
-            for (ConstSPtr<Client> Session : mConnections)
-            {
-                Session->Flush();
-            }
-        }
-
-    private:
-
-        // -=(Undocumented)=-
-        void OnAttach(ConstSPtr<class Client> Session) override;
-
-        // -=(Undocumented)=-
-        void OnDetach(ConstSPtr<class Client> Session) override;
-
-        // -=(Undocumented)=-
-        void OnError(ConstSPtr<class Client> Session, UInt Error, CStr Description) override;
-
-        // -=(Undocumented)=-
-        void OnRead(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes) override;
-
-        // -=(Undocumented)=-
-        void OnWrite(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes) override;
-
-    private:
+    protected:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Protocol>       mProtocol;
-        Vector<SPtr<Client>> mConnections;
+        SPtr<Protocol> mProtocol;
     };
 }

@@ -12,7 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Types.hpp"
+#include "Network/Client.hpp"
+#include <enet.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,24 +22,39 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    struct Statistics final
+    class EnetClient final : public EnableSmartPointer<EnetClient>, public Client
     {
-        // -=(Undocumented)=-
-        SStr   Address;
+    public:
 
         // -=(Undocumented)=-
-        UInt64 TotalBytesSent      = 0;
+        EnetClient(Ptr<ENetPeer> Peer);
 
         // -=(Undocumented)=-
-        UInt64 TotalBytesReceived  = 0;
+        ~EnetClient() override;
 
         // -=(Undocumented)=-
-        UInt64 TotalBytesPending   = 0;
+        void Handle(Ref<ENetEvent> Event);
 
         // -=(Undocumented)=-
-        UInt64 TotalPacketSent     = 0;
+        Bool Connect(CStr Address, UInt16 Port);
 
         // -=(Undocumented)=-
-        UInt64 TotalPacketReceived = 0;
+        void Poll();
+
+    protected:
+
+        // \see Session::OnClose
+        void OnClose(Bool Immediately) override;
+
+        // \see Session::OnWrite
+        void OnWrite(CPtr<const UInt08> Bytes, Channel Mode) override;
+
+    private:
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Ptr<ENetHost> mHost;
+        Ptr<ENetPeer> mPeer;
     };
 }

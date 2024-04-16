@@ -35,12 +35,6 @@ namespace Network
         Packet() = default;
 
         // -=(Undocumented)=-
-        Packet(Ref<Reader> Archive)
-        {
-            Decode(Archive);
-        }
-
-        // -=(Undocumented)=-
         virtual ~Packet() = default;
 
         // -=(Undocumented)=-
