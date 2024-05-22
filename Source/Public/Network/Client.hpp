@@ -90,7 +90,7 @@ namespace Network
 
         // -=(Undocumented)=-
         template<typename Message>
-        void Write(Message && Packet, Channel Mode)
+        void Write(Message && Packet, Channel Mode = Channel::Reliable)
         {
             this->template Append<Message>(Packet);
             Flush(Mode);

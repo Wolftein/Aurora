@@ -332,6 +332,27 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        template<typename Reader>
+        static Rect<Base> Read(Ref<Reader> Input)
+        {
+            const Base Left   = Input.template Read<Base>();
+            const Base Top    = Input.template Read<Base>();
+            const Base Right  = Input.template Read<Base>();
+            const Base Bottom = Input.template Read<Base>();
+            return Rect<Base>(Left, Top, Right, Bottom);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Writer>
+        static void Write(Ref<Writer> Output, Ref<const Rect<Base>> Rect)
+        {
+            Output.Write(Rect.GetLeft());
+            Output.Write(Rect.GetTop());
+            Output.Write(Rect.GetBottom());
+            Output.Write(Rect.GetRight());
+        }
+
+        // -=(Undocumented)=-
         static Rect<Base> Min(Ref<const Rect<Base>> Lhs, Ref<const Rect<Base>> Rhs)
         {
             const Base X1 = (Lhs.mX1 < Rhs.mX1 ? Lhs.mX1 : Rhs.mX1);

@@ -103,6 +103,20 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        template<typename Reader>
+        static Color Read(Ref<Reader> Input)
+        {
+            return Color(Input.template ReadInt<UInt32>());
+        }
+
+        // -=(Undocumented)=-
+        template<typename Writer>
+        static void Write(Ref<Writer> Output, Ref<const Color> Color)
+        {
+            Output.template WriteInt<UInt32>(Color.AsPacked());
+        }
+
+        // -=(Undocumented)=-
         static Color Lerp(Ref<const Color> Start, Ref<const Color> End, Real32 Percentage)
         {
             const Real32 Red   = Core::Lerp(Start.GetRed(),   End.GetRed(),   Percentage);

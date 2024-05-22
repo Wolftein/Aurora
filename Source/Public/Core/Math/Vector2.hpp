@@ -275,6 +275,23 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        template<typename Reader>
+        static Vector2<Base> Read(Ref<Reader> Input)
+        {
+            const Base X = Input.template Read<Base>();
+            const Base Y = Input.template Read<Base>();
+            return Vector2<Base>(X, Y);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Writer>
+        static void Write(Ref<Writer> Output, Ref<const Vector2<Base>> Vector)
+        {
+            Output.Write(Vector.GetX());
+            Output.Write(Vector.GetY());
+        }
+
+        // -=(Undocumented)=-
         static Vector2<Base> Normalize(Ref<const Vector2<Base>> Vector)
         {
             const Real32 Length = Vector.GetLength();
