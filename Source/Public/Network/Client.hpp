@@ -92,7 +92,13 @@ namespace Network
         template<typename Message>
         void Write(Message && Packet, Channel Mode = Channel::Reliable)
         {
-            this->template Append<Message>(Packet);
+            // write message's id
+            mAccumulator.WriteInt(Packet.GetID());
+
+            // write message's body
+            Packet.Encode(mAccumulator);
+
+            // flush message immediately
             Flush(Mode);
         }
 
