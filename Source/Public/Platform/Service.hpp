@@ -32,7 +32,7 @@ namespace Platform
         ~Service();
 
         // -=(Undocumented)=-
-        void OnTick(UInt64 Tick) override;
+        void OnTick(Real64 Tick) override;
 
         // -=(Undocumented)=-
         SPtr<Window> Initialise(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless);
