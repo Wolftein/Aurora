@@ -31,7 +31,7 @@ namespace Content
         Service(Ref<Context> Context);
 
         // \see Subsystem::OnTick
-        void OnTick() override;
+        void OnTick(UInt64 Tick) override;
 
         // -=(Undocumented)=-
         void AddLoader(ConstSPtr<Loader> Loader);

@@ -39,7 +39,7 @@ namespace Engine
 
         // Creates the platform service
         LOG_INFO("Kernel: Creating platform service");
-        ConstSPtr<Platform::Service> PlatformService = AddSubsystem<Platform::Service>();
+        mPlatform = AddSubsystem<Platform::Service>();
 
         // Creates multimedia services (if running in client mode)
         if (IsClientMode())
@@ -55,7 +55,7 @@ namespace Engine
             if (!DisplayHandle.has_value())
             {
                 LOG_INFO("Kernel: Creating display ({}, {})", Properties.GetWindowWidth(), Properties.GetWindowHeight());
-                mDisplay = PlatformService->Initialise(
+                mDisplay = mPlatform->Initialise(
                     Properties.GetWindowTitle(),
                     Properties.GetWindowWidth(),
                     Properties.GetWindowHeight(),
@@ -105,9 +105,11 @@ namespace Engine
 
     void Kernel::Tick()
     {
-        Execute([](Ref<Core::Subsystem> Service)
+        const UInt64 Tick = mPlatform->GetTime();
+
+        Execute([Tick](Ref<Core::Subsystem> Service)
         {
-            Service.OnTick();
+            Service.OnTick(Tick);
         });
     }
 }

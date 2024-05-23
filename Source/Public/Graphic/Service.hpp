@@ -29,7 +29,7 @@ namespace Graphic
         Service(Ref<Context> Context);
 
         // \see Subsystem::OnTick
-        void OnTick() override;
+        void OnTick(UInt64 Tick) override;
 
         // -=(Undocumented)=-
         Bool Initialise(Backend Backend, Any Display, UInt Width, UInt Height);

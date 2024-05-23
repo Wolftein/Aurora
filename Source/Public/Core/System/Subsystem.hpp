@@ -40,7 +40,7 @@ inline namespace Core
         virtual ~Subsystem() = default;
 
         // -=(Undocumented)=-
-        virtual void OnTick()
+        virtual void OnTick(UInt64 Tick)
         {
         }
 
