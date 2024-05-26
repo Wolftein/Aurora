@@ -29,7 +29,7 @@ namespace Audio
         Service(Ref<Context> Context);
 
         // \see Subsystem::OnTick
-        void OnTick(Real64 Tick) override;
+        void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
         Bool Initialise(Backend Backend, UInt32 Submixes);

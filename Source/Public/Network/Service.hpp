@@ -33,7 +33,7 @@ namespace Network
         ~Service();
 
         // -=(Undocumented)=-
-        void OnTick(Real64 Tick) override;
+        void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
         Bool Initialise();

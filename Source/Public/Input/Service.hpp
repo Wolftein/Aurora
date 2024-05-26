@@ -31,7 +31,7 @@ namespace Input
         Service(Ref<Context> System);
 
         // -=(Undocumented)=-
-        void OnTick(Real64 Tick) override;
+        void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
         template<typename T>
