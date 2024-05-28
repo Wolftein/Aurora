@@ -20,6 +20,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <variant>
 
 #include <EASTL/span.h>
 #include <EASTL/fixed_vector.h>
@@ -32,6 +33,10 @@ inline namespace Core
 {
     // -=(Undocumented)=-
     using Any    = std::any;
+
+    // -=(Undocumented)=-
+    template<class... Types>
+    using Union  = std::variant<Types...>;
 
     // -=(Undocumented)=-
     using Bool   = bool;
