@@ -57,5 +57,8 @@ namespace Input
 
         // -=(Undocumented)=-
         virtual Bool OnWindowResize(SInt Width, SInt Height);
+
+        // -=(Undocumented)=-
+        virtual Bool OnWindowExit();
     };
 }

@@ -36,9 +36,6 @@ namespace Platform
         // -=(Undocumented)=-
         Bool Create(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless);
 
-        // \see Window::Poll
-        Bool Poll() override;
-
         // \see Window::Close
         void Close() override;
 

@@ -55,15 +55,16 @@ namespace Engine
             if (!DisplayHandle.has_value())
             {
                 LOG_INFO("Kernel: Creating display ({}, {})", Properties.GetWindowWidth(), Properties.GetWindowHeight());
-                mDisplay = mPlatform->Initialise(
+                mPlatform->Initialise(
                     Properties.GetWindowTitle(),
                     Properties.GetWindowWidth(),
                     Properties.GetWindowHeight(),
                     Properties.IsWindowFullscreen(),
                     Properties.IsWindowBorderless());
 
-                DisplaySize   = mDisplay->GetSize();
-                DisplayHandle = mDisplay->GetHandle();
+                ConstSPtr<Platform::Window> Window = mPlatform->GetWindow();
+                DisplaySize   = Window->GetSize();
+                DisplayHandle = Window->GetHandle();
             }
 
             // Create the graphic service

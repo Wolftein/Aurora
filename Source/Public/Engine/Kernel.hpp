@@ -46,18 +46,11 @@ namespace Engine
         // -=(Undocumented)=-
         void Tick();
 
-        // -=(Undocumented)=-
-        SPtr<Platform::Window> GetDisplay() const
-        {
-            return mDisplay;
-        }
-
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         SPtr<Platform::Service> mPlatform;
-        SPtr<Platform::Window>  mDisplay;
     };
 }

@@ -41,21 +41,16 @@ namespace Platform
 
     void Service::OnTick(Real64 Time)
     {
-        // TODO: Anything?
+        glfwPollEvents();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Window> Service::Initialise(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless)
+    Bool Service::Initialise(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless)
     {
-        SPtr<GLFWWindow> Window = NewPtr<GLFWWindow>(GetContext());
-
-        if (Window->Create(Title, Width, Height, Fullscreen, Borderless))
-        {
-            return Window;
-        }
-        return nullptr;
+        mWindow = NewPtr<GLFWWindow>(GetContext());
+        return CastPtr<GLFWWindow>(mWindow)->Create(Title, Width, Height, Fullscreen, Borderless);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -64,5 +59,13 @@ namespace Platform
     Real64 Service::GetTime() const
     {
         return glfwGetTime();
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    SPtr<Window> Service::GetWindow() const
+    {
+        return mWindow;
     }
 }

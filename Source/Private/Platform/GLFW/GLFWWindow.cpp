@@ -141,17 +141,17 @@ namespace Platform
             Self->Invoke(Event);
         });
 
+        glfwSetWindowCloseCallback(mHandle, [](Ptr<GLFWwindow> Window)
+        {
+            Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
+
+            const Input::Event Event {
+                .Time = glfwGetTime(), .Type = Input::Event::Type::WindowExit
+            };
+            Self->Invoke(Event);
+        });
+
         return true;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    Bool GLFWWindow::Poll()
-    {
-        glfwPollEvents();
-
-        return !glfwWindowShouldClose(mHandle);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

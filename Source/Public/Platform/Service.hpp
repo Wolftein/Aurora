@@ -35,9 +35,19 @@ namespace Platform
         void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
-        SPtr<Window> Initialise(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless);
+        Bool Initialise(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless);
 
         // -=(Undocumented)=-
         Real64 GetTime() const;
+
+        // -=(Undocumented)=-
+        SPtr<Window> GetWindow() const;
+
+    private:
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        SPtr<Window> mWindow;
     };
 }

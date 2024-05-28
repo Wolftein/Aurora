@@ -43,6 +43,8 @@ namespace Input
             return OnWindowFocus(Event.WindowFocus.State);
         case Event::Type::WindowResize:
             return OnWindowResize(Event.WindowResize.Width, Event.WindowResize.Height);
+        case Event::Type::WindowExit:
+            return OnWindowExit();
         default:
             return false;
         }
@@ -116,6 +118,14 @@ namespace Input
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Bool Listener::OnWindowResize(SInt Width, SInt Height)
+    {
+        return false;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool Listener::OnWindowExit()
     {
         return false;
     }

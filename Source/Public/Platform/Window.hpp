@@ -29,9 +29,6 @@ namespace Platform
         virtual ~Window() = default;
 
         // -=(Undocumented)=-
-        virtual Bool Poll() = 0;
-
-        // -=(Undocumented)=-
         virtual void Close() = 0;
 
         // -=(Undocumented)=-

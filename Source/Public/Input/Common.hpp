@@ -163,6 +163,7 @@ namespace Input
             MouseDown,
             WindowFocus,
             WindowResize,
+            WindowExit,
         };
 
         // -=(Undocumented)=-
