@@ -38,13 +38,28 @@ namespace Engine
     public:
 
         // -=(Undocumented)=-
+        enum class State
+        {
+            Running,
+            Exiting,
+        };
+
+    public:
+
+        // -=(Undocumented)=-
         ~Kernel();
 
         // -=(Undocumented)=-
         void Initialize(Mode Mode, Ref<const Properties> Properties);
 
         // -=(Undocumented)=-
+        void Run();
+
+        // -=(Undocumented)=-
         void Tick();
+
+        // -=(Undocumented)=-
+        void Exit();
 
     private:
 
@@ -52,5 +67,6 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         SPtr<Platform::Service> mPlatform;
+        State                   mState;
     };
 }
