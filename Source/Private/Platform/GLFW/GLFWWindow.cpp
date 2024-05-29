@@ -128,7 +128,7 @@ namespace Platform
             const Input::Event Event {
                 .Time = glfwGetTime(), .Type = Input::Event::Type::WindowFocus, .WindowFocus { !!GotFocus }
             };
-            Self->Invoke(Event);
+            (Self->mKeyboard)->Invoke(Event);
         });
 
         glfwSetFramebufferSizeCallback(mHandle, [](Ptr<GLFWwindow> Window, SInt32 Width, SInt32 Height)
@@ -138,7 +138,7 @@ namespace Platform
             const Input::Event Event {
                 .Time = glfwGetTime(), .Type = Input::Event::Type::WindowResize, .WindowResize { Width, Height }
             };
-            Self->Invoke(Event);
+            (Self->mKeyboard)->Invoke(Event);
         });
 
         glfwSetWindowCloseCallback(mHandle, [](Ptr<GLFWwindow> Window)
@@ -148,7 +148,7 @@ namespace Platform
             const Input::Event Event {
                 .Time = glfwGetTime(), .Type = Input::Event::Type::WindowExit
             };
-            Self->Invoke(Event);
+            (Self->mKeyboard)->Invoke(Event);
         });
 
         return true;

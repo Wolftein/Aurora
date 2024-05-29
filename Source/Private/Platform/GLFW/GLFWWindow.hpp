@@ -23,7 +23,7 @@
 namespace Platform
 {
     // -=(Undocumented)=-
-    class GLFWWindow final : public Window, public Input::Device
+    class GLFWWindow final : public Window
     {
     public:
 
