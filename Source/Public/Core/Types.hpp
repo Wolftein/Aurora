@@ -35,10 +35,6 @@ inline namespace Core
     using Any    = std::any;
 
     // -=(Undocumented)=-
-    template<class... Types>
-    using Union  = std::variant<Types...>;
-
-    // -=(Undocumented)=-
     using Bool   = bool;
 
     // -=(Undocumented)=-
@@ -199,4 +195,47 @@ inline namespace Core
     // -=(Undocumented)=-
     template<typename Value>
     using StringTable = Table<SStr, Value, StringHash>;
+
+    // -=(Undocumented)=-
+    template<class... Types>
+    class Union : public std::variant<std::monostate, Types...>
+    {
+    private:
+
+        // -=(Undocumented)=-
+        using Super = std::variant<std::monostate, Types...>;
+
+    public:
+
+        // -=(Undocumented)=-
+        Union()
+            : Super()
+        {
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        Union(Type Value)
+            : Super(Value)
+        {
+        }
+
+    public:
+
+        // -=(Undocumented)=-
+        template <typename Type>
+        operator Type () const
+        {
+            return std::visit([](auto const & Value) {
+                if constexpr (std::is_convertible_v<decltype(Value), Type>)
+                {
+                    return Type(Value);
+                }
+                else
+                {
+                    return Type();
+                }
+            }, * this);
+        }
+    };
 }
