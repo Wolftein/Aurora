@@ -12,21 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Activity.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
+#include "Core/Core.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -35,47 +21,26 @@
 namespace Engine
 {
     // -=(Undocumented)=-
-    class Kernel final : public Subsystem::Context
+    class Activity
     {
     public:
 
         // -=(Undocumented)=-
-        enum class State
-        {
-            Idle,
-            Running,
-            Exiting,
-        };
-
-    public:
+        virtual ~Activity() = default;
 
         // -=(Undocumented)=-
-        Kernel();
+        virtual void OnAttach(Ref<Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        ~Kernel();
+        virtual void OnDetach(Ref<Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        void Initialize(Mode Mode, Ref<const Properties> Properties);
+        virtual void OnPause();
 
         // -=(Undocumented)=-
-        void Run();
+        virtual void OnResume();
 
         // -=(Undocumented)=-
-        void Exit();
-
-        // -=(Undocumented)=-
-        void Goto(ConstSPtr<Activity> Foreground);
-
-        // -=(Undocumented)=-
-        void Back();
-
-    private:
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        State                  mState;
-        Vector<SPtr<Activity>> mActivities;
+        virtual void OnUpdate(Real64 Time);
     };
 }

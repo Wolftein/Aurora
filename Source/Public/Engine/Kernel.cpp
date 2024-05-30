@@ -21,6 +21,14 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    Kernel::Kernel()
+        : mState { State::Idle }
+    {
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     Kernel::~Kernel()
     {
         Log::Service::GetSingleton().Shutdown();
@@ -39,7 +47,7 @@ namespace Engine
 
         // Creates the platform service
         LOG_INFO("Kernel: Creating platform service");
-        mPlatform = AddSubsystem<Platform::Service>();
+        ConstSPtr<Platform::Service> Platform = AddSubsystem<Platform::Service>();
 
         // Creates multimedia services (if running in client mode)
         if (IsClientMode())
@@ -55,14 +63,14 @@ namespace Engine
             if (!DisplayHandle.has_value())
             {
                 LOG_INFO("Kernel: Creating display ({}, {})", Properties.GetWindowWidth(), Properties.GetWindowHeight());
-                mPlatform->Initialise(
+                Platform->Initialise(
                     Properties.GetWindowTitle(),
                     Properties.GetWindowWidth(),
                     Properties.GetWindowHeight(),
                     Properties.IsWindowFullscreen(),
                     Properties.IsWindowBorderless());
 
-                ConstSPtr<Platform::Window> Window = mPlatform->GetWindow();
+                ConstSPtr<Platform::Window> Window = Platform->GetWindow();
                 DisplaySize   = Window->GetSize();
                 DisplayHandle = Window->GetHandle();
             }
@@ -110,21 +118,19 @@ namespace Engine
 
         while (mState == State::Running)
         {
-            Tick();
+            const Real64 Time = GetSubsystem<Platform::Service>()->GetTime();
+
+            Execute([Time](Ref<Core::Subsystem> Service)
+            {
+                Service.OnTick(Time);
+            });
+
+            ConstSPtr<Engine::Activity> Foreground = (mActivities.empty() ? nullptr : mActivities.back());
+            if (Foreground)
+            {
+                Foreground->OnUpdate(Time);
+            }
         }
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Kernel::Tick()
-    {
-        const UInt64 Tick = mPlatform->GetTime();
-
-        Execute([Tick](Ref<Core::Subsystem> Service)
-        {
-            Service.OnTick(Tick);
-        });
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -133,5 +139,39 @@ namespace Engine
     void Kernel::Exit()
     {
         mState = State::Exiting;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Kernel::Goto(ConstSPtr<Activity> Foreground)
+    {
+        ConstSPtr<Activity> Current = (mActivities.empty() ? nullptr : mActivities.back());
+        if (Current)
+        {
+            Current->OnPause();
+        }
+
+        mActivities.emplace_back(Foreground)->OnAttach(* this);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Kernel::Back()
+    {
+        ConstSPtr<Engine::Activity> Current = (mActivities.empty() ? nullptr : mActivities.back());
+        if (Current)
+        {
+            Current->OnPause();
+            Current->OnDetach(* this);
+            mActivities.pop_back();
+        }
+
+        ConstSPtr<Engine::Activity> Newest = (mActivities.empty() ? nullptr : mActivities.back());
+        if (Newest)
+        {
+            Newest->OnResume();
+        }
     }
 }
