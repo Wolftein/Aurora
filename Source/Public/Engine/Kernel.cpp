@@ -104,9 +104,9 @@ namespace Engine
             RemoveSubsystem<Network::Service>();
         }
 
+        // Create the user interface service
         if (IsClientMode())
         {
-            // Create the user interface service
             LOG_INFO("Kernel: Creating user interface service");
             ConstSPtr<UI::Service> UserInterfaceService = AddSubsystem<UI::Service>();
             if (! UserInterfaceService->Initialise(Properties.GetWindowWidth(), Properties.GetWindowHeight()))
