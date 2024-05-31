@@ -103,7 +103,19 @@ namespace UI
 #endif // EA_PLATFORM_WINDOWS
 
         // Enable default option(s)
-        SciterSetOption(kHandle, SCITER_SET_SCRIPT_RUNTIME_FEATURES, ALLOW_FILE_IO | ALLOW_SOCKET_IO);
+#ifdef    EASTL_DEBUG
+        SciterSetOption(kHandle, SCITER_SET_SCRIPT_RUNTIME_FEATURES,
+                          ALLOW_FILE_IO
+                        | ALLOW_SOCKET_IO);
+#else
+        SciterSetOption(kHandle, SCITER_SET_SCRIPT_RUNTIME_FEATURES,
+                          ALLOW_FILE_IO
+                        | ALLOW_SOCKET_IO
+                        | ALLOW_EVAL
+                        | ALLOW_SYSINFO);
+        SciterSetOption(kHandle, SCITER_SET_DEBUG_MODE, true);
+#endif // EASTL_DEBUG
+
         SciterSetOption(kHandle, SCITER_SET_GFX_LAYER, kGraphicsBackend);
 
         // Create sciter renderer
