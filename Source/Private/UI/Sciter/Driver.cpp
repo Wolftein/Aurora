@@ -135,7 +135,7 @@ namespace UI
                 Host->OnSciterLoad(reinterpret_cast<LPSCN_LOAD_DATA>(Notification));
                 break;
             case SC_INVALIDATE_RECT:
-                mDirty = true;
+                Host->mDirty = true;
                 break;
             }
             return 0;
