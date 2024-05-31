@@ -57,8 +57,7 @@ namespace Engine
             AddSubsystem<Input::Service>();
 
             // Create the game's window
-            Any      DisplayHandle = Properties.GetWindowHandle();
-            Vector2i DisplaySize(Properties.GetWindowWidth(), Properties.GetWindowHeight());
+            Any DisplayHandle = Properties.GetWindowHandle();
 
             if (!DisplayHandle.has_value())
             {
@@ -69,17 +68,14 @@ namespace Engine
                     Properties.GetWindowHeight(),
                     Properties.IsWindowFullscreen(),
                     Properties.IsWindowBorderless());
-
-                ConstSPtr<Platform::Window> Window = Platform->GetWindow();
-                DisplaySize   = Window->GetSize();
-                DisplayHandle = Window->GetHandle();
+                DisplayHandle = Platform->GetWindow()->GetHandle();
             }
 
             // Create the graphic service
             LOG_INFO("Kernel: Creating graphics service");
             ConstSPtr<Graphic::Service> GraphicService = AddSubsystem<Graphic::Service>();
             if (! GraphicService->Initialise(
-                Graphic::Backend::Direct3D11, DisplayHandle, DisplaySize.GetX(), DisplaySize.GetY()))
+                Graphic::Backend::Direct3D11, DisplayHandle, Properties.GetWindowWidth(), Properties.GetWindowHeight()))
             {
                 LOG_WARNING("Kernel: Failed to create graphics service, disabling service.");
                 GraphicService->Initialise(Graphic::Backend::None, nullptr, 0, 0);
@@ -92,15 +88,6 @@ namespace Engine
             {
                 LOG_WARNING("Kernel: Failed to create audio service, disabling service.");
                 AudioService->Initialise(Audio::Backend::None, Audio::k_MaxSubmixes);
-            }
-
-            // Create the user interface service
-            LOG_INFO("Kernel: Creating user interface service");
-            ConstSPtr<UI::Service> UserInterfaceService = AddSubsystem<UI::Service>();
-            if (! UserInterfaceService->Initialise(DisplaySize.GetX(), DisplaySize.GetY()))
-            {
-                LOG_WARNING("Kernel: Failed to create user interface service, disabling service.");
-                RemoveSubsystem<UI::Service>();
             }
         }
 
@@ -115,6 +102,18 @@ namespace Engine
         {
             LOG_WARNING("Kernel: Failed to create network service, disabling service.");
             RemoveSubsystem<Network::Service>();
+        }
+
+        if (IsClientMode())
+        {
+            // Create the user interface service
+            LOG_INFO("Kernel: Creating user interface service");
+            ConstSPtr<UI::Service> UserInterfaceService = AddSubsystem<UI::Service>();
+            if (! UserInterfaceService->Initialise(Properties.GetWindowWidth(), Properties.GetWindowHeight()))
+            {
+                LOG_WARNING("Kernel: Failed to create user interface service, disabling service.");
+                RemoveSubsystem<UI::Service>();
+            }
         }
     }
 
