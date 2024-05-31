@@ -106,14 +106,14 @@ namespace UI
 #ifdef    EASTL_DEBUG
         SciterSetOption(kHandle, SCITER_SET_SCRIPT_RUNTIME_FEATURES,
                           ALLOW_FILE_IO
-                        | ALLOW_SOCKET_IO);
-#else
-        SciterSetOption(kHandle, SCITER_SET_SCRIPT_RUNTIME_FEATURES,
-                          ALLOW_FILE_IO
                         | ALLOW_SOCKET_IO
                         | ALLOW_EVAL
                         | ALLOW_SYSINFO);
         SciterSetOption(kHandle, SCITER_SET_DEBUG_MODE, true);
+#else
+        SciterSetOption(kHandle, SCITER_SET_SCRIPT_RUNTIME_FEATURES,
+                          ALLOW_FILE_IO
+                        | ALLOW_SOCKET_IO);
 #endif // EASTL_DEBUG
 
         SciterSetOption(kHandle, SCITER_SET_GFX_LAYER, kGraphicsBackend);
