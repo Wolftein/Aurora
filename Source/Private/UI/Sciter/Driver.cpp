@@ -36,12 +36,14 @@ namespace UI
         switch (Argument.index())
         {
         case 0:
-            return sciter::value(Argument.operator Bool());
+            return sciter::value();
         case 1:
-            return sciter::value(Argument.operator SInt32());
+            return sciter::value(Argument.operator Bool());
         case 2:
-            return sciter::value(Argument.operator Real());
+            return sciter::value(Argument.operator SInt32());
         case 3:
+            return sciter::value(Argument.operator Real());
+        case 4:
             return sciter::value(Argument.operator SStr());
         default:
             return sciter::value(Argument.operator SInt32());
