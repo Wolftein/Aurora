@@ -135,7 +135,7 @@ namespace UI
                 Host->OnSciterLoad(reinterpret_cast<LPSCN_LOAD_DATA>(Notification));
                 break;
             case SC_INVALIDATE_RECT:
-                Host->OnSciterPaint();
+                mDirty = true;
                 break;
             }
             return 0;
@@ -205,6 +205,12 @@ namespace UI
 
     void SciterDriver::Present()
     {
+        if (mDirty)
+        {
+            OnSciterPaint();
+            mDirty = false;
+        }
+
         ConstSPtr<Graphic::Texture> Texture = mMaterial->GetTexture(0);
 
         mRenderer->Begin(Matrix4f::CreateOrthographic(0, Texture->GetWidth(), Texture->GetHeight(), 0, 1.0f, -1.0f), 0.0f);
