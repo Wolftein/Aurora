@@ -12,72 +12,78 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Activity.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
-
-#include "UI/Service.hpp"
+#include "Driver.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace UI
 {
     // -=(Undocumented)=-
-    class Kernel final : public Subsystem::Context
+    class Service final : public Subsystem
     {
     public:
 
         // -=(Undocumented)=-
-        enum class State
+        Service(Ref<Context> System);
+
+        // -=(Undocumented)=-
+        void OnTick(Real64 Time) override;
+
+        // -=(Undocumented)=-
+        Bool Initialise(UInt Width, UInt Height);
+
+        // -=(Undocumented)=-
+        void Reset(UInt Width, UInt Height);
+
+        // -=(Undocumented)=-
+        void Present();
+
+        // -=(Undocumented)=-
+        Bool Load(CStr Uri);
+
+        // -=(Undocumented)=-
+        template <typename Return = void, typename... Arguments>
+        Return Call(CStr Function, Arguments... Args)
         {
-            Idle,
-            Running,
-            Exiting,
-        };
+            Stack<Value, sizeof...(Arguments)> Parameters;
+            for (auto Element : std::initializer_list<Value>{ Args... })
+            {
+                Parameters.emplace_back(Element);
+            }
 
-    public:
+            const Value Result = mDriver->Call(Function, Parameters);
 
-        // -=(Undocumented)=-
-        Kernel();
-
-        // -=(Undocumented)=-
-        ~Kernel();
-
-        // -=(Undocumented)=-
-        void Initialize(Mode Mode, Ref<const Properties> Properties);
+            if constexpr (! std::is_void_v<Return>)
+            {
+                return Result;
+            }
+        }
 
         // -=(Undocumented)=-
-        void Run();
+        template <typename Return = void>
+        Return Eval(CStr Script)
+        {
+            const Value Result = mDriver->Eval(Script);
+
+            if constexpr (! std::is_void_v<Return>)
+            {
+                return Result;
+            }
+        }
 
         // -=(Undocumented)=-
-        void Exit();
+        void Register(CStr Function, Callback OnExecute);
 
         // -=(Undocumented)=-
-        void Goto(ConstSPtr<Activity> Foreground);
-
-        // -=(Undocumented)=-
-        void Back();
+        void Unregister(CStr Function);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        State                  mState;
-        Vector<SPtr<Activity>> mActivities;
+        UPtr<Driver> mDriver;
     };
 }

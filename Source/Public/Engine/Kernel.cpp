@@ -93,6 +93,15 @@ namespace Engine
                 LOG_WARNING("Kernel: Failed to create audio service, disabling service.");
                 AudioService->Initialise(Audio::Backend::None, Audio::k_MaxSubmixes);
             }
+
+            // Create the user interface service
+            LOG_INFO("Kernel: Creating user interface service");
+            ConstSPtr<UI::Service> UserInterfaceService = AddSubsystem<UI::Service>();
+            if (! UserInterfaceService->Initialise(DisplaySize.GetX(), DisplaySize.GetY()))
+            {
+                LOG_WARNING("Kernel: Failed to create user interface service, disabling service.");
+                RemoveSubsystem<UI::Service>();
+            }
         }
 
         // Create the content service

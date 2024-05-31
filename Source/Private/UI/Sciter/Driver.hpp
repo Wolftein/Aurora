@@ -12,72 +12,82 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
+#include "Input.hpp"
+#include "UI/Driver.hpp"
 #include "Content/Service.hpp"
-
-#include "Activity.hpp"
-
-#include "Properties.hpp"
-
+#include "Graphic/Material.hpp"
+#include "Graphic/Pipeline.hpp"
+#include "Graphic/Renderer.hpp"
 #include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
-
-#include "UI/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace UI
 {
     // -=(Undocumented)=-
-    class Kernel final : public Subsystem::Context
+    class SciterDriver final : public Subsystem, public Driver
     {
     public:
 
         // -=(Undocumented)=-
-        enum class State
-        {
-            Idle,
-            Running,
-            Exiting,
-        };
+        static constexpr UInt kMaxArguments = 16;
 
     public:
 
         // -=(Undocumented)=-
-        Kernel();
+        SciterDriver(Ref<Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        ~Kernel();
+        ~SciterDriver() override;
 
         // -=(Undocumented)=-
-        void Initialize(Mode Mode, Ref<const Properties> Properties);
+        Bool Initialise(UInt Width, UInt Height) override;
 
         // -=(Undocumented)=-
-        void Run();
+        void Reset(UInt Width, UInt Height) override;
 
         // -=(Undocumented)=-
-        void Exit();
+        void Advance(Real64 Time) override;
 
         // -=(Undocumented)=-
-        void Goto(ConstSPtr<Activity> Foreground);
+        void Present() override;
 
         // -=(Undocumented)=-
-        void Back();
+        Bool Load(CStr Uri) override;
+
+        // -=(Undocumented)=-
+        Value Call(CStr Function, CPtr<const Value> Parameters) override;
+
+        // -=(Undocumented)=-
+        Value Eval(CStr Script) override;
+
+        // -=(Undocumented)=-
+        void Register(CStr Function, Callback OnExecute) override;
+
+        // -=(Undocumented)=-
+        void Unregister(CStr Function) override;
+
+    private:
+
+        // -=(Undocumented)=-
+        void OnSciterPaint();
+
+        // -=(Undocumented)=-
+        void OnSciterLoad(LPSCN_LOAD_DATA Data);
+
+        // -=(Undocumented)=-
+        Bool OnSciterCall(Ptr<SCRIPTING_METHOD_PARAMS> Parameters);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        State                  mState;
-        Vector<SPtr<Activity>> mActivities;
+        SPtr<Graphic::Renderer> mRenderer;
+        SPtr<Graphic::Material> mMaterial;
+        SPtr<Graphic::Pipeline> mPipeline;
+        StringTable<Callback>   mRegistry;
     };
 }

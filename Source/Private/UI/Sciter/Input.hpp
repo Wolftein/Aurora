@@ -6,78 +6,68 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#pragma once
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Activity.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
-
-#include "UI/Service.hpp"
+#include <Input/Service.hpp>
+#include <sciter-x.h>
+#include <sciter-x-key-codes.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace UI
 {
     // -=(Undocumented)=-
-    class Kernel final : public Subsystem::Context
+    class SciterInput final : public Input::Listener
     {
     public:
 
         // -=(Undocumented)=-
-        enum class State
+        SciterInput(HWINDOW Handle)
+            : mHandle        { Handle },
+              mKeys          { 0 },
+              mMousePosition { 0, 0 },
+              mMouseButtons  { MOUSE_BUTTONS(0) }
         {
-            Idle,
-            Running,
-            Exiting,
-        };
+        }
 
-    public:
+    private:
 
-        // -=(Undocumented)=-
-        Kernel();
+        // \see Listener::OnKeyType
+        Bool OnKeyType(UInt Codepoint) override;
 
-        // -=(Undocumented)=-
-        ~Kernel();
+        // \see Listener::OnKeyDown
+        Bool OnKeyDown(Input::Key Key) override;
 
-        // -=(Undocumented)=-
-        void Initialize(Mode Mode, Ref<const Properties> Properties);
+        // \see Listener::OnKeyUp
+        Bool OnKeyUp(Input::Key Key) override;
 
-        // -=(Undocumented)=-
-        void Run();
+        // \see Listener::OnMouseMove
+        Bool OnMouseMove(UInt X, UInt Y) override;
 
-        // -=(Undocumented)=-
-        void Exit();
+        // \see Listener::OnMouseScroll
+        Bool OnMouseScroll(SInt X, SInt Y) override;
 
-        // -=(Undocumented)=-
-        void Goto(ConstSPtr<Activity> Foreground);
+        // \see Listener::OnMouseUp
+        Bool OnMouseUp(Input::Button Button) override;
 
-        // -=(Undocumented)=-
-        void Back();
+        // \see Listener::OnMouseDown
+        Bool OnMouseDown(Input::Button Button) override;
+
+        // \see Listener::OnWindowFocus
+        Bool OnWindowFocus(Bool Focused) override;
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        State                  mState;
-        Vector<SPtr<Activity>> mActivities;
+        HWINDOW       mHandle;
+        UINT          mKeys;
+        POINT         mMousePosition;
+        MOUSE_BUTTONS mMouseButtons;
     };
 }

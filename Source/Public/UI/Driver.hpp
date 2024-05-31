@@ -12,72 +12,47 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Audio/Service.hpp"
-
-#include "Content/Service.hpp"
-
-#include "Activity.hpp"
-
-#include "Properties.hpp"
-
-#include "Graphic/Service.hpp"
-
-#include "Input/Service.hpp"
-
-#include "Network/Service.hpp"
-
-#include "Platform/Service.hpp"
-
-#include "UI/Service.hpp"
+#include "Common.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Engine
+namespace UI
 {
     // -=(Undocumented)=-
-    class Kernel final : public Subsystem::Context
+    class Driver
     {
     public:
 
         // -=(Undocumented)=-
-        enum class State
-        {
-            Idle,
-            Running,
-            Exiting,
-        };
-
-    public:
+        virtual ~Driver() = default;
 
         // -=(Undocumented)=-
-        Kernel();
+        virtual Bool Initialise(UInt Width, UInt Height) = 0;
 
         // -=(Undocumented)=-
-        ~Kernel();
+        virtual void Reset(UInt Width, UInt Height) = 0;
 
         // -=(Undocumented)=-
-        void Initialize(Mode Mode, Ref<const Properties> Properties);
+        virtual void Advance(Real64 Time) = 0;
 
         // -=(Undocumented)=-
-        void Run();
+        virtual void Present() = 0;
 
         // -=(Undocumented)=-
-        void Exit();
+        virtual Bool Load(CStr Uri) = 0;
 
         // -=(Undocumented)=-
-        void Goto(ConstSPtr<Activity> Foreground);
+        virtual Value Call(CStr Function, CPtr<const Value> Parameters) = 0;
 
         // -=(Undocumented)=-
-        void Back();
+        virtual Value Eval(CStr Script) = 0;
 
-    private:
+        // -=(Undocumented)=-
+        virtual void Register(CStr Function, Callback OnExecute) = 0;
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        State                  mState;
-        Vector<SPtr<Activity>> mActivities;
+        // -=(Undocumented)=-
+        virtual void Unregister(CStr Function) = 0;
     };
 }

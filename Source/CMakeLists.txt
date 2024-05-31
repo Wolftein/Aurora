@@ -149,6 +149,20 @@ FetchContent_MakeAvailable(External_SPDLOG)
 LIST(APPEND PROJECT_DEPENDENCIES "spdlog")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Dependency (Sciter)
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+FetchContent_Declare(External_Sciter
+        GIT_REPOSITORY https://gitlab.com/sciter-engine/sciter-js-sdk.git
+        GIT_TAG main)
+FetchContent_MakeAvailable(External_Sciter)
+
+ADD_LIBRARY(Sciter INTERFACE)
+TARGET_INCLUDE_DIRECTORIES(Sciter INTERFACE ${external_sciter_SOURCE_DIR}/include)
+
+LIST(APPEND PROJECT_DEPENDENCIES "Sciter")
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Configuration
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
