@@ -21,18 +21,21 @@
 namespace Engine
 {
     // -=(Undocumented)=-
-    class Activity
+    class Activity : public Subsystem
     {
     public:
+
+        // -=(Undocumented)=-
+        Activity(Ref<Subsystem::Context> Context);
 
         // -=(Undocumented)=-
         virtual ~Activity() = default;
 
         // -=(Undocumented)=-
-        virtual void OnAttach(Ref<Subsystem::Context> Context);
+        virtual void OnAttach();
 
         // -=(Undocumented)=-
-        virtual void OnDetach(Ref<Subsystem::Context> Context);
+        virtual void OnDetach();
 
         // -=(Undocumented)=-
         virtual void OnPause();
@@ -41,6 +44,6 @@ namespace Engine
         virtual void OnResume();
 
         // -=(Undocumented)=-
-        virtual void OnUpdate(Real64 Time);
+        virtual void OnTick(Real64 Time) override;
     };
 }

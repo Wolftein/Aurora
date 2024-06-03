@@ -136,7 +136,7 @@ namespace Engine
             ConstSPtr<Engine::Activity> Foreground = (mActivities.empty() ? nullptr : mActivities.back());
             if (Foreground)
             {
-                Foreground->OnUpdate(Time);
+                Foreground->OnTick(Time);
             }
         }
     }
@@ -160,7 +160,7 @@ namespace Engine
             Current->OnPause();
         }
 
-        mActivities.emplace_back(Foreground)->OnAttach(* this);
+        mActivities.emplace_back(Foreground)->OnAttach();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -172,7 +172,7 @@ namespace Engine
         if (Current)
         {
             Current->OnPause();
-            Current->OnDetach(* this);
+            Current->OnDetach();
             mActivities.pop_back();
         }
 
