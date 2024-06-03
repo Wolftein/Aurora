@@ -256,11 +256,38 @@ inline namespace Core
             }
         }
 
+        // -=(Undocumented)=-
+        template<typename Type, typename Serializer>
+        void SerializeList(Ref<Vector<Type>> Value, Serializer OnSerialize)
+        {
+            if constexpr (std::is_same<T, Reader>::value)
+            {
+                const UInt Length = mArchive.template ReadInt<UInt>();
+
+                Value.clear();
+                Value.resize(Length);
+
+                for (Ref<Type> Element : Value)
+                {
+                    OnSerialize(* this, Element);
+                }
+            }
+            else
+            {
+                mArchive.template WriteInt<UInt>(Value.size());
+
+                for (Ref<Type> Element : Value)
+                {
+                    OnSerialize(* this, Element);
+                }
+            }
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        const Ref<T> mArchive;
+        Ref<T> mArchive;
     };
 }
