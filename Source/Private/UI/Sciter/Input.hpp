@@ -26,11 +26,18 @@ namespace UI
     public:
 
         // -=(Undocumented)=-
-        SciterInput(HWINDOW Handle)
-            : mHandle        { Handle },
-              mKeys          { 0 },
-              mMousePosition { 0, 0 },
-              mMouseButtons  { MOUSE_BUTTONS(0) }
+        using OnDocumentResize = FPtr<void (SInt, SInt)>;
+
+    public:
+
+        // -=(Undocumented)=-
+        template<typename Callback>
+        SciterInput(HWINDOW Handle, Callback OnDocumentResize)
+            : mHandle           { Handle },
+              mKeys             { 0 },
+              mMousePosition    { 0, 0 },
+              mMouseButtons     { MOUSE_BUTTONS(0) },
+              mOnDocumentResize { OnDocumentResize }
         {
         }
 
@@ -60,14 +67,18 @@ namespace UI
         // \see Listener::OnWindowFocus
         Bool OnWindowFocus(Bool Focused) override;
 
+        // \see Listener::OnWindowResize
+        Bool OnWindowResize(SInt Width, SInt Height) override;
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        HWINDOW       mHandle;
-        UINT          mKeys;
-        POINT         mMousePosition;
-        MOUSE_BUTTONS mMouseButtons;
+        HWINDOW          mHandle;
+        UINT             mKeys;
+        POINT            mMousePosition;
+        MOUSE_BUTTONS    mMouseButtons;
+        OnDocumentResize mOnDocumentResize;
     };
 }

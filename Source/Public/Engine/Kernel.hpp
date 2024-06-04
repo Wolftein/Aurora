@@ -58,7 +58,7 @@ namespace Engine
         ~Kernel();
 
         // -=(Undocumented)=-
-        void Initialize(Mode Mode, Ref<const Properties> Properties);
+        void Initialize(Mode Mode, Ref<const Properties> Properties, SPtr<class Host> Host);
 
         // -=(Undocumented)=-
         void Run();
@@ -79,5 +79,6 @@ namespace Engine
 
         State                  mState;
         Vector<SPtr<Activity>> mActivities;
+        SPtr<class Host>       mHost;
     };
 }

@@ -12,75 +12,61 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Driver.hpp"
+#include "Kernel.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace UI
+namespace Engine
 {
     // -=(Undocumented)=-
-    class Service final : public Subsystem
+    class Host : public Input::Listener
     {
     public:
 
         // -=(Undocumented)=-
-        Service(Ref<Context> System);
+        Host(Ref<Kernel> Kernel);
 
         // -=(Undocumented)=-
-        void OnTick(Real64 Time) override;
+        virtual ~Host() = default;
 
         // -=(Undocumented)=-
-        Bool Initialise(ConstSPtr<Platform::Window> Window);
+        virtual void OnStart();
 
         // -=(Undocumented)=-
-        void Present();
+        virtual void OnStop();
 
         // -=(Undocumented)=-
-        Bool Load(CStr Uri);
+        virtual void OnPreTick();
 
         // -=(Undocumented)=-
-        template <typename Return = void, typename... Arguments>
-        Return Call(CStr Function, Arguments... Args)
+        virtual void OnTick(Real64 Time);
+
+        // -=(Undocumented)=-
+        virtual void OnPostTick();
+
+    public:
+
+        // -=(Undocumented)=-
+        Ref<Kernel> GetKernel()
         {
-            Stack<Value, sizeof...(Arguments)> Parameters;
-            for (auto Element : std::initializer_list<Value>{ Args... })
-            {
-                Parameters.emplace_back(Element);
-            }
-
-            const Value Result = mDriver->Call(Function, Parameters);
-
-            if constexpr (! std::is_void_v<Return>)
-            {
-                return Result;
-            }
+            return mKernel;
         }
 
-        // -=(Undocumented)=-
-        template <typename Return = void>
-        Return Eval(CStr Script)
-        {
-            const Value Result = mDriver->Eval(Script);
+    private:
 
-            if constexpr (! std::is_void_v<Return>)
-            {
-                return Result;
-            }
-        }
+        // \see Listener::OnWindowExit
+        Bool OnWindowExit() override;
 
-        // -=(Undocumented)=-
-        void Register(CStr Function, Callback OnExecute);
-
-        // -=(Undocumented)=-
-        void Unregister(CStr Function);
+        // \see Listener::OnWindowResize
+        Bool OnWindowResize(SInt Width, SInt Height) override;
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UPtr<Driver> mDriver;
+        Ref<Kernel> mKernel;
     };
 }

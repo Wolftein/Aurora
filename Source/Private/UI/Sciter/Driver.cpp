@@ -81,7 +81,7 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     SciterDriver::SciterDriver(Ref<Subsystem::Context> Context)
-        : Subsystem(Context)
+        : mContext { Context }
     {
     }
 
@@ -96,7 +96,7 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool SciterDriver::Initialise(UInt Width, UInt Height)
+    Bool SciterDriver::Initialise(ConstSPtr<Platform::Window> Window)
     {
 #ifdef    EA_PLATFORM_WINDOWS
         const GFX_LAYER kGraphicsBackend = GFX_LAYER_D2D;
@@ -157,41 +157,38 @@ namespace UI
         };
         SciterWindowAttachEventHandler(kHandle, OnHostElementCallback, this, HANDLE_ALL);
 
-        // Set device size and resolution (pixels per inch) TODO?
-        SciterProcX(kHandle, SCITER_X_MSG_SIZE(Width, Height));
-        SciterProcX(kHandle, SCITER_X_MSG_RESOLUTION(96));
+        // Set device size and resolution (pixels per inch)
+        const Vector2f Scale = Window->GetScale();
+        SciterProcX(kHandle, SCITER_X_MSG_RESOLUTION(static_cast<UINT>(Scale.GetX() * 96)));
+
+        const Vector2i Size  = Window->GetSize();
+        SciterProcX(kHandle, SCITER_X_MSG_SIZE(Size.GetX(), Size.GetY()));
 
         // Initialize the pipeline that will be used to render the ui
-        mRenderer = NewPtr<Graphic::Renderer>(GetContext());
-        mPipeline = GetSubsystem<Content::Service>()->Load<Graphic::Pipeline>("Engine://Pipeline/UI.effect");
+        mRenderer = NewPtr<Graphic::Renderer>(mContext);
+        mPipeline = mContext.GetSubsystem<Content::Service>()->Load<Graphic::Pipeline>("Engine://Pipeline/UI.effect");
 
         // Initialize the texture that will be used to render the ui
         const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>(Content::Uri { "_SciterTexture" });
-        Texture->Load(Graphic::TextureFormat::BGRA8UIntNorm, Graphic::TextureLayout::Dual, Width, Height, 1);
-        Texture->Create(GetContext());
+        Texture->Load(Graphic::TextureFormat::BGRA8UIntNorm, Graphic::TextureLayout::Dual, Size.GetX(), Size.GetY(), 1);
+        Texture->Create(mContext);
 
         // Initialize the material that will be used to render the ui
         mMaterial = NewPtr<Graphic::Material>(Content::Uri { "_SciterMaterial" });
         mMaterial->SetTexture(0, Texture);
-        mMaterial->Create(GetContext());
+        mMaterial->Create(mContext);
 
         // Create the input listener and attach device event(s)
-        GetSubsystem<Input::Service>()->AddListener(NewPtr<SciterInput>(kHandle));
+        const auto OnDocumentResize = [this](SInt Width, SInt Height)
+        {
+            ConstSPtr<Graphic::Texture> Texture = mMaterial->GetTexture(0);
+            Texture->Dispose(mContext);
+            Texture->Load(Texture->GetFormat(), Texture->GetLayout(), Width, Height, Texture->GetLayer());
+            Texture->Create(mContext);
+        };
+        mContext.GetSubsystem<Input::Service>()->AddListener(NewPtr<SciterInput>(kHandle, OnDocumentResize));
 
         return true;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void SciterDriver::Reset(UInt Width, UInt Height)
-    {
-        ConstSPtr<Graphic::Texture> Texture = mMaterial->GetTexture(0);
-        Texture->Dispose(GetContext());
-        Texture->Load(Texture->GetFormat(), Texture->GetLayout(), Width, Height, Texture->GetLayer());
-        Texture->Create(GetContext());
-
-        SciterProcX(kHandle, SCITER_X_MSG_SIZE(Width, Height));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -297,7 +294,7 @@ namespace UI
         SciterPaintEvent.targetType = SPT_SURFACE;
 #ifdef    EA_PLATFORM_WINDOWS
         SciterPaintEvent.target.pSurface
-            = GetSubsystem<Graphic::Service>()->QueryTexture<Ptr<IDXGISurface>>(Texture->GetID());
+            = mContext.GetSubsystem<Graphic::Service>()->QueryTexture<Ptr<IDXGISurface>>(Texture->GetID());
 #endif // EA_PLATFORM_WINDOWS
         SciterGetRootElement(kHandle, & SciterPaintEvent.element);
         SciterProcX(kHandle, SciterPaintEvent);
@@ -309,7 +306,7 @@ namespace UI
     void SciterDriver::OnSciterLoad(LPSCN_LOAD_DATA Data)
     {
         const SStr  Filename = aux::w2a(Data->uri).c_str();
-        const Chunk Chunk    = GetSubsystem<Content::Service>()->Find(Content::Uri { Filename });
+        const Chunk Chunk    = mContext.GetSubsystem<Content::Service>()->Find(Content::Uri { Filename });
 
         if (Chunk.HasData())
         {

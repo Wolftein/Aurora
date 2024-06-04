@@ -375,4 +375,16 @@ namespace UI
         SciterProcX(mHandle, SCITER_X_MSG_FOCUS(Focused));
         return false;
     }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool SciterInput::OnWindowResize(SInt Width, SInt Height)
+    {
+        SciterProcX(mHandle, SCITER_X_MSG_SIZE(Width, Height));
+
+        mOnDocumentResize(Width, Height);
+        
+        return false;
+    }
 }

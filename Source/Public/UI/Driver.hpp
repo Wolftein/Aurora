@@ -13,6 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Common.hpp"
+#include "Platform/Window.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -29,10 +30,7 @@ namespace UI
         virtual ~Driver() = default;
 
         // -=(Undocumented)=-
-        virtual Bool Initialise(UInt Width, UInt Height) = 0;
-
-        // -=(Undocumented)=-
-        virtual void Reset(UInt Width, UInt Height) = 0;
+        virtual Bool Initialise(ConstSPtr<Platform::Window> Window) = 0;
 
         // -=(Undocumented)=-
         virtual void Advance(Real64 Time) = 0;

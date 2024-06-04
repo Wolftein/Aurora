@@ -11,6 +11,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Kernel.hpp"
+#include "Host.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -37,7 +38,7 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Kernel::Initialize(Mode Mode, Ref<const Properties> Properties)
+    void Kernel::Initialize(Mode Mode, Ref<const Properties> Properties, SPtr<Host> Host)
     {
         // Creates the logging service
         Log::Service::GetSingleton().Initialise(Properties.GetLogFilename());
@@ -54,7 +55,8 @@ namespace Engine
         {
             // Creates the input service
             LOG_INFO("Kernel: Creating input service");
-            AddSubsystem<Input::Service>();
+            ConstSPtr<Input::Service> Input = AddSubsystem<Input::Service>();
+            Input->AddListener(Host);
 
             // Create the game's window
             Any DisplayHandle = Properties.GetWindowHandle();
@@ -108,12 +110,21 @@ namespace Engine
         if (IsClientMode())
         {
             LOG_INFO("Kernel: Creating user interface service");
-            ConstSPtr<UI::Service> UserInterfaceService = AddSubsystem<UI::Service>();
-            if (! UserInterfaceService->Initialise(Properties.GetWindowWidth(), Properties.GetWindowHeight()))
+            ConstSPtr<UI::Service> UIService = AddSubsystem<UI::Service>();
+            if (! UIService->Initialise(Platform->GetWindow()))
             {
                 LOG_WARNING("Kernel: Failed to create user interface service, disabling service.");
                 RemoveSubsystem<UI::Service>();
             }
+        }
+
+        // Initialise the Host and then enable the platform's window
+        mHost = Host;
+        mHost->OnStart();
+
+        if (ConstSPtr<Platform::Window> Window = Platform->GetWindow())
+        {
+            Window->SetVisible(true);
         }
     }
 
@@ -128,17 +139,25 @@ namespace Engine
         {
             const Real64 Time = GetSubsystem<Platform::Service>()->GetTime();
 
+            mHost->OnPreTick();
+
             Execute([Time](Ref<Core::Subsystem> Service)
             {
                 Service.OnTick(Time);
             });
+
+            mHost->OnTick(Time);
 
             ConstSPtr<Engine::Activity> Foreground = (mActivities.empty() ? nullptr : mActivities.back());
             if (Foreground)
             {
                 Foreground->OnTick(Time);
             }
+
+            mHost->OnPostTick();
         }
+
+        mHost->OnStop();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

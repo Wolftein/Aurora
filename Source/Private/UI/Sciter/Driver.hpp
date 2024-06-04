@@ -27,7 +27,7 @@
 namespace UI
 {
     // -=(Undocumented)=-
-    class SciterDriver final : public Subsystem, public Driver
+    class SciterDriver final : public Driver
     {
     public:
 
@@ -43,10 +43,7 @@ namespace UI
         ~SciterDriver() override;
 
         // -=(Undocumented)=-
-        Bool Initialise(UInt Width, UInt Height) override;
-
-        // -=(Undocumented)=-
-        void Reset(UInt Width, UInt Height) override;
+        Bool Initialise(ConstSPtr<Platform::Window> Window) override;
 
         // -=(Undocumented)=-
         void Advance(Real64 Time) override;
@@ -81,6 +78,11 @@ namespace UI
         Bool OnSciterCall(Ptr<SCRIPTING_METHOD_PARAMS> Parameters);
 
     private:
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Ref<Subsystem::Context> mContext;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
