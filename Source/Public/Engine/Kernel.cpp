@@ -179,7 +179,9 @@ namespace Engine
             Current->OnPause();
         }
 
-        mActivities.emplace_back(Foreground)->OnAttach();
+        mActivities.emplace_back(Foreground);
+        Foreground->OnAttach();
+        Foreground->OnResume();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
