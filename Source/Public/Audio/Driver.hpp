@@ -30,7 +30,7 @@ namespace Audio
         virtual ~Driver() = default;
 
         // -=(Undocumented)=-
-        virtual Bool Initialise(UInt32 Submixes) = 0;
+        virtual Bool Initialize(UInt32 Submixes) = 0;
 
         // -=(Undocumented)=-
         virtual void Advance() = 0;

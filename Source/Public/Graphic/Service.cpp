@@ -42,7 +42,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Initialise(Backend Backend, Any Display, UInt Width, UInt Height)
+    Bool Service::Initialize(Backend Backend, Any Display, UInt Width, UInt Height)
     {
         Bool Successful = true;
 
@@ -60,7 +60,7 @@ namespace Graphic
                 break;
             }
 
-            Successful = mDriver->Initialise(Display, Width, Height);
+            Successful = mDriver->Initialize(Display, Width, Height);
 
             if (!Successful)
             {

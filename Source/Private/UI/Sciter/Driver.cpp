@@ -96,7 +96,7 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool SciterDriver::Initialise(ConstSPtr<Platform::Window> Window)
+    Bool SciterDriver::Initialize(ConstSPtr<Platform::Window> Window)
     {
 #ifdef    EA_PLATFORM_WINDOWS
         const GFX_LAYER kGraphicsBackend = GFX_LAYER_D2D;

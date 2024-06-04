@@ -32,7 +32,7 @@ namespace Graphic
         void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
-        Bool Initialise(Backend Backend, Any Display, UInt Width, UInt Height);
+        Bool Initialize(Backend Backend, Any Display, UInt Width, UInt Height);
 
         // -=(Undocumented)=-
         void Reset(UInt Width, UInt Height);

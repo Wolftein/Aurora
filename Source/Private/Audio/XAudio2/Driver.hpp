@@ -34,8 +34,8 @@ namespace Audio
         // -=(Undocumented)=-
         ~XAudio2Driver() override;
 
-        // \see Driver::Initialise
-        Bool Initialise(UInt32 Submixes) override;
+        // \see Driver::Initialize
+        Bool Initialize(UInt32 Submixes) override;
 
         // \see Driver::Advance
         void Advance() override;
@@ -167,7 +167,7 @@ namespace Audio
     private:
 
         // -=(Undocumented)=-
-        Bool InitialiseLibrary();
+        Bool InitializeLibrary();
 
         // -=(Undocumented)=-
         Ptr<XAudioInstance> GetInstance(UInt ID)

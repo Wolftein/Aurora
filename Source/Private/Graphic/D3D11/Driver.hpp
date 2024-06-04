@@ -27,8 +27,8 @@ namespace Graphic
     {
     public:
 
-        // \see Driver::Initialise
-        Bool Initialise(Any Display, UInt Width, UInt Height) override;
+        // \see Driver::Initialize
+        Bool Initialize(Any Display, UInt Width, UInt Height) override;
 
         // \see Driver::Reset
         void Reset(UInt Width, UInt Height) override;

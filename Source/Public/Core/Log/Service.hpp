@@ -42,7 +42,7 @@ namespace Log
         Service();
 
         // -=(Undocumented)=-
-        void Initialise(CStr Filename);
+        void Initialize(CStr Filename);
 
         // -=(Undocumented)=-
         void Shutdown();

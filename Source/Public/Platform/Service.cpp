@@ -47,7 +47,7 @@ namespace Platform
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Initialise(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless)
+    Bool Service::Initialize(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless)
     {
         mWindow = NewPtr<GLFWWindow>(GetContext());
         return CastPtr<GLFWWindow>(mWindow)->Create(Title, Width, Height, Fullscreen, Borderless);

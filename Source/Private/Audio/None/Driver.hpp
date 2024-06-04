@@ -25,8 +25,8 @@ namespace Audio
     {
     public:
 
-        // \see Driver::Initialise
-        Bool Initialise(UInt32 Submixes) override;
+        // \see Driver::Initialize
+        Bool Initialize(UInt32 Submixes) override;
 
         // \see Driver::Advance
         void Advance() override;

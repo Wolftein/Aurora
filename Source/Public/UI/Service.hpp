@@ -32,7 +32,7 @@ namespace UI
         void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
-        Bool Initialise(ConstSPtr<Platform::Window> Window);
+        Bool Initialize(ConstSPtr<Platform::Window> Window);
 
         // -=(Undocumented)=-
         void Present();

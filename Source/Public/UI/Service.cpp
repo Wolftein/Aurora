@@ -41,7 +41,7 @@ namespace UI
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Initialise(ConstSPtr<Platform::Window> Window)
+    Bool Service::Initialize(ConstSPtr<Platform::Window> Window)
     {
         Bool Successful = true;
 
@@ -51,7 +51,7 @@ namespace UI
             mDriver = NewUniquePtr<SciterDriver>(GetContext());
 #endif // EA_PLATFORM_DESKTOP
 
-            Successful = (mDriver && mDriver->Initialise(Window));
+            Successful = (mDriver && mDriver->Initialize(Window));
         }
         return Successful;
     }

@@ -32,7 +32,7 @@ namespace Audio
         void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
-        Bool Initialise(Backend Backend, UInt32 Submixes);
+        Bool Initialize(Backend Backend, UInt32 Submixes);
 
         // -=(Undocumented)=-
         void Suspend();

@@ -29,7 +29,7 @@ namespace Graphic
         virtual ~Driver() = default;
 
         // -=(Undocumented)=-
-        virtual Bool Initialise(Any Display, UInt Width, UInt Height) = 0;
+        virtual Bool Initialize(Any Display, UInt Width, UInt Height) = 0;
 
         // -=(Undocumented)=-
         virtual void Reset(UInt Width, UInt Height) = 0;

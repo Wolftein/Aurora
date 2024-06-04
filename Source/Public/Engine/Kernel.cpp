@@ -41,7 +41,7 @@ namespace Engine
     void Kernel::Initialize(Mode Mode, Ref<const Properties> Properties, SPtr<Host> Host)
     {
         // Creates the logging service
-        Log::Service::GetSingleton().Initialise(Properties.GetLogFilename());
+        Log::Service::GetSingleton().Initialize(Properties.GetLogFilename());
 
         // Set the mode
         SetMode(Mode);
@@ -64,7 +64,7 @@ namespace Engine
             if (!DisplayHandle.has_value())
             {
                 LOG_INFO("Kernel: Creating display ({}, {})", Properties.GetWindowWidth(), Properties.GetWindowHeight());
-                Platform->Initialise(
+                Platform->Initialize(
                     Properties.GetWindowTitle(),
                     Properties.GetWindowWidth(),
                     Properties.GetWindowHeight(),
@@ -76,20 +76,20 @@ namespace Engine
             // Create the graphic service
             LOG_INFO("Kernel: Creating graphics service");
             ConstSPtr<Graphic::Service> GraphicService = AddSubsystem<Graphic::Service>();
-            if (! GraphicService->Initialise(
+            if (! GraphicService->Initialize(
                 Graphic::Backend::Direct3D11, DisplayHandle, Properties.GetWindowWidth(), Properties.GetWindowHeight()))
             {
                 LOG_WARNING("Kernel: Failed to create graphics service, disabling service.");
-                GraphicService->Initialise(Graphic::Backend::None, nullptr, 0, 0);
+                GraphicService->Initialize(Graphic::Backend::None, nullptr, 0, 0);
             }
 
             // Create the audio service
             LOG_INFO("Kernel: Creating audio service");
             ConstSPtr<Audio::Service> AudioService = AddSubsystem<Audio::Service>();
-            if (! AudioService->Initialise(Audio::Backend::XAudio2, Audio::k_MaxSubmixes))
+            if (! AudioService->Initialize(Audio::Backend::XAudio2, Audio::k_MaxSubmixes))
             {
                 LOG_WARNING("Kernel: Failed to create audio service, disabling service.");
-                AudioService->Initialise(Audio::Backend::None, Audio::k_MaxSubmixes);
+                AudioService->Initialize(Audio::Backend::None, Audio::k_MaxSubmixes);
             }
         }
 
@@ -100,7 +100,7 @@ namespace Engine
         // Create the network service
         LOG_INFO("Kernel: Creating network service");
         ConstSPtr<Network::Service> NetworkService = AddSubsystem<Network::Service>();
-        if (! NetworkService->Initialise())
+        if (! NetworkService->Initialize())
         {
             LOG_WARNING("Kernel: Failed to create network service, disabling service.");
             RemoveSubsystem<Network::Service>();
@@ -111,14 +111,14 @@ namespace Engine
         {
             LOG_INFO("Kernel: Creating user interface service");
             ConstSPtr<UI::Service> UIService = AddSubsystem<UI::Service>();
-            if (! UIService->Initialise(Platform->GetWindow()))
+            if (! UIService->Initialize(Platform->GetWindow()))
             {
                 LOG_WARNING("Kernel: Failed to create user interface service, disabling service.");
                 RemoveSubsystem<UI::Service>();
             }
         }
 
-        // Initialise the Host and then enable the platform's window
+        // Initialize the Host and then enable the platform's window
         mHost = Host;
         mHost->OnStart();
 

@@ -30,7 +30,7 @@ namespace UI
         virtual ~Driver() = default;
 
         // -=(Undocumented)=-
-        virtual Bool Initialise(ConstSPtr<Platform::Window> Window) = 0;
+        virtual Bool Initialize(ConstSPtr<Platform::Window> Window) = 0;
 
         // -=(Undocumented)=-
         virtual void Advance(Real64 Time) = 0;

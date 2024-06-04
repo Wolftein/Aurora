@@ -122,9 +122,9 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool XAudio2Driver::Initialise(UInt32 Submixes)
+    Bool XAudio2Driver::Initialize(UInt32 Submixes)
     {
-        if (!InitialiseLibrary())
+        if (!InitializeLibrary())
         {
             LOG_ERROR("XAudio2: Failed to find XAudio2 libraries, please make sure you have XAudio v2.9 or v2.8.");
             return false;
@@ -142,7 +142,7 @@ namespace Audio
             return false;
         }
 
-        // Initialise Submixes
+        // Initialize Submixes
         XAUDIO2_VOICE_DETAILS Details;
         mMaster->GetVoiceDetails(& Details);
 
@@ -151,7 +151,7 @@ namespace Audio
             mDevice->CreateSubmixVoice(& mSubmixes.push_back(), Details.InputChannels, Details.InputSampleRate);
         }
 
-        // Initialise X3D audio for positional 3D voices
+        // Initialize X3D audio for positional 3D voices
         DWORD Mask;
         mMaster->GetChannelMask(& Mask);
         mLibrary.X3DAudioInitialize(Mask, X3DAUDIO_SPEED_OF_SOUND, m3DAudio);
@@ -546,7 +546,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool XAudio2Driver::InitialiseLibrary()
+    Bool XAudio2Driver::InitializeLibrary()
     {
         HMODULE Dll = ::LoadLibrary("XAUDIO2_9.DLL");
 

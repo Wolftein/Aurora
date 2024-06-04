@@ -42,7 +42,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Initialise(Backend Backend, UInt32 Submixes)
+    Bool Service::Initialize(Backend Backend, UInt32 Submixes)
     {
         Bool Successful = true;
 
@@ -60,7 +60,7 @@ namespace Audio
                 break;
             }
 
-            Successful = mDriver->Initialise(Submixes);
+            Successful = mDriver->Initialize(Submixes);
 
             if (!Successful)
             {

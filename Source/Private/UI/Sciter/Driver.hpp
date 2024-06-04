@@ -43,7 +43,7 @@ namespace UI
         ~SciterDriver() override;
 
         // -=(Undocumented)=-
-        Bool Initialise(ConstSPtr<Platform::Window> Window) override;
+        Bool Initialize(ConstSPtr<Platform::Window> Window) override;
 
         // -=(Undocumented)=-
         void Advance(Real64 Time) override;

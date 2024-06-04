@@ -35,7 +35,7 @@ namespace Platform
         void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
-        Bool Initialise(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless);
+        Bool Initialize(CStr Title, UInt Width, UInt Height, Bool Fullscreen, Bool Borderless);
 
         // -=(Undocumented)=-
         Real64 GetTime() const;
