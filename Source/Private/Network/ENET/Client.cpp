@@ -84,6 +84,8 @@ namespace Network
         enet_address_set_host(& SocketAddress, Address.data());
 
         mPeer = enet_host_connect(mHost, & SocketAddress, 2, 0);
+        enet_peer_timeout(mPeer, 0, 0, kTimeout);
+
         return (mPeer != nullptr);
     }
 

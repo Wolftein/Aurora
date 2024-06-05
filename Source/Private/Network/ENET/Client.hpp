@@ -27,6 +27,11 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
+        static constexpr UInt kTimeout = 10000;
+
+    public:
+
+        // -=(Undocumented)=-
         EnetClient(Ptr<ENetPeer> Peer);
 
         // -=(Undocumented)=-
