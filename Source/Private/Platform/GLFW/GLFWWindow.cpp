@@ -135,10 +135,13 @@ namespace Platform
         {
             Ptr<GLFWWindow> Self = static_cast<Ptr<GLFWWindow>>(glfwGetWindowUserPointer(Window));
 
-            const Input::Event Event {
-                .Time = glfwGetTime(), .Type = Input::Event::Type::WindowResize, .WindowResize { Width, Height }
-            };
-            (Self->mKeyboard)->Invoke(Event);
+            if (Width > 0 && Height > 0)
+            {
+                const Input::Event Event {
+                    .Time = glfwGetTime(), .Type = Input::Event::Type::WindowResize, .WindowResize { Width, Height }
+                };
+                (Self->mKeyboard)->Invoke(Event);
+            }
         });
 
         // @TODO glfwSetWindowContentScaleCallback
