@@ -74,7 +74,7 @@ namespace Engine
 
         // -=(Undocumented)=-
         template<typename Type = Activity>
-        SPtr<Activity> GetForeground()
+        SPtr<Type> GetForeground()
         {
             return mActivities.empty() ? nullptr : CastPtr<Type>(mActivities.back());
         }
