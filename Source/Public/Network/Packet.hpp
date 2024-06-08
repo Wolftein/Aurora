@@ -27,7 +27,7 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
-        constexpr static inline UInt k_ID = ID;
+        constexpr static inline UInt kID = ID;
 
     public:
 
@@ -40,7 +40,7 @@ namespace Network
         // -=(Undocumented)=-
         UInt GetID() const
         {
-            return k_ID;
+            return kID;
         }
 
         // -=(Undocumented)=-

@@ -13,6 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Network/Client.hpp"
+#include "Network/Protocol.hpp"
 #include <enet.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -32,13 +33,22 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
-        EnetClient(Ptr<ENetPeer> Peer);
+        EnetClient(SPtr<Protocol> Protocol, Ptr<ENetPeer> Peer);
 
         // -=(Undocumented)=-
         ~EnetClient() override;
 
-        // -=(Undocumented)=-
-        void Handle(Ref<ENetEvent> Event);
+        // \see Session::GetID
+        UInt GetID() const override;
+
+        // \see Session::GetAddress
+        CStr GetAddress() const override;
+
+        // \see Session::Close
+        void Close(Bool Immediately) override;
+
+        // \see Session::Write
+        void Write(CPtr<UInt08> Bytes, Channel Mode) override;
 
         // -=(Undocumented)=-
         Bool Connect(CStr Address, UInt16 Port);
@@ -46,20 +56,17 @@ namespace Network
         // -=(Undocumented)=-
         void Poll();
 
-    protected:
-
-        // \see Session::OnClose
-        void OnClose(Bool Immediately) override;
-
-        // \see Session::OnWrite
-        void OnWrite(CPtr<const UInt08> Bytes, Channel Mode) override;
+        // -=(Undocumented)=-
+        void Notify(Ref<const ENetEvent> Event);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Ptr<ENetHost> mHost;
-        Ptr<ENetPeer> mPeer;
+        SPtr<Protocol> mProtocol;
+        Ptr<ENetHost>  mHost;
+        Ptr<ENetPeer>  mPeer;
+        SStr           mAddress;
     };
 }

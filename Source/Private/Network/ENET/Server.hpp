@@ -14,6 +14,7 @@
 
 #include "Client.hpp"
 #include "Network/Server.hpp"
+#include "Network/Protocol.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,12 +23,12 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    class EnetServer final : public EnableSmartPointer<EnetServer>, public Server
+    class EnetServer final : public Server
     {
     public:
 
         // -=(Undocumented)=-
-        EnetServer();
+        EnetServer(SPtr<Protocol> Protocol);
 
         // -=(Undocumented)=-
         ~EnetServer() override;
@@ -44,6 +45,7 @@ namespace Network
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Ptr<ENetHost>                 mHost;
+        SPtr<Protocol>                mProtocol;
         Table<UInt, SPtr<EnetClient>> mDatabase;
     };
 }

@@ -28,25 +28,17 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        static constexpr Bool kReader = std::is_same<T, Reader>::value;
+
+        // -=(Undocumented)=-
+        static constexpr Bool kWriter = std::is_same<T, Writer>::value;
+
+    public:
+
+        // -=(Undocumented)=-
         Stream(Ref<T> Archive)
             : mArchive { Archive }
         {
-        }
-
-        // -=(Undocumented)=-
-        template<typename Data, UInt Size>
-        void SerializeArray(Ref<Array<Data, Size>> Value)
-        {
-            if constexpr (std::is_same<T, Reader>::value)
-            {
-                const auto Chunk = mArchive.template Read<Ptr<Data>>(Size * sizeof(Data));
-
-                std::copy(Chunk, Chunk + Size, Value.data());
-            }
-            else
-            {
-                mArchive.Write(Value.data(), Size * sizeof(Data));
-            }
         }
 
         // -=(Undocumented)=-
@@ -257,28 +249,46 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        template<typename Type, typename Serializer>
-        void SerializeList(Ref<Vector<Type>> Value, Serializer OnSerialize)
+        template<typename Object>
+        void SerializeObject(Ref<Object> Value)
+        {
+            if constexpr (std::is_same<T, Reader>::value)
+            {
+                Value = Object::Read(mArchive);
+            }
+            else
+            {
+                Object::Write(mArchive, Value);
+            }
+        }
+
+        // -=(Undocumented)=-
+        template<typename Object, UInt Capacity = UINT32_MAX>
+        void SerializeList(Ref<Vector<Object>> Value)
         {
             if constexpr (std::is_same<T, Reader>::value)
             {
                 const UInt Length = mArchive.template ReadInt<UInt>();
+                if (Length >= Capacity)
+                {
+                    return;
+                }
 
                 Value.clear();
-                Value.resize(Length);
+                Value.reserve(Length);
 
-                for (Ref<Type> Element : Value)
+                for (UInt Element = 0; Element < Length; ++Element)
                 {
-                    OnSerialize(* this, Element);
+                    Value.emplace_back(Object::Read(mArchive));
                 }
             }
             else
             {
                 mArchive.template WriteInt<UInt>(Value.size());
 
-                for (Ref<Type> Element : Value)
+                for (Ref<const Object> Element : Value)
                 {
-                    OnSerialize(* this, Element);
+                    Object::Write(mArchive, Element);
                 }
             }
         }

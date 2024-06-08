@@ -21,9 +21,10 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    EnetClient::EnetClient(Ptr<ENetPeer> Peer)
-        : mHost { nullptr },
-          mPeer { Peer }
+    EnetClient::EnetClient(SPtr<Protocol> Protocol, Ptr<ENetPeer> Peer)
+        : mProtocol { Protocol },
+          mHost     { nullptr },
+          mPeer     { Peer }
     {
     }
 
@@ -32,7 +33,7 @@ namespace Network
 
     EnetClient::~EnetClient()
     {
-        OnClose(true);
+        Close(true);
 
         enet_host_destroy(mHost);
     }
@@ -40,37 +41,21 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void EnetClient::Handle(Ref<ENetEvent> Event)
+    UInt EnetClient::GetID() const
     {
-        switch (Event.type)
+        if (mPeer)
         {
-        case ENET_EVENT_TYPE_CONNECT:
-            Char Buffer[MAX_PATH];
-            enet_peer_get_ip(mPeer, Buffer, MAX_PATH);
-
-            if (mProtocol)
-            {
-                mProtocol->OnConnect(shared_from_this());
-            }
-            break;
-        case ENET_EVENT_TYPE_RECEIVE:
-            if (mProtocol)
-            {
-                mProtocol->OnRead(shared_from_this(), CPtr<UInt08>(Event.packet->data, Event.packet->dataLength));
-            }
-
-            enet_packet_destroy(Event.packet);
-            break;
-        case ENET_EVENT_TYPE_DISCONNECT:
-        case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-            if (mProtocol)
-            {
-                mProtocol->OnDisconnect(shared_from_this());
-            }
-            break;
-        case ENET_EVENT_TYPE_NONE:
-            break;
+            return mPeer->connectID;
         }
+        return 0;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    CStr EnetClient::GetAddress() const
+    {
+        return mAddress;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -98,14 +83,42 @@ namespace Network
 
         while (mHost && enet_host_service(mHost, & Event, 0) > 0)
         {
-            Handle(Event);
+            Notify(Event);
         }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void EnetClient::OnClose(Bool Immediately)
+    void EnetClient::Notify(Ref<const ENetEvent> Event)
+    {
+        switch (Event.type)
+        {
+        case ENET_EVENT_TYPE_CONNECT:
+            Char Address[256];
+            enet_peer_get_ip(mPeer, Address, sizeof(Address));
+            mAddress = Address;
+
+            mProtocol->OnConnect(shared_from_this());
+            break;
+        case ENET_EVENT_TYPE_RECEIVE:
+            mProtocol->OnRead(shared_from_this(), CPtr<UInt08>(Event.packet->data, Event.packet->dataLength));
+
+            enet_packet_destroy(Event.packet);
+            break;
+        case ENET_EVENT_TYPE_DISCONNECT:
+        case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
+            mProtocol->OnDisconnect(shared_from_this());
+            break;
+        case ENET_EVENT_TYPE_NONE:
+            break;
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void EnetClient::Close(Bool Immediately)
     {
         if (mPeer)
         {
@@ -123,7 +136,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void EnetClient::OnWrite(CPtr<const UInt08> Bytes, Channel Mode)
+    void EnetClient::Write(CPtr<UInt08> Bytes, Channel Mode)
     {
         if (mPeer)
         {

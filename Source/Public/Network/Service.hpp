@@ -30,19 +30,16 @@ namespace Network
         Service(Ref<Context> System);
 
         // -=(Undocumented)=-
-        ~Service();
-
-        // -=(Undocumented)=-
         void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
         Bool Initialize();
 
         // -=(Undocumented)=-
-        SPtr<Server> Listen(CStr Address, UInt16 Port, UInt32 Capacity);
+        SPtr<Server> Listen(SPtr<Protocol> Protocol, CStr Address, UInt16 Port, UInt32 Capacity);
 
         // -=(Undocumented)=-
-        SPtr<Client> Connect(CStr Address, UInt16 Port);
+        SPtr<Client> Connect(SPtr<Protocol> Protocol, CStr Address, UInt16 Port);
 
     private:
 

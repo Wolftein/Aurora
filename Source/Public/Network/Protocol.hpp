@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Core/Types.hpp"
+#include "Client.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -29,15 +29,15 @@ namespace Network
         virtual ~Protocol() = default;
 
         // -=(Undocumented)=-
-        virtual void OnConnect(ConstSPtr<class Client> Session);
+        virtual void OnConnect(ConstSPtr<Client> Session);
 
         // -=(Undocumented)=-
-        virtual void OnDisconnect(ConstSPtr<class Client> Session);
+        virtual void OnDisconnect(ConstSPtr<Client> Session);
 
         // -=(Undocumented)=-
-        virtual void OnRead(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes);
+        virtual void OnRead(ConstSPtr<Client> Session, CPtr<UInt08> Bytes);
 
         // -=(Undocumented)=-
-        virtual void OnWrite(ConstSPtr<class Client> Session, CPtr<UInt08> Bytes);
+        virtual void OnWrite(ConstSPtr<Client> Session, CPtr<UInt08> Bytes);
     };
 }

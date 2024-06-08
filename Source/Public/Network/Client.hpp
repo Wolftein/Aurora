@@ -14,7 +14,6 @@
 
 #include "Channel.hpp"
 #include "Packet.hpp"
-#include "Protocol.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -28,95 +27,42 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
-        Client()
-            : mAttachment { 0 }
-        {
-        }
-
-        // -=(Undocumented)=-
         virtual ~Client() = default;
 
         // -=(Undocumented)=-
-        void SetProtocol(ConstSPtr<Protocol> Protocol)
-        {
-            mProtocol = Protocol;
-        }
+        virtual UInt GetID() const = 0;
 
         // -=(Undocumented)=-
-        void SetAttachment(UInt Attachment)
-        {
-            mAttachment = Attachment;
-        }
+        virtual CStr GetAddress() const = 0;
 
         // -=(Undocumented)=-
-        UInt GetAttachment() const
-        {
-            return mAttachment;
-        }
+        virtual void Close(Bool Forcibly) = 0;
 
         // -=(Undocumented)=-
-        void Close(Bool Forcibly)
-        {
-            OnClose(Forcibly);
-        }
-
-        // -=(Undocumented)=-
-        void Append(CPtr<const UInt08> Bytes)
-        {
-			mAccumulator.Write(Bytes.data(), Bytes.size());
-        }
-
-        // -=(Undocumented)=-
-        template<typename Message>
-        void Append(Message && Packet)
-        {
-            // write message's id
-            mAccumulator.WriteInt(Packet.GetID());
-
-            // write message's body
-            Packet.Encode(mAccumulator);
-        }
-
-        // -=(Undocumented)=-
-        void Flush(Channel Mode)
-        {
-            if (mAccumulator.HasData())
-            {
-                OnWrite(mAccumulator.GetData(), Mode);
-
-                mAccumulator.Clear();
-            }
-        }
+        virtual void Write(CPtr<UInt08> Bytes, Channel Mode) = 0;
 
         // -=(Undocumented)=-
         template<typename Message>
         void Write(Message && Packet, Channel Mode = Channel::Reliable)
         {
-            // write message's id
+            // Reset it before using it
+            mAccumulator.Clear();
+
+            // Write message's id
             mAccumulator.WriteInt(Packet.GetID());
 
-            // write message's body
+            // Write message's body
             Packet.Encode(mAccumulator);
 
-            // flush message immediately
-            Flush(Mode);
+            // Flush message immediately
+            Write(mAccumulator.GetData(), Mode);
         }
 
     private:
 
-        // -=(Undocumented)=-
-        virtual void OnClose(Bool Forcibly) = 0;
-
-        // -=(Undocumented)=-
-        virtual void OnWrite(CPtr<const UInt08> Bytes, Channel Mode) = 0;
-
-    protected:
-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UInt           mAttachment;
-        SPtr<Protocol> mProtocol;
-        Writer         mAccumulator;
+        Writer mAccumulator;
     };
 }

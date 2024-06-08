@@ -21,8 +21,9 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    EnetServer::EnetServer()
-        : mHost { nullptr }
+    EnetServer::EnetServer(SPtr<Protocol> Protocol)
+        : mHost     { nullptr },
+          mProtocol { Protocol }
     {
     }
 
@@ -61,24 +62,23 @@ namespace Network
                 break;
             case ENET_EVENT_TYPE_CONNECT:
             {
-                ConstSPtr<EnetClient> Client = NewPtr<EnetClient>(Event.peer);
+                ConstSPtr<EnetClient> Client = NewPtr<EnetClient>(mProtocol, Event.peer);
                 mDatabase.emplace(Event.peer->connectID, Client);
 
-                Client->SetProtocol(mProtocol);
-                Client->Handle(Event);
+                Client->Notify(Event);
             }
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
             {
                 ConstSPtr<EnetClient> Client = mDatabase.find(Event.peer->connectID)->second;
-                Client->Handle(Event);
+                Client->Notify(Event);
             }
                 break;
             case ENET_EVENT_TYPE_DISCONNECT:
             case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
             {
                 ConstSPtr<EnetClient> Client = mDatabase.find(Event.peer->connectID)->second;
-                Client->Handle(Event);
+                Client->Notify(Event);
 
                 mDatabase.erase(Event.peer->connectID);
             }
