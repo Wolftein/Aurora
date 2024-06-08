@@ -36,7 +36,7 @@ namespace Network
         Bool Initialize();
 
         // -=(Undocumented)=-
-        SPtr<Server> Listen(SPtr<Protocol> Protocol, CStr Address, UInt16 Port, UInt32 Capacity);
+        SPtr<Server> Listen(SPtr<Protocol> Protocol, UInt16 Port, UInt32 Capacity);
 
         // -=(Undocumented)=-
         SPtr<Client> Connect(SPtr<Protocol> Protocol, CStr Address, UInt16 Port);

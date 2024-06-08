@@ -64,9 +64,9 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Server> Service::Listen(SPtr<Protocol> Protocol, CStr Address, UInt16 Port, UInt32 Capacity)
+    SPtr<Server> Service::Listen(SPtr<Protocol> Protocol, UInt16 Port, UInt32 Capacity)
     {
-        return mDriver->Listen(Protocol, Address, Port, Capacity);
+        return mDriver->Listen(Protocol, "0.0.0.0", Port, Capacity);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
