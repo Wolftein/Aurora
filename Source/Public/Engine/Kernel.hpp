@@ -72,6 +72,13 @@ namespace Engine
         // -=(Undocumented)=-
         void Back();
 
+        // -=(Undocumented)=-
+        template<typename Type = Activity>
+        SPtr<Activity> GetForeground()
+        {
+            return mActivities.empty() ? nullptr : CastPtr<Type>(mActivities.back());
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

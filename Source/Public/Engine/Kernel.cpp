@@ -173,7 +173,7 @@ namespace Engine
 
     void Kernel::Goto(ConstSPtr<Activity> Foreground)
     {
-        ConstSPtr<Activity> Current = (mActivities.empty() ? nullptr : mActivities.back());
+        ConstSPtr<Activity> Current = GetForeground();
         if (Current)
         {
             Current->OnPause();
@@ -189,7 +189,7 @@ namespace Engine
 
     void Kernel::Back()
     {
-        ConstSPtr<Engine::Activity> Current = (mActivities.empty() ? nullptr : mActivities.back());
+        ConstSPtr<Engine::Activity> Current = GetForeground();
         if (Current)
         {
             Current->OnPause();
@@ -197,7 +197,7 @@ namespace Engine
             mActivities.pop_back();
         }
 
-        ConstSPtr<Engine::Activity> Newest = (mActivities.empty() ? nullptr : mActivities.back());
+        ConstSPtr<Engine::Activity> Newest = GetForeground();
         if (Newest)
         {
             Newest->OnResume();
