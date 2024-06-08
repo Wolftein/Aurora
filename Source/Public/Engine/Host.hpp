@@ -38,13 +38,7 @@ namespace Engine
         virtual void OnStop();
 
         // -=(Undocumented)=-
-        virtual void OnPreTick();
-
-        // -=(Undocumented)=-
         virtual void OnTick(Real64 Time);
-
-        // -=(Undocumented)=-
-        virtual void OnPostTick();
 
     public:
 

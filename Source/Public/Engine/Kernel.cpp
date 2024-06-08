@@ -139,14 +139,10 @@ namespace Engine
         {
             const Real64 Time = GetSubsystem<Platform::Service>()->GetTime();
 
-            mHost->OnPreTick();
-
             Execute([Time](Ref<Core::Subsystem> Service)
             {
                 Service.OnTick(Time);
             });
-
-            mHost->OnTick(Time);
 
             ConstSPtr<Engine::Activity> Foreground = (mActivities.empty() ? nullptr : mActivities.back());
             if (Foreground)
@@ -154,7 +150,7 @@ namespace Engine
                 Foreground->OnTick(Time);
             }
 
-            mHost->OnPostTick();
+            mHost->OnTick(Time);
         }
 
         mHost->OnStop();
