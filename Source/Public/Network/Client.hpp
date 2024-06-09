@@ -49,23 +49,10 @@ namespace Network
             mAccumulator.Clear();
 
             // Write message
-            Client::Write(mAccumulator, Packet);
+            std::remove_reference_t<Message>::Write(mAccumulator, Packet);
 
             // Flush message immediately
             Write(mAccumulator.GetData(), Mode);
-        }
-
-    public:
-
-        // -=(Undocumented)=-
-        template<typename Message>
-        static void Write(Ref<Writer> Writer, Message && Packet)
-        {
-            // Write message's id
-            Writer.WriteInt(Packet.GetID());
-
-            // Write message's body
-            Packet.Encode(Writer);
         }
 
     private:

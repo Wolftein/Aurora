@@ -54,5 +54,26 @@ namespace Network
         {
             static_cast<Ptr<Derived>>(this)->OnSerialize(Stream<Reader>(Archive));
         }
+
+        // -=(Undocumented)=-
+        Writer Dump()
+        {
+            Writer Output;
+            Write(Output, * this);
+
+            return Output;
+        }
+
+    public:
+
+        // -=(Undocumented)=-
+        static void Write(Ref<Writer> Output, Ref<Packet<Derived, ID>> Packet)
+        {
+            // Write message's id
+            Output.WriteInt(Packet.GetID());
+
+            // Write message's body
+            Packet.Encode(Output);
+        }
     };
 }
