@@ -48,14 +48,24 @@ namespace Network
             // Reset it before using it
             mAccumulator.Clear();
 
-            // Write message's id
-            mAccumulator.WriteInt(Packet.GetID());
-
-            // Write message's body
-            Packet.Encode(mAccumulator);
+            // Write message
+            Client::Write(mAccumulator, Packet);
 
             // Flush message immediately
             Write(mAccumulator.GetData(), Mode);
+        }
+
+    public:
+
+        // -=(Undocumented)=-
+        template<typename Message>
+        static void Write(Ref<Writer> Writer, Message && Packet)
+        {
+            // Write message's id
+            Writer.WriteInt(Packet.GetID());
+
+            // Write message's body
+            Packet.Encode(Writer);
         }
 
     private:
