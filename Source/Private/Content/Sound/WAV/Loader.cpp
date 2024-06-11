@@ -24,7 +24,7 @@ namespace Content
 
     Bool WAVLoader::Load(Ref<class Service> Service, Ref<Chunk> Data, ConstSPtr<Audio::Sound> Asset)
     {
-        SPtr<Audio::WAVDecoder> Decoder = NewUniquePtr<Audio::WAVDecoder>(Data);
+        SPtr<Audio::WAVDecoder> Decoder = NewPtr<Audio::WAVDecoder>(Data);
 
         if (Decoder->GetSize() > 0)
         {

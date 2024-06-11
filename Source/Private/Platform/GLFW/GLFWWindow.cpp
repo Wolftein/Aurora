@@ -28,7 +28,7 @@ namespace Platform
            mKeyboard { NewPtr<GLFWKeyboard>() },
            mMouse    { NewPtr<GLFWMouse>() }
     {
-        const SPtr<Input::Service> Input = System.GetSubsystem<Input::Service>();
+        ConstSPtr<Input::Service> Input = System.GetSubsystem<Input::Service>();
         Input->Register<Input::Keyboard>(mKeyboard);
         Input->Register<Input::Mouse>(mMouse);
     }

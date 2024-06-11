@@ -78,7 +78,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename T, typename ... Args>
-        SPtr<T> AddSubsystem(Args && ... Arguments)
+        ConstSPtr<T> AddSubsystem(Args && ... Arguments)
         {
             return CastPtr<T>(
                 mSubsystems.emplace_back(NewPtr<T>(* this, Arguments...)));
@@ -96,7 +96,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename T>
-        SPtr<T> GetSubsystem()
+        ConstSPtr<T> GetSubsystem()
         {
             for (ConstSPtr<Subsystem> SubsystemPtr : mSubsystems)
             {

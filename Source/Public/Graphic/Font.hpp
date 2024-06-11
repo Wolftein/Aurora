@@ -98,7 +98,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        SPtr<Graphic::Material> GetMaterial() const
+        ConstSPtr<Graphic::Material> GetMaterial() const
         {
             return mMaterial;
         }

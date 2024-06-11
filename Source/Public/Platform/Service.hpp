@@ -41,7 +41,7 @@ namespace Platform
         Real64 GetTime() const;
 
         // -=(Undocumented)=-
-        SPtr<Window> GetWindow() const;
+        ConstSPtr<Window> GetWindow() const;
 
     private:
 

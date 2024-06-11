@@ -66,14 +66,14 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename T, typename ... Args>
-        SPtr<T> AddSubsystem(Args && ... Arguments)
+        ConstSPtr<T> AddSubsystem(Args && ... Arguments)
         {
             return mContext.AddSubsystem<T>(Arguments...);
         }
 
         // -=(Undocumented)=-
         template<typename T>
-        SPtr<T> GetSubsystem()
+        ConstSPtr<T> GetSubsystem()
         {
             return mContext.GetSubsystem<T>();
         }
