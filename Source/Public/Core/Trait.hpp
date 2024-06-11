@@ -86,7 +86,7 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Destination, typename Source>
-    inline SPtr<Destination> CastPtr(SPtr<Source> Pointer)
+    inline SPtr<Destination> CastPtr(ConstSPtr<Source> Pointer)
     {
         return std::static_pointer_cast<Destination>(Pointer);
     }
