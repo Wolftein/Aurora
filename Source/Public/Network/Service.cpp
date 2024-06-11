@@ -64,7 +64,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Server> Service::Listen(SPtr<Protocol> Protocol, UInt16 Port, UInt32 Capacity)
+    SPtr<Server> Service::Listen(Ref<Protocol> Protocol, UInt16 Port, UInt32 Capacity)
     {
         return mDriver->Listen(Protocol, "0.0.0.0", Port, Capacity);
     }
@@ -72,7 +72,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Client> Service::Connect(SPtr<Protocol> Protocol, CStr Address, UInt16 Port)
+    SPtr<Client> Service::Connect(Ref<Protocol> Protocol, CStr Address, UInt16 Port)
     {
         return mDriver->Connect(Protocol, Address, Port);
     }

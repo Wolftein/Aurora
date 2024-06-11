@@ -34,6 +34,6 @@ namespace Content
         }
 
         // \see AbstractLoader::Load
-        Bool Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Shader> Asset);
+        Bool Load(Ref<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Shader> Asset);
     };
 }

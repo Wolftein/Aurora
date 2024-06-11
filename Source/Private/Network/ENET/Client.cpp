@@ -21,7 +21,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    EnetClient::EnetClient(SPtr<Protocol> Protocol, Ptr<ENetPeer> Peer)
+    EnetClient::EnetClient(Ref<Protocol> Protocol, Ptr<ENetPeer> Peer)
         : mProtocol { Protocol },
           mHost     { nullptr },
           mPeer     { Peer }
@@ -99,16 +99,16 @@ namespace Network
             enet_peer_get_ip(mPeer, Address, sizeof(Address));
             mAddress = Address;
 
-            mProtocol->OnConnect(shared_from_this());
+            mProtocol.OnConnect(shared_from_this());
             break;
         case ENET_EVENT_TYPE_RECEIVE:
-            mProtocol->OnRead(shared_from_this(), CPtr<UInt08>(Event.packet->data, Event.packet->dataLength));
+            mProtocol.OnRead(shared_from_this(), CPtr<UInt08>(Event.packet->data, Event.packet->dataLength));
 
             enet_packet_destroy(Event.packet);
             break;
         case ENET_EVENT_TYPE_DISCONNECT:
         case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-            mProtocol->OnDisconnect(shared_from_this());
+            mProtocol.OnDisconnect(shared_from_this());
             break;
         case ENET_EVENT_TYPE_NONE:
             break;
@@ -136,19 +136,15 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void EnetClient::Write(CPtr<UInt08> Bytes, Channel Mode)
+    void EnetClient::Write(CPtr<UInt08> Bytes, Bool Unreliable)
     {
         if (mPeer)
         {
-            if (mProtocol)
-            {
-                mProtocol->OnWrite(
-                    shared_from_this(), CPtr<UInt08>(const_cast<Ptr<UInt08>>(Bytes.data()), Bytes.size()));
-            }
+            mProtocol.OnWrite(
+                shared_from_this(), CPtr<UInt08>(const_cast<Ptr<UInt08>>(Bytes.data()), Bytes.size()));
 
-            const UInt32 Flag = (Mode == Channel::Reliable ? ENET_PACKET_FLAG_RELIABLE
-                              : (Mode == Channel::Unsequenced ? ENET_PACKET_FLAG_UNSEQUENCED : 0));
-            const UInt32 Slot = (Mode == Channel::Reliable ? 1 : 0);
+            const UInt32 Flag = (Unreliable ? ENET_PACKET_FLAG_UNSEQUENCED : ENET_PACKET_FLAG_RELIABLE);
+            const UInt32 Slot = (Unreliable ? 1 : 0);
 
             Ptr<ENetPacket> Packet = enet_packet_create(Bytes.data(), Bytes.size(), Flag);
             enet_peer_send(mPeer, Slot, Packet);

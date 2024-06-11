@@ -72,7 +72,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Server> EnetDriver::Listen(SPtr<Protocol> Protocol, CStr Address, UInt16 Port, UInt32 Capacity)
+    SPtr<Server> EnetDriver::Listen(Ref<Protocol> Protocol, CStr Address, UInt16 Port, UInt32 Capacity)
     {
         ConstSPtr<EnetServer> Server = NewPtr<EnetServer>(Protocol);
 
@@ -87,7 +87,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Client> EnetDriver::Connect(SPtr<Protocol> Protocol, CStr Address, UInt16 Port)
+    SPtr<Client> EnetDriver::Connect(Ref<Protocol> Protocol, CStr Address, UInt16 Port)
     {
         ConstSPtr<EnetClient> Client = NewPtr<EnetClient>(Protocol, nullptr);
 

@@ -315,7 +315,7 @@ namespace Content
 
             if (Chunk File = Find(Key); File.HasData())
             {
-                if (Loader->Load(shared_from_this(), File, Asset))
+                if (Loader->Load(* this, File, Asset))
                 {
                     return true;
                 }

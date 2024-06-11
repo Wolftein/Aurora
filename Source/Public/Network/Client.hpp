@@ -12,7 +12,6 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Channel.hpp"
 #include "Packet.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -39,11 +38,11 @@ namespace Network
         virtual void Close(Bool Forcibly) = 0;
 
         // -=(Undocumented)=-
-        virtual void Write(CPtr<UInt08> Bytes, Channel Mode) = 0;
+        virtual void Write(CPtr<UInt08> Bytes, Bool Unreliable) = 0;
 
         // -=(Undocumented)=-
         template<typename Message>
-        void Write(Message && Packet, Channel Mode = Channel::Reliable)
+        void Write(Message && Packet, Bool Unreliable)
         {
             // Reset it before using it
             mAccumulator.Clear();
@@ -52,7 +51,7 @@ namespace Network
             std::remove_reference_t<Message>::Write(mAccumulator, Packet);
 
             // Flush message immediately
-            Write(mAccumulator.GetData(), Mode);
+            Write(mAccumulator.GetData(), Unreliable);
         }
 
     private:

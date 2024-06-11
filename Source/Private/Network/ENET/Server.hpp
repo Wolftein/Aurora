@@ -28,7 +28,7 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
-        EnetServer(SPtr<Protocol> Protocol);
+        EnetServer(Ref<Protocol> Protocol);
 
         // -=(Undocumented)=-
         ~EnetServer() override;
@@ -45,7 +45,7 @@ namespace Network
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Ptr<ENetHost>                 mHost;
-        SPtr<Protocol>                mProtocol;
+        Ref<Protocol>                 mProtocol;
         Table<UInt, SPtr<EnetClient>> mDatabase;
     };
 }

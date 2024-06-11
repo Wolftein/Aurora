@@ -208,7 +208,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool PipelineLoader::Load(ConstSPtr<Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset)
+    Bool PipelineLoader::Load(Ref<Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset)
     {
         Graphic::Descriptor Description;
 
@@ -287,7 +287,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Chunk PipelineLoader::Compile(ConstSPtr<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage)
+    Chunk PipelineLoader::Compile(Ref<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage)
     {
         if (Section.IsEmpty())
         {
@@ -295,7 +295,7 @@ namespace Content
         }
         else
         {
-            ConstSPtr<Graphic::Shader> Shader = Service->Load<Graphic::Shader>(Section.GetString("Filename"));
+            ConstSPtr<Graphic::Shader> Shader = Service.Load<Graphic::Shader>(Section.GetString("Filename"));
             const CStr         Code     = Shader->GetBytecode();
             const CStr         Entry    = Section.GetString("Entry", "main");
             const Vector<CStr> Defines  = Section.GetStringArray("Defines");

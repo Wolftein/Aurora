@@ -21,7 +21,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool ShaderLoader::Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Shader> Asset)
+    Bool ShaderLoader::Load(Ref<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Shader> Asset)
     {
         Asset->SetBytecode(Data.GetText()); // TODO: Include files :(--D)
         return true;

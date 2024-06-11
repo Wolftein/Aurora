@@ -37,7 +37,7 @@ namespace Content
         }
 
         // \see AbstractLoader::Load
-        Bool Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset);
+        Bool Load(Ref<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Pipeline> Asset);
 
     private:
 
@@ -54,7 +54,7 @@ namespace Content
     private:
 
         // -=(Undocumented)=-
-        Chunk Compile(ConstSPtr<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage);
+        Chunk Compile(Ref<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage);
 
         // -=(Undocumented)=-
         Chunk CompileDXBC(CStr Entry, CStr Code, Ref<Vector<Property>> Properties, Graphic::Stage Stage);

@@ -22,7 +22,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool WAVLoader::Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Audio::Sound> Asset)
+    Bool WAVLoader::Load(Ref<class Service> Service, Ref<Chunk> Data, ConstSPtr<Audio::Sound> Asset)
     {
         SPtr<Audio::WAVDecoder> Decoder = NewUniquePtr<Audio::WAVDecoder>(Data);
 

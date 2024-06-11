@@ -33,7 +33,7 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
-        EnetClient(SPtr<Protocol> Protocol, Ptr<ENetPeer> Peer);
+        EnetClient(Ref<Protocol> Protocol, Ptr<ENetPeer> Peer);
 
         // -=(Undocumented)=-
         ~EnetClient() override;
@@ -48,7 +48,7 @@ namespace Network
         void Close(Bool Immediately) override;
 
         // \see Session::Write
-        void Write(CPtr<UInt08> Bytes, Channel Mode) override;
+        void Write(CPtr<UInt08> Bytes, Bool Unreliable) override;
 
         // -=(Undocumented)=-
         Bool Connect(CStr Address, UInt16 Port);
@@ -64,9 +64,9 @@ namespace Network
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Protocol> mProtocol;
-        Ptr<ENetHost>  mHost;
-        Ptr<ENetPeer>  mPeer;
-        SStr           mAddress;
+        Ref<Protocol> mProtocol;
+        Ptr<ENetHost> mHost;
+        Ptr<ENetPeer> mPeer;
+        SStr          mAddress;
     };
 }

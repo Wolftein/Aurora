@@ -34,7 +34,7 @@ namespace Content
         }
 
         // \see AbstractLoader::Load
-        Bool Load(ConstSPtr<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Font> Asset);
+        Bool Load(Ref<class Service> Service, Ref<Chunk> Data, ConstSPtr<Graphic::Font> Asset);
 
     private:
 
