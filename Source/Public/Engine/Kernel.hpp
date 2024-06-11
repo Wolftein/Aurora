@@ -16,8 +16,6 @@
 
 #include "Content/Service.hpp"
 
-#include "Activity.hpp"
-
 #include "Properties.hpp"
 
 #include "Graphic/Service.hpp"
@@ -37,7 +35,7 @@
 namespace Engine
 {
     // -=(Undocumented)=-
-    class Kernel final : public Subsystem::Context
+    class Kernel : public Subsystem::Context, public Input::Listener
     {
     public:
 
@@ -45,8 +43,8 @@ namespace Engine
         enum class State
         {
             Idle,
-            Running,
-            Exiting,
+            Execute,
+            Exit,
         };
 
     public:
@@ -58,7 +56,7 @@ namespace Engine
         ~Kernel();
 
         // -=(Undocumented)=-
-        void Initialize(Mode Mode, Ref<const Properties> Properties, SPtr<class Host> Host);
+        void Initialize(Mode Mode, Ref<const Properties> Properties);
 
         // -=(Undocumented)=-
         void Run();
@@ -66,26 +64,48 @@ namespace Engine
         // -=(Undocumented)=-
         void Exit();
 
-        // -=(Undocumented)=-
-        void Goto(ConstSPtr<Activity> Foreground);
+    protected:
 
         // -=(Undocumented)=-
-        void Back();
+        virtual Bool OnInitialize();
 
         // -=(Undocumented)=-
-        template<typename Type = Activity>
-        SPtr<Type> GetForeground()
+        virtual void OnDestroy();
+
+        // -=(Undocumented)=-
+        virtual void OnTick(Real64 Time);
+
+    private:
+
+        // -=(Undocumented)=-
+        struct ProxyInputListener final : public Input::Listener
         {
-            return mActivities.empty() ? nullptr : CastPtr<Type>(mActivities.back());
-        }
+            Ref<Kernel> Kernel;
+
+            // -=(Undocumented)=-
+            ProxyInputListener(Ref<Engine::Kernel> Kernel)
+                : Kernel { Kernel }
+            {
+            }
+
+            // \see Listener::OnEvent
+            Bool OnEvent(Ref<const Input::Event> Event) override
+            {
+                return Kernel.OnEvent(Event);
+            }
+        };
+
+        // \see Listener::OnWindowExit
+        Bool OnWindowExit() override;
+
+        // \see Listener::OnWindowResize
+        Bool OnWindowResize(SInt Width, SInt Height) override;
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        State                  mState;
-        Vector<SPtr<Activity>> mActivities;
-        SPtr<class Host>       mHost;
+        State mState;
     };
 }

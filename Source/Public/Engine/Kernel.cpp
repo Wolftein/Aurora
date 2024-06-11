@@ -11,7 +11,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Kernel.hpp"
-#include "Host.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -38,7 +37,7 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Kernel::Initialize(Mode Mode, Ref<const Properties> Properties, SPtr<Host> Host)
+    void Kernel::Initialize(Mode Mode, Ref<const Properties> Properties)
     {
         // Creates the logging service
         Log::Service::GetSingleton().Initialize(Properties.GetLogFilename());
@@ -55,8 +54,7 @@ namespace Engine
         {
             // Creates the input service
             LOG_INFO("Kernel: Creating input service");
-            ConstSPtr<Input::Service> Input = AddSubsystem<Input::Service>();
-            Input->AddListener(Host);
+            AddSubsystem<Input::Service>();
 
             // Create the game's window
             Any DisplayHandle = Properties.GetWindowHandle();
@@ -116,13 +114,15 @@ namespace Engine
                 LOG_WARNING("Kernel: Failed to create user interface service, disabling service.");
                 RemoveSubsystem<UI::Service>();
             }
+
+            // Add our proxy input listener after creating the user interface
+            GetSubsystem<Input::Service>()->AddListener(NewPtr<ProxyInputListener>(* this));
         }
 
         // Initialize the Host and then enable the platform's window
-        mHost = Host;
-        mHost->OnStart();
+        mState = OnInitialize() ? State::Execute : State::Exit;
 
-        if (ConstSPtr<Platform::Window> Window = Platform->GetWindow())
+        if (ConstSPtr<Platform::Window> Window = Platform->GetWindow(); Window && mState == State::Execute)
         {
             Window->SetVisible(true);
         }
@@ -133,27 +133,19 @@ namespace Engine
 
     void Kernel::Run()
     {
-        mState = State::Running;
+        const SPtr<Platform::Service> Platform = GetSubsystem<Platform::Service>();
 
-        while (mState == State::Running)
+        while (mState == State::Execute)
         {
-            const Real64 Time = GetSubsystem<Platform::Service>()->GetTime();
+            const Real64 Time = Platform->GetTime();
 
             Execute([Time](Ref<Core::Subsystem> Service)
             {
                 Service.OnTick(Time);
             });
-
-            ConstSPtr<Engine::Activity> Foreground = (mActivities.empty() ? nullptr : mActivities.back());
-            if (Foreground)
-            {
-                Foreground->OnTick(Time);
-            }
-
-            mHost->OnTick(Time);
+            OnTick(Time);
         }
-
-        mHost->OnStop();
+        OnDestroy();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -161,42 +153,48 @@ namespace Engine
 
     void Kernel::Exit()
     {
-        mState = State::Exiting;
+        mState = State::Exit;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Kernel::Goto(ConstSPtr<Activity> Foreground)
+    Bool Kernel::OnInitialize()
     {
-        ConstSPtr<Activity> Current = GetForeground();
-        if (Current)
-        {
-            Current->OnPause();
-        }
-
-        mActivities.emplace_back(Foreground);
-        Foreground->OnAttach();
-        Foreground->OnResume();
+        return true;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Kernel::Back()
+    void Kernel::OnDestroy()
     {
-        ConstSPtr<Engine::Activity> Current = GetForeground();
-        if (Current)
-        {
-            Current->OnPause();
-            Current->OnDetach();
-            mActivities.pop_back();
-        }
 
-        ConstSPtr<Engine::Activity> Newest = GetForeground();
-        if (Newest)
-        {
-            Newest->OnResume();
-        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Kernel::OnTick(Real64 Time)
+    {
+
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool Kernel::OnWindowExit()
+    {
+        Exit();
+        return false;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool Kernel::OnWindowResize(SInt Width, SInt Height)
+    {
+        GetSubsystem<Graphic::Service>()->Reset(Width, Height);
+        return false;
     }
 }
