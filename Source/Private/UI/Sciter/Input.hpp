@@ -37,11 +37,16 @@ namespace UI
               mKeys             { 0 },
               mMousePosition    { 0, 0 },
               mMouseButtons     { MOUSE_BUTTONS(0) },
+              mMouseClickTime   { 0 },
+              mMouseClickButton { Input::Button::Unknown },
               mOnDocumentResize { OnDocumentResize }
         {
         }
 
     private:
+
+        // \see Input::Listener::OnEvent
+        Bool OnEvent(Ref<const Input::Event> Event) override;
 
         // \see Listener::OnKeyType
         Bool OnKeyType(UInt Codepoint) override;
@@ -72,6 +77,11 @@ namespace UI
 
     private:
 
+        // -=(Undocumented)=-
+        Bool OnMouseDoubleClick(Input::Button Button);
+
+    private:
+
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -79,6 +89,8 @@ namespace UI
         UINT             mKeys;
         POINT            mMousePosition;
         MOUSE_BUTTONS    mMouseButtons;
+        Real64           mMouseClickTime;
+        Input::Button    mMouseClickButton;
         OnDocumentResize mOnDocumentResize;
     };
 }
