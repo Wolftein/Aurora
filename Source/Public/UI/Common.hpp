@@ -19,7 +19,7 @@
 namespace UI
 {
     // -=(Undocumented)=-
-    using Value    = Union<Bool, SInt, Real, SStr>;
+    using Value    = Union<Bool, SInt, UInt, Real, SStr>;
 
     // -=(Undocumented)=-
     using Callback = FPtr<Value (CPtr<const Value>)>;

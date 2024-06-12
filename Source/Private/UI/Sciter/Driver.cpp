@@ -42,8 +42,10 @@ namespace UI
         case 2:
             return sciter::value(Argument.operator SInt32());
         case 3:
-            return sciter::value(Argument.operator Real());
+            return sciter::value(Argument.operator UInt32());
         case 4:
+            return sciter::value(Argument.operator Real());
+        case 5:
             return sciter::value(Argument.operator SStr());
         default:
             return sciter::value(Argument.operator SInt32());
