@@ -286,7 +286,7 @@ inline namespace Core
             {
                 mArchive.template WriteInt<UInt>(Value.size());
 
-                for (Ref<const Object> Element : Value)
+                for (Ref<Object> Element : Value)
                 {
                     Object::Write(mArchive, Element);
                 }
