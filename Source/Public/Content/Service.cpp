@@ -12,6 +12,7 @@
 
 #include "Service.hpp"
 #include "Locator/MemoryLocator.hpp"
+#include "Locator/SystemLocator.hpp"
 
 #ifdef    AE_CONTENT_LOADER_MP3
     #include "Content/Sound/MP3/Loader.hpp"
@@ -256,6 +257,7 @@ namespace Content
     void Service::RegisterDefaultResources()
     {
         AddLocator("Engine://", NewPtr<Content::MemoryLocator>());
+        AddLocator("Root://", NewPtr<Content::SystemLocator>());
 
         if (IsClientMode())
         {
