@@ -30,6 +30,8 @@
 
 #include "Serialization/Binary/Reader.hpp"
 #include "Serialization/Binary/Writer.hpp"
+#include "Serialization/Binary/Stream.hpp"
+#include "Serialization/Binary/Serializable.hpp"
 #include "Serialization/TOML/Parser.hpp"
 
 #include "System/Subsystem.hpp"
