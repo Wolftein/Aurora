@@ -22,7 +22,7 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Kernel::Kernel()
-        : mState { State::Idle }
+        : mActive { false }
     {
     }
 
@@ -120,9 +120,9 @@ namespace Engine
         }
 
         // Initialize the Host and then enable the platform's window
-        mState = OnInitialize() ? State::Execute : State::Exit;
+        mActive = OnInitialize();
 
-        if (ConstSPtr<Platform::Window> Window = Platform->GetWindow(); Window && mState == State::Execute)
+        if (ConstSPtr<Platform::Window> Window = Platform->GetWindow(); Window && mActive)
         {
             Window->SetVisible(true);
         }
@@ -135,7 +135,7 @@ namespace Engine
     {
         const SPtr<Platform::Service> Platform = GetSubsystem<Platform::Service>();
 
-        while (mState == State::Execute)
+        while (mActive)
         {
             const Real64 Time = Platform->GetTime();
 
@@ -153,7 +153,7 @@ namespace Engine
 
     void Kernel::Exit()
     {
-        mState = State::Exit;
+        mActive = false;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

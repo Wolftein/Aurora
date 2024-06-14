@@ -40,16 +40,6 @@ namespace Engine
     public:
 
         // -=(Undocumented)=-
-        enum class State
-        {
-            Idle,
-            Execute,
-            Exit,
-        };
-
-    public:
-
-        // -=(Undocumented)=-
         Kernel();
 
         // -=(Undocumented)=-
@@ -64,7 +54,7 @@ namespace Engine
         // -=(Undocumented)=-
         void Exit();
 
-    protected:
+    private:
 
         // -=(Undocumented)=-
         virtual Bool OnInitialize();
@@ -106,6 +96,6 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        State mState;
+        Bool mActive;
     };
 }
