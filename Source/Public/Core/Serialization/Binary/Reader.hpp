@@ -209,6 +209,13 @@ inline namespace Core
             return CStr16(Data, Size);
         }
 
+        // -=(Undocumented)=-
+        template<typename Object>
+        Object ReadObject()
+        {
+            return Object::Read(* this);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

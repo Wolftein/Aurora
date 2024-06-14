@@ -279,7 +279,7 @@ inline namespace Core
 
                 for (UInt Element = 0; Element < Length; ++Element)
                 {
-                    Value.emplace_back(Object::Read(mArchive));
+                    Value.emplace_back(mArchive.template ReadObject<Object>());
                 }
             }
             else
@@ -288,7 +288,7 @@ inline namespace Core
 
                 for (Ref<Object> Element : Value)
                 {
-                    Object::Write(mArchive, Element);
+                    mArchive.template WriteObject<Object>(Element);
                 }
             }
         }

@@ -201,6 +201,13 @@ inline namespace Core
             }
         }
 
+        // -=(Undocumented)=-
+        template<typename Object>
+        void WriteObject(Ref<const Object> Data)
+        {
+            Object::Write(* this, Data);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
