@@ -127,61 +127,61 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator+(Ref<const Vector2<Base>> Vector) const
+        constexpr Vector2<Base> operator+(Ref<const Vector2<Base>> Vector) const
         {
             return Vector2<Base>(mX + Vector.mX, mY + Vector.mY);
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator+(Base Scalar) const
+        constexpr Vector2<Base> operator+(Base Scalar) const
         {
             return Vector2<Base>(mX + Scalar, mY + Scalar);
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator-() const
+        constexpr Vector2<Base> operator-() const
         {
             return Vector2<Base>(-mX, -mY);
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator-(Ref<const Vector2<Base>> Vector) const
+        constexpr Vector2<Base> operator-(Ref<const Vector2<Base>> Vector) const
         {
             return Vector2<Base>(mX - Vector.mX, mY - Vector.mY);
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator-(Base Scalar) const
+        constexpr Vector2<Base> operator-(Base Scalar) const
         {
             return Vector2<Base>(mX - Scalar, mY - Scalar);
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator*(Ref<const Vector2<Base>> Vector) const
+        constexpr Vector2<Base> operator*(Ref<const Vector2<Base>> Vector) const
         {
             return Vector2<Base>(mX * Vector.mX, mY * Vector.mY);
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator*(Base Scalar) const
+        constexpr Vector2<Base> operator*(Base Scalar) const
         {
             return Vector2<Base>(mX * Scalar, mY * Scalar);
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator/(Ref<const Vector2<Base>> Vector) const
+        constexpr Vector2<Base> operator/(Ref<const Vector2<Base>> Vector) const
         {
             return Vector2<Base>(mX / Vector.mX, mY / Vector.mY);
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator/(Base Scalar) const
+        constexpr Vector2<Base> operator/(Base Scalar) const
         {
             return Vector2<Base>(mX / Scalar, mY / Scalar);
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator++()
+        constexpr Ref<Vector2<Base>> operator++()
         {
             ++mX;
             ++mY;
@@ -189,7 +189,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator--()
+        constexpr Ref<Vector2<Base>> operator--()
         {
             --mX;
             --mY;
@@ -197,7 +197,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator+=(Ref<const Vector2<Base>> Vector)
+        constexpr Ref<Vector2<Base>> operator+=(Ref<const Vector2<Base>> Vector)
         {
             mX += Vector.mX;
             mY += Vector.mY;
@@ -205,7 +205,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator+=(Base Scalar)
+        constexpr Ref<Vector2<Base>> operator+=(Base Scalar)
         {
             mX += Scalar;
             mY += Scalar;
@@ -213,7 +213,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator-=(Ref<const Vector2<Base>> Vector)
+        constexpr Ref<Vector2<Base>> operator-=(Ref<const Vector2<Base>> Vector)
         {
             mX -= Vector.mX;
             mY -= Vector.mY;
@@ -221,7 +221,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator-=(Base Scalar)
+        constexpr Ref<Vector2<Base>> operator-=(Base Scalar)
         {
             mX -= Scalar;
             mY -= Scalar;
@@ -229,7 +229,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator*=(Ref<const Vector2<Base>> Vector)
+        constexpr Ref<Vector2<Base>> operator*=(Ref<const Vector2<Base>> Vector)
         {
             mX *= Vector.mX;
             mY *= Vector.mY;
@@ -237,7 +237,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator*=(Base Scalar)
+        constexpr Ref<Vector2<Base>> operator*=(Base Scalar)
         {
             mX *= Scalar;
             mY *= Scalar;
@@ -245,7 +245,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator/=(Ref<const Vector2<Base>> Vector)
+        constexpr Ref<Vector2<Base>> operator/=(Ref<const Vector2<Base>> Vector)
         {
             mX /= Vector.mX;
             mY /= Vector.mY;
@@ -253,7 +253,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Vector2<Base>> operator/=(Base Scalar)
+        constexpr Ref<Vector2<Base>> operator/=(Base Scalar)
         {
             mX /= Scalar;
             mY /= Scalar;
@@ -261,13 +261,13 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Bool operator<(Ref<const Vector2<Base>> Vector) const
+        constexpr Bool operator<(Ref<const Vector2<Base>> Vector) const
         {
             return mX < Vector.mX || (mX == Vector.mX && mY < Vector.mY);
         }
 
         // -=(Undocumented)=-
-        Bool operator>(Ref<const Vector2<Base>> Vector) const
+        constexpr Bool operator>(Ref<const Vector2<Base>> Vector) const
         {
             return mX > Vector.mX || (mX == Vector.mX && mY > Vector.mY);
         }
