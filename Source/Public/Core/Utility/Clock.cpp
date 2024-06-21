@@ -6,34 +6,8 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#pragma once
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Log/Service.hpp"
-
-#include "Math/Color.hpp"
-#include "Math/Interpolator.hpp"
-#include "Math/Matrix4.hpp"
-#include "Math/Quaternion.hpp"
-#include "Math/Rect.hpp"
-#include "Math/Transform.hpp"
-#include "Math/Trigonometry.hpp"
-#include "Math/Vector2.hpp"
-#include "Math/Vector3.hpp"
-#include "Math/Vector4.hpp"
-
-#include "Memory/Chunk.hpp"
-#include "Memory/Handle.hpp"
-
-#include "Serialization/Binary/Reader.hpp"
-#include "Serialization/Binary/Writer.hpp"
-#include "Serialization/Binary/Stream.hpp"
-#include "Serialization/Binary/Serializable.hpp"
-#include "Serialization/TOML/Parser.hpp"
-
-#include "System/Subsystem.hpp"
-
-#include "Utility/Clock.hpp"
+#include "Clock.hpp"
