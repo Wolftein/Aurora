@@ -24,6 +24,7 @@
 
 #include <EASTL/span.h>
 #include <EASTL/fixed_vector.h>
+#include <EASTL/vector_set.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -154,6 +155,10 @@ inline namespace Core
     // -=(Undocumented)=-
     template<typename Value>
     using List   = std::initializer_list<Value>;
+
+    // -=(Undocumented)=-
+    template<typename Value>
+    using Set    = eastl::vector_set<Value>;
 
     // -=(Undocumented)=-
     template<typename Value, UInt Capacity>
