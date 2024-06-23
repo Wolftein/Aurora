@@ -45,6 +45,12 @@ inline namespace Core
         TOMLArray GetArray(UInt Index) const;
 
         // -=(Undocumented)=-
+        class TOMLSection AddSection();
+
+        // -=(Undocumented)=-
+        class TOMLSection GetSection(UInt Index) const;
+
+        // -=(Undocumented)=-
         void AddBool(Bool Value);
 
         // -=(Undocumented)=-
