@@ -53,6 +53,20 @@ inline namespace Core
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    TOMLArray TOMLParser::GetArray(CStr Key, Bool CreateIfNeeded)
+    {
+        Ptr<toml::array> Array = mTable[Key].as_array();
+
+        if (Array == nullptr && CreateIfNeeded)
+        {
+            Array = mTable.emplace<toml::array>(Key).first->second.as_array();
+        }
+        return TOMLArray(Array);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     TOMLSection TOMLParser::GetSection(CStr Key, Bool CreateIfNeeded)
     {
         Ptr<toml::table> Table = mTable[Key].as_table();

@@ -35,6 +35,9 @@ inline namespace Core
         TOMLSection GetRoot();
 
         // -=(Undocumented)=-
+        TOMLArray GetArray(CStr Key, Bool CreateIfNeeded = true);
+
+        // -=(Undocumented)=-
         TOMLSection GetSection(CStr Key, Bool CreateIfNeeded = true);
 
         // -=(Undocumented)=-
