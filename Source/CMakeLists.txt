@@ -163,6 +163,20 @@ TARGET_INCLUDE_DIRECTORIES(Sciter INTERFACE ${external_sciter_SOURCE_DIR}/includ
 LIST(APPEND PROJECT_DEPENDENCIES "Sciter")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Dependency (Enumeration static reflection)
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+FetchContent_Declare(External_Enum
+        GIT_REPOSITORY https://github.com/Neargye/magic_enum
+        GIT_TAG master)
+FetchContent_MakeAvailable(External_Enum)
+
+ADD_LIBRARY(Enum INTERFACE)
+TARGET_INCLUDE_DIRECTORIES(Enum INTERFACE ${external_enum_SOURCE_DIR}/include)
+
+LIST(APPEND PROJECT_DEPENDENCIES "Enum")
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Configuration
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

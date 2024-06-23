@@ -15,6 +15,7 @@
 #include "Types.hpp"
 #include <algorithm>
 #include <format>
+#include <magic_enum/magic_enum.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -44,10 +45,17 @@ inline namespace Core
     }
     
     // -=(Undocumented)=-
-    template<typename Enum>
-    inline constexpr auto CastEnum(Enum Value)
+    template<typename Type>
+    inline constexpr auto CastEnum(Type Value)
     {
-        return static_cast<std::underlying_type_t<Enum>>(Value);
+        return static_cast<std::underlying_type_t<Type>>(Value);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    inline constexpr auto CastEnum(CStr Value)
+    {
+        return magic_enum::enum_cast<Type>(Value, magic_enum::case_insensitive).value();
     }
 
     // -=(Undocumented)=-
