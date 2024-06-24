@@ -53,9 +53,10 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
-    inline constexpr auto CastEnum(CStr Value)
+    inline constexpr auto CastEnum(CStr Value, Type Default)
     {
-        return magic_enum::enum_cast<Type>(Value, magic_enum::case_insensitive).value();
+        const auto Result = magic_enum::enum_cast<Type>(Value, magic_enum::case_insensitive);
+        return (Result.has_value() ? Result.value() : Default);
     }
 
     // -=(Undocumented)=-
