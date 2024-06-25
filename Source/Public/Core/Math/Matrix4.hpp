@@ -132,6 +132,151 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Matrix4<Base> Inverse() const
+        {
+            const Base C0 =
+                GetComponent(5)  * GetComponent(10) * GetComponent(15) -
+                GetComponent(5)  * GetComponent(11) * GetComponent(14) -
+                GetComponent(9)  * GetComponent(6)  * GetComponent(15) +
+                GetComponent(9)  * GetComponent(7)  * GetComponent(14) +
+                GetComponent(13) * GetComponent(6)  * GetComponent(11) -
+                GetComponent(13) * GetComponent(7)  * GetComponent(10);
+
+            const Base C4 =
+                -GetComponent(4)  * GetComponent(10) * GetComponent(15) +
+                 GetComponent(4)  * GetComponent(11) * GetComponent(14) +
+                 GetComponent(8)  * GetComponent(6)  * GetComponent(15) -
+                 GetComponent(8)  * GetComponent(7)  * GetComponent(14) -
+                 GetComponent(12) * GetComponent(6)  * GetComponent(11) +
+                 GetComponent(12) * GetComponent(7)  * GetComponent(10);
+
+            const Base C8 =
+                GetComponent(4)  * GetComponent(9)  * GetComponent(15) -
+                GetComponent(4)  * GetComponent(11) * GetComponent(13) -
+                GetComponent(8)  * GetComponent(5)  * GetComponent(15) +
+                GetComponent(8)  * GetComponent(7)  * GetComponent(13) +
+                GetComponent(12) * GetComponent(5)  * GetComponent(11) -
+                GetComponent(12) * GetComponent(7)  * GetComponent(9);
+
+            const Base C12 =
+                -GetComponent(4)  * GetComponent(9)  * GetComponent(14) +
+                 GetComponent(4)  * GetComponent(10) * GetComponent(13) +
+                 GetComponent(8)  * GetComponent(5)  * GetComponent(14) -
+                 GetComponent(8)  * GetComponent(6)  * GetComponent(13) -
+                 GetComponent(12) * GetComponent(5)  * GetComponent(10) +
+                 GetComponent(12) * GetComponent(6)  * GetComponent(9);
+
+            const Base C1 =
+                -GetComponent(1)  * GetComponent(10) * GetComponent(15) +
+                 GetComponent(1)  * GetComponent(11) * GetComponent(14) +
+                 GetComponent(9)  * GetComponent(2)  * GetComponent(15) -
+                 GetComponent(9)  * GetComponent(3)  * GetComponent(14) -
+                 GetComponent(13) * GetComponent(2)  * GetComponent(11) +
+                 GetComponent(13) * GetComponent(3)  * GetComponent(10);
+
+            const Base C5 =
+                GetComponent(0)  * GetComponent(10) * GetComponent(15) -
+                GetComponent(0)  * GetComponent(11) * GetComponent(14) -
+                GetComponent(8)  * GetComponent(2)  * GetComponent(15) +
+                GetComponent(8)  * GetComponent(3)  * GetComponent(14) +
+                GetComponent(12) * GetComponent(2)  * GetComponent(11) -
+                GetComponent(12) * GetComponent(3)  * GetComponent(10);
+
+            const Base C9 =
+                -GetComponent(0)  * GetComponent(9)  * GetComponent(15) +
+                 GetComponent(0)  * GetComponent(11) * GetComponent(13) +
+                 GetComponent(8)  * GetComponent(1)  * GetComponent(15) -
+                 GetComponent(8)  * GetComponent(3)  * GetComponent(13) -
+                 GetComponent(12) * GetComponent(1)  * GetComponent(11) +
+                 GetComponent(12) * GetComponent(3)  * GetComponent(9);
+
+            const Base C13 =
+                GetComponent(0)  * GetComponent(9)  * GetComponent(14) -
+                GetComponent(0)  * GetComponent(10) * GetComponent(13) -
+                GetComponent(8)  * GetComponent(1)  * GetComponent(14) +
+                GetComponent(8)  * GetComponent(2)  * GetComponent(13) +
+                GetComponent(12) * GetComponent(1)  * GetComponent(10) -
+                GetComponent(12) * GetComponent(2)  * GetComponent(9);
+
+            const Base C2 =
+                GetComponent(1)  * GetComponent(6) * GetComponent(15) -
+                GetComponent(1)  * GetComponent(7) * GetComponent(14) -
+                GetComponent(5)  * GetComponent(2) * GetComponent(15) +
+                GetComponent(5)  * GetComponent(3) * GetComponent(14) +
+                GetComponent(13) * GetComponent(2) * GetComponent(7)  -
+                GetComponent(13) * GetComponent(3) * GetComponent(6);
+
+            const Base C6 =
+                -GetComponent(0)  * GetComponent(6) * GetComponent(15) +
+                 GetComponent(0)  * GetComponent(7) * GetComponent(14) +
+                 GetComponent(4)  * GetComponent(2) * GetComponent(15) -
+                 GetComponent(4)  * GetComponent(3) * GetComponent(14) -
+                 GetComponent(12) * GetComponent(2) * GetComponent(7)  +
+                 GetComponent(12) * GetComponent(3) * GetComponent(6);
+
+            const Base C10 =
+                GetComponent(0)  * GetComponent(5) * GetComponent(15) -
+                GetComponent(0)  * GetComponent(7) * GetComponent(13) -
+                GetComponent(4)  * GetComponent(1) * GetComponent(15) +
+                GetComponent(4)  * GetComponent(3) * GetComponent(13) +
+                GetComponent(12) * GetComponent(1) * GetComponent(7)  -
+                GetComponent(12) * GetComponent(3) * GetComponent(5);
+
+            const Base C14 =
+                -GetComponent(0)  * GetComponent(5) * GetComponent(14) +
+                 GetComponent(0)  * GetComponent(6) * GetComponent(13) +
+                 GetComponent(4)  * GetComponent(1) * GetComponent(14) -
+                 GetComponent(4)  * GetComponent(2) * GetComponent(13) -
+                 GetComponent(12) * GetComponent(1) * GetComponent(6) +
+                 GetComponent(12) * GetComponent(2) * GetComponent(5);
+
+            const Base C3 =
+                -GetComponent(1) * GetComponent(6) * GetComponent(11) +
+                 GetComponent(1) * GetComponent(7) * GetComponent(10) +
+                 GetComponent(5) * GetComponent(2) * GetComponent(11) -
+                 GetComponent(5) * GetComponent(3) * GetComponent(10) -
+                 GetComponent(9) * GetComponent(2) * GetComponent(7) +
+                 GetComponent(9) * GetComponent(3) * GetComponent(6);
+
+            const Base C7 =
+                GetComponent(0) * GetComponent(6) * GetComponent(11) -
+                GetComponent(0) * GetComponent(7) * GetComponent(10) -
+                GetComponent(4) * GetComponent(2) * GetComponent(11) +
+                GetComponent(4) * GetComponent(3) * GetComponent(10) +
+                GetComponent(8) * GetComponent(2) * GetComponent(7) -
+                GetComponent(8) * GetComponent(3) * GetComponent(6);
+
+            const Base C11 =
+                -GetComponent(0) * GetComponent(5) * GetComponent(11) +
+                 GetComponent(0) * GetComponent(7) * GetComponent(9) +
+                 GetComponent(4) * GetComponent(1) * GetComponent(11) -
+                 GetComponent(4) * GetComponent(3) * GetComponent(9) -
+                 GetComponent(8) * GetComponent(1) * GetComponent(7) +
+                 GetComponent(8) * GetComponent(3) * GetComponent(5);
+
+            const Base C15 =
+                GetComponent(0) * GetComponent(5) * GetComponent(10) -
+                GetComponent(0) * GetComponent(6) * GetComponent(9) -
+                GetComponent(4) * GetComponent(1) * GetComponent(10) +
+                GetComponent(4) * GetComponent(2) * GetComponent(9) +
+                GetComponent(8) * GetComponent(1) * GetComponent(6) -
+                GetComponent(8) * GetComponent(2) * GetComponent(5);
+
+            const Base InvDeterminant =
+                1.0f / (GetComponent(0) * C0 + GetComponent(1) * C4 + GetComponent(2) * C8 + GetComponent(3) * C12);
+            if (InvDeterminant != 0)
+            {
+                const Matrix4<Base> Result(
+                    C0,  C1,  C2,  C3,
+                    C4,  C5,  C6,  C7,
+                    C8,  C9,  C10, C11,
+                    C12, C13, C14, C15);
+                return Result * InvDeterminant;
+            }
+            return Matrix4<Base>();
+        }
+
+        // -=(Undocumented)=-
         Ref<Base> operator()(UInt Component)
         {
             return operator[](Component);
@@ -259,6 +404,22 @@ inline namespace Core
             const Base VectorZ = (GetComponent(2) * X + GetComponent(6) * Y + GetComponent(10) * Z + GetComponent(14)) * W;
 
             return Vector3<Base>(VectorX, VectorY, VectorZ);
+        }
+
+        // -=(Undocumented)=-
+        Vector4<Base> operator*(Ref<const Vector4<Base>> Vector) const
+        {
+            const Base X = Vector.GetX();
+            const Base Y = Vector.GetY();
+            const Base Z = Vector.GetZ();
+            const Base W = Vector.GetW();
+
+            const Base VectorX = (GetComponent(0) * X + GetComponent(4) * Y + GetComponent(8)  * Z + GetComponent(12) * W);
+            const Base VectorY = (GetComponent(1) * X + GetComponent(5) * Y + GetComponent(9)  * Z + GetComponent(13) * W);
+            const Base VectorZ = (GetComponent(2) * X + GetComponent(6) * Y + GetComponent(10) * Z + GetComponent(14) * W);
+            const Base VectorW = (GetComponent(3) * X + GetComponent(7) * Y + GetComponent(11) * Z + GetComponent(15) * W);
+
+            return Vector4<Base>(VectorX, VectorY, VectorZ, VectorW);
         }
 
         // -=(Undocumented)=-

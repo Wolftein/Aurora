@@ -35,8 +35,9 @@ namespace Graphic
 
         if (Dirty)
         {
-            mDirty = false;
-            mWorld = mProjection * (mView = mTransformation.AsMatrix());
+            mDirty   = false;
+            mWorld   = mProjection * (mView = mTransformation.AsMatrix());
+            mInverse = mWorld.Inverse();
         }
         return Dirty;
     }
@@ -46,7 +47,21 @@ namespace Graphic
 
     Vector3f Camera::GetWorldCoordinates(Ref<const Vector3f> Position, Ref<const Rectf> Viewport) const
     {
-        return { }; // TODO
+        const Real32 Width  = Viewport.GetWidth();
+        const Real32 Height = Viewport.GetHeight();
+
+        // Undo the Z normalization first
+        const Real32 Z = Position.GetZ() * 2.0f - 1.0f;
+
+        // Calculate X and Y in normalized device coordinates
+        const Real32 X = (Position.GetX() - Viewport.GetX()) / Width  * 2.0f - 1.0f;
+        const Real32 Y = (Height - (Position.GetY() - Viewport.GetY())) / Height * 2.0f - 1.0f;
+
+        // Transform the normalized device coordinates back to world space
+        const Vector4f NDC(X, Y, Z, 1.0f);
+        const Vector4f WorldPosition = mInverse * NDC;
+
+        return Vector3f(WorldPosition.GetX(), WorldPosition.GetY(), WorldPosition.GetZ());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

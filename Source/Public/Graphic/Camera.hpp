@@ -306,6 +306,7 @@ namespace Graphic
         Matrix4f   mProjection;
         Matrix4f   mView;
         Matrix4f   mWorld;
+        Matrix4f   mInverse;
         Transformf mTransformation;
     };
 }
