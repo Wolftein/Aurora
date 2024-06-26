@@ -208,6 +208,20 @@ inline namespace Core
             Object::Write(* this, Data);
         }
 
+        // -=(Undocumented)=-
+        template<typename Type>
+        void WriteNumber(Type Number)
+        {
+            if constexpr (std::is_integral_v<Type>)
+            {
+                WriteInt<Type>(Number);
+            }
+            else
+            {
+                Write<Type>(Number);
+            }
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -317,10 +317,10 @@ inline namespace Core
         template<typename Reader>
         static Vector4<Base> Read(Ref<Reader> Input)
         {
-            const Base X = Input.template Read<Base>();
-            const Base Y = Input.template Read<Base>();
-            const Base Z = Input.template Read<Base>();
-            const Base W = Input.template Read<Base>();
+            const Base X = Input.template ReadNumber<Base>();
+            const Base Y = Input.template ReadNumber<Base>();
+            const Base Z = Input.template ReadNumber<Base>();
+            const Base W = Input.template ReadNumber<Base>();
             return Vector4<Base>(X, Y, Z, W);
         }
 
@@ -328,10 +328,10 @@ inline namespace Core
         template<typename Writer>
         static void Write(Ref<Writer> Output, Ref<const Vector4<Base>> Vector)
         {
-            Output.Write(Vector.GetX());
-            Output.Write(Vector.GetY());
-            Output.Write(Vector.GetZ());
-            Output.Write(Vector.GetW());
+            Output.template WriteNumber<Base>(Vector.GetX());
+            Output.template WriteNumber<Base>(Vector.GetY());
+            Output.template WriteNumber<Base>(Vector.GetZ());
+            Output.template WriteNumber<Base>(Vector.GetW());
         }
 
         // -=(Undocumented)=-

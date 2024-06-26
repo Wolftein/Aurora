@@ -335,10 +335,10 @@ inline namespace Core
         template<typename Reader>
         static Rect<Base> Read(Ref<Reader> Input)
         {
-            const Base Left   = Input.template Read<Base>();
-            const Base Top    = Input.template Read<Base>();
-            const Base Right  = Input.template Read<Base>();
-            const Base Bottom = Input.template Read<Base>();
+            const Base Left   = Input.template ReadNumber<Base>();
+            const Base Top    = Input.template ReadNumber<Base>();
+            const Base Right  = Input.template ReadNumber<Base>();
+            const Base Bottom = Input.template ReadNumber<Base>();
             return Rect<Base>(Left, Top, Right, Bottom);
         }
 
@@ -346,10 +346,10 @@ inline namespace Core
         template<typename Writer>
         static void Write(Ref<Writer> Output, Ref<const Rect<Base>> Rect)
         {
-            Output.Write(Rect.GetLeft());
-            Output.Write(Rect.GetTop());
-            Output.Write(Rect.GetBottom());
-            Output.Write(Rect.GetRight());
+            Output.template WriteNumber<Base>(Rect.GetLeft());
+            Output.template WriteNumber<Base>(Rect.GetTop());
+            Output.template WriteNumber<Base>(Rect.GetBottom());
+            Output.template WriteNumber<Base>(Rect.GetRight());
         }
 
         // -=(Undocumented)=-

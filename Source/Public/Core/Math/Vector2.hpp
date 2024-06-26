@@ -278,8 +278,8 @@ inline namespace Core
         template<typename Reader>
         static Vector2<Base> Read(Ref<Reader> Input)
         {
-            const Base X = Input.template Read<Base>();
-            const Base Y = Input.template Read<Base>();
+            const Base X = Input.template ReadNumber<Base>();
+            const Base Y = Input.template ReadNumber<Base>();
             return Vector2<Base>(X, Y);
         }
 
@@ -287,8 +287,8 @@ inline namespace Core
         template<typename Writer>
         static void Write(Ref<Writer> Output, Ref<const Vector2<Base>> Vector)
         {
-            Output.Write(Vector.GetX());
-            Output.Write(Vector.GetY());
+            Output.template WriteNumber<Base>(Vector.GetX());
+            Output.template WriteNumber<Base>(Vector.GetY());
         }
 
         // -=(Undocumented)=-

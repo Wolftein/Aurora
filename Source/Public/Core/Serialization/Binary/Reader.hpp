@@ -216,6 +216,20 @@ inline namespace Core
             return Object::Read(* this);
         }
 
+        // -=(Undocumented)=-
+        template<typename Type>
+        Type ReadNumber()
+        {
+            if constexpr (std::is_integral_v<Type>)
+            {
+                return ReadInt<Type>();
+            }
+            else
+            {
+                return Read<Type>();
+            }
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
