@@ -131,7 +131,7 @@ namespace Content
         template<typename Type>
         void Unload(ConstSPtr<Type> Asset)
         {
-            if (Asset && Type::GetFactory()->Remove(Asset->GetKey()))
+            if (Asset && Type::GetFactory().Remove(Asset->GetKey()))
             {
                 // TODO: Asynchronous
 
