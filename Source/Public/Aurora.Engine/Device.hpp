@@ -128,6 +128,12 @@ namespace Engine
         }
 
         // -=(Undocumented)=-
+        Real32 GetScale() const
+        {
+            return SDL_GetWindowDisplayScale(mWindow);
+        }
+
+        // -=(Undocumented)=-
         void SetClipboard(CStr Text)
         {
             SDL_SetClipboardText(Text.data());

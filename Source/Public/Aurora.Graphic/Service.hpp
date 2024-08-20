@@ -116,6 +116,9 @@ namespace Graphic
         Data ReadTexture(Object ID, UInt8 Level, Recti Offset);
 
         // -=(Undocumented)=-
+        UInt QueryTexture(Object ID);
+
+        // -=(Undocumented)=-
         void DeleteTexture(Object ID);
 
         // -=(Undocumented)=-
