@@ -18,8 +18,12 @@ PROJECT(Aurora_Engine)
 ## Code
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-FILE(GLOB_RECURSE PROJECT_SOURCE   "Public/*.cpp" "Private/*.cpp")
+FILE(GLOB_RECURSE PROJECT_SOURCE "Public/*.cpp" "Private/*.cpp")
 FILE(GLOB_RECURSE PROJECT_RESOURCE "Resources/*")
+
+IF    (NOT ${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
+    LIST(FILTER PROJECT_SOURCE EXCLUDE REGEX ".*Direct3D11.*")
+ENDIF ()
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Includes
@@ -40,66 +44,96 @@ CMRC_ADD_RESOURCE_LIBRARY(Engine-Resources
         ALIAS Engine::RC NAMESPACE Resources WHENCE ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${PROJECT_RESOURCE})
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (Win32: XAudio2)
+## Dependency (SDL)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-IF    (WIN32)
-    FetchContent_Declare(External_XAudio2
-            URL https://www.nuget.org/api/v2/package/Microsoft.XAudio2.Redist/1.2.11)
-    FetchContent_MakeAvailable(External_XAudio2)
+SET(SDL_SHARED             OFF)
+SET(SDL_STATIC             ON)
+SET(SDL_TEST_LIBRARY       OFF)
+SET(SDL_DISABLE_UNINSTALL  ON)
+SET(SDL_AUDIO_DEFAULT      ON)
+SET(SDL_VIDEO_DEFAULT      ON)
+SET(SDL_JOYSTICK_DEFAULT   OFF)
+SET(SDL_HAPTIC_DEFAULT     OFF)
+SET(SDL_HIDAPI_DEFAULT     OFF)
+SET(SDL_POWER_DEFAULT      OFF)
+SET(SDL_SENSOR_DEFAULT     OFF)
+SET(SDL_DIALOG_DEFAULT     OFF)
+SET(SDL_CAMERA_DEFAULT     OFF)
 
-    ADD_LIBRARY(XAudio2 INTERFACE)
-    TARGET_INCLUDE_DIRECTORIES(XAudio2 INTERFACE ${external_xaudio2_SOURCE_DIR}/build/native/include)
+FetchContent_Declare(External_SDL
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL
+        GIT_TAG main
+        GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(External_SDL)
 
-    LIST(APPEND PROJECT_DEPENDENCIES "XAudio2")
-ENDIF ()
-
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (EASTL in-drop replacement for STL)
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-FetchContent_Declare(External_EASTL
-        GIT_REPOSITORY https://github.com/electronicarts/EASTL
-        GIT_SUBMODULES_RECURSE  OFF
-        GIT_SHALLOW             ON
-        GIT_PROGRESS            ON)
-FetchContent_MakeAvailable(External_EASTL)
-
-LIST(APPEND PROJECT_DEPENDENCIES "EASTL")
+LIST(APPEND PROJECT_DEPENDENCIES "SDL3-static")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (GLFW)
+## Dependency (FAudio)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-SET(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "")
-SET(GLFW_BUILD_TESTS    OFF CACHE INTERNAL "")
-SET(GLFW_BUILD_DOCS     OFF CACHE INTERNAL "")
-SET(GLFW_BUILD_INSTALL  OFF CACHE INTERNAL "")
+SET(XNASONG            OFF)
+SET(BUILD_SDL3         ON)
+SET(SDL3_INCLUDE_DIRS  ${external_sdl_SOURCE_DIR}/include)
+SET(SDL3_LIBRARIES     "SDL3-static")
+SET(BUILD_SHARED_LIBS, OFF)
 
-FetchContent_Declare(External_GLFW
-        GIT_REPOSITORY https://github.com/glfw/glfw)
-FetchContent_MakeAvailable(External_GLFW)
+FetchContent_Declare(External_FAudio GIT_REPOSITORY https://github.com/Wolftein/FAudio)
+FetchContent_MakeAvailable(External_FAudio)
 
-LIST(APPEND PROJECT_DEPENDENCIES "glfw")
-
-IF    (WIN32)
-    ADD_DEFINITIONS(-DGLFW_EXPOSE_NATIVE_WIN32)
-ENDIF ()
+LIST(APPEND PROJECT_DEPENDENCIES "FAudio")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (ENET)
+## Dependency (ASIO)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-SET(ENET_STATIC ON CACHE INTERNAL "")
+FetchContent_Declare(External_ASIO
+        GIT_REPOSITORY https://github.com/chriskohlhoff/asio)
+FetchContent_MakeAvailable(External_ASIO)
 
-FetchContent_Declare(External_ENET
-        GIT_REPOSITORY https://github.com/zpl-c/enet)
-FetchContent_MakeAvailable(External_ENET)
+ADD_LIBRARY(ASIO INTERFACE)
+TARGET_INCLUDE_DIRECTORIES(ASIO INTERFACE ${external_asio_SOURCE_DIR}/asio/include)
 
-LIST(APPEND PROJECT_DEPENDENCIES "enet_static")
+LIST(APPEND PROJECT_DEPENDENCIES "ASIO")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (DrLibs for reading WAV and MP3)
+## Dependency (in-drop replacement for unordered_map)
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+FetchContent_Declare(External_Ankerl
+        GIT_REPOSITORY https://github.com/martinus/unordered_dense
+        GIT_TAG main)
+FetchContent_MakeAvailable(External_Ankerl)
+
+ADD_LIBRARY(Ankerl INTERFACE)
+TARGET_INCLUDE_DIRECTORIES(Ankerl INTERFACE ${external_ankerl_SOURCE_DIR}/include/ankerl)
+
+LIST(APPEND PROJECT_DEPENDENCIES "Ankerl")
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Dependency (BMP / PNG)
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+ADD_DEFINITIONS(-DSTBI_NO_PSD)
+ADD_DEFINITIONS(-DSTBI_NO_TGA)
+ADD_DEFINITIONS(-DSTBI_NO_GIF)
+ADD_DEFINITIONS(-DSTBI_NO_HDR)
+ADD_DEFINITIONS(-DSTBI_NO_PIC)
+ADD_DEFINITIONS(-DSTBI_NO_PNM)
+ADD_DEFINITIONS(-DSTBI_NO_STDIO)
+
+FetchContent_Declare(External_STB
+        GIT_REPOSITORY https://github.com/nothings/stb)
+FetchContent_MakeAvailable(External_STB)
+
+ADD_LIBRARY(STB INTERFACE)
+TARGET_INCLUDE_DIRECTORIES(STB INTERFACE ${external_stb_SOURCE_DIR})
+
+LIST(APPEND PROJECT_DEPENDENCIES "STB")
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Dependency (WAV / MP3)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 FetchContent_Declare(External_DRLIBS
@@ -110,19 +144,6 @@ ADD_LIBRARY(DrLibs INTERFACE)
 TARGET_INCLUDE_DIRECTORIES(DrLibs INTERFACE ${external_drlibs_SOURCE_DIR})
 
 LIST(APPEND PROJECT_DEPENDENCIES "DrLibs")
-
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (STB for reading images)
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-FetchContent_Declare(External_STB
-        GIT_REPOSITORY https://github.com/nothings/stb)
-FetchContent_MakeAvailable(External_STB)
-
-ADD_LIBRARY(STB INTERFACE)
-TARGET_INCLUDE_DIRECTORIES(STB INTERFACE ${external_stb_SOURCE_DIR})
-
-LIST(APPEND PROJECT_DEPENDENCIES "STB")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (TOML)
@@ -141,40 +162,30 @@ LIST(APPEND PROJECT_DEPENDENCIES "Toml")
 ## Dependency (SPDLOG)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+SET(BUILD_SHARED_LIBS     OFF)
+SET(SPDLOG_BUILD_SHARED   OFF)
+SET(SPDLOG_USE_STD_FORMAT ON)
+
 FetchContent_Declare(External_SPDLOG
         GIT_REPOSITORY https://github.com/gabime/spdlog
         GIT_TAG v2.x)
 FetchContent_MakeAvailable(External_SPDLOG)
 
-LIST(APPEND PROJECT_DEPENDENCIES "spdlog")
-
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (Sciter)
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-FetchContent_Declare(External_Sciter
-        GIT_REPOSITORY https://gitlab.com/sciter-engine/sciter-js-sdk.git
-        GIT_TAG main)
-FetchContent_MakeAvailable(External_Sciter)
-
-ADD_LIBRARY(Sciter INTERFACE)
-TARGET_INCLUDE_DIRECTORIES(Sciter INTERFACE ${external_sciter_SOURCE_DIR}/include)
-
-LIST(APPEND PROJECT_DEPENDENCIES "Sciter")
+LIST(APPEND PROJECT_DEPENDENCIES "spdlog::spdlog")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (Enumeration static reflection)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-FetchContent_Declare(External_Enum
+FetchContent_Declare(External_Neargye
         GIT_REPOSITORY https://github.com/Neargye/magic_enum
         GIT_TAG master)
-FetchContent_MakeAvailable(External_Enum)
+FetchContent_MakeAvailable(External_Neargye)
 
-ADD_LIBRARY(Enum INTERFACE)
-TARGET_INCLUDE_DIRECTORIES(Enum INTERFACE ${external_enum_SOURCE_DIR}/include)
+ADD_LIBRARY(Neargye INTERFACE)
+TARGET_INCLUDE_DIRECTORIES(Neargye INTERFACE ${external_neargye_SOURCE_DIR}/include)
 
-LIST(APPEND PROJECT_DEPENDENCIES "Enum")
+LIST(APPEND PROJECT_DEPENDENCIES "Neargye")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Configuration
@@ -182,7 +193,7 @@ LIST(APPEND PROJECT_DEPENDENCIES "Enum")
 
 ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MP3)        # .mp3
 ADD_DEFINITIONS(-DAE_CONTENT_LOADER_WAV)        # .wav
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_STB)        # .png, .bmp, .tiff, .tga, .jpg
+ADD_DEFINITIONS(-DAE_CONTENT_LOADER_STB)        # .png, .bmp, .tga, .jpg
 ADD_DEFINITIONS(-DAE_CONTENT_LOADER_EFFECT)     # .effect, .shader
 ADD_DEFINITIONS(-DAE_CONTENT_LOADER_ARTERY)     # .arfont
 

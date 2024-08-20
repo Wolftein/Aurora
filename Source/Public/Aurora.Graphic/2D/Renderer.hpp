@@ -1,0 +1,260 @@
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Copyright (C) 2021-2024 by Agustin Alvarez. All rights reserved.
+//
+// This work is licensed under the terms of the MIT license.
+//
+// For a copy, see <https://opensource.org/licenses/MIT>.
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+#pragma once
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// [  HEADER  ]
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+#include "Font.hpp"
+#include "Encoder.hpp"
+#include "Aurora.Graphic/Camera.hpp"
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// [   CODE   ]
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+namespace Graphic
+{
+    // -=(Undocumented)=-
+    // TODO: Need Rework
+    class Renderer final
+    {
+    public:
+
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxDrawables = 16384;
+
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxVertices  = 24 * 1024 * 1024; // 24mb
+
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxIndices   =  4 * 1024 * 1024; // 4mb
+
+        // -=(Undocumented)=-
+        inline constexpr static UInt k_MaxUniform   =  8 * 1024 * 1024; // 8mb
+
+        // -=(Undocumented)=-
+        enum class Order
+        {
+            // -=(Undocumented)=-
+            Subtractive,
+
+            // -=(Undocumented)=-
+            Additive,
+
+            // -=(Undocumented)=-
+            Normal,
+
+            // -=(Undocumented)=-
+            Opaque,
+        };
+
+        // -=(Undocumented)=-
+        enum class Alignment
+        {
+            // -=(Undocumented)=-
+            LeftTop        = (1 << 0) | (1 << 3),
+
+            // -=(Undocumented)=-
+            LeftMiddle     = (1 << 0) | (1 << 4),
+
+            // -=(Undocumented)=-
+            LeftBottom     = (1 << 0) | (1 << 5),
+
+            // -=(Undocumented)=-
+            LeftBaseline   = (1 << 0) | (1 << 6),
+
+            // -=(Undocumented)=-
+            CenterTop      = (1 << 1) | (1 << 3),
+
+            // -=(Undocumented)=-
+            CenterMiddle   = (1 << 1) | (1 << 4),
+
+            // -=(Undocumented)=-
+            CenterBottom   = (1 << 1) | (1 << 5),
+
+            // -=(Undocumented)=-
+            CenterBaseline = (1 << 1) | (1 << 6),
+
+            // -=(Undocumented)=-
+            RightTop       = (1 << 2) | (1 << 3),
+
+            // -=(Undocumented)=-
+            RightMiddle    = (1 << 2) | (1 << 4),
+
+            // -=(Undocumented)=-
+            RightBottom    = (1 << 2) | (1 << 5),
+
+            // -=(Undocumented)=-
+            RightBaseline  = (1 << 2) | (1 << 6),
+        };
+
+    public:
+
+        // -=(Undocumented)=-
+        Renderer(Ref<Core::Subsystem::Context> Context);
+
+        // -=(Undocumented)=-
+        void Begin(Ref<const Matrix4f> Projection, UInt64 Tick);
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void SetParameter(UInt Offset, Type Parameter)
+        {
+            constexpr UInt32 Size = sizeof(Type) / sizeof(Vector4f) + 1;
+
+            if (Offset + Size > mParameters.size())
+            {
+                mParameters.resize(mParameters.size() + Align(Size, 16));
+            }
+
+            * (reinterpret_cast<Ptr<Type>>(reinterpret_cast<UInt>(mParameters.data()) + Offset)) = Parameter;
+        }
+
+        // -=(Undocumented)=-
+        void DrawLine(Ref<const Array<Vector2f, 2>> Points, Real32 Depth, Ref<const Array<Color, 2>> Tint, Real32 Thickness = 1.0f);
+
+        // -=(Undocumented)=-
+        void DrawLine(Ref<const Array<Vector2f, 2>> Points, Real32 Depth, Ref<const Color> Tint, Real32 Thickness = 1.0f)
+        {
+            DrawLine(Points, Depth, Array<Color, 2> { Tint, Tint }, Thickness);
+        }
+
+        // -=(Undocumented)=-b
+        void DrawRectangle(Ref<const Array<Vector2f, 4>> Points, Real32 Depth, Ref<const Array<Color, 4>> Tint);
+
+        // -=(Undocumented)=-
+        void DrawRectangle(Ref<const Rectf> Rectangle, Vector2f Origin, Real32 Depth, Real32 Angle, Ref<const Array<Color, 4>> Tint);
+
+        // -=(Undocumented)=-
+        void DrawRectangle(Ref<const Rectf> Rectangle, Vector2f Origin, Real32 Depth, Real32 Angle, Ref<const Color> Tint)
+        {
+            DrawRectangle(Rectangle, Origin, Depth, Angle, Array<Color, 4> { Tint, Tint, Tint, Tint });
+        }
+
+        // -=(Undocumented)=-
+        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Vector2f Origin, Real32 Depth, Real32 Angle, Order Order, Ref<const Array<Color, 4>> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+
+        // -=(Undocumented)=-
+        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Vector2f Origin, Real32 Depth, Real32 Angle, Order Order, Ref<const Color> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+        {
+            DrawTexture(Rectangle, Source, Origin, Depth, Angle, Order, Array<Color, 4> { Tint, Tint, Tint, Tint }, Pipeline, Material);
+        }
+
+        // -=(Undocumented)=-
+        void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Real32 Depth, Real32 Angle, Order Order, Ref<const Color> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+        {
+            Vector2f Origin(
+                Rectangle.GetX() + (Rectangle.GetWidth() * 0.5f),
+                Rectangle.GetY() + (Rectangle.GetHeight() * 0.5f));
+            DrawTexture(Rectangle, Source, Origin, Depth, Angle, Order, Array<Color, 4> { Tint, Tint, Tint, Tint }, Pipeline, Material);
+        }
+
+        // -=(Undocumented)=-
+        void DrawFont(ConstSPtr<Font> Font, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Alignment Alignment);
+
+        // -=(Undocumented)=-
+        void Flush();
+
+        // -=(Undocumented)=-
+        void End();
+
+    private:
+
+        // -=(Undocumented)=-
+        struct Layout
+        {
+            // -=(Undocumented)=-
+            Vector3f Position;
+
+            // -=(Undocumented)=-
+            UInt32   Color;
+
+            // -=(Undocumented)=-
+            Vector2f Texture;
+        };
+
+        // -=(Undocumented)=-
+        struct Layout2
+        {
+            // -=(Undocumented)=-
+            Vector3f Position;
+
+            // -=(Undocumented)=-
+            UInt32   Color;
+        };
+
+        // -=(Undocumented)=-
+        struct Drawable
+        {
+            // -=(Undocumented)=-
+            UInt64                  ID;
+
+            // -=(Undocumented)=-
+            Real                    Depth;
+
+            // -=(Undocumented)=-
+            Array<Vector2f, 4>      Position;
+
+            // -=(Undocumented)=-
+            Array<Color, 4>         Color;
+
+            // -=(Undocumented)=-
+            Array<Vector2f, 4>      Texture;
+
+            // -=(Undocumented)=-
+            SPtr<Graphic::Pipeline> Pipeline;
+
+            // -=(Undocumented)=-
+            SPtr<Graphic::Material> Material;
+        };
+
+    private:
+
+        // -=(Undocumented)=-
+        void CreateDefaultResources(Ref<Core::Subsystem::Context> Context);
+
+        // -=(Undocumented)=-
+        void Push(
+            Ref<const Array<Vector2f, 4>> Position,
+            Ref<const Array<Color, 4>> Tint,
+            Ref<const Array<Vector2f, 4>> Texture,
+            Order Order, Real32 Depth, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+
+        // -=(Undocumented)=-
+        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<Layout> Buffer);
+
+        // -=(Undocumented)=-
+        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<Layout2> Buffer);
+
+        // -=(Undocumented)=-
+        UInt64 GenerateUniqueID(Order Order, UInt Pipeline, UInt Material, Real32 Depth) const;
+
+    private:
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Encoder                              mEncoder;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Array<SPtr<Pipeline>, 2>             mPipelines;
+        Vector<Vector4f>                     mParameters;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Stack<Drawable, k_MaxDrawables>      mDrawables;
+        Vector<Ptr<Drawable>>                mDrawablesPtr;
+    };
+
+}

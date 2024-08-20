@@ -7,7 +7,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 // TODO: Configurable
-#define OUTLINE_THICKNESS 0.4
+#define OUTLINE_THICKNESS 0.3
 #define OUTLINE_COLOR     float4(0, 0, 0, 1)
 
 Texture2D    ColorTexture : register(t0);
@@ -17,14 +17,14 @@ SamplerState ColorSampler : register(s0);
 
 cbuffer SceneConstantBuffer : register(b0)
 {
-    float4x4 uCamera;
-    float    uTime;
+float4x4 uCamera;
+float    uTime;
 };
 
 cbuffer MaterialConstantBuffer : register(b2)
 {
-    float2   uDimension;
-    float    uDistance;
+float2   uDimension;
+float    uDistance;
 };
 
 // Definition
@@ -40,13 +40,13 @@ struct PixelShaderInput
 
 PixelShaderInput vertex(float3 Position : ATTRIBUTE0, float4 Color : ATTRIBUTE1, float2 UV : ATTRIBUTE2)
 {
-    PixelShaderInput Result;
+PixelShaderInput Result;
 
-    Result.Position = mul(uCamera, float4(Position,  1));
-    Result.Color    = Color;
-    Result.UV       = UV;
+Result.Position = mul(uCamera, float4(Position,  1));
+Result.Color    = Color;
+Result.UV       = UV;
 
-    return Result;
+return Result;
 }
 
 // PS Main
@@ -67,8 +67,8 @@ float2 SafeNormalize(float2 Vector)
 
 float GetOpacityFromDistance(float signedDistance, float2 Jdx, float2 Jdy)
 {
-    const float distanceLimit = sqrt(2.0f) / 2.0f;  
-    const float thickness = 1.0f / uDistance; 
+    const float distanceLimit = sqrt(2.0f) / 2.0f;
+    const float thickness = 1.0f / uDistance;
     float2 gradientDistance = SafeNormalize(float2(ddx(signedDistance), ddy(signedDistance)));
     float2 gradient = float2(gradientDistance.x * Jdx.x + gradientDistance.y * Jdy.x, gradientDistance.x * Jdx.y + gradientDistance.y * Jdy.y);
     float scaledDistanceLimit = min(thickness * distanceLimit * length(gradient), 0.5f);
