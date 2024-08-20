@@ -151,14 +151,6 @@ namespace Content
             }
         }
 
-    private:
-
-        // -=(Undocumented)=-
-        void RegisterDefaultResources();
-
-        // -=(Undocumented)=-
-        Bool Parse(ConstSPtr<Resource> Asset);
-
         // -=(Undocumented)=-
         template<typename Type>
         void Process(ConstSPtr<Type> Asset, Bool Loaded)
@@ -176,6 +168,14 @@ namespace Content
                 Asset->Delete(GetContext());
             }
         }
+
+    private:
+
+        // -=(Undocumented)=-
+        void RegisterDefaultResources();
+
+        // -=(Undocumented)=-
+        Bool Parse(ConstSPtr<Resource> Asset);
 
     private:
 
