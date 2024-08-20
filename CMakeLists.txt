@@ -60,4 +60,3 @@ ENDIF ()
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/Source)
-ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/Test)
