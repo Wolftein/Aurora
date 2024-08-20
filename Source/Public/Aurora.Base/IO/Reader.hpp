@@ -117,9 +117,13 @@ inline namespace IO
             {
                 ReadNumber<Type>();
             }
-            else if constexpr (std::is_same<Type, SStr>::value)
+            else if constexpr (std::is_same<Type, SStr>::value || std::is_same<Type, CStr>::value)
             {
-                ReadString();
+                ReadString8();
+            }
+            else if constexpr (std::is_same<Type, SStr16>::value || std::is_same<Type, CStr16>::value)
+            {
+                ReadString16();
             }
             else
             {
@@ -209,12 +213,21 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        CStr ReadString()
+        CStr ReadString8()
         {
             const auto Size = ReadInt<UInt>();
             const auto Data = Read<CStr::const_pointer>(Size * sizeof(CStr::value_type));
 
             return CStr(Data, Size);
+        }
+
+        // -=(Undocumented)=-
+        CStr16 ReadString16()
+        {
+            const auto Size = ReadInt<UInt>();
+            const auto Data = Read<CStr16::const_pointer>(Size * sizeof(CStr16::value_type));
+
+            return CStr16(Data, Size);
         }
 
         // -=(Undocumented)=-

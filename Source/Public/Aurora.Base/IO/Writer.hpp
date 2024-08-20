@@ -110,9 +110,13 @@ inline namespace IO
             {
                 WriteNumber(Data);
             }
-            else if constexpr (std::is_same<Type, SStr>::value)
+            else if constexpr (std::is_same<Type, SStr>::value || std::is_same<Type, CStr>::value)
             {
-                WriteString(Data);
+                WriteString8(Data);
+            }
+            else if constexpr (std::is_same<Type, SStr16>::value || std::is_same<Type, CStr16>::value)
+            {
+                WriteString16(Data);
             }
             else
             {
@@ -198,13 +202,24 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        void WriteString(CStr Data)
+        void WriteString8(CStr Data)
         {
             WriteInt(Data.size());
 
             if (!Data.empty())
             {
                 Write<CStr::const_pointer>(Data.data(), Data.size() * sizeof(CStr::value_type));
+            }
+        }
+
+        // -=(Undocumented)=-
+        void WriteString16(CStr16 Data)
+        {
+            WriteInt(Data.size());
+
+            if (!Data.empty())
+            {
+                Write<CStr16::const_pointer>(Data.data(), Data.size() * sizeof(CStr16::value_type));
             }
         }
 
