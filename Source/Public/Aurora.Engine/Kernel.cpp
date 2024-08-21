@@ -112,38 +112,31 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Kernel::Tick()
-    {
-        const UInt64 Time = SDL_GetTicks();
-
-        // Tick subsystems (order matters)
-        Execute([Time](Ref<Core::Subsystem> Service)
-        {
-            Service.OnTick(Time);
-        });
-
-        // Tick application
-        OnTick(Time);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
     void Kernel::Run()
     {
+        const auto OnMainTick = [this]()
+        {
+            const UInt64 Time = SDL_GetTicks();
+
+            // Tick subsystems (order matters)
+            Execute([Time](Ref<Core::Subsystem> Service)
+            {
+                Service.OnTick(Time);
+            });
+
+            // Tick application
+            OnTick(Time);
+        };
+
 #ifdef    __EMSCRIPTEN__
 
-        const auto OnTick = [this]()
-        {
-            Tick();
-        };
-        emscripten_set_main_loop(OnTick, 0, true);
+        emscripten_set_main_loop(OnMainTick, 0, true);
 
 #else
 
         while (mActive)
         {
-            Tick();
+            OnMainTick();
         }
 
 #endif // __EMSCRIPTEN__
@@ -158,7 +151,6 @@ namespace Engine
     {
         mActive = false;
     }
-
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -90,11 +90,7 @@ inline namespace Core
         // -=(Undocumented)=-
         ~Data()
         {
-            if (mData)
-            {
-                mDeleter(mData);
-            }
-            mData = nullptr;
+            Clear();
         }
 
         // -=(Undocumented)=-
@@ -139,7 +135,11 @@ inline namespace Core
         // -=(Undocumented)=-
         void Clear()
         {
-            mData = nullptr;
+            if (mData)
+            {
+                mDeleter(mData);
+                mData = nullptr;
+            }
             mSize = 0;
         }
 

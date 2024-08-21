@@ -47,9 +47,6 @@ namespace Engine
         void Initialize(Mode Mode, Ref<const Properties> Properties);
 
         // -=(Undocumented)=-
-        void Tick();
-
-        // -=(Undocumented)=-
         void Run();
 
         // -=(Undocumented)=-
