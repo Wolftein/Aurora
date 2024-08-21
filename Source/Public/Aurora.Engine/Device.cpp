@@ -50,11 +50,14 @@ namespace Engine
 #endif  // SDL_PLATFORM_WIN32
 
         mWindow = SDL_CreateWindowWithProperties(Config);
+        if (! mWindow)
+        {
+            Log::Error("Failed to create device: '{}'", SDL_GetError());
+        }
 
 #ifdef     SDL_PLATFORM_WIN32
 
         SDL_StartTextInput(mWindow);
-
 #endif  // SDL_PLATFORM_WIN32
     }
 
@@ -67,6 +70,7 @@ namespace Engine
         {
             SDL_DestroyWindow(mWindow);
         }
+        SDL_Quit();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

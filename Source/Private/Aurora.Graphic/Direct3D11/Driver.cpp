@@ -576,7 +576,7 @@ namespace Graphic
     void D3D11Driver::CreatePass(Object ID, UInt Display, UInt Width, UInt Height)
     {
         DXGI_SWAP_CHAIN_DESC Description { 0 };
-        Description.BufferCount       = 2;
+        Description.BufferCount       = 3;
         Description.BufferUsage       = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         Description.Flags             = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
              | (mCapabilities.Tearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
@@ -590,11 +590,11 @@ namespace Graphic
         ComPtr<IDXGIFactory4> DXGIFactor4;
         if (SUCCEEDED(mDisplayFactory.As<IDXGIFactory4>(& DXGIFactor4)))
         {
-            Description.SwapEffect    = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+            Description.SwapEffect = (mCapabilities.Tearing ? DXGI_SWAP_EFFECT_FLIP_DISCARD : DXGI_SWAP_EFFECT_DISCARD);
         }
         else
         {
-            Description.SwapEffect    = DXGI_SWAP_EFFECT_DISCARD;
+            Description.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
         }
 
         CheckIfFail(mDisplayFactory->CreateSwapChain(mDevice.Get(), & Description, mPasses[ID].Display.GetAddressOf()));
@@ -1119,7 +1119,9 @@ namespace Graphic
         ComPtr<IDXGIFactory5> DXGIFactory5;
         if (SUCCEEDED(mDisplayFactory.As<IDXGIFactory5>(& DXGIFactory5)))
         {
-            DXGIFactory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, & mCapabilities.Tearing, sizeof(Bool));
+            BOOL AllowTearing = FALSE;
+            DXGIFactory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, & AllowTearing, sizeof(AllowTearing));
+            mCapabilities.Tearing = AllowTearing;
         }
     }
 

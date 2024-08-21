@@ -26,6 +26,11 @@ namespace Log
 
     void Initialize(CStr Filename)
     {
+        if (spdlog::thread_pool())
+        {
+            return;
+        }
+
         Vector<spdlog::sink_ptr> Sinks;
 
 #ifdef    _DEBUG
