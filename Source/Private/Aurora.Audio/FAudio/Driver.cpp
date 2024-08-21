@@ -85,7 +85,11 @@ namespace Audio
 
     static auto GetVector(Ref<const Vector3f> Vector)
     {
-        return F3DAUDIO_VECTOR(Vector.GetX(), Vector.GetY(), Vector.GetZ());
+        F3DAUDIO_VECTOR Conversion;
+        Conversion.x = Vector.GetX();
+        Conversion.y = Vector.GetY();
+        Conversion.z = Vector.GetZ();
+        return Conversion;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
