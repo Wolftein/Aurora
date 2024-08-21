@@ -182,7 +182,7 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
-        static constexpr inline Ref<Factory<Impl>> GetFactory()
+        static inline Ref<Factory<Impl>> GetFactory()
         {
             static Factory<Impl> RTTI_FACTORY;
             return RTTI_FACTORY;

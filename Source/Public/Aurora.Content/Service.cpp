@@ -101,9 +101,9 @@ namespace Content
             return It->second->Read(Key.GetPath());
         }
 
-        for (const auto Iterator : mLocators)
+        for (auto [_, Locator] : mLocators)
         {
-            if (Data Data = Iterator.second->Read(Key.GetPath()); Data.HasData())
+            if (Data Data = Locator->Read(Key.GetPath()); Data.HasData())
             {
                 return Move(Data);
             }

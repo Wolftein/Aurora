@@ -46,8 +46,6 @@ namespace Network
         const UInt Reader = mReader.load(std::memory_order_acquire);
         const UInt Marker = mMarker.load(std::memory_order_acquire);
 
-        SInt32 Offset = -1;
-
         if (Marker != 0)
         {
             if (Writer + Length <= Reader)

@@ -34,7 +34,7 @@ namespace Content
         }
 
         // \see AbstractLoader::Load
-        Bool Load(Ref<class Service> Service, Data&& File, Ref<Graphic::Font> Asset);
+        Bool OnLoad(Ref<class Service> Service, Data&& File, Ref<Graphic::Font> Asset);
 
     private:
 

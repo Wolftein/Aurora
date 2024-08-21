@@ -79,10 +79,10 @@ namespace Audio
     private:
 
         // \see Resource::OnCreate(Ref<Subsystem::Context>)
-        Bool OnCreate(Ref<Subsystem::Context> Context) override;
+        Bool OnCreate(Ref<Subsystem::Context> Context);
 
         // \see Resource::OnDelete(Ref<Subsystem::Context>)
-        void OnDelete(Ref<Subsystem::Context> Context) override;
+        void OnDelete(Ref<Subsystem::Context> Context);
 
     private:
 

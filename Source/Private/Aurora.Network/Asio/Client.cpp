@@ -174,7 +174,7 @@ namespace Network
             // reset all buffer(s)
             mEncoder.Reset();
             mDecoder.Reset();
-            mFlushable.store(false, std::memory_order::memory_order_relaxed);
+            mFlushable.store(false, std::memory_order_relaxed);
 
             const auto OnCallback = [Self = shared_from_this()]()
             {
@@ -226,7 +226,7 @@ namespace Network
         }
         else
         {
-            mFlushable.store(true, std::memory_order::memory_order_release);
+            mFlushable.store(true, std::memory_order_release);
 
             if (mState == State::Closing)
             {

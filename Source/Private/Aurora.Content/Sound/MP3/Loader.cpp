@@ -22,7 +22,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool MP3Loader::Load(Ref<class Service> Service, Data&& File, Ref<Audio::Sound> Asset)
+    Bool MP3Loader::OnLoad(Ref<class Service> Service, Data&& File, Ref<Audio::Sound> Asset)
     {
         UPtr<Audio::MP3Decoder> Decoder = NewUniquePtr<Audio::MP3Decoder>(Move(File));
 
