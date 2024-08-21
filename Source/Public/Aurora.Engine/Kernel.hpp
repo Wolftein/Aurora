@@ -41,7 +41,7 @@ namespace Engine
         Kernel();
 
         // -=(Undocumented)=-
-        ~Kernel();
+        virtual ~Kernel();
 
         // -=(Undocumented)=-
         void Initialize(Mode Mode, Ref<const Properties> Properties);
