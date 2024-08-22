@@ -11,6 +11,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Driver.hpp"
+#include <codecvt> // TODO: Replace with in-house implementation
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -23,9 +24,8 @@ namespace Audio
 
     static auto As(const Ptr<wchar_t> Value)
     {
-        Char Buffer[256];
-        ::WideCharToMultiByte(0, 0, Value, -1, Buffer, 256, NULL, NULL);
-        return SStr(Buffer);
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> Conversor;
+        return Conversor.to_bytes(Value);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
