@@ -15,8 +15,9 @@
 #include <algorithm>
 #include <array>
 #include <bitset>
+#include <cmath>
+#include <format>
 #include <functional>
-#include <math.h>
 #include <memory>
 #include <span>
 #include <string>

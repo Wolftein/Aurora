@@ -151,11 +151,7 @@ namespace Content
 
     Data PipelineLoader::Compile(Ref<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage)
     {
-        if (Section.IsEmpty())
-        {
-            return Data();
-        }
-        else
+        if (!Section.IsEmpty())
         {
             ConstSPtr<Graphic::Shader> Shader = Service.Load<Graphic::Shader>(Section.GetString("Filename"));
             const CStr         Code     = Shader->GetBytecode();
@@ -178,6 +174,7 @@ namespace Content
             return CompileDXBC(Entry, Code, Properties, Stage);
 #endif // SDL_PLATFORM_WINDOWS
         }
+        return Data();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
