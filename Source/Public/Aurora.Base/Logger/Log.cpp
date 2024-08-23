@@ -12,8 +12,17 @@
 
 #include "Log.hpp"
 #include <spdlog/async.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_sinks.h>
+
+#ifdef    SDL_PLATFORM_ANDROID
+
+    #include "spdlog/sinks/android_sink.h"
+
+#else  // SDL_PLATFORM_ANDROID
+
+    #include <spdlog/sinks/basic_file_sink.h>
+    #include <spdlog/sinks/stdout_sinks.h>
+
+#endif // SDL_PLATFORM_ANDROID
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -33,14 +42,24 @@ namespace Log
 
         Vector<spdlog::sink_ptr> Sinks;
 
+#ifdef    SDL_PLATFORM_ANDROID
+
+        Sinks.emplace_back(NewPtr<spdlog::sinks::android_sink_mt>("Aurora", false));
+
+#else  // SDL_PLATFORM_ANDROID
+
 #ifdef    _DEBUG
+
         Sinks.emplace_back(NewPtr<spdlog::sinks::stdout_sink_mt>());
+
 #endif // _DEBUG
 
         if (! Filename.empty())
         {
             Sinks.emplace_back(NewPtr<spdlog::sinks::basic_file_sink_mt>(Filename.data(), true));
         }
+
+#endif // SDL_PLATFORM_ANDROID
 
         // Create the backend logging thread
         spdlog::init_thread_pool(8192, 1);
