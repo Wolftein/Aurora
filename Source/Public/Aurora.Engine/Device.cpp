@@ -45,8 +45,6 @@ namespace Engine
 
         // TODO: Create VK context
 
-        SDL_GL_CreateContext();
-
 #ifdef     SDL_PLATFORM_WIN32
 
         if (Handle)
