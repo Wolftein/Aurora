@@ -63,8 +63,7 @@ SET(SDL_CAMERA_DEFAULT     OFF)
 
 FetchContent_Declare(External_SDL
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
-        GIT_TAG main
-        GIT_SHALLOW TRUE)
+        GIT_TAG main)
 FetchContent_MakeAvailable(External_SDL)
 
 LIST(APPEND PROJECT_DEPENDENCIES "SDL3-static")
@@ -74,12 +73,13 @@ LIST(APPEND PROJECT_DEPENDENCIES "SDL3-static")
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 SET(XNASONG            OFF)
+SET(BUILD_SHARED_LIBS, OFF)
 SET(BUILD_SDL3         ON)
 SET(SDL3_INCLUDE_DIRS  ${external_sdl_SOURCE_DIR}/include)
 SET(SDL3_LIBRARIES     "SDL3-static")
-SET(BUILD_SHARED_LIBS, OFF)
 
-FetchContent_Declare(External_FAudio GIT_REPOSITORY https://github.com/Wolftein/FAudio)
+FetchContent_Declare(External_FAudio
+        GIT_REPOSITORY https://github.com/Wolftein/FAudio)
 FetchContent_MakeAvailable(External_FAudio)
 
 LIST(APPEND PROJECT_DEPENDENCIES "FAudio")

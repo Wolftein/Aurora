@@ -20,7 +20,7 @@ PROJECT(Aurora)
 
 INCLUDE(FetchContent)
 
-SET(FETCHCONTENT_QUIET FALSE)
+SET(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Compiler
