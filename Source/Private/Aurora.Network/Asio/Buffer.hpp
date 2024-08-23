@@ -35,7 +35,7 @@ namespace Network
         CPtr<UInt8> Reserve(UInt Length);
 
         // -=(Undocumented)=-
-        void Commit(UInt32 Length);
+        void Commit(UInt Length);
 
         // -=(Undocumented)=-
         CPtr<UInt8> Read();
