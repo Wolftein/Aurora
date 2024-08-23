@@ -41,7 +41,7 @@ namespace Content
             return Result;
         }
         return Data();
-	}
+    }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -70,7 +70,11 @@ namespace Content
     {
         if (Path.empty())
         {
+#ifdef    SDL_PLATFORM_ANDROID
+            return SStr();
+#else  // SDL_PLATFORM_ANDROID
             return SDL_GetBasePath();
+#endif // SDL_PLATFORM_ANDROID
         }
         else
         {
