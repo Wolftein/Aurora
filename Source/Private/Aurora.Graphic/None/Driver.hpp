@@ -26,7 +26,7 @@ namespace Graphic
     public:
 
         // \see Driver::Initialize
-        Bool Initialize(UInt Display, UInt Width, UInt Height) override;
+        Bool Initialize(Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height) override;
 
         // \see Driver::Reset
         void Reset(UInt Width, UInt Height) override;
@@ -42,9 +42,6 @@ namespace Graphic
 
         // \see Driver::DeleteBuffer
         void DeleteBuffer(Object ID) override;
-
-        // \see Driver::CreatePass
-        void CreatePass(Object ID, UInt Display, UInt Width, UInt Height) override;
 
         // \see Driver::CreatePass
         void CreatePass(Object ID, CPtr<Object> Colors, Object Auxiliary) override;

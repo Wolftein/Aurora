@@ -33,32 +33,21 @@ namespace Engine
         ~Device();
 
         // -=(Undocumented)=-
-        auto GetWindow() -> Ptr<SDL_Window>
+        Ptr<SDL_Window> GetHandle()
         {
-            return mWindow;
-        }
-
-        // -=(Undocumented)=-
-        UInt GetHandle() const
-        {
-#ifdef     SDL_PLATFORM_WIN32
-            Ptr<const Char> Property = SDL_PROP_WINDOW_WIN32_HWND_POINTER;
-#else
-            Ptr<const Char> Property = nullptr;  // TODO X11 / Cocoa / Wayland / Android
-#endif  // SDL_PLATFORM_WIN32
-            return reinterpret_cast<UInt>(SDL_GetPointerProperty(SDL_GetWindowProperties(mWindow), Property, nullptr));
+            return mHandle;
         }
 
         // -=(Undocumented)=-
         void SetTitle(CStr Title)
         {
-            SDL_SetWindowTitle(mWindow, Title.data());
+            SDL_SetWindowTitle(mHandle, Title.data());
         }
 
         // -=(Undocumented)=-
         CStr GetTitle() const
         {
-            return SDL_GetWindowTitle(mWindow);
+            return SDL_GetWindowTitle(mHandle);
         }
 
         // -=(Undocumented)=-
@@ -66,30 +55,30 @@ namespace Engine
         {
             if (Visible)
             {
-                SDL_ShowWindow(mWindow);
+                SDL_ShowWindow(mHandle);
             }
             else
             {
-                SDL_HideWindow(mWindow);
+                SDL_HideWindow(mHandle);
             }
         }
 
         // -=(Undocumented)=-
         Bool IsVisible() const
         {
-            return (SDL_GetWindowFlags(mWindow) & SDL_WINDOW_HIDDEN) == 0;
+            return (SDL_GetWindowFlags(mHandle) & SDL_WINDOW_HIDDEN) == 0;
         }
 
         // -=(Undocumented)=-
         void SetFocus()
         {
-            SDL_RaiseWindow(mWindow);
+            SDL_RaiseWindow(mHandle);
         }
 
         // -=(Undocumented)=-
         Bool IsFocused() const
         {
-            return (SDL_GetWindowFlags(mWindow) & SDL_WINDOW_INPUT_FOCUS) != 0;
+            return (SDL_GetWindowFlags(mHandle) & SDL_WINDOW_INPUT_FOCUS) != 0;
         }
 
         // -=(Undocumented)=-
@@ -98,19 +87,19 @@ namespace Engine
         // -=(Undocumented)=-
         Bool IsBorderless() const
         {
-            return (SDL_GetWindowFlags(mWindow) & SDL_WINDOW_BORDERLESS) != 0;
+            return (SDL_GetWindowFlags(mHandle) & SDL_WINDOW_BORDERLESS) != 0;
         }
 
         // -=(Undocumented)=-
         Bool IsWindowed() const
         {
-            return (SDL_GetWindowFlags(mWindow) & SDL_WINDOW_FULLSCREEN) == 0;
+            return (SDL_GetWindowFlags(mHandle) & SDL_WINDOW_FULLSCREEN) == 0;
         }
 
         // -=(Undocumented)=-
         Bool IsFullscreen() const
         {
-            return (SDL_GetWindowFlags(mWindow) & SDL_WINDOW_FULLSCREEN) != 0;
+            return (SDL_GetWindowFlags(mHandle) & SDL_WINDOW_FULLSCREEN) != 0;
         }
 
         // -=(Undocumented)=-
@@ -118,7 +107,7 @@ namespace Engine
         {
             mWidth  = Width;
             mHeight = Height;
-            SDL_SetWindowSize(mWindow, Width, Height);
+            SDL_SetWindowSize(mHandle, Width, Height);
         }
 
         // -=(Undocumented)=-
@@ -136,7 +125,7 @@ namespace Engine
         // -=(Undocumented)=-
         Real32 GetScale() const
         {
-            return SDL_GetWindowDisplayScale(mWindow);
+            return SDL_GetWindowDisplayScale(mHandle);
         }
 
         // -=(Undocumented)=-
@@ -156,7 +145,7 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Ptr<SDL_Window> mWindow;
+        Ptr<SDL_Window> mHandle;
         UInt16          mWidth;
         UInt16          mHeight;
     };

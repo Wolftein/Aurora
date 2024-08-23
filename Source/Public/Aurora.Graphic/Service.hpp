@@ -32,7 +32,7 @@ namespace Graphic
         void OnTick(UInt64 Time) override;
 
         // -=(Undocumented)=-
-        Bool Initialize(Backend Backend, UInt Display, UInt16 Width, UInt16 Height);
+        Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height);
 
         // -=(Undocumented)=-
         void Reset(UInt16 Width, UInt16 Height);
@@ -72,9 +72,6 @@ namespace Graphic
 
         // -=(Undocumented)=-
         void DeleteMaterial(Object ID);
-
-        // -=(Undocumented)=-
-        Object CreatePass(UInt Display, UInt16 Width, UInt16 Height);
 
         // -=(Undocumented)=-
         Object CreatePass(CPtr<Object> Colors, Object Auxiliary);

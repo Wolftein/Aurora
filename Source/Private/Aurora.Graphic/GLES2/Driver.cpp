@@ -10,16 +10,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Service.hpp"
-#include <Aurora.Graphic/None/Driver.hpp>
-
-#ifdef    SDL_PLATFORM_WINDOWS
-    #include <Aurora.Graphic/D3D11/Driver.hpp>
-#endif // SDL_PLATFORM_WINDOWS
-
-#ifdef    SDL_VIDEO_OPENGL_ES2
-    #include <Aurora.Graphic/GLES2/Driver.hpp>
-#endif // SDL_VIDEO_OPENGL_ES2
+#include "Driver.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -30,229 +21,148 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Service::Service(Ref<Context> System)
-        : Subsystem { System }
+    Bool GLES2Driver::Initialize(Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height)
+    {
+        LoadCapabilities();
+
+        return true;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void GLES2Driver::Reset(UInt Width, UInt Height)
     {
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::OnTick(UInt64 Time)
+    Ref<const Capabilities> GLES2Driver::GetCapabilities() const
     {
-        // TODO Command Buffer
+        return mCapabilities;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height)
+    void GLES2Driver::CreateBuffer(Object ID, Usage Type, UInt Capacity, CPtr<UInt8> Data)
     {
-        Bool Successful = true;
-
-        if (!mDriver)
-        {
-            switch (Backend)
-            {
-#ifdef    SDL_PLATFORM_WINDOWS
-            case Backend::D3D11:
-                mDriver = NewUniquePtr<D3D11Driver>();
-                break;
-#endif // SDL_PLATFORM_WINDOWS
-
-#ifdef    SDL_VIDEO_OPENGL
-            case Backend::GLES2:
-                mDriver = NewUniquePtr<GLES2Driver>();
-                break;
-#endif // SDL_VIDEO_OPENGL
-
-            default:
-                mDriver = NewUniquePtr<NoneDriver>();
-                break;
-            }
-
-            Successful = mDriver && mDriver->Initialize(Swapchain, Width, Height);
-
-            if (!Successful)
-            {
-                mDriver = nullptr;
-            }
-            else
-            {
-                Ref<const Capabilities> Capabilities = mDriver->GetCapabilities();
-                Log::Info("Graphics: using {}", magic_enum::enum_name(Capabilities.Backend));
-                Log::Info("Graphics: Detected shader model {}", CastEnum(Capabilities.Language) + 1);
-
-                for (Ref<const Adapter> Adapter : Capabilities.Adapters)
-                {
-                    Log::Info("Graphics: Found GPU '{}'", Adapter.Description);
-                    Log::Info("Graphics:     Memory {} (video), {} (system), {} (shared)",
-                             Adapter.DedicatedMemoryInMBs,
-                             Adapter.SystemMemoryInMBs,
-                             Adapter.SharedMemoryInMBs);
-                }
-            }
-        }
-        return Successful;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Reset(UInt16 Width, UInt16 Height)
+    void GLES2Driver::UpdateBuffer(Object ID, Bool Discard, UInt Offset, CPtr<UInt8> Data)
     {
-        mDriver->Reset(Width, Height);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Object Service::CreateBuffer(Usage Type, UInt Capacity, CPtr<UInt8> Data)
+    void GLES2Driver::DeleteBuffer(Object ID)
     {
-        const Object ID = mBuffers.Allocate();
-
-        if (ID > 0)
-        {
-            mDriver->CreateBuffer(ID, Type, Capacity, Data);
-        }
-        return ID;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::DeleteBuffer(Object ID)
+    void GLES2Driver::CreatePass(Object ID, CPtr<Object> Colors, Object Auxiliary)
     {
-        mDriver->DeleteBuffer(mBuffers.Free(ID));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Object Service::CreateMaterial()
+    void GLES2Driver::DeletePass(Object ID)
     {
-        return mMaterials.Allocate();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::DeleteMaterial(Object ID)
+    void GLES2Driver::CreatePipeline(Object ID, CPtr<UInt8> Vertex, CPtr<UInt8> Pixel, CPtr<UInt8> Geometry, Ref<const Descriptor> Properties)
     {
-        mMaterials.Free(ID);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Object Service::CreatePass(CPtr<Object> Colors, Object Auxiliary)
+    void GLES2Driver::DeletePipeline(Object ID)
     {
-        const Object ID = mPasses.Allocate();
-
-        if (ID > 0)
-        {
-            mDriver->CreatePass(ID, Colors, Auxiliary);
-        }
-        return ID;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::DeletePass(Object ID)
+    void GLES2Driver::CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<UInt8> Data)
     {
-        mDriver->DeletePass(mPasses.Free(ID));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Object Service::CreatePipeline(CPtr<UInt8> Vertex, CPtr<UInt8> Fragment, CPtr<UInt8> Geometry, Ref<const Descriptor> Properties)
+    void GLES2Driver::UpdateTexture(Object ID, UInt Level, Recti Offset, UInt Pitch, CPtr<UInt8> Data)
     {
-        const Object ID = mPipelines.Allocate();
-
-        if (ID > 0)
-        {
-            mDriver->CreatePipeline(ID, Vertex, Fragment, Geometry, Properties);
-        }
-        return ID;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::DeletePipeline(Object ID)
+    void GLES2Driver::CopyTexture(Object Destination, UInt DstLevel, Vector3f DstOffset, Object Source, UInt SrcLevel, Recti SrcOffset)
     {
-        mDriver->DeletePipeline(mPipelines.Free(ID));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Object Service::CreateTexture(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Layer, CPtr<UInt8> Data)
+    Data GLES2Driver::ReadTexture(Object ID, UInt Level, Recti Offset)
     {
-        const Object ID = mTextures.Allocate();
-
-        if (ID > 0)
-        {
-            mDriver->CreateTexture(ID, Format, Layout, Width, Height, Layer, Data);
-        }
-        return ID;
+        return Data();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::CopyTexture(Object Destination, UInt8 DstLevel, Vector3f DstOffset, Object Source, UInt8 SrcLevel, Recti SrcOffset)
+    UInt GLES2Driver::QueryTexture(Object ID)
     {
-        mDriver->CopyTexture(Destination, DstLevel, DstOffset, Source, SrcLevel, SrcOffset);
+        return 0;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Data Service::ReadTexture(Object ID, UInt8 Level, Recti Offset)
+    void GLES2Driver::DeleteTexture(Object ID)
     {
-        return mDriver->ReadTexture(ID, Level, Offset);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    UInt Service::QueryTexture(Object ID)
+    void GLES2Driver::Prepare(Object ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
     {
-        return mDriver->QueryTexture(ID);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::DeleteTexture(Object ID)
+    void GLES2Driver::Submit(CPtr<Submission> Submissions)
     {
-        mDriver->DeleteTexture(mTextures.Free(ID));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Prepare(Object ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
+    void GLES2Driver::Commit(Object ID, Bool Synchronised)
     {
-        mDriver->Prepare(ID, Viewport, Target, Tint, Depth, Stencil);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Submit(CPtr<Submission> Submissions)
+    void GLES2Driver::LoadCapabilities()
     {
-        mDriver->Submit(Submissions);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Service::Commit(Object ID, Bool Synchronised)
-    {
-        mDriver->Commit(ID, Synchronised);
+        mCapabilities.Backend = Backend::GLES2;
     }
 }
+

@@ -22,7 +22,7 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Device::Device(UInt Handle, CStr Title, UInt16 Width, UInt16 Height, Graphic::Backend Backend, Bool Fullscreen, Bool Borderless)
-        : mWindow { nullptr },
+        : mHandle { nullptr },
           mWidth  { Width },
           mHeight { Height }
     {
@@ -38,12 +38,19 @@ namespace Engine
         SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT_BOOLEAN, true);
         SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, !Borderless);
 
-        if (Backend == Graphic::Backend::OpenGL)
+        switch (Backend)
         {
+        case Graphic::Backend::None:
+        case Graphic::Backend::D3D11:
+            break;
+        case Graphic::Backend::GLES2:
             SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0 );
+            break;
         }
-
-        // TODO: Create VK context
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 #ifdef     SDL_PLATFORM_WIN32
 
@@ -54,15 +61,16 @@ namespace Engine
 
 #endif  // SDL_PLATFORM_WIN32
 
-        mWindow = SDL_CreateWindowWithProperties(Config);
-        if (! mWindow)
+        mHandle = SDL_CreateWindowWithProperties(Config);
+        if (! mHandle)
         {
             Log::Error("Failed to create device: '{}'", SDL_GetError());
         }
 
 #ifdef     SDL_PLATFORM_WIN32
 
-        SDL_StartTextInput(mWindow);
+        SDL_StartTextInput(mHandle);
+
 #endif  // SDL_PLATFORM_WIN32
     }
 
@@ -71,9 +79,9 @@ namespace Engine
 
     Device::~Device()
     {
-        if (mWindow)
+        if (mHandle)
         {
-            SDL_DestroyWindow(mWindow);
+            SDL_DestroyWindow(mHandle);
         }
         SDL_Quit();
     }
@@ -92,15 +100,15 @@ namespace Engine
             }
 
             Ptr<const SDL_DisplayMode> Display = (Borderless ? nullptr : & FullscreenDisplayMode);
-            SDL_SetWindowFullscreenMode(mWindow, Display);
-            SDL_SetWindowFullscreen(mWindow, true);
+            SDL_SetWindowFullscreenMode(mHandle, Display);
+            SDL_SetWindowFullscreen(mHandle, true);
         }
         else
         {
-            SDL_SetWindowSize(mWindow, mWidth, mHeight);
-            SDL_SetWindowFullscreen(mWindow, false);
-            SDL_SetWindowPosition(mWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-            SDL_SetWindowBordered(mWindow, !Borderless);
+            SDL_SetWindowSize(mHandle, mWidth, mHeight);
+            SDL_SetWindowFullscreen(mHandle, false);
+            SDL_SetWindowPosition(mHandle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+            SDL_SetWindowBordered(mHandle, !Borderless);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Graphic
         virtual ~Driver() = default;
 
         // -=(Undocumented)=-
-        virtual Bool Initialize(UInt Display, UInt Width, UInt Height) = 0;
+        virtual Bool Initialize(Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height) = 0;
 
         // -=(Undocumented)=-
         virtual void Reset(UInt Width, UInt Height) = 0;
@@ -45,9 +45,6 @@ namespace Graphic
 
         // -=(Undocumented)=-
         virtual void DeleteBuffer(Object ID) = 0;
-
-        // -=(Undocumented)=-
-        virtual void CreatePass(Object ID, UInt Display, UInt Width, UInt Height) = 0;
 
         // -=(Undocumented)=-
         virtual void CreatePass(Object ID, CPtr<Object> Colors, Object Auxiliary) = 0;

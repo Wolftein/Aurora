@@ -38,6 +38,9 @@ inline namespace Core
     using Char      = char;
 
     // -=(Undocumented)=-
+    using Char16    = char16_t;
+
+    // -=(Undocumented)=-
     using SInt      = intptr_t;
 
     // -=(Undocumented)=-

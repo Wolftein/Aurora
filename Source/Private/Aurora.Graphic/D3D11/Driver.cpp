@@ -396,7 +396,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool D3D11Driver::Initialize(UInt Display, UInt Width, UInt Height)
+    Bool D3D11Driver::Initialize(Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height)
     {
         decltype(& D3D11CreateDevice)  D3D11CreateDevicePtr = nullptr;
         decltype(& CreateDXGIFactory1) CreateDXGIFactoryPtr = nullptr;
@@ -492,9 +492,11 @@ namespace Graphic
                     LoadAdapters();
                     LoadCapabilities();
 
-                    if (Display)
+                    if (Swapchain)
                     {
-                        CreatePass(k_Default, Display, Width, Height);
+                        const Ptr<void> Display = SDL_GetPointerProperty(
+                            SDL_GetWindowProperties(Swapchain), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+                        CreatePass(k_Default, reinterpret_cast<UInt>(Display), Width, Height);
                     }
                 }
             }
@@ -1086,7 +1088,7 @@ namespace Graphic
 
     void D3D11Driver::LoadCapabilities()
     {
-        mCapabilities.Backend = Backend::Direct3D11;
+        mCapabilities.Backend = Backend::D3D11;
 
         switch (mDevice->GetFeatureLevel())
         {

@@ -68,8 +68,8 @@ namespace Graphic
     enum class Backend
     {
         None,
-        Direct3D11,
-        OpenGL,
+        D3D11,
+        GLES2,
     };
 
     // -=(Undocumented)=-
