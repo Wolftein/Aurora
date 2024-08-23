@@ -33,6 +33,12 @@ namespace Engine
         ~Device();
 
         // -=(Undocumented)=-
+        auto GetWindow() -> Ptr<SDL_Window>
+        {
+            return mWindow;
+        }
+
+        // -=(Undocumented)=-
         UInt GetHandle() const
         {
 #ifdef     SDL_PLATFORM_WIN32

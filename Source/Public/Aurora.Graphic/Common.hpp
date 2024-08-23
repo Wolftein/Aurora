@@ -69,6 +69,7 @@ namespace Graphic
     {
         None,
         Direct3D11,
+        OpenGL,
     };
 
     // -=(Undocumented)=-

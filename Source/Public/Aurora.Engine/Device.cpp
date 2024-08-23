@@ -38,7 +38,14 @@ namespace Engine
         SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT_BOOLEAN, true);
         SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, !Borderless);
 
-        // TODO: Create GL/VK context
+        if (Backend == Graphic::Backend::OpenGL)
+        {
+            SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true);
+        }
+
+        // TODO: Create VK context
+
+        SDL_GL_CreateContext();
 
 #ifdef     SDL_PLATFORM_WIN32
 
