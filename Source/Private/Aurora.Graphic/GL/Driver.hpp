@@ -14,8 +14,7 @@
 
 #include "Aurora.Graphic/Driver.hpp"
 #include <SDL3/SDL_opengl.h>
-#include <SDL3/SDL_opengles2_gl2.h>
-#include <SDL3/SDL_opengles2_gl2ext.h>
+#include <SDL3/SDL_opengl_glext.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]

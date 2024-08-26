@@ -206,8 +206,6 @@ namespace Graphic
         BC3UIntNorm_sRGB,
         BC4UIntNorm,
         BC5UIntNorm,
-        BC7UIntNorm,
-        BC7UIntNorm_sRGB,
         R8SInt,
         R8SIntNorm,
         R8UInt,

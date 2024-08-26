@@ -158,8 +158,6 @@ namespace Graphic
             { GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT,  GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT,  GL_NONE,             128 }, // TextureFormat::BC3UIntNorm_sRGB
             { GL_COMPRESSED_RED_RGTC1_EXT,             GL_COMPRESSED_RED_RGTC1_EXT,             GL_NONE,              64 }, // TextureFormat::BC4UIntNorm
             { GL_COMPRESSED_RED_GREEN_RGTC2_EXT,       GL_COMPRESSED_RED_GREEN_RGTC2_EXT,       GL_NONE,             128 }, // TextureFormat::BC5UIntNorm
-            { GL_COMPRESSED_RGBA_BPTC_UNORM_EXT,       GL_COMPRESSED_RGBA_BPTC_UNORM_EXT,       GL_NONE,             128 }, // TextureFormat::BC7UIntNorm
-            { GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT, GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT, GL_NONE,             128 }, // TextureFormat::BC7UIntNorm_sRGB
             { GL_R8I,                                  GL_RED,                                  GL_BYTE,               8 }, // TextureFormat::R8SInt
             { GL_R8_SNORM,                             GL_RED,                                  GL_BYTE,               8 }, // TextureFormat::R8SIntNorm
             { GL_R8UI,                                 GL_RED_INTEGER,                          GL_UNSIGNED_BYTE,      8 }, // TextureFormat::R8UInt

@@ -166,8 +166,6 @@ namespace Graphic
             DXGI_FORMAT_BC3_UNORM_SRGB,       // TextureFormat::BC3UIntNorm_sRGB
             DXGI_FORMAT_BC4_UNORM,            // TextureFormat::BC4UIntNorm
             DXGI_FORMAT_BC5_UNORM,            // TextureFormat::BC5UIntNorm
-            DXGI_FORMAT_BC7_UNORM,            // TextureFormat::BC7UIntNorm
-            DXGI_FORMAT_BC7_UNORM_SRGB,       // TextureFormat::BC7UIntNorm_sRGB
             DXGI_FORMAT_R8_SINT,              // TextureFormat::R8SInt
             DXGI_FORMAT_R8_SNORM,             // TextureFormat::R8SIntNorm
             DXGI_FORMAT_R8_UINT,              // TextureFormat::R8UInt
