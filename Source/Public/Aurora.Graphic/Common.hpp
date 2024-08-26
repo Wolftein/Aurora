@@ -69,7 +69,7 @@ namespace Graphic
     {
         None,
         D3D11,
-        GLES2,
+        GL,
     };
 
     // -=(Undocumented)=-
@@ -250,13 +250,11 @@ namespace Graphic
         RGBA32SInt,
         RGBA32UInt,
         RGBA32Float,
-        D16Float,
-        D24Float,
         D32Float,
         D16X0UIntNorm,
         D24X0UIntNorm,
         D24S8UIntNorm,
-        D32X0UIntNorm,
+        D32S8UIntNorm,
     };
 
     // -=(Undocumented)=-

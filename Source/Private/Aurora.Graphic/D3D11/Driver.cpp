@@ -155,89 +155,66 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    template<Bool Resource>
     static auto As(TextureFormat Value)
     {
         constexpr static DXGI_FORMAT k_Mapping[] = {
-            DXGI_FORMAT_BC1_UNORM,           // TextureFormat::BC1UIntNorm
-            DXGI_FORMAT_BC1_UNORM_SRGB,      // TextureFormat::BC1UIntNorm_sRGB
-            DXGI_FORMAT_BC2_UNORM,           // TextureFormat::BC2UIntNorm
-            DXGI_FORMAT_BC2_UNORM_SRGB,      // TextureFormat::BC2UIntNorm_sRGB
-            DXGI_FORMAT_BC3_UNORM,           // TextureFormat::BC3UIntNorm
-            DXGI_FORMAT_BC3_UNORM_SRGB,      // TextureFormat::BC3UIntNorm_sRGB
-            DXGI_FORMAT_BC4_UNORM,           // TextureFormat::BC4UIntNorm
-            DXGI_FORMAT_BC5_UNORM,           // TextureFormat::BC5UIntNorm
-            DXGI_FORMAT_BC7_UNORM,           // TextureFormat::BC7UIntNorm
-            DXGI_FORMAT_BC7_UNORM_SRGB,      // TextureFormat::BC7UIntNorm_sRGB
-            DXGI_FORMAT_R8_SINT,             // TextureFormat::R8SInt
-            DXGI_FORMAT_R8_SNORM,            // TextureFormat::R8SIntNorm
-            DXGI_FORMAT_R8_UINT,             // TextureFormat::R8UInt
-            DXGI_FORMAT_R8_UNORM,            // TextureFormat::R8UIntNorm
-            DXGI_FORMAT_R16_SINT,            // TextureFormat::R16SInt
-            DXGI_FORMAT_R16_SNORM,           // TextureFormat::R16SIntNorm
-            DXGI_FORMAT_R16_UINT,            // TextureFormat::R16UInt
-            DXGI_FORMAT_R16_UNORM,           // TextureFormat::R16UIntNorm
-            DXGI_FORMAT_R16_FLOAT,           // TextureFormat::R16Float
-            DXGI_FORMAT_R32_SINT,            // TextureFormat::R32SInt
-            DXGI_FORMAT_R32_UINT,            // TextureFormat::R32UInt
-            DXGI_FORMAT_R32_FLOAT,           // TextureFormat::R32Float
-            DXGI_FORMAT_R8G8_SINT,           // TextureFormat::RG8SInt
-            DXGI_FORMAT_R8G8_SNORM,          // TextureFormat::RG8SIntNorm
-            DXGI_FORMAT_R8G8_UINT,           // TextureFormat::RG8UInt
-            DXGI_FORMAT_R8G8_UNORM,          // TextureFormat::RG8UIntNorm
-            DXGI_FORMAT_R16G16_SINT,         // TextureFormat::RG16SInt
-            DXGI_FORMAT_R16G16_SNORM,        // TextureFormat::RG16SIntNorm
-            DXGI_FORMAT_R16G16_UINT,         // TextureFormat::RG16UInt
-            DXGI_FORMAT_R16G16_UNORM,        // TextureFormat::RG16UIntNorm
-            DXGI_FORMAT_R16G16_FLOAT,        // TextureFormat::RG16Float
-            DXGI_FORMAT_R32G32_SINT,         // TextureFormat::RG32SInt
-            DXGI_FORMAT_R32G32_UINT,         // TextureFormat::RG32UInt
-            DXGI_FORMAT_R32G32_FLOAT,        // TextureFormat::RG32Float
-            DXGI_FORMAT_R32G32B32_SINT,      // TextureFormat::RGB32SInt
-            DXGI_FORMAT_R32G32B32_UINT,      // TextureFormat::RGB32UInt
-            DXGI_FORMAT_R32G32B32_FLOAT,     // TextureFormat::RGB32Float
-            DXGI_FORMAT_R8G8B8A8_SINT,       // TextureFormat::RGBA8SInt
-            DXGI_FORMAT_R8G8B8A8_SNORM,      // TextureFormat::RGBA8SIntNorm
-            DXGI_FORMAT_R8G8B8A8_UINT,       // TextureFormat::RGBA8UInt
-            DXGI_FORMAT_R8G8B8A8_UNORM,      // TextureFormat::RGBA8UIntNorm
-            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, // TextureFormat::RGBA8UIntNorm_sRGB
-            DXGI_FORMAT_B8G8R8A8_UNORM,      // TextureFormat::BGRA8UIntNorm
-            DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, // TextureFormat::BGRA8UIntNorm_sRGB
-            DXGI_FORMAT_R16G16B16A16_SINT,   // TextureFormat::RGBA16SInt
-            DXGI_FORMAT_R16G16B16A16_SNORM,  // TextureFormat::RGBA16SIntNorm
-            DXGI_FORMAT_R16G16B16A16_UINT,   // TextureFormat::RGBA16UInt
-            DXGI_FORMAT_R16G16B16A16_UNORM,  // TextureFormat::RGBA16UIntNorm
-            DXGI_FORMAT_R16G16B16A16_FLOAT,  // TextureFormat::RGBA16Float
-            DXGI_FORMAT_R32G32B32A32_SINT,   // TextureFormat::RGBA32SInt
-            DXGI_FORMAT_R32G32B32A32_UINT,   // TextureFormat::RGBA32UInt
-            DXGI_FORMAT_R32G32B32A32_FLOAT,  // TextureFormat::RGBA32Float
-            DXGI_FORMAT_R32_TYPELESS,        // TextureFormat::D16Float
-            DXGI_FORMAT_R32_TYPELESS,        // TextureFormat::D24Float
-            DXGI_FORMAT_R32_TYPELESS,        // TextureFormat::D32Float
-            DXGI_FORMAT_R16_TYPELESS,        // TextureFormat::D16X0UIntNorm
-            DXGI_FORMAT_D24_UNORM_S8_UINT,   // TextureFormat::D24X0UIntNorm
-            DXGI_FORMAT_D24_UNORM_S8_UINT,   // TextureFormat::D24S8UIntNorm
-            DXGI_FORMAT_D24_UNORM_S8_UINT,   // TextureFormat::D32X0UIntNorm
+            DXGI_FORMAT_BC1_UNORM,            // TextureFormat::BC1UIntNorm
+            DXGI_FORMAT_BC1_UNORM_SRGB,       // TextureFormat::BC1UIntNorm_sRGB
+            DXGI_FORMAT_BC2_UNORM,            // TextureFormat::BC2UIntNorm
+            DXGI_FORMAT_BC2_UNORM_SRGB,       // TextureFormat::BC2UIntNorm_sRGB
+            DXGI_FORMAT_BC3_UNORM,            // TextureFormat::BC3UIntNorm
+            DXGI_FORMAT_BC3_UNORM_SRGB,       // TextureFormat::BC3UIntNorm_sRGB
+            DXGI_FORMAT_BC4_UNORM,            // TextureFormat::BC4UIntNorm
+            DXGI_FORMAT_BC5_UNORM,            // TextureFormat::BC5UIntNorm
+            DXGI_FORMAT_BC7_UNORM,            // TextureFormat::BC7UIntNorm
+            DXGI_FORMAT_BC7_UNORM_SRGB,       // TextureFormat::BC7UIntNorm_sRGB
+            DXGI_FORMAT_R8_SINT,              // TextureFormat::R8SInt
+            DXGI_FORMAT_R8_SNORM,             // TextureFormat::R8SIntNorm
+            DXGI_FORMAT_R8_UINT,              // TextureFormat::R8UInt
+            DXGI_FORMAT_R8_UNORM,             // TextureFormat::R8UIntNorm
+            DXGI_FORMAT_R16_SINT,             // TextureFormat::R16SInt
+            DXGI_FORMAT_R16_SNORM,            // TextureFormat::R16SIntNorm
+            DXGI_FORMAT_R16_UINT,             // TextureFormat::R16UInt
+            DXGI_FORMAT_R16_UNORM,            // TextureFormat::R16UIntNorm
+            DXGI_FORMAT_R16_FLOAT,            // TextureFormat::R16Float
+            DXGI_FORMAT_R32_SINT,             // TextureFormat::R32SInt
+            DXGI_FORMAT_R32_UINT,             // TextureFormat::R32UInt
+            DXGI_FORMAT_R32_FLOAT,            // TextureFormat::R32Float
+            DXGI_FORMAT_R8G8_SINT,            // TextureFormat::RG8SInt
+            DXGI_FORMAT_R8G8_SNORM,           // TextureFormat::RG8SIntNorm
+            DXGI_FORMAT_R8G8_UINT,            // TextureFormat::RG8UInt
+            DXGI_FORMAT_R8G8_UNORM,           // TextureFormat::RG8UIntNorm
+            DXGI_FORMAT_R16G16_SINT,          // TextureFormat::RG16SInt
+            DXGI_FORMAT_R16G16_SNORM,         // TextureFormat::RG16SIntNorm
+            DXGI_FORMAT_R16G16_UINT,          // TextureFormat::RG16UInt
+            DXGI_FORMAT_R16G16_UNORM,         // TextureFormat::RG16UIntNorm
+            DXGI_FORMAT_R16G16_FLOAT,         // TextureFormat::RG16Float
+            DXGI_FORMAT_R32G32_SINT,          // TextureFormat::RG32SInt
+            DXGI_FORMAT_R32G32_UINT,          // TextureFormat::RG32UInt
+            DXGI_FORMAT_R32G32_FLOAT,         // TextureFormat::RG32Float
+            DXGI_FORMAT_R32G32B32_SINT,       // TextureFormat::RGB32SInt
+            DXGI_FORMAT_R32G32B32_UINT,       // TextureFormat::RGB32UInt
+            DXGI_FORMAT_R32G32B32_FLOAT,      // TextureFormat::RGB32Float
+            DXGI_FORMAT_R8G8B8A8_SINT,        // TextureFormat::RGBA8SInt
+            DXGI_FORMAT_R8G8B8A8_SNORM,       // TextureFormat::RGBA8SIntNorm
+            DXGI_FORMAT_R8G8B8A8_UINT,        // TextureFormat::RGBA8UInt
+            DXGI_FORMAT_R8G8B8A8_UNORM,       // TextureFormat::RGBA8UIntNorm
+            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,  // TextureFormat::RGBA8UIntNorm_sRGB
+            DXGI_FORMAT_B8G8R8A8_UNORM,       // TextureFormat::BGRA8UIntNorm
+            DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,  // TextureFormat::BGRA8UIntNorm_sRGB
+            DXGI_FORMAT_R16G16B16A16_SINT,    // TextureFormat::RGBA16SInt
+            DXGI_FORMAT_R16G16B16A16_SNORM,   // TextureFormat::RGBA16SIntNorm
+            DXGI_FORMAT_R16G16B16A16_UINT,    // TextureFormat::RGBA16UInt
+            DXGI_FORMAT_R16G16B16A16_UNORM,   // TextureFormat::RGBA16UIntNorm
+            DXGI_FORMAT_R16G16B16A16_FLOAT,   // TextureFormat::RGBA16Float
+            DXGI_FORMAT_R32G32B32A32_SINT,    // TextureFormat::RGBA32SInt
+            DXGI_FORMAT_R32G32B32A32_UINT,    // TextureFormat::RGBA32UInt
+            DXGI_FORMAT_R32G32B32A32_FLOAT,   // TextureFormat::RGBA32Float
+            DXGI_FORMAT_D32_FLOAT,            // TextureFormat::D32Float
+            DXGI_FORMAT_D16_UNORM,            // TextureFormat::D16X0UIntNorm
+            DXGI_FORMAT_D24_UNORM_S8_UINT,    // TextureFormat::D24S8UIntNorm
+            DXGI_FORMAT_D32_FLOAT_S8X24_UINT, // TextureFormat::D32S8UIntNorm
         };
-
-        if constexpr (Resource)
-        {
-            switch (Value)
-            {
-            case TextureFormat::D16Float:
-            case TextureFormat::D24Float:
-            case TextureFormat::D32Float:
-                return DXGI_FORMAT_R32_FLOAT;
-            case TextureFormat::D16X0UIntNorm:
-                return DXGI_FORMAT_R16_UNORM;
-            case TextureFormat::D24X0UIntNorm:
-            case TextureFormat::D24S8UIntNorm:
-            case TextureFormat::D32X0UIntNorm:
-                return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-            default:
-                break;
-            }
-        }
         return k_Mapping[CastEnum(Value)];
     }
 
@@ -389,7 +366,7 @@ namespace Graphic
     static auto As(const Ptr<WCHAR> Value)
     {
         Char Buffer[MAX_PATH];
-        ::WideCharToMultiByte(CP_ACP, 0, Value, -1, Buffer, MAX_PATH, NULL, NULL);
+        ::WideCharToMultiByte(CP_ACP, 0, Value, -1, Buffer, MAX_PATH, nullptr, nullptr);
         return SStr(Buffer);
     }
 
@@ -485,7 +462,7 @@ namespace Graphic
             {
                 Successful = CheckIfFail(Device.As<ID3D11Device1>(& mDevice));
                 Successful = Successful && CheckIfFail(DeviceImmediate.As<ID3D11DeviceContext1>(& mDeviceImmediate));
-                Successful = Successful && CheckIfFail(CreateDXGIFactoryPtr(IID_PPV_ARGS(& mDisplayFactory)));
+                Successful = Successful && CheckIfFail(CreateDXGIFactoryPtr(IID_PPV_ARGS(& mDeviceFactory)));
 
                 if (Successful)
                 {
@@ -590,7 +567,7 @@ namespace Graphic
         Description.Windowed          = true;
 
         ComPtr<IDXGIFactory4> DXGIFactor4;
-        if (SUCCEEDED(mDisplayFactory.As<IDXGIFactory4>(& DXGIFactor4)))
+        if (SUCCEEDED(mDeviceFactory.As<IDXGIFactory4>(& DXGIFactor4)))
         {
             Description.SwapEffect = (mCapabilities.Tearing ? DXGI_SWAP_EFFECT_FLIP_DISCARD : DXGI_SWAP_EFFECT_DISCARD);
         }
@@ -599,8 +576,8 @@ namespace Graphic
             Description.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
         }
 
-        CheckIfFail(mDisplayFactory->CreateSwapChain(mDevice.Get(), & Description, mPasses[ID].Display.GetAddressOf()));
-        CheckIfFail(mDisplayFactory->MakeWindowAssociation(Description.OutputWindow, DXGI_MWA_NO_WINDOW_CHANGES));
+        CheckIfFail(mDeviceFactory->CreateSwapChain(mDevice.Get(), & Description, mPasses[ID].Display.GetAddressOf()));
+        CheckIfFail(mDeviceFactory->MakeWindowAssociation(Description.OutputWindow, DXGI_MWA_NO_WINDOW_CHANGES));
 
         CreateSwapchainResources(mPasses[ID], Width, Height);
     }
@@ -747,7 +724,7 @@ namespace Graphic
 
     void D3D11Driver::CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt Width, UInt Height, UInt Layer, CPtr<UInt8> Data)
     {
-        CD3D11_TEXTURE2D_DESC Description(As<false>(Format), Width, Height, 1, Layer);
+        CD3D11_TEXTURE2D_DESC Description(As(Format), Width, Height, 1, Layer);
         Description.Usage     = (Data.empty() ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE);
         Description.BindFlags = (Layout != TextureLayout::Destination ? D3D11_BIND_SHADER_RESOURCE : 0);
         Description.MiscFlags = (Layer < 1 ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0);
@@ -756,13 +733,11 @@ namespace Graphic
         {
             switch (Format)
             {
-            case TextureFormat::D16Float:
-            case TextureFormat::D24Float:
             case TextureFormat::D32Float:
             case TextureFormat::D16X0UIntNorm:
             case TextureFormat::D24X0UIntNorm:
             case TextureFormat::D24S8UIntNorm:
-            case TextureFormat::D32X0UIntNorm:
+            case TextureFormat::D32S8UIntNorm:
                 Description.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
                 break;
             default:
@@ -776,7 +751,7 @@ namespace Graphic
 
         if (Layout != TextureLayout::Destination)
         {
-            const CD3D11_SHADER_RESOURCE_VIEW_DESC Type(D3D11_SRV_DIMENSION_TEXTURE2D, As<true>(Format), 0, Layer);
+            const CD3D11_SHADER_RESOURCE_VIEW_DESC Type(D3D11_SRV_DIMENSION_TEXTURE2D, As(Format), 0, Layer);
             CheckIfFail(mDevice->CreateShaderResourceView(
                 mTextures[ID].Object.Get(), & Type, mTextures[ID].Resource.GetAddressOf()));
         }
@@ -1043,17 +1018,16 @@ namespace Graphic
     void D3D11Driver::LoadAdapters()
     {
         ComPtr<IDXGIAdapter1> DXGIAdapter;
-        for (UInt Index = 0; SUCCEEDED(mDisplayFactory->EnumAdapters1(Index, DXGIAdapter.GetAddressOf())); ++Index)
+        for (UInt Index = 0; SUCCEEDED(mDeviceFactory->EnumAdapters1(Index, DXGIAdapter.GetAddressOf())); ++Index)
         {
             DXGI_ADAPTER_DESC1 DXGIDescription;
-            if (SUCCEEDED(DXGIAdapter->GetDesc1(& DXGIDescription)))
+            if (SUCCEEDED(DXGIAdapter->GetDesc1(AddressOf(DXGIDescription))))
             {
                 if ((DXGIDescription.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) == 0)
                 {
                     Ref<Graphic::Adapter> AdapterInfo = mCapabilities.Adapters.emplace_back();
 
                     AdapterInfo.Description          = As(DXGIDescription.Description);
-
                     AdapterInfo.DedicatedMemoryInMBs = DXGIDescription.DedicatedVideoMemory >> 20;
                     AdapterInfo.SharedMemoryInMBs    = DXGIDescription.SharedSystemMemory >> 20;
                     AdapterInfo.SystemMemoryInMBs    = DXGIDescription.DedicatedSystemMemory >> 20;
@@ -1066,10 +1040,10 @@ namespace Graphic
                 UINT        Length = 0;
                 DXGI_FORMAT Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 
-                if (SUCCEEDED(DXGIOutput->GetDisplayModeList(Format, 0, & Length, NULL)))
+                if (SUCCEEDED(DXGIOutput->GetDisplayModeList(Format, 0, AddressOf(Length), nullptr)))
                 {
                     Vector<DXGI_MODE_DESC> Descriptions(Length);
-                    DXGIOutput->GetDisplayModeList(Format, 0, & Length, Descriptions.data());
+                    DXGIOutput->GetDisplayModeList(Format, 0, AddressOf(Length), Descriptions.data());
 
                     for (Ref<DXGI_MODE_DESC> Description : Descriptions)
                     {
@@ -1119,7 +1093,7 @@ namespace Graphic
 
         // Check if we support tearing mode
         ComPtr<IDXGIFactory5> DXGIFactory5;
-        if (SUCCEEDED(mDisplayFactory.As<IDXGIFactory5>(& DXGIFactory5)))
+        if (SUCCEEDED(mDeviceFactory.As<IDXGIFactory5>(& DXGIFactory5)))
         {
             BOOL AllowTearing = FALSE;
             DXGIFactory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, & AllowTearing, sizeof(AllowTearing));

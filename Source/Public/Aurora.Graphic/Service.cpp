@@ -17,9 +17,9 @@
     #include <Aurora.Graphic/D3D11/Driver.hpp>
 #endif // SDL_PLATFORM_WINDOWS
 
-#ifdef    SDL_VIDEO_OPENGL_ES2
-    #include <Aurora.Graphic/GLES2/Driver.hpp>
-#endif // SDL_VIDEO_OPENGL_ES2
+#ifdef    SDL_VIDEO_OPENGL
+    #include <Aurora.Graphic/GL/Driver.hpp>
+#endif // SDL_VIDEO_OPENGL
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -61,8 +61,8 @@ namespace Graphic
 #endif // SDL_PLATFORM_WINDOWS
 
 #ifdef    SDL_VIDEO_OPENGL
-            case Backend::GLES2:
-                mDriver = NewUniquePtr<GLES2Driver>();
+            case Backend::GL:
+                mDriver = NewUniquePtr<GLDriver>();
                 break;
 #endif // SDL_VIDEO_OPENGL
 

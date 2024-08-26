@@ -13,6 +13,9 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Aurora.Graphic/Driver.hpp"
+#include <SDL3/SDL_opengl.h>
+#include <SDL3/SDL_opengles2_gl2.h>
+#include <SDL3/SDL_opengles2_gl2ext.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,7 +24,7 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    class GLES2Driver final : public Driver
+    class GLDriver final : public Driver
     {
     public:
 

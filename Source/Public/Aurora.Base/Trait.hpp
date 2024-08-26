@@ -106,16 +106,9 @@ inline namespace Core
     }
 
     // -=(Undocumented)=-
-    template<typename Iterator, typename Pred, typename Op>
-    inline constexpr void ForEachIf(Iterator Begin, Iterator End, Pred Predicate, Op Function)
+    template <class Type>
+    inline constexpr auto AddressOf(Ref<Type> Value)
     {
-        for(; Begin != End; ++Begin)
-        {
-            if (p(*Begin))
-            {
-                op(*Begin);
-            }
-        }
+        return std::addressof(Value);
     }
-
 }

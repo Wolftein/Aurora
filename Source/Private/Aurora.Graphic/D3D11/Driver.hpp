@@ -163,7 +163,7 @@ namespace Graphic
 
         ComPtr<ID3D11Device1>        mDevice;
         ComPtr<ID3D11DeviceContext1> mDeviceImmediate;
-        ComPtr<IDXGIFactory1>        mDisplayFactory;
+        ComPtr<IDXGIFactory1>        mDeviceFactory;
         Capabilities                 mCapabilities;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
