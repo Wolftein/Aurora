@@ -60,7 +60,6 @@ SET(SDL_POWER_DEFAULT      OFF)
 SET(SDL_SENSOR_DEFAULT     OFF)
 SET(SDL_DIALOG_DEFAULT     OFF)
 SET(SDL_CAMERA_DEFAULT     OFF)
-ADD_DEFINITIONS(-DSDL_VIDEO_OPENGL_ES2)
 
 FetchContent_Declare(External_SDL
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
@@ -187,16 +186,6 @@ ADD_LIBRARY(Neargye INTERFACE)
 TARGET_INCLUDE_DIRECTORIES(Neargye INTERFACE ${external_neargye_SOURCE_DIR}/include)
 
 LIST(APPEND PROJECT_DEPENDENCIES "Neargye")
-
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (OpenGL) TODO: Check if this is really necessary
-## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-IF    (SDL_VIDEO_OPENGL_ES2)
-
-    LIST(APPEND PROJECT_DEPENDENCIES "opengl32")
-
-ENDIF ()
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Configuration
