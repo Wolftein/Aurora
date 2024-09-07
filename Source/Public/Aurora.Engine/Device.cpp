@@ -37,20 +37,7 @@ namespace Engine
         SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_HIDDEN_BOOLEAN, true);
         SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT_BOOLEAN, true);
         SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, !Borderless);
-
-        switch (Backend)
-        {
-#ifdef    SDL_VIDEO_OPENGL
-        case Graphic::Backend::GL:
-            SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true);
-            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, true);
-            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-            SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-            break;
-#endif // SDL_VIDEO_OPENGL
-        default:
-            break;
-        }
+        SDL_SetBooleanProperty(Config, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, (Backend == Graphic::Backend::GLES3));
 
 #ifdef     SDL_PLATFORM_WIN32
 

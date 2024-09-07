@@ -11,8 +11,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Service.hpp"
-#include <Aurora.Audio/None/Driver.hpp>
-#include <Aurora.Audio/FAudio/Driver.hpp>
+#include <Aurora.Audio/FAudio/FAudioDriver.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -51,7 +50,6 @@ namespace Audio
                 mDriver = NewUniquePtr<FAudioDriver>();
                 break;
             default:
-                mDriver = NewUniquePtr<NoneDriver>();
                 break;
             }
 

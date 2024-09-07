@@ -125,7 +125,7 @@ inline namespace IO
 
         for (UInt Index = 0, Limit = Section.GetSize(); Index < Limit; ++Index)
         {
-            Array.emplace_back(Section.GetBool(Index));
+            Array[Index] = Section.GetBool(Index);
         }
         return Array;
     }
@@ -159,7 +159,7 @@ inline namespace IO
 
         for (UInt Index = 0, Limit = Section.GetSize(); Index < Limit; ++Index)
         {
-            Array.emplace_back(Section.GetString(Index));
+            Array[Index] = Section.GetString(Index);
         }
         return Array;
     }
@@ -191,7 +191,7 @@ inline namespace IO
 
         for (UInt Index = 0, Limit = Section.GetSize(); Index < Limit; ++Index)
         {
-            Array.emplace_back(Section.GetNumber(Index));
+            Array[Index] = Section.GetNumber(Index);
         }
         return Array;
     }
@@ -223,7 +223,7 @@ inline namespace IO
 
         for (UInt Index = 0, Limit = Section.GetSize(); Index < Limit; ++Index)
         {
-            Array.emplace_back(Section.GetReal(Index));
+            Array[Index] = Section.GetReal(Index);
         }
         return Array;
     }

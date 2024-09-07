@@ -11,15 +11,11 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Service.hpp"
-#include <Aurora.Graphic/None/Driver.hpp>
+#include <Aurora.Graphic/GLES3/GLES3Driver.hpp>
 
 #ifdef    SDL_PLATFORM_WINDOWS
-    #include <Aurora.Graphic/D3D11/Driver.hpp>
+    #include <Aurora.Graphic/D3D11/D3D11Driver.hpp>
 #endif // SDL_PLATFORM_WINDOWS
-
-#ifdef    SDL_VIDEO_OPENGL
-    #include <Aurora.Graphic/GL/Driver.hpp>
-#endif // SDL_VIDEO_OPENGL
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -59,15 +55,10 @@ namespace Graphic
                 mDriver = NewUniquePtr<D3D11Driver>();
                 break;
 #endif // SDL_PLATFORM_WINDOWS
-
-#ifdef    SDL_VIDEO_OPENGL
-            case Backend::GL:
-                mDriver = NewUniquePtr<GLDriver>();
+            case Backend::GLES3:
+                mDriver = NewUniquePtr<GLES3Driver>();
                 break;
-#endif // SDL_VIDEO_OPENGL
-
             default:
-                mDriver = NewUniquePtr<NoneDriver>();
                 break;
             }
 

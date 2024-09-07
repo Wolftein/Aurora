@@ -74,7 +74,7 @@ namespace Engine
                 GraphicBackend, mDevice->GetHandle(), mDevice->GetWidth(), mDevice->GetHeight()))
             {
                 Log::Warn("Kernel: Failed to create graphics service, disabling service.");
-                GraphicService->Initialize(Graphic::Backend::None, 0, 0, 0);
+                RemoveSubsystem<Graphic::Service>();
             }
 
             // Create the audio service
@@ -83,7 +83,7 @@ namespace Engine
             if (! AudioService->Initialize(Audio::Backend::FAudio, Properties.GetAudioDevice()))
             {
                 Log::Warn("Kernel: Failed to create audio service, disabling service.");
-                AudioService->Initialize(Audio::Backend::None, "Default");
+                RemoveSubsystem<Audio::Service>();
             }
         }
 

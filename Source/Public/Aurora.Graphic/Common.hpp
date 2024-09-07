@@ -69,7 +69,7 @@ namespace Graphic
     {
         None,
         D3D11,
-        GL,
+        GLES3,
     };
 
     // -=(Undocumented)=-

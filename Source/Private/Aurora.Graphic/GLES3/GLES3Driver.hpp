@@ -23,7 +23,7 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    class GLDriver final : public Driver
+    class GLES3Driver final : public Driver
     {
     public:
 
