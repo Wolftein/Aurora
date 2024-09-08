@@ -287,7 +287,7 @@ namespace Network
 
     void TCPClient::WhenError(Ref<const std::error_code> Error)
     {
-        if (Error)
+        if (Error && Error != asio::error::eof)
         {
             Log::Error("Client: \"{} - {}\"", Error.value(), Error.message());
         }
