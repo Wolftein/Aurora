@@ -28,8 +28,8 @@ namespace Graphic
         // -=(Undocumented)=-
         Service(Ref<Context> Context);
 
-        // \see Subsystem::OnTick(UInt64)
-        void OnTick(UInt64 Time) override;
+        // \see Subsystem::OnTick(Real64)
+        void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
         Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height);

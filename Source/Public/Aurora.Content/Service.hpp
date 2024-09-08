@@ -30,8 +30,8 @@ namespace Content
         // -=(Undocumented)=-
         Service(Ref<Context> Context);
 
-        // \see Subsystem::OnTick(UInt64)
-        void OnTick(UInt64 Time) override;
+        // \see Subsystem::OnTick(Real64)
+        void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
         void AddLoader(ConstSPtr<Loader> Loader);

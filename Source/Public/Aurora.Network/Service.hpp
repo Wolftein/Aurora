@@ -28,8 +28,8 @@ namespace Network
         // -=(Undocumented)=-
         Service(Ref<Context> System);
 
-        // \see Subsystem::OnTick(UInt64)
-        void OnTick(UInt64 Time) override;
+        // \see Subsystem::OnTick(Real64)
+        void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
         Bool Initialize(UInt Workers);

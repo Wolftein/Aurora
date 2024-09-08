@@ -298,7 +298,7 @@ namespace Input
         for (Ref<const SDL_Event> Event : CPtr<const SDL_Event>(Stack.data(), Count))
         {
             Ref<Input::Event> Result = mBuffer[Element++];
-            Result.Time = Event.common.timestamp;
+            Result.Time = Event.common.timestamp / SDL_NS_PER_SECOND;
 
             switch (Event.type)
             {

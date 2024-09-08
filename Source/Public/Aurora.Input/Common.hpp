@@ -168,7 +168,7 @@ namespace Input
         };
 
         // -=(Undocumented)=-
-        UInt64 Time;
+        Real64 Time;
 
         // -=(Undocumented)=-
         Type   Type;

@@ -34,7 +34,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Interpolator(Type Start, Type End, UInt64 Time)
+        Interpolator(Type Start, Type End, Real64 Time)
             : mStart       { Start },
               mEnd         { End },
               mTime        { Time },
@@ -43,7 +43,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Type Tick(UInt64 Delta)
+        Type Tick(Real64 Delta)
         {
             mAccumulator = Min(mAccumulator + Delta, mTime);
 
@@ -76,7 +76,7 @@ inline namespace Math
 
         Type   mStart;
         Type   mEnd;
-        UInt64 mTime;
-        UInt64 mAccumulator;
+        Real64 mTime;
+        Real64 mAccumulator;
     };
 }

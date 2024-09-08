@@ -73,7 +73,7 @@ namespace Engine
         }
 
         // -=(Undocumented)=-
-        virtual void OnTick(UInt64 Time)
+        virtual void OnTick(Real64 Time)
         {
         }
 

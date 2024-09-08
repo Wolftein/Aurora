@@ -61,7 +61,7 @@ namespace Graphic
         Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        void SetScene(Ref<const Matrix4f> Projection, UInt64 Tick);
+        void SetScene(Ref<const Matrix4f> Projection, Real32 Time);
 
         // -=(Undocumented)=-
         template<typename Type>

@@ -31,14 +31,14 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::SetScene(Ref<const Matrix4f> Projection, UInt64 Tick)
+    void Renderer::SetScene(Ref<const Matrix4f> Projection, Real32 Time)
     {
         // TODO: Rework
         struct
         {
             const Matrix4f uProjection;
             const Real32   uTime;
-        } Scene { Projection, Tick / 1000.0f };
+        } Scene { Projection, Time };
 
         mEncoder.SetScene<decltype(Scene)>(Scene);
     }

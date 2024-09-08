@@ -116,7 +116,7 @@ namespace Engine
     {
         const auto OnMainTick = [this]()
         {
-            const UInt64 Time = SDL_GetTicksNS();
+            const Real64 Time = SDL_GetTicksNS() / static_cast<Real64>(SDL_NS_PER_SECOND);
 
             // Tick subsystems (order matters)
             Execute([Time](Ref<Core::Subsystem> Service)
