@@ -317,10 +317,10 @@ namespace Graphic
                 {
                     EncodeWithoutMaterial(Start, Count, * Current);
                 }
-            }
 
-            // Continue with the next batch
-            Start = Element + 1;
+                // Continue with the next batch
+                Start = Element + 1;
+            }
         }
 
         // Flush all batches to the GPU
