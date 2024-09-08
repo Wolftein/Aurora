@@ -207,15 +207,28 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        void SerializeString(Ref<SStr> Value)
+        void SerializeString8(Ref<SStr> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = mArchive.ReadString();
+                Value = mArchive.ReadString8();
             }
             else
             {
-                mArchive.WriteString(Value);
+                mArchive.WriteString8(Value);
+            }
+        }
+
+        // -=(Undocumented)=-
+        void SerializeString16(Ref<SStr16> Value)
+        {
+            if constexpr (k_Reader)
+            {
+                Value = mArchive.ReadString16();
+            }
+            else
+            {
+                mArchive.WriteString16(Value);
             }
         }
 
