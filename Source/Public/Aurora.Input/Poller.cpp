@@ -328,7 +328,7 @@ namespace Input
                 break;
             case SDL_EVENT_TEXT_INPUT:
                 Result.Type                = Event::Type::KeyType;
-                // TODO
+                Result.KeyType.Codepoint   = Event.text.text[0]; // TODO
                 break;
             case SDL_EVENT_MOUSE_MOTION:
                 Result.Type                = Event::Type::MouseMove;
