@@ -111,4 +111,25 @@ inline namespace Core
     {
         return std::addressof(Value);
     }
+
+    // -=(Undocumented)=-
+    template<typename Type, Type Mask, Type Shift>
+    inline constexpr Type GetBit(Type Field)
+    {
+        return (Field & Mask) >> Shift;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type, Type Mask, Type Shift>
+    inline constexpr Type SetBit(Type Field, Type Value)
+    {
+        return (Field & ~Mask) | ((Value << Shift) & Mask);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    inline constexpr Type GetMask(Type Count)
+    {
+        return static_cast<Type>(-(Count != 0)) & (static_cast<Type>(-1) >> ((sizeof(Type) * CHAR_BIT) - Count));
+    }
 }
