@@ -28,7 +28,7 @@ namespace Log
     void Shutdown();
 
     // -=(Undocumented)=-
-    inline void Level(Level Level)
+    inline void SetLevel(Level Level)
     {
         switch (Level)
         {

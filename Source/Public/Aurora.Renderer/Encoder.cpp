@@ -164,7 +164,7 @@ namespace Graphic
         }
 
         Buffer.Writer = Offset + Size;
-        return & Buffer.Memory[Offset];
+        return AddressOf(Buffer.Memory[Offset]);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -204,7 +204,7 @@ namespace Graphic
         if (Length > 0)
         {
             Ptr<void> DataPtr = AllocateTransientUniforms(Range, Length);
-            std::memcpy(DataPtr, & mInFlyBuffers[2].Memory[Offset], Length);
+            std::memcpy(DataPtr, AddressOf(mInFlyBuffers[2].Memory[Offset]), Length);
         }
     }
 
@@ -229,7 +229,8 @@ namespace Graphic
         {
             const Bool Discard = (Buffer.Reader == 0);
 
-            mGraphics->UpdateBuffer(Buffer.ID, Discard, Buffer.Reader, CPtr<UInt8>(& Buffer.Memory[Buffer.Reader], Count));
+            mGraphics->UpdateBuffer(Buffer.ID, Discard, Buffer.Reader,
+                CPtr<UInt8>(AddressOf(Buffer.Memory[Buffer.Reader]), Count));
 
             Buffer.Reader = Buffer.Writer;
         }

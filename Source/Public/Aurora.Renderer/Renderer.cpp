@@ -31,8 +31,9 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Begin(Ref<const Matrix4f> Projection, UInt64 Tick)
+    void Renderer::SetScene(Ref<const Matrix4f> Projection, UInt64 Tick)
     {
+        // TODO: Rework
         struct
         {
             const Matrix4f uProjection;
@@ -223,58 +224,14 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::DrawFont(ConstSPtr<Font> Font, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Alignment Alignment)
+    void Renderer::DrawFont(ConstSPtr<Font> Font, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Font::Alignment Alignment)
     {
         if (!Font->HasLoaded())
         {
             return;
         }
 
-        Ref<const Graphic::Font::Metrics> Metrics = Font->GetMetrics();
-
-        // Align horizontally
-        const UInt AlignmentType = static_cast<UInt>(Alignment);
-
-        if (AlignmentType & (1 << 0))
-        {
-            // Empty
-        }
-        else
-        {
-            Real32 BoundariesX = 0;
-
-            for (UInt Letter = 0; Letter < Text.size(); ++Letter)
-            {
-                const UInt Character = Text[Letter];
-                const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Character);
-
-                const Real32 Kerning = (Letter < Text.size() - 1) ? Font->GetKerning(Character, Text[Letter + 1]) : 0.0f;
-                BoundariesX += Scale * (Glyph->Advance + Kerning);
-            }
-
-            if (AlignmentType & (1 << 2))
-            {
-                Position.SetX(Position.GetX() - BoundariesX);
-            }
-            else
-            {
-                Position.SetX(Position.GetX() - BoundariesX * 0.5f);
-            }
-        }
-
-        // Align vertically.
-        if (AlignmentType &  (1 << 3))
-        {
-            Position.SetY(Position.GetY() + (Metrics.Descender * Scale));
-        }
-        else if (AlignmentType &  (1 << 4))
-        {
-            Position.SetY(Position.GetY() - (Metrics.Ascender + Metrics.Descender) / 2.0f * Scale);
-        }
-        else if (AlignmentType &  (1 << 5))
-        {
-            Position.SetY(Position.GetY() + (Metrics.Ascender * Scale));
-        }
+        const Rectf Boundaries = Font->Measure(Text, Scale, Alignment);
 
         Real32 CurrentX = Position.GetX();
         Real32 CurrentY = Position.GetY();
@@ -285,38 +242,38 @@ namespace Graphic
 
             switch (Character)
             {
-            case ' ' :
-            {
-                const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Character);
-
-                if (Letter < Text.size() - 1)
+                case ' ':
                 {
-                    const Real32 Kerning = Font->GetKerning(Character, Text[Letter + 1]);
-                    CurrentX += Scale * (Glyph->Advance + Kerning);
+                    const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Character);
+
+                    if (Letter < Text.size() - 1)
+                    {
+                        const Real32 Kerning = Font->GetKerning(Character, Text[Letter + 1]);
+                        CurrentX += Scale * (Glyph->Advance + Kerning);
+                    }
+                    break;
                 }
-            }
-                break;
-            case '\r':
-                break;
-            case '\n':
-                CurrentX  = Position.GetX();
-                CurrentY += Scale * Font->GetMetrics().UnderlineHeight;
-                break;
-            default:
-            {
-                const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Character);
-
-                Rectf PositionRect = (Glyph->PlaneBounds * Scale) + Vector2f(CurrentX, CurrentY);
-
-                DrawTexture(PositionRect, Glyph->ImageBounds, Depth, 0.0f, Order::Normal, Tint, mPipelines[1], Font->GetMaterial());
-
-                if (Letter < Text.size() - 1)
+                case '\r':
+                    CurrentX = Position.GetX();
+                    break;
+                case '\n':
+                    CurrentY += Scale * Font->GetMetrics().UnderlineHeight;
+                    break;
+                default:
                 {
-                    const Real32 Kerning = Font->GetKerning(Character, Text[Letter + 1]);
-                    CurrentX += Scale * (Glyph->Advance + Kerning);
+                    const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Character);
+
+                    const Rectf Destination = Boundaries + Vector2f(CurrentX, CurrentY);
+
+                    DrawTexture(Destination, Glyph->ImageBounds, Depth, 0.0f, Order::Normal, Tint, mPipelines[1], Font->GetMaterial());
+
+                    if (Letter < Text.size() - 1)
+                    {
+                        const Real32 Kerning = Font->GetKerning(Character, Text[Letter + 1]);
+                        CurrentX += Scale * (Glyph->Advance + Kerning);
+                    }
+                    break;
                 }
-            }
-                break;
             }
         }
     }
@@ -343,68 +300,27 @@ namespace Graphic
         // Render all drawables in batches
         for (UInt Element = 0, Start = 0, Max = mDrawablesPtr.size() - 1; Element <= Max; ++Element)
         {
-            const Ptr<const Drawable> This  = mDrawablesPtr[Element];
-            const Ptr<const Drawable> Other = (Element == Max ? This : mDrawablesPtr[Element + 1]);
+            const Ptr<const Drawable> Current = mDrawablesPtr[Element];
+            const Ptr<const Drawable> Next = (Element == Max ? Current : mDrawablesPtr[Element + 1]);
 
-            // Break batch if material or pipeline differ or we are handling the last element
-            if (This->Material != Other->Material || This->Pipeline != Other->Pipeline || This == Other)
+            // Break batch if material and pipeline differ or we are handling the last element
+            if (Current->Material != Next->Material || Current->Pipeline != Next->Pipeline || Current == Next)
             {
                 const UInt Count = Element - Start + 1;
 
                 // Ensure we have enough space for the batch otherwise flush previous batches
-                if (This->Material)
+                if (Current->Material)
                 {
-                    mEncoder.Ensure<Layout>(
-                        Count * 4,
-                        Count * 6,
-                        This->Material ? This->Material->GetParameters().size() : 0);
+                    EncodeWithMaterial(Start, Count, * Current);
                 }
                 else
                 {
-                    mEncoder.Ensure<Layout2>(Count * 4, Count * 6, 0);
+                    EncodeWithoutMaterial(Start, Count, * Current);
                 }
-
-
-                for (UInt Drawable = Start, Index = 0; Drawable <= Element; ++Drawable, Index += 4)
-                {
-                    if (This->Material)
-                    {
-                        Ptr<Layout> Vertices = mEncoder.AllocateTransientVertices<Layout>(4);
-
-                        WriteGeometry(mDrawablesPtr[Drawable], Vertices);
-                    }
-                    else
-                    {
-                        Ptr<Layout2> Vertices = mEncoder.AllocateTransientVertices<Layout2>(4);
-
-                        WriteGeometry(mDrawablesPtr[Drawable], Vertices);
-                    }
-
-                    const Ptr<UInt16> Indices = mEncoder.AllocateTransientIndices<UInt16>(6);
-                    Indices[0] = Index;
-                    Indices[1] = Index + 1;
-                    Indices[2] = Index + 2;
-                    Indices[3] = Index + 1;
-                    Indices[4] = Index + 3;
-                    Indices[5] = Index + 2;
-                }
-
-                mEncoder.SetPipeline(This->Pipeline);
-
-                if (This->Material)
-                {
-                    mEncoder.SetMaterial(This->Material);
-                    mEncoder.Draw<Layout>();
-                }
-                else
-                {
-                    mEncoder.Draw<Layout2>();
-                }
-
-
-                // Continue with the next batch
-                Start = Element + 1;
             }
+
+            // Continue with the next batch
+            Start = Element + 1;
         }
 
         // Flush all batches to the GPU
@@ -418,9 +334,52 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::End()
+    void Renderer::EncodeWithMaterial(UInt Offset, UInt Count, Ref<const Drawable> Drawable)
     {
-        Flush();
+        mEncoder.Ensure<Layout>(Count * 4, Count * 6, Drawable.Material->GetParameters().size());
+
+        for (UInt Index = 0, Element = Offset; Element < Offset + Count; ++Element, Index += 4)
+        {
+            Ptr<Layout> Vertices = mEncoder.AllocateTransientVertices<Layout>(4);
+            WriteGeometry(mDrawablesPtr[Element], Vertices);
+
+            const Ptr<UInt16> Indices = mEncoder.AllocateTransientIndices<UInt16>(6);
+            Indices[0] = Index;
+            Indices[1] = Index + 1;
+            Indices[2] = Index + 2;
+            Indices[3] = Index + 1;
+            Indices[4] = Index + 3;
+            Indices[5] = Index + 2;
+        }
+
+        mEncoder.SetPipeline(Drawable.Pipeline);
+        mEncoder.SetMaterial(Drawable.Material);
+        mEncoder.Draw<Layout>();
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::EncodeWithoutMaterial(UInt Offset, UInt Count, Ref<const Drawable> Drawable)
+    {
+        mEncoder.Ensure<Layout>(Count * 4, Count * 6, 0);
+
+        for (UInt Index = 0, Element = Offset; Element <= Offset + Count; ++Element, Index += 4)
+        {
+            Ptr<NonTextureLayout> Vertices = mEncoder.AllocateTransientVertices<NonTextureLayout>(4);
+            WriteGeometry(mDrawablesPtr[Element], Vertices);
+
+            const Ptr<UInt16> Indices = mEncoder.AllocateTransientIndices<UInt16>(6);
+            Indices[0] = Index;
+            Indices[1] = Index + 1;
+            Indices[2] = Index + 2;
+            Indices[3] = Index + 1;
+            Indices[4] = Index + 3;
+            Indices[5] = Index + 2;
+        }
+
+        mEncoder.SetPipeline(Drawable.Pipeline);
+        mEncoder.Draw<NonTextureLayout>();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -480,7 +439,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::WriteGeometry(Ptr<const Drawable> Drawable, Ptr<Layout2> Buffer)
+    void Renderer::WriteGeometry(Ptr<const Drawable> Drawable, Ptr<NonTextureLayout> Buffer)
     {
         Buffer[0].Position.Set(Drawable->Position[0].GetX(), Drawable->Position[0].GetY(), Drawable->Depth);
         Buffer[1].Position.Set(Drawable->Position[1].GetX(), Drawable->Position[1].GetY(), Drawable->Depth);

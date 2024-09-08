@@ -35,7 +35,7 @@ namespace Network
     {
         mLock.reset();
 
-        for (Ref<std::thread> Thread : mPool)
+        for (Ref<std::thread> Thread : mWorkers)
         {
             Thread.join();
         }
@@ -44,11 +44,11 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool TCPDriver::Initialize(UInt32 Cores)
+    Bool TCPDriver::Initialize(UInt32 Workers)
     {
-        for (UInt32 Core = 0; Core < Cores; ++Core)
+        for (UInt32 Core = 0; Core < Workers; ++Core)
         {
-            mPool.emplace_back([this]()
+            mWorkers.emplace_back([this]()
             {
                 mReactor.run();
             });

@@ -103,28 +103,6 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void WriteAny(Type Data)
-        {
-            if constexpr (std::is_arithmetic_v<Type>)
-            {
-                WriteNumber(Data);
-            }
-            else if constexpr (std::is_same<Type, SStr>::value || std::is_same<Type, CStr>::value)
-            {
-                WriteString8(Data);
-            }
-            else if constexpr (std::is_same<Type, SStr16>::value || std::is_same<Type, CStr16>::value)
-            {
-                WriteString16(Data);
-            }
-            else
-            {
-                WriteObject(Data);
-            }
-        }
-
-        // -=(Undocumented)=-
         void WriteBool(Bool Data)
         {
             Write<Bool>(Data);
@@ -241,7 +219,22 @@ inline namespace IO
         template<typename Type>
         void WriteObject(Ref<Type> Data)
         {
-            Type::Write(* this, Data);
+            if constexpr (std::is_arithmetic_v<Type>)
+            {
+                WriteNumber(Data);
+            }
+            else if constexpr (std::is_same<Type, SStr>::value || std::is_same<Type, CStr>::value)
+            {
+                WriteString8(Data);
+            }
+            else if constexpr (std::is_same<Type, SStr16>::value || std::is_same<Type, CStr16>::value)
+            {
+                WriteString16(Data);
+            }
+            else
+            {
+                Type::Write(* this, Data);
+            }
         }
 
     private:

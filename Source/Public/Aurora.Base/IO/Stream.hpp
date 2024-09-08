@@ -271,14 +271,14 @@ inline namespace IO
             {
                 for (Ref<Type> Element : Value)
                 {
-                    Element = mArchive.template ReadAny<Type>();
+                    Element = mArchive.template ReadObject<Type>();
                 }
             }
             else
             {
                 for (Ref<Type> Element : Value)
                 {
-                    Element = mArchive.template WriteAny<Type>(Element);
+                    Element = mArchive.template WriteObject<Type>(Element);
                 }
             }
         }
@@ -300,7 +300,7 @@ inline namespace IO
 
                 for (UInt Element = 0; Element < Length; ++Element)
                 {
-                    Value.emplace_back(mArchive.template ReadAny<Type>());
+                    Value.emplace_back(mArchive.template ReadObject<Type>());
                 }
             }
             else
@@ -309,7 +309,7 @@ inline namespace IO
 
                 for (Ref<Type> Element : Value)
                 {
-                    mArchive.template WriteAny<Type>(Element);
+                    mArchive.template WriteObject<Type>(Element);
                 }
             }
         }

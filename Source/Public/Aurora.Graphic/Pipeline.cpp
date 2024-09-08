@@ -44,7 +44,7 @@ namespace Graphic
     {
         UInt Memory = 0;
 
-        for (Ref<Data> Stage : mStages)
+        for (Ref<const Data> Stage : mStages)
         {
             Memory += Stage.GetSize();
         }

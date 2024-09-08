@@ -327,6 +327,7 @@ namespace Input
                 Result.KeyAction.Key       = GetKey(Event.key.key);
                 break;
             case SDL_EVENT_TEXT_INPUT:
+                Result.Type                = Event::Type::KeyType;
                 // TODO
                 break;
             case SDL_EVENT_MOUSE_MOTION:

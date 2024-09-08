@@ -556,7 +556,7 @@ namespace Graphic
         Description.BufferCount       = 3;
         Description.BufferUsage       = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         Description.Flags             = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
-             | (mCapabilities.Tearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
+             | (mCapabilities.Adaptive ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
         Description.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
         Description.BufferDesc.Width  = Width;
         Description.BufferDesc.Height = Height;
@@ -567,7 +567,7 @@ namespace Graphic
         ComPtr<IDXGIFactory4> DXGIFactor4;
         if (SUCCEEDED(mDeviceFactory.As<IDXGIFactory4>(& DXGIFactor4)))
         {
-            Description.SwapEffect = (mCapabilities.Tearing ? DXGI_SWAP_EFFECT_FLIP_DISCARD : DXGI_SWAP_EFFECT_DISCARD);
+            Description.SwapEffect = (mCapabilities.Adaptive ? DXGI_SWAP_EFFECT_FLIP_DISCARD : DXGI_SWAP_EFFECT_DISCARD);
         }
         else
         {
@@ -911,8 +911,7 @@ namespace Graphic
             {
                 Ref<const D3D11Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
                 const DXGI_FORMAT      Format = (NewestSubmission.Indices.Stride == sizeof(UInt16)
-                                                 ? DXGI_FORMAT_R16_UINT
-                                                 : DXGI_FORMAT_R32_UINT);
+                    ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT);
                 mDeviceImmediate->IASetIndexBuffer(Buffer.Object.Get(), Format, NewestSubmission.Indices.Offset);
             }
 
@@ -1005,7 +1004,7 @@ namespace Graphic
         if (Display)
         {
             const UInt Sync = Synchronised ? 1 : 0;
-            const UInt Flag = Synchronised ? 0 : mCapabilities.Tearing ? DXGI_PRESENT_ALLOW_TEARING : 0;
+            const UInt Flag = Synchronised ? 0 : mCapabilities.Adaptive ? DXGI_PRESENT_ALLOW_TEARING : 0;
             Display->Present(Sync, Flag);
         }
     }
@@ -1093,9 +1092,9 @@ namespace Graphic
         ComPtr<IDXGIFactory5> DXGIFactory5;
         if (SUCCEEDED(mDeviceFactory.As<IDXGIFactory5>(& DXGIFactory5)))
         {
-            BOOL AllowTearing = FALSE;
-            DXGIFactory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, & AllowTearing, sizeof(AllowTearing));
-            mCapabilities.Tearing = AllowTearing;
+            BOOL AllowAdaptive = FALSE;
+            DXGIFactory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, & AllowAdaptive, sizeof(AllowAdaptive));
+            mCapabilities.Adaptive = AllowAdaptive;
         }
     }
 

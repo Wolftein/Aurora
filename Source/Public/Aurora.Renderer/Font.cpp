@@ -40,6 +40,103 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    Rectf Font::Measure(CStr16 Text, Real32 Scale, Alignment Alignment)
+    {
+        Real32 CurrentX    = 0.0f;
+        Real32 CurrentY    = 0.0f;
+        Real32 BoundariesX = 0.0f;
+        Real32 BoundariesY = 0.0f;
+
+        for (UInt Letter = 0; Letter < Text.size(); ++Letter)
+        {
+            const UInt Character = Text[Letter];
+
+            switch (Character)
+            {
+                case '\r':
+                    if (CurrentX > BoundariesX)
+                    {
+                        BoundariesX = CurrentX;
+                    }
+                    CurrentX = 0.0f;
+                    break;
+                case '\n':
+                    CurrentY += Scale * mMetrics.UnderlineHeight;
+                    break;
+                default:
+                {
+                    const Ptr<const Glyph> Glyph = GetGlyph(Character);
+
+                    const Real32 Kerning = (Letter < Text.size() - 1) ? GetKerning(Character, Text[Letter + 1]) : 0.0f;
+                    CurrentX += Scale * (Glyph->Advance + Kerning);
+                    break;
+                }
+            }
+        }
+
+        if (CurrentX > BoundariesX)
+        {
+            BoundariesX = CurrentX;
+        }
+
+        if (CurrentY > BoundariesY)
+        {
+            BoundariesY = CurrentY;
+        }
+
+        Real32 OffsetX = 0.0f;
+        Real32 OffsetY = 0.0f;
+
+        switch (Alignment)
+        {
+        case Alignment::LeftTop:
+            OffsetY = mMetrics.Descender * Scale;
+            break;
+        case Alignment::LeftMiddle:
+            OffsetY = - (mMetrics.Ascender + mMetrics.Descender) / 2.0f * Scale;
+            break;
+        case Alignment::LeftBottom:
+            OffsetY = mMetrics.Ascender * Scale;
+            break;
+        case Alignment::LeftBaseline:
+            break;
+        case Alignment::CenterTop:
+            OffsetX = - BoundariesX * 0.5f;
+            OffsetY = mMetrics.Descender * Scale;
+            break;
+        case Alignment::CenterMiddle:
+            OffsetX = - BoundariesX * 0.5f;
+            OffsetY = - (mMetrics.Ascender + mMetrics.Descender) / 2.0f * Scale;
+            break;
+        case Alignment::CenterBottom:
+            OffsetX = - BoundariesX * 0.5f;
+            OffsetY = mMetrics.Ascender * Scale;
+            break;
+        case Alignment::CenterBaseline:
+            OffsetX = - BoundariesX * 0.5f;
+            break;
+        case Alignment::RightTop:
+            OffsetX = - BoundariesX;
+            OffsetY = mMetrics.Descender * Scale;
+            break;
+        case Alignment::RightMiddle:
+            OffsetX = - BoundariesX;
+            OffsetY = - (mMetrics.Ascender + mMetrics.Descender) / 2.0f * Scale;
+            break;
+        case Alignment::RightBottom:
+            OffsetX = - BoundariesX;
+            OffsetY = mMetrics.Ascender * Scale;
+            break;
+        case Alignment::RightBaseline:
+            OffsetX = - BoundariesX;
+            break;
+        }
+        return Rectf(OffsetX, OffsetY, OffsetX + BoundariesX, OffsetY + BoundariesY);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     Bool Font::OnCreate(Ref<Subsystem::Context> Context)
     {
         Bool Success;

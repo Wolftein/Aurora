@@ -23,7 +23,6 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    // TODO: Need Rework
     class Encoder final
     {
     public:
@@ -63,7 +62,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        template<typename Type = SInt16>
+        template<typename Type = UInt16>
         Ptr<Type> AllocateTransientIndices(UInt Length)
         {
             // TODO: Alignment
@@ -158,7 +157,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        template<typename Vertices, typename Indices = SInt16>
+        template<typename Vertices, typename Indices = UInt16>
         Bool Ensure(UInt AmountOfVertices, UInt AmountOfIndices, UInt AmountOfUniforms)
         {
             return Ensure(AmountOfVertices * sizeof(Vertices), AmountOfIndices * sizeof(Indices), AmountOfUniforms);
@@ -168,7 +167,7 @@ namespace Graphic
         Bool Ensure(UInt VerticesInBytes, UInt IndicesInBytes, UInt AmountOfUniforms);
 
         // -=(Undocumented)=-
-        template<typename Vertices, typename Indices = SInt16>
+        template<typename Vertices, typename Indices = UInt16>
         void Draw()
         {
             Draw(sizeof(Vertices), sizeof(Indices));

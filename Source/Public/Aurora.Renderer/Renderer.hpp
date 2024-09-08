@@ -14,7 +14,6 @@
 
 #include "Font.hpp"
 #include "Encoder.hpp"
-#include "Aurora.Graphic/Camera.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -56,53 +55,13 @@ namespace Graphic
             Opaque,
         };
 
-        // -=(Undocumented)=-
-        enum class Alignment
-        {
-            // -=(Undocumented)=-
-            LeftTop        = (1 << 0) | (1 << 3),
-
-            // -=(Undocumented)=-
-            LeftMiddle     = (1 << 0) | (1 << 4),
-
-            // -=(Undocumented)=-
-            LeftBottom     = (1 << 0) | (1 << 5),
-
-            // -=(Undocumented)=-
-            LeftBaseline   = (1 << 0) | (1 << 6),
-
-            // -=(Undocumented)=-
-            CenterTop      = (1 << 1) | (1 << 3),
-
-            // -=(Undocumented)=-
-            CenterMiddle   = (1 << 1) | (1 << 4),
-
-            // -=(Undocumented)=-
-            CenterBottom   = (1 << 1) | (1 << 5),
-
-            // -=(Undocumented)=-
-            CenterBaseline = (1 << 1) | (1 << 6),
-
-            // -=(Undocumented)=-
-            RightTop       = (1 << 2) | (1 << 3),
-
-            // -=(Undocumented)=-
-            RightMiddle    = (1 << 2) | (1 << 4),
-
-            // -=(Undocumented)=-
-            RightBottom    = (1 << 2) | (1 << 5),
-
-            // -=(Undocumented)=-
-            RightBaseline  = (1 << 2) | (1 << 6),
-        };
-
     public:
 
         // -=(Undocumented)=-
         Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        void Begin(Ref<const Matrix4f> Projection, UInt64 Tick);
+        void SetScene(Ref<const Matrix4f> Projection, UInt64 Tick);
 
         // -=(Undocumented)=-
         template<typename Type>
@@ -158,13 +117,10 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void DrawFont(ConstSPtr<Font> Font, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Alignment Alignment);
+        void DrawFont(ConstSPtr<Font> Font, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Font::Alignment Alignment);
 
         // -=(Undocumented)=-
         void Flush();
-
-        // -=(Undocumented)=-
-        void End();
 
     private:
 
@@ -182,7 +138,7 @@ namespace Graphic
         };
 
         // -=(Undocumented)=-
-        struct Layout2
+        struct NonTextureLayout
         {
             // -=(Undocumented)=-
             Vector3f Position;
@@ -216,6 +172,12 @@ namespace Graphic
             SPtr<Graphic::Material> Material;
         };
 
+        // -=(Undocumented)=-
+        void EncodeWithMaterial(UInt Offset, UInt Count, Ref<const Drawable> Drawable);
+
+        // -=(Undocumented)=-
+        void EncodeWithoutMaterial(UInt Offset, UInt Count, Ref<const Drawable> Drawable);
+
     private:
 
         // -=(Undocumented)=-
@@ -232,7 +194,7 @@ namespace Graphic
         void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<Layout> Buffer);
 
         // -=(Undocumented)=-
-        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<Layout2> Buffer);
+        void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<NonTextureLayout> Buffer);
 
         // -=(Undocumented)=-
         UInt64 GenerateUniqueID(Order Order, UInt Pipeline, UInt Material, Real32 Depth) const;

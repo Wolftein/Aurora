@@ -32,7 +32,7 @@ namespace Network
         void OnTick(UInt64 Time) override;
 
         // -=(Undocumented)=-
-        Bool Initialize();
+        Bool Initialize(UInt Workers);
 
         // -=(Undocumented)=-
         SPtr<Server> Listen(CStr Address, UInt16 Port);

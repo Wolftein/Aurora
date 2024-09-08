@@ -376,10 +376,10 @@ namespace Graphic
         Language Language = Language::Version_1;
 
         // -=(Undocumented)=-
-        Vector<Adapter> Adapters;
+        Bool     Adaptive = false;
 
         // -=(Undocumented)=-
-        Bool     Tearing  = false;
+        Vector<Adapter> Adapters;
     };
 
     // -=(Undocumented)=-

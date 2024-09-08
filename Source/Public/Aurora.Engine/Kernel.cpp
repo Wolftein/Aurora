@@ -94,7 +94,7 @@ namespace Engine
         // Create the network service
         Log::Info("Kernel: Creating network service");
         ConstSPtr<Network::Service> NetworkService = AddSubsystem<Network::Service>();
-        if (! NetworkService->Initialize())
+        if (! NetworkService->Initialize(IsServerMode() ? SDL_GetCPUCount() : 1))
         {
             Log::Warn("Kernel: Failed to create network service, disabling service.");
             RemoveSubsystem<Network::Service>();

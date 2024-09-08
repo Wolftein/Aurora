@@ -38,7 +38,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Initialize()
+    Bool Service::Initialize(UInt Workers)
     {
         Bool Successful = true;
 
@@ -46,11 +46,11 @@ namespace Network
         {
             mDriver = NewUniquePtr<TCPDriver>();
 
-            Successful = mDriver && mDriver->Initialize(IsServerMode() ? SDL_GetCPUCount() : 1);
+            Successful = mDriver && mDriver->Initialize(Workers);
 
             if (Successful)
             {
-                Log::Info("Network - Initialized with {} threads", IsServerMode() ? SDL_GetCPUCount() : 1);
+                Log::Info("Network - Initialized with {} threads", Workers);
             }
             else
             {

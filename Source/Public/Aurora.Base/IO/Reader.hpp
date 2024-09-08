@@ -110,28 +110,6 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        Type ReadAny()
-        {
-            if constexpr (std::is_arithmetic_v<Type>)
-            {
-                ReadNumber<Type>();
-            }
-            else if constexpr (std::is_same<Type, SStr>::value || std::is_same<Type, CStr>::value)
-            {
-                ReadString8();
-            }
-            else if constexpr (std::is_same<Type, SStr16>::value || std::is_same<Type, CStr16>::value)
-            {
-                ReadString16();
-            }
-            else
-            {
-                ReadObject<Type>();
-            }
-        }
-
-        // -=(Undocumented)=-
         Bool ReadBool()
         {
             return Read<Bool>();
@@ -248,7 +226,22 @@ inline namespace IO
         template<typename Type>
         Type ReadObject()
         {
-            return Type::Read(* this);
+            if constexpr (std::is_arithmetic_v<Type>)
+            {
+                return ReadNumber<Type>();
+            }
+            else if constexpr (std::is_same<Type, SStr>::value || std::is_same<Type, CStr>::value)
+            {
+                return ReadString8();
+            }
+            else if constexpr (std::is_same<Type, SStr16>::value || std::is_same<Type, CStr16>::value)
+            {
+                return ReadString16();
+            }
+            else
+            {
+                return Type::Read(* this);
+            }
         }
 
     private:

@@ -21,12 +21,51 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    // TODO: Need Rework
     class Font final : public Content::AbstractResource<Font>
     {
         friend class Content::AbstractResource<Font>;
 
     public:
+
+        // -=(Undocumented)=-
+        enum class Alignment
+        {
+            // -=(Undocumented)=-
+            LeftTop,
+
+            // -=(Undocumented)=-
+            LeftMiddle,
+
+            // -=(Undocumented)=-
+            LeftBottom,
+
+            // -=(Undocumented)=-
+            LeftBaseline,
+
+            // -=(Undocumented)=-
+            CenterTop,
+
+            // -=(Undocumented)=-
+            CenterMiddle,
+
+            // -=(Undocumented)=-
+            CenterBottom,
+
+            // -=(Undocumented)=-
+            CenterBaseline,
+
+            // -=(Undocumented)=-
+            RightTop,
+
+            // -=(Undocumented)=-
+            RightMiddle,
+
+            // -=(Undocumented)=-
+            RightBottom,
+
+            // -=(Undocumented)=-
+            RightBaseline,
+        };
 
         // -=(Undocumented)=-
         struct Atlas
@@ -85,6 +124,9 @@ namespace Graphic
         void Load(Metrics&& Metrics, Atlas&& Atlas, Table<UInt32, Glyph>&& Glyphs, Table<UInt64, Real32>&& Kerning);
 
         // -=(Undocumented)=-
+        Rectf Measure(CStr16 Text, Real32 Scale, Alignment Alignment);
+
+        // -=(Undocumented)=-
         Ref<const Metrics> GetMetrics() const
         {
             return mMetrics;
@@ -97,11 +139,11 @@ namespace Graphic
 
             if (Iterator != mGlyphs.end())
             {
-                return & Iterator->second;
+                return AddressOf(Iterator->second);
             }
             else
             {
-                return (Fallback != 0 ? GetGlyph(Fallback) : nullptr);
+                return (Fallback != 0 && Unicode != Fallback ? GetGlyph(Fallback) : nullptr);
             }
         }
 

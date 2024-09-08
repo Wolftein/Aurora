@@ -33,7 +33,7 @@ namespace Network
         ~TCPDriver();
 
         // \see Driver::Initialize
-        Bool Initialize(UInt32 Cores) override;
+        Bool Initialize(UInt32 Workers) override;
 
         // \see Driver::Tick
         void Tick() override;
@@ -56,7 +56,7 @@ namespace Network
 
         asio::io_context    mExecutor;
         asio::io_context    mReactor;
-        Vector<std::thread> mPool;
+        Vector<std::thread> mWorkers;
         Lock                mLock;
     };
 }
