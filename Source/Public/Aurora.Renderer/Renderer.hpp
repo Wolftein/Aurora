@@ -110,10 +110,7 @@ namespace Graphic
         // -=(Undocumented)=-
         void DrawTexture(Ref<const Rectf> Rectangle, Ref<const Rectf> Source, Real32 Depth, Real32 Angle, Order Order, Ref<const Color> Tint, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
         {
-            Vector2f Origin(
-                Rectangle.GetX() + (Rectangle.GetWidth() * 0.5f),
-                Rectangle.GetY() + (Rectangle.GetHeight() * 0.5f));
-            DrawTexture(Rectangle, Source, Origin, Depth, Angle, Order, Array<Color, 4> { Tint, Tint, Tint, Tint }, Pipeline, Material);
+            DrawTexture(Rectangle, Source, Rectangle.GetCenter(), Depth, Angle, Order, Array<Color, 4> { Tint, Tint, Tint, Tint }, Pipeline, Material);
         }
 
         // -=(Undocumented)=-
@@ -204,19 +201,19 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Encoder                              mEncoder;
+        Encoder                        mEncoder;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Array<SPtr<Pipeline>, 2>             mPipelines;
-        Vector<Vector4f>                     mParameters;
+        Array<SPtr<Pipeline>, 2>        mPipelines;
+        Vector<Vector4f>                mParameters;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Stack<Drawable, k_MaxDrawables>      mDrawables;
-        Vector<Ptr<Drawable>>                mDrawablesPtr;
+        Array<Drawable, k_MaxDrawables> mDrawables;
+        Vector<Ptr<Drawable>>           mDrawablesPtr;
     };
 
 }

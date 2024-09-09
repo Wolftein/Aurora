@@ -316,7 +316,6 @@ namespace Graphic
         mEncoder.Flush();
 
         // Reset all stack(s) back to original states
-        mDrawables.Clear();
         mDrawablesPtr.clear();
     }
 
@@ -390,12 +389,12 @@ namespace Graphic
         Ref<const Array<Vector2f, 4>> Texture,
         Order Order, Real32 Depth, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
-        if (mDrawables.IsFull())
+        if (mDrawablesPtr.size() == k_MaxDrawables)
         {
             Flush();
         }
 
-        Ref<Drawable> Drawable  = mDrawables[mDrawables.Allocate()];
+        Ref<Drawable> Drawable  = mDrawables[mDrawablesPtr.size()];
         Drawable.ID             = GenerateUniqueID(Order, Pipeline->GetID(), Material ? Material->GetID() : 0, Depth);
         Drawable.Depth          = Depth;
         Drawable.Position       = Position;
