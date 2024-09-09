@@ -87,13 +87,13 @@ namespace Graphic
         if (IndicesFormatStride > 0)
         {
             mInFlyBatch.Primitive.Count  = (mInFlyBuffers[1].Writer - mInFlyBuffers[1].Marker) / IndicesFormatStride;
-            mInFlyBatch.Primitive.Base   = (mInFlyBuffers[1].Marker - mInFlyBuffers[1].Reader) / IndicesFormatStride;
-            mInFlyBatch.Primitive.Offset = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VerticesFormatStride;
+            mInFlyBatch.Primitive.Offset = (mInFlyBuffers[1].Marker - mInFlyBuffers[1].Reader) / IndicesFormatStride;
+            mInFlyBatch.Primitive.Base   = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VerticesFormatStride;
         }
         else
         {
             mInFlyBatch.Primitive.Count  = (mInFlyBuffers[0].Writer - mInFlyBuffers[0].Marker) / VerticesFormatStride;
-            mInFlyBatch.Primitive.Base   = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VerticesFormatStride;
+            mInFlyBatch.Primitive.Offset = (mInFlyBuffers[0].Marker - mInFlyBuffers[0].Reader) / VerticesFormatStride;
         }
 
         // Apply batch's vertices range

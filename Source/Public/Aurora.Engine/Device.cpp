@@ -22,9 +22,7 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Device::Device(UInt Handle, CStr Title, UInt16 Width, UInt16 Height, Graphic::Backend Backend, Bool Fullscreen, Bool Borderless)
-        : mHandle { nullptr },
-          mWidth  { Width },
-          mHeight { Height }
+        : mHandle { nullptr }
     {
         SDL_PropertiesID Config = SDL_CreateProperties();
         SDL_SetStringProperty(Config, SDL_PROP_WINDOW_CREATE_TITLE_STRING, Title.data());
@@ -80,10 +78,12 @@ namespace Engine
     {
         if (Fullscreen)
         {
+            mSize.Set(GetWidth(), GetHeight());
+
             SDL_DisplayMode FullscreenDisplayMode;
             if (!Borderless)
             {
-                SDL_GetClosestFullscreenDisplayMode(0, mWidth, mHeight, 0, true, & FullscreenDisplayMode);
+                SDL_GetClosestFullscreenDisplayMode(0, mSize.GetX(), mSize.GetY(), 0, true, & FullscreenDisplayMode);
             }
 
             Ptr<const SDL_DisplayMode> Display = (Borderless ? nullptr : & FullscreenDisplayMode);
@@ -92,7 +92,7 @@ namespace Engine
         }
         else
         {
-            SDL_SetWindowSize(mHandle, mWidth, mHeight);
+            SDL_SetWindowSize(mHandle, mSize.GetX(), mSize.GetY());
             SDL_SetWindowFullscreen(mHandle, false);
             SDL_SetWindowPosition(mHandle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
             SDL_SetWindowBordered(mHandle, !Borderless);

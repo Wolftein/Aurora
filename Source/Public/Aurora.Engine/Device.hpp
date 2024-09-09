@@ -105,21 +105,23 @@ namespace Engine
         // -=(Undocumented)=-
         void SetSize(UInt16 Width, UInt16 Height)
         {
-            mWidth  = Width;
-            mHeight = Height;
             SDL_SetWindowSize(mHandle, Width, Height);
         }
 
         // -=(Undocumented)=-
         UInt16 GetWidth() const
         {
-            return mWidth;
+            int Width;
+            SDL_GetWindowSize(mHandle, AddressOf(Width), nullptr);
+            return Width;
         }
 
         // -=(Undocumented)=-
         UInt16 GetHeight() const
         {
-            return mHeight;
+            int Height;
+            SDL_GetWindowSize(mHandle, nullptr, AddressOf(Height));
+            return Height;
         }
 
         // -=(Undocumented)=-
@@ -146,7 +148,6 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Ptr<SDL_Window> mHandle;
-        UInt16          mWidth;
-        UInt16          mHeight;
+        Vector2i        mSize;
     };
 }

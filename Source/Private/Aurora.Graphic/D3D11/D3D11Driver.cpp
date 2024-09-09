@@ -493,7 +493,8 @@ namespace Graphic
         mPasses[k_Default].Auxiliary->Release();
 
         // Changes the swap chain's back buffer size, format, and number of buffers
-        mPasses[k_Default].Display->ResizeBuffers(0, Width, Height, DXGI_FORMAT_UNKNOWN, 0);
+        const UINT Flags = (mCapabilities.Adaptive ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
+        mPasses[k_Default].Display->ResizeBuffers(0, Width, Height, DXGI_FORMAT_UNKNOWN, Flags);
 
         // Recreate the swap chain's resources
         CreateSwapchainResources(mPasses[k_Default], Width, Height);
@@ -979,15 +980,15 @@ namespace Graphic
             if (NewestSubmission.Indices.Buffer)
             {
                 const UINT IndicesCount          = NewestSubmission.Primitive.Count;
-                const UINT IndicesStartLocation  = NewestSubmission.Primitive.Base;
-                const UINT VerticesStartLocation = NewestSubmission.Primitive.Offset;
+                const UINT IndicesStartLocation  = NewestSubmission.Primitive.Offset;
+                const UINT VerticesStartLocation = NewestSubmission.Primitive.Base;
 
                 mDeviceImmediate->DrawIndexed(IndicesCount, IndicesStartLocation, VerticesStartLocation);
             }
             else
             {
                 const UINT VerticesCount         = NewestSubmission.Primitive.Count;
-                const UINT VerticesStartLocation = NewestSubmission.Primitive.Base;
+                const UINT VerticesStartLocation = NewestSubmission.Primitive.Offset;
 
                 mDeviceImmediate->Draw(VerticesCount, VerticesStartLocation);
             }
