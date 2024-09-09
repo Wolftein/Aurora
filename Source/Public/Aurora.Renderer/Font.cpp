@@ -40,98 +40,94 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Rectf Font::Measure(CStr16 Text, Real32 Scale, Alignment Alignment)
+    Vector2f Font::Measure(CStr16 Text, Real32 Size)
     {
-        Real32 CurrentX    = 0.0f;
-        Real32 CurrentY    = 0.0f;
-        Real32 BoundariesX = 0.0f;
-        Real32 BoundariesY = 0.0f;
+        const Real32 Scale = Size / mMetrics.Size;
 
-        for (UInt Letter = 0; Letter < Text.size(); ++Letter)
+        Real32 CurrentX = 0.0f;
+        Real32 MaximumX = 0.0f;
+        Real32 MaximumY = mMetrics.UnderlineHeight;
+
+        for (UInt Previous = 0, Symbol = 0; Symbol < Text.size(); ++Symbol)
         {
-            const UInt Character = Text[Letter];
+            const UInt Codepoint = Text[Symbol];
 
-            switch (Character)
+            switch (Codepoint)
             {
                 case '\r':
-                    if (CurrentX > BoundariesX)
-                    {
-                        BoundariesX = CurrentX;
-                    }
                     CurrentX = 0.0f;
                     break;
                 case '\n':
-                    CurrentY += Scale * mMetrics.UnderlineHeight;
+                    MaximumY += mMetrics.UnderlineHeight * Scale;
                     break;
                 default:
                 {
-                    const Ptr<const Glyph> Glyph = GetGlyph(Character);
-
-                    const Real32 Kerning = (Letter < Text.size() - 1) ? GetKerning(Character, Text[Letter + 1]) : 0.0f;
-                    CurrentX += Scale * (Glyph->Advance + Kerning);
+                    const Ptr<const Glyph> Glyph = GetGlyph(Codepoint);
+                    CurrentX += (GetKerning(Previous, Codepoint) * Scale) + (Glyph->Advance * Scale);
+                    MaximumX = Max(MaximumX, CurrentX);
                     break;
                 }
             }
+            Previous = Codepoint;
         }
+        return Vector2f(MaximumX, MaximumY) * mMetrics.Size;
+    }
 
-        if (CurrentX > BoundariesX)
-        {
-            BoundariesX = CurrentX;
-        }
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        if (CurrentY > BoundariesY)
-        {
-            BoundariesY = CurrentY;
-        }
+    Rectf Font::Calculate(CStr16 Text, Real32 Size, Ref<const Vector2f> Position, Alignment Alignment)
+    {
+        const Vector2f Measurement = Measure(Text, Size);
 
-        Real32 OffsetX = 0.0f;
-        Real32 OffsetY = 0.0f;
+        Real32 OffsetX = Position.GetX();
+        Real32 OffsetY = Position.GetY();
 
         switch (Alignment)
         {
-        case Alignment::LeftTop:
-            OffsetY = mMetrics.Descender * Scale;
+        case Font::Alignment::LeftTop:
             break;
-        case Alignment::LeftMiddle:
-            OffsetY = - (mMetrics.Ascender + mMetrics.Descender) / 2.0f * Scale;
+        case Font::Alignment::LeftMiddle:
+            OffsetY -= (mMetrics.Ascender * 0.5f) * Size;
             break;
-        case Alignment::LeftBottom:
-            OffsetY = mMetrics.Ascender * Scale;
+        case Font::Alignment::LeftBottom:
+            OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Alignment::LeftBaseline:
+        case Font::Alignment::LeftBaseline:
+            OffsetY -= mMetrics.Ascender * Size;
             break;
-        case Alignment::CenterTop:
-            OffsetX = - BoundariesX * 0.5f;
-            OffsetY = mMetrics.Descender * Scale;
+        case Font::Alignment::CenterTop:
+            OffsetX -= Measurement.GetX() * 0.5f;
             break;
-        case Alignment::CenterMiddle:
-            OffsetX = - BoundariesX * 0.5f;
-            OffsetY = - (mMetrics.Ascender + mMetrics.Descender) / 2.0f * Scale;
+        case Font::Alignment::CenterMiddle:
+            OffsetX -= Measurement.GetX() * 0.5f;
+            OffsetY -= (mMetrics.Ascender * 0.5f) * Size;
             break;
-        case Alignment::CenterBottom:
-            OffsetX = - BoundariesX * 0.5f;
-            OffsetY = mMetrics.Ascender * Scale;
+        case Font::Alignment::CenterBottom:
+            OffsetX -= Measurement.GetX() * 0.5f;
+            OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Alignment::CenterBaseline:
-            OffsetX = - BoundariesX * 0.5f;
+        case Font::Alignment::CenterBaseline:
+            OffsetX -= Measurement.GetX() * 0.5f;
+            OffsetY -= mMetrics.Ascender * Size;
             break;
-        case Alignment::RightTop:
-            OffsetX = - BoundariesX;
-            OffsetY = mMetrics.Descender * Scale;
+        case Font::Alignment::RightTop:
+            OffsetX -= Measurement.GetX();
             break;
-        case Alignment::RightMiddle:
-            OffsetX = - BoundariesX;
-            OffsetY = - (mMetrics.Ascender + mMetrics.Descender) / 2.0f * Scale;
+        case Font::Alignment::RightMiddle:
+            OffsetX -= Measurement.GetX();
+            OffsetY -= (mMetrics.Ascender * 0.5f) * Size;
             break;
-        case Alignment::RightBottom:
-            OffsetX = - BoundariesX;
-            OffsetY = mMetrics.Ascender * Scale;
+        case Font::Alignment::RightBottom:
+            OffsetX -= Measurement.GetX();
+            OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Alignment::RightBaseline:
-            OffsetX = - BoundariesX;
+        case Font::Alignment::RightBaseline:
+            OffsetX -= Measurement.GetX();
+            OffsetY -= mMetrics.Ascender * Size;
             break;
         }
-        return Rectf(OffsetX, OffsetY, OffsetX + BoundariesX, OffsetY + BoundariesY);
+        return Rectf(OffsetX, OffsetY, OffsetX + Measurement.GetX(), OffsetY + Measurement.GetY());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

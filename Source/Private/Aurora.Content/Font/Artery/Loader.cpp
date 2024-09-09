@@ -108,6 +108,7 @@ namespace Content
                     static_cast<UInt64>(KernPair.Codepoint1) << 32 | KernPair.Codepoint2, KernPair.Advance.Horizontal);
             }
 
+            FontMetrics.Size               = VariantHeader.Metrics[0];
             FontMetrics.Distance           = VariantHeader.Metrics[1];
             FontMetrics.Ascender           = VariantHeader.Metrics[3];
             FontMetrics.Descender          = VariantHeader.Metrics[4];

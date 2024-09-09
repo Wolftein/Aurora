@@ -97,6 +97,9 @@ namespace Graphic
         struct Metrics
         {
             // -=(Undocumented)=-
+            Real32 Size;
+
+            // -=(Undocumented)=-
             Real32 Distance;
 
             // -=(Undocumented)=-
@@ -124,7 +127,10 @@ namespace Graphic
         void Load(Metrics&& Metrics, Atlas&& Atlas, Table<UInt32, Glyph>&& Glyphs, Table<UInt64, Real32>&& Kerning);
 
         // -=(Undocumented)=-
-        Rectf Measure(CStr16 Text, Real32 Scale, Alignment Alignment);
+        Vector2f Measure(CStr16 Text, Real32 Size);
+
+        // -=(Undocumented)=-
+        Rectf Calculate(CStr16 Text, Real32 Size, Ref<const Vector2f> Position, Alignment Alignment);
 
         // -=(Undocumented)=-
         Ref<const Metrics> GetMetrics() const

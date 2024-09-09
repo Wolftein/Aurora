@@ -224,57 +224,46 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::DrawFont(ConstSPtr<Font> Font, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Font::Alignment Alignment)
+    void Renderer::DrawFont(ConstSPtr<Font> Font, CStr16 Text, Real32 Size, Vector2f Position, Real32 Depth, Real32 Angle, Color Tint, Font::Alignment Alignment)
     {
         if (!Font->HasLoaded())
         {
             return;
         }
 
-        const Rectf Boundaries = Font->Measure(Text, Scale, Alignment);
+        const Rectf Boundaries = Font->Calculate(Text, Size, Position, Alignment);
+        const Vector2f Origin  = Boundaries.GetCenter();
 
-        Real32 CurrentX = Position.GetX();
-        Real32 CurrentY = Position.GetY();
+        Real32 CurrentX = Boundaries.GetX();
+        Real32 CurrentY = Boundaries.GetY();
 
-        for (UInt Letter = 0; Letter < Text.size(); ++Letter)
+        for (UInt Previous = 0, Symbol = 0; Symbol < Text.size(); ++Symbol)
         {
-            const UInt Character = Text[Letter];
+            const UInt Codepoint = Text[Symbol];
 
-            switch (Character)
+            switch (Codepoint)
             {
-                case ' ':
-                {
-                    const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Character);
-
-                    if (Letter < Text.size() - 1)
-                    {
-                        const Real32 Kerning = Font->GetKerning(Character, Text[Letter + 1]);
-                        CurrentX += Scale * (Glyph->Advance + Kerning);
-                    }
-                    break;
-                }
                 case '\r':
-                    CurrentX = Position.GetX();
+                    CurrentX = Boundaries.GetX();
                     break;
                 case '\n':
-                    CurrentY += Scale * Font->GetMetrics().UnderlineHeight;
+                    CurrentY += Font->GetMetrics().UnderlineHeight * Size;
                     break;
                 default:
                 {
-                    const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Character);
+                    const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Codepoint);
 
-                    const Rectf Destination = Boundaries + Vector2f(CurrentX, CurrentY);
-
-                    DrawTexture(Destination, Glyph->ImageBounds, Depth, 0.0f, Order::Normal, Tint, mPipelines[1], Font->GetMaterial());
-
-                    if (Letter < Text.size() - 1)
+                    if (Glyph->PlaneBounds.GetWidth() > 0 && Glyph->PlaneBounds.GetHeight() > 0)
                     {
-                        const Real32 Kerning = Font->GetKerning(Character, Text[Letter + 1]);
-                        CurrentX += Scale * (Glyph->Advance + Kerning);
+                        const Rectf Destination =  (Glyph->PlaneBounds * Size) + Vector2f(CurrentX, CurrentY);
+                        DrawTexture(Destination, Glyph->ImageBounds, Origin,
+                            Depth, Angle, Order::Normal, Tint, mPipelines[1], Font->GetMaterial());
                     }
+                    CurrentX += (Font->GetKerning(Previous, Codepoint) + Glyph->Advance) * Size;
                     break;
                 }
             }
+            Previous = Codepoint;
         }
     }
 

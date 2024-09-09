@@ -145,6 +145,12 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        Vector2<Base> GetCenter() const
+        {
+            return Vector2<Base>(mX1 + GetWidth() * 0.5f, mY1 + GetHeight() * 0.5f);
+        }
+
+        // -=(Undocumented)=-
         Bool Contains(Ref<const Rect<Base>> Other) const
         {
             return (mX1 <= Other.mX1 && Other.mX2 >= mX2 && mY1 <= Other.mY1 && Other.mY1 >= mY2);

@@ -106,6 +106,13 @@ inline namespace Core
     }
 
     // -=(Undocumented)=-
+    template<typename... Args>
+    inline constexpr auto Format(CStr16 Format, Args&&... Arguments)
+    {
+        return std::vformat(Format, std::make_wformat_args(Arguments...));
+    }
+
+    // -=(Undocumented)=-
     template <class Type>
     inline constexpr auto AddressOf(Ref<Type> Value)
     {

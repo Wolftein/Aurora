@@ -117,7 +117,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void DrawFont(ConstSPtr<Font> Font, CStr16 Text, Vector2f Position, Real32 Depth, Real32 Scale, Color Tint, Font::Alignment Alignment);
+        void DrawFont(ConstSPtr<Font> Font, CStr16 Text, Real32 Size, Vector2f Position, Real32 Depth, Real32 Angle, Color Tint, Font::Alignment Alignment);
 
         // -=(Undocumented)=-
         void Flush();

@@ -576,7 +576,7 @@ namespace Audio
             FAudio_GetDeviceDetails(mDevice, Element, & Details);
 
             Ref<Adapter> Adapter = mCapabilities.Adapters.emplace_back();
-            Adapter.Name    = As(reinterpret_cast<Ptr<char16_t>>(Details.DisplayName));
+            Adapter.Name    = As(reinterpret_cast<Ptr<wchar_t>>(Details.DisplayName));
             Adapter.Default = (Details.Role & FAudioDeviceRole::FAudioDefaultGameDevice);
 
             if (Adapter.Name == Device)
