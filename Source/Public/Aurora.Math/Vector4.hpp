@@ -311,6 +311,12 @@ inline namespace Math
             return (* this);
         }
 
+        // -=(Undocumented)=-
+        constexpr Bool operator==(Ref<const Vector4<Base>> Vector) const
+        {
+            return mX == Vector.mX && mY == Vector.mY && mZ == Vector.mZ && mW == Vector.mW;
+        }
+
         // \see Serializable::OnSerialize
         template<typename Stream>
         void OnSerialize(Stream Archive)

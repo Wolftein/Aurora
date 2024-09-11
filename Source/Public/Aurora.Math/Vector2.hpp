@@ -260,6 +260,12 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        constexpr Bool operator==(Ref<const Vector2<Base>> Vector) const
+        {
+            return mX == Vector.mX && mY == Vector.mY;
+        }
+
+        // -=(Undocumented)=-
         constexpr Bool operator<(Ref<const Vector2<Base>> Vector) const
         {
             return mX < Vector.mX || (mX == Vector.mX && mY < Vector.mY);
