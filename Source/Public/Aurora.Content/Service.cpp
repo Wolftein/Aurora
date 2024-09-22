@@ -32,6 +32,9 @@
 #ifdef    AE_CONTENT_LOADER_ARTERY
     #include "Aurora.Content/Font/Artery/Loader.hpp"
 #endif // AE_CONTENT_LOADER_ARTERY
+#ifdef    AE_CONTENT_LOADER_MODEL
+    #include "Aurora.Content/Model/GLTF/Loader.hpp"
+#endif // AE_CONTENT_LOADER_MODEL
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -174,6 +177,10 @@ namespace Content
 #ifdef    AE_CONTENT_LOADER_ARTERY
             AddLoader(NewPtr<Content::ArteryFontLoader>());
 #endif // AE_CONTENT_LOADER_ARTERY
+
+#ifdef    AE_CONTENT_LOADER_MODEL
+            AddLoader(NewPtr<Content::GLTFLoader>());
+#endif // AE_CONTENT_LOADER_MODEL
         }
     }
 
