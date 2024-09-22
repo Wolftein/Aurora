@@ -255,8 +255,9 @@ namespace Input
             return Key::RightAlt;
         case SDLK_MENU:
             return Key::Menu;
+        default:
+            return Key::Unknown;
         }
-        return Key::Unknown;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -276,8 +277,9 @@ namespace Input
             return Button::Back;
         case SDL_BUTTON_X2:
             return Button::Forward;
+        default:
+                return Button::Unknown;
         }
-        return Button::Unknown;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

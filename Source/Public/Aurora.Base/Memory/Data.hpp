@@ -41,7 +41,7 @@ inline namespace Core
         template<typename Type>
         static constexpr auto BASIC_DELETER  = [](Ptr<void> Address)
         {
-            delete reinterpret_cast<Ptr<Type>>(Address);
+            delete static_cast<Ptr<Type>>(Address);
         };
 
     public:
@@ -97,27 +97,27 @@ inline namespace Core
         template<typename Type = void>
         Ptr<Type> GetData()
         {
-            return reinterpret_cast<Ptr<Type>>(mData);
+            return static_cast<Ptr<Type>>(mData);
         }
 
         // -=(Undocumented)=-
         template<typename Type = void>
         Ptr<const Type> GetData() const
         {
-            return reinterpret_cast<Ptr<const Type>>(mData);
+            return static_cast<Ptr<const Type>>(mData);
         }
 
         // -=(Undocumented)=-
         template<typename Type>
         CPtr<Type> GetSpan(UInt Offset = 0) const
         {
-            return CPtr<Type>(reinterpret_cast<Ptr<Type>>(mData) + Offset, mSize / sizeof(Type));
+            return CPtr<Type>(static_cast<Ptr<Type>>(mData) + Offset, mSize / sizeof(Type));
         }
 
         // -=(Undocumented)=-
         CStr GetText() const
         {
-            return CStr(reinterpret_cast<CStr::pointer>(mData), mSize);
+            return CStr(static_cast<CStr::pointer>(mData), mSize);
         }
 
         // -=(Undocumented)=-
@@ -157,7 +157,7 @@ inline namespace Core
         template<typename Type>
         operator CPtr<Type>() const
         {
-            return CPtr<Type>(reinterpret_cast<Ptr<Type>>(mData), mSize / sizeof(Type));
+            return CPtr<Type>(static_cast<Ptr<Type>>(mData), mSize / sizeof(Type));
         }
 
     private:
