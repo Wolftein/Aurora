@@ -1174,7 +1174,7 @@ namespace Graphic
         if (Min != k_MaxFetches && Max > 0)
         {
             const UInt Count = Max - Min;
-            mDeviceImmediate->IASetVertexBuffers(Min, Count, Array + Min, ArrayOffset + Min, ArrayStride + Min);
+            mDeviceImmediate->IASetVertexBuffers(Min, Count, Array + Min, ArrayStride + Min, ArrayOffset + Min);
         }
     }
 
