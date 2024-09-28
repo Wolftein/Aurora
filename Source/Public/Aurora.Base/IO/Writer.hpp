@@ -217,7 +217,7 @@ inline namespace IO
 
         // -=(Undocumented)=-
         template<typename Type>
-        void WriteObject(Ref<Type> Data)
+        void WriteObject(Ref<const Type> Data)
         {
             if constexpr (std::is_arithmetic_v<Type>)
             {
@@ -233,7 +233,7 @@ inline namespace IO
             }
             else
             {
-                Type::Write(* this, Data);
+                Type::Write(* this, const_cast<Ref<Type>>(Data));
             }
         }
 
