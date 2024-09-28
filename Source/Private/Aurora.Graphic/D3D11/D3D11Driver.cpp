@@ -895,15 +895,7 @@ namespace Graphic
             Ref<const Submission> OldestSubmission = (Batch > 0 ? Submissions[Batch - 1] : k_DefaultSubmission);
 
             // Apply vertices
-            if (OldestSubmission.Vertices.Buffer != NewestSubmission.Vertices.Buffer ||
-                OldestSubmission.Vertices.Offset != NewestSubmission.Vertices.Offset ||
-                OldestSubmission.Vertices.Stride != NewestSubmission.Vertices.Stride)
-            {
-                Ref<const D3D11Buffer> Buffer = mBuffers[NewestSubmission.Vertices.Buffer];
-                const UINT Stride = NewestSubmission.Vertices.Stride;
-                const UINT Offset = NewestSubmission.Vertices.Offset;
-                mDeviceImmediate->IASetVertexBuffers(0, 1, Buffer.Object.GetAddressOf(), & Stride, & Offset);
-            }
+            ApplyVertexResources(OldestSubmission, NewestSubmission);
 
             // Apply indices
             if (OldestSubmission.Indices.Buffer != NewestSubmission.Indices.Buffer ||
@@ -1155,6 +1147,40 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    void D3D11Driver::ApplyVertexResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
+    {
+        Ptr<ID3D11Buffer> Array[k_MaxFetches];
+        UINT ArrayOffset[k_MaxFetches];
+        UINT ArrayStride[k_MaxFetches];
+        UInt Min = k_MaxFetches;
+        UInt Max = 0u;
+
+        for (UInt Element = 0; Element < k_MaxFetches; ++Element)
+        {
+            Ref<const Binding> Old = Oldest.Vertices[Element];
+            Ref<const Binding> New = Newest.Vertices[Element];
+
+            if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Stride != New.Stride)
+            {
+                Min = Core::Min(Element, Min);
+                Max = Core::Max(Element + 1, Max);
+            }
+
+            Array[Element]       = mBuffers[New.Buffer].Object.Get();
+            ArrayOffset[Element] = New.Offset;
+            ArrayStride[Element] = New.Stride;
+        }
+
+        if (Min != k_MaxFetches && Max > 0)
+        {
+            const UInt Count = Max - Min;
+            mDeviceImmediate->IASetVertexBuffers(Min, Count, Array + Min, ArrayOffset + Min, ArrayStride + Min);
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void D3D11Driver::ApplySamplerResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
     {
         Ptr<ID3D11SamplerState> Array[k_MaxSources];
@@ -1213,11 +1239,10 @@ namespace Graphic
     void D3D11Driver::ApplyUniformResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
     {
         Ptr<ID3D11Buffer> Array[k_MaxUniforms];
-        UINT   ArrayIDs[k_MaxUniforms];
-        UINT   ArrayOffset[k_MaxUniforms];
-        UINT   ArrayLength[k_MaxUniforms];
-        UInt   Min = k_MaxUniforms;
-        UInt   Max = 0u;
+        UINT ArrayOffset[k_MaxUniforms];
+        UINT ArrayLength[k_MaxUniforms];
+        UInt Min = k_MaxUniforms;
+        UInt Max = 0u;
 
         for (UInt Element = 0; Element < k_MaxUniforms; ++Element)
         {
@@ -1231,7 +1256,6 @@ namespace Graphic
             }
 
             Array[Element]       = mBuffers[New.Buffer].Object.Get();
-            ArrayIDs[Element]    = New.Buffer;
             ArrayOffset[Element] = Align(New.Offset, 16);
             ArrayLength[Element] = Align(New.Length, 16);
         }

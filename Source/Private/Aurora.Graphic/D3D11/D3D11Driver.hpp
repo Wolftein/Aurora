@@ -148,6 +148,9 @@ namespace Graphic
         Ref<D3D11Sampler> GetOrCreateSampler(Ref<const Sampler> Descriptor);
 
         // -=(Undocumented)=-
+        void ApplyVertexResources(Ref<const Submission> Oldest, Ref<const Submission> Newest);
+
+        // -=(Undocumented)=-
         void ApplySamplerResources(Ref<const Submission> Oldest, Ref<const Submission> Newest);
 
         // -=(Undocumented)=-

@@ -56,9 +56,9 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetVertices(Graphic::Object Buffer, UInt Offset, UInt Length, UInt Stride)
+        void SetVertices(UInt Location, Graphic::Object Buffer, UInt Offset, UInt Length, UInt Stride)
         {
-            mInFlyBatch.Vertices = { Buffer, Length, Offset, Stride };
+            mInFlyBatch.Vertices[Location] = { Buffer, Length, Offset, Stride };
         }
 
         // -=(Undocumented)=-

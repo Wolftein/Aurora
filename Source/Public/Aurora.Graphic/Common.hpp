@@ -37,6 +37,9 @@ namespace Graphic
         k_MaxBuffers     = 0x0080,
 
         // -=(Undocumented)=-
+        k_MaxFetches     = 0x0004,
+
+        // -=(Undocumented)=-
         k_MaxMaterials   = 0x1000,
 
         // -=(Undocumented)=-
@@ -62,6 +65,7 @@ namespace Graphic
 
         // -=(Undocumented)=-
         k_MaxUniforms    = 0x0004,
+
     };
 
     // -=(Undocumented)=-
@@ -470,7 +474,7 @@ namespace Graphic
     struct Submission
     {
         // -=(Undocumented)=-
-        Binding   Vertices;
+        Binding   Vertices[k_MaxFetches];
 
         // -=(Undocumented)=-
         Binding   Indices;

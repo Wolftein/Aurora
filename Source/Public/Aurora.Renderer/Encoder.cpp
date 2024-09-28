@@ -97,7 +97,7 @@ namespace Graphic
         }
 
         // Apply batch's vertices range
-        SetVertices(
+        SetVertices(0,
             mInFlyBuffers[0].ID,
             mInFlyBuffers[0].Reader,
             mInFlyBuffers[0].Writer - mInFlyBuffers[0].Marker,
