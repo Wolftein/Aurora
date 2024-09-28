@@ -51,7 +51,6 @@ namespace Graphic
         template<typename Type>
         Ptr<Type> AllocateTransientVertices(UInt Length)
         {
-            // TODO: Alignment
             return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[0], Length * sizeof(Type)));
         }
 
@@ -65,7 +64,6 @@ namespace Graphic
         template<typename Type = UInt16>
         Ptr<Type> AllocateTransientIndices(UInt Length)
         {
-            // TODO: Alignment
             return reinterpret_cast<Ptr<Type>>(AllocateTransientBuffer(mInFlyBuffers[1], Length * sizeof(Type)));
         }
 
