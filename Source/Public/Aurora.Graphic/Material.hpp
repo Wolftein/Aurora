@@ -82,7 +82,7 @@ namespace Graphic
                 mParameters.resize(mParameters.size() + Align(Size, k_Alignment));
             }
 
-            * (reinterpret_cast<Ptr<Type>>(reinterpret_cast<UInt>(mParameters.data()) + Offset)) = Parameter;
+            * (reinterpret_cast<Ptr<Type>>(reinterpret_cast<UInt>(mParameters.data() + Offset))) = Parameter;
         }
 
         // -=(Undocumented)=-

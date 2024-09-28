@@ -68,17 +68,6 @@ namespace Content
 
     SStr SystemLocator::CreatePath(CStr Path)
     {
-        if (Path.empty())
-        {
-#ifdef    SDL_PLATFORM_ANDROID
-            return SStr();
-#else  // SDL_PLATFORM_ANDROID
-            return SDL_GetBasePath();
-#endif // SDL_PLATFORM_ANDROID
-        }
-        else
-        {
-            return (Path.ends_with("/") ? SStr(Path) : SStr(Path).append("/"));
-        }
+        return (Path.empty() || Path.ends_with("/") ? SStr(Path) : SStr(Path).append("/"));
     }
 }
