@@ -82,7 +82,7 @@ FetchContent_Declare(External_FAudio
         GIT_REPOSITORY https://github.com/Wolftein/FAudio)
 FetchContent_MakeAvailable(External_FAudio)
 
-LIST(APPEND PROJECT_DEPENDENCIES "FAudio")
+LIST(APPEND PROJECT_DEPENDENCIES "FAudio-static")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (ASIO)
