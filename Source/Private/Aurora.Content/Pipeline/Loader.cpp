@@ -70,7 +70,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool PipelineLoader::OnLoad(Ref<Service> Service, Data&& File, Ref<Graphic::Pipeline> Asset)
+    Bool PipelineLoader::OnLoad(Ref<Service> Service, Any<Data> File, Ref<Graphic::Pipeline> Asset)
     {
         Graphic::Descriptor Description;
 

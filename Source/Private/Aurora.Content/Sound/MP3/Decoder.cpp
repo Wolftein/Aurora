@@ -25,7 +25,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    MP3Decoder::MP3Decoder(Data&& File)
+    MP3Decoder::MP3Decoder(Any<Data> File)
         : mFile { Move(File) }
     {
         drmp3_init_memory(& mDescription, mFile.GetData(), mFile.GetSize(), nullptr);

@@ -22,7 +22,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool WAVLoader::OnLoad(Ref<class Service> Service, Data&& File, Ref<Audio::Sound> Asset)
+    Bool WAVLoader::OnLoad(Ref<class Service> Service, Any<Data> File, Ref<Audio::Sound> Asset)
     {
         static constexpr auto GetKind = [](UInt Format)
         {

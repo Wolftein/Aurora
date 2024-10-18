@@ -57,21 +57,21 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
-    inline constexpr auto Move(Type && Object)
+    inline constexpr auto Move(Any<Type> Object)
     {
         return std::move(Object);
     }
 
     // -=(Undocumented)=-
     template<typename Type, typename... Args>
-    inline SPtr<Type> NewPtr(Args && ... Arguments)
+    inline SPtr<Type> NewPtr(Any<Args> ... Arguments)
     {
         return std::make_shared<Type>(std::forward<Args>(Arguments)...);
     }
 
     // -=(Undocumented)=-
     template<typename Type, typename... Args>
-    inline UPtr<Type> NewUniquePtr(Args && ... Arguments)
+    inline UPtr<Type> NewUniquePtr(Any<Args> ... Arguments)
     {
         return std::make_unique<Type>(std::forward<Args>(Arguments)...);
     }
@@ -100,14 +100,14 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename... Args>
-    inline constexpr auto Format(CStr Format, Args&&... Arguments)
+    inline constexpr auto Format(CStr Format, Any<Args> ... Arguments)
     {
         return std::vformat(Format, std::make_format_args(Arguments...));
     }
 
     // -=(Undocumented)=-
     template<typename... Args>
-    inline constexpr auto Format(CStr16 Format, Args&&... Arguments)
+    inline constexpr auto Format(CStr16 Format, Any<Args> ... Arguments)
     {
         return std::vformat(Format, std::make_wformat_args(Arguments...));
     }

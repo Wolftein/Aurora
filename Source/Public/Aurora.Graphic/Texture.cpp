@@ -36,7 +36,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Texture::Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Layer, Data&& Data)
+    void Texture::Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Layer, Any<Data> Data)
     {
         mFormat = Format;
         mLayout = Layout;

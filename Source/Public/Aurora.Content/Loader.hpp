@@ -32,7 +32,7 @@ namespace Content
         virtual List<CStr> GetExtensions() const = 0;
 
         // -=(Undocumented)=-
-        virtual Bool Load(Ref<class Service> Service, Data&& File, Ref<Resource> Asset) = 0;
+        virtual Bool Load(Ref<class Service> Service, Any<Data> File, Ref<Resource> Asset) = 0;
     };
 
     // -=(Undocumented)=-
@@ -42,7 +42,7 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
-        Bool Load(Ref<class Service> Service, Data&& File, Ref<Resource> Asset) override final
+        Bool Load(Ref<class Service> Service, Any<Data> File, Ref<Resource> Asset) override final
         {
             return static_cast<Ptr<Impl>>(this)->OnLoad(Service, Move(File), reinterpret_cast<Ref<Type>>(Asset));
         }

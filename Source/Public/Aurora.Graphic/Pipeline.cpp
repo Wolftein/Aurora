@@ -31,7 +31,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Pipeline::Load(Array<Data, k_MaxStages>&& Stages, Descriptor&& Properties)
+    void Pipeline::Load(Any<Array<Data, k_MaxStages>> Stages, Any<Descriptor> Properties)
     {
         mStages     = Move(Stages);
         mProperties = Move(Properties);

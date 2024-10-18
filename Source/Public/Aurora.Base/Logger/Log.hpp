@@ -55,21 +55,21 @@ namespace Log
 
     // -=(Undocumented)=-
     template <typename... Args>
-    inline void Trace(spdlog::format_string_t<Args...> Format, Args &&... Arguments)
+    inline void Trace(spdlog::format_string_t<Args...> Format, Any<Args> ... Arguments)
     {
         spdlog::log(spdlog::level::trace, Format, std::forward<Args>(Arguments)...);
     }
 
     // -=(Undocumented)=-
     template <typename... Args>
-    inline void Debug(spdlog::format_string_t<Args...> Format, Args &&...Arguments)
+    inline void Debug(spdlog::format_string_t<Args...> Format, Any<Args> ...Arguments)
     {
         spdlog::log(spdlog::level::debug, Format, std::forward<Args>(Arguments)...);
     }
 
     // -=(Undocumented)=-
     template <typename... Args>
-    inline void Info(spdlog::format_string_t<Args...> Format, Args &&...Arguments)
+    inline void Info(spdlog::format_string_t<Args...> Format, Any<Args> ...Arguments)
     {
         spdlog::log(spdlog::level::info, Format, std::forward<Args>(Arguments)...);
     }
@@ -83,14 +83,14 @@ namespace Log
 
     // -=(Undocumented)=-
     template <typename... Args>
-    inline void Error(spdlog::format_string_t<Args...> Format, Args &&...Arguments)
+    inline void Error(spdlog::format_string_t<Args...> Format, Any<Args> ...Arguments)
     {
         spdlog::log(spdlog::level::err, Format, std::forward<Args>(Arguments)...);
     }
 
     // -=(Undocumented)=-
     template <typename... Args>
-    inline void Critical(spdlog::format_string_t<Args...> Format, Args &&...Arguments)
+    inline void Critical(spdlog::format_string_t<Args...> Format, Any<Args> ...Arguments)
     {
         spdlog::log(spdlog::level::critical, Format, std::forward<Args>(Arguments)...);
     }

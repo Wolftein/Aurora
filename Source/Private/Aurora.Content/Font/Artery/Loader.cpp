@@ -21,7 +21,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool ArteryFontLoader::OnLoad(Ref<class Service> Service, Data&& File, Ref<Graphic::Font> Asset)
+    Bool ArteryFontLoader::OnLoad(Ref<class Service> Service, Any<Data> File, Ref<Graphic::Font> Asset)
     {
         UInt32 CurrentOffset = 0;
 

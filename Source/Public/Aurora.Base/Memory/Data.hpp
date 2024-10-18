@@ -80,7 +80,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Data(Data&& Other)
+        Data(Any<Data> Other)
             : mDeleter { Move(Other.mDeleter) },
               mData    { std::exchange(Other.mData, nullptr) },
               mSize    { std::exchange(Other.mSize, 0) }
@@ -144,7 +144,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Ref<Data> operator=(Data&& Other)
+        Ref<Data> operator=(Any<Data> Other)
         {
             mDeleter = Move(Other.mDeleter);
             mData    = std::exchange(Other.mData, nullptr);

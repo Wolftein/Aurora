@@ -11,6 +11,9 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Loader.hpp"
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <tiny_gltf.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,8 +24,29 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool GLTFLoader::OnLoad(Ref<class Service> Service, Data&& File, Ref<Graphic::Model> Asset)
+    Bool GLTFLoader::OnLoad(Ref<class Service> Service, Any<Data> File, Ref<Graphic::Model> Asset)
     {
-        return false;
+        tinygltf::TinyGLTF Context;
+        tinygltf::Model    Model;
+        SStr Error;
+        SStr Warning;
+
+        const Bool Result = Context.LoadBinaryFromMemory(
+            AddressOf(Model), AddressOf(Error), AddressOf(Warning), File.GetData<UInt8>(), File.GetSize());
+
+        if (!Warning.empty())
+        {
+            Log::Warn("GLTFLoader: {}", Warning);
+        }
+        if (!Error.empty())
+        {
+            Log::Warn("GLTFLoader: {}", Error);
+        }
+
+        if (Result)
+        {
+
+        }
+        return Result;
     }
 }

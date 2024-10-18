@@ -24,7 +24,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool STBLoader::OnLoad(Ref<class Service> Service, Data&& File, Ref<Graphic::Texture> Asset)
+    Bool STBLoader::OnLoad(Ref<class Service> Service, Any<Data> File, Ref<Graphic::Texture> Asset)
     {
         SInt32 Width, Height, Channel;
 

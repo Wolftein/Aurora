@@ -21,7 +21,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    TCPClient::TCPClient(Ref<Reactor> Executor, Socket&& Channel)
+    TCPClient::TCPClient(Ref<Reactor> Executor, Any<Socket> Channel)
         : mExecutor  { Executor },
           mSocket    { Move(Channel) },
           mEncoder   { 65'535 },

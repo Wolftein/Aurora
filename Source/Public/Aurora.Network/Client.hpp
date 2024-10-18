@@ -70,7 +70,7 @@ namespace Network
 
         // -=(Undocumented)=-
         template<typename Packet>
-        void Write(Packet&& Message)
+        void Write(Any<Packet> Message)
         {
             // Write message into a buffer
             mAccumulator.Clear();

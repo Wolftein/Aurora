@@ -32,7 +32,7 @@ namespace Audio
     public:
 
         // -=(Undocumented)=-
-        MP3Decoder(Data&& File);
+        MP3Decoder(Any<Data> File);
 
         // -=(Undocumented)=-
         ~MP3Decoder() override;

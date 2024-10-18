@@ -34,6 +34,6 @@ namespace Content
         }
 
         // \see AbstractLoader::Load
-        Bool OnLoad(Ref<class Service> Service, Data&& File, Ref<Graphic::Texture> Asset);
+        Bool OnLoad(Ref<class Service> Service, Any<Data> File, Ref<Graphic::Texture> Asset);
     };
 }

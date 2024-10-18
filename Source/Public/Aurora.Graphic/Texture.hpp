@@ -32,7 +32,7 @@ namespace Graphic
         Texture(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Layer, Data&& Data);
+        void Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Layer, Any<Data> Data);
 
         // -=(Undocumented)=-
         Object GetID() const

@@ -48,7 +48,7 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
-        explicit TCPClient(Ref<Reactor> Executor, Socket&& Channel);
+        explicit TCPClient(Ref<Reactor> Executor, Any<Socket> Channel);
 
         // -=(Undocumented)=-
         ~TCPClient();

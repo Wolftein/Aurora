@@ -32,7 +32,7 @@ namespace Graphic
         Pipeline(Ref<const Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(Array<Data, k_MaxStages>&& Stages, Descriptor&& Properties);
+        void Load(Any<Array<Data, k_MaxStages>> Stages, Any<Descriptor> Properties);
 
         // -=(Undocumented)=-
         Object GetID() const

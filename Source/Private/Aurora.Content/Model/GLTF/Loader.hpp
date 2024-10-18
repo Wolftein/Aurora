@@ -29,11 +29,11 @@ namespace Content
         // \see Loader::GetExtensions
         List<CStr> GetExtensions() const override
         {
-            static constexpr List<CStr> EXTENSION_LIST = { "gltf" };
+            static constexpr List<CStr> EXTENSION_LIST = { "glb" };
             return EXTENSION_LIST;
         }
 
         // \see AbstractLoader::Load
-        Bool OnLoad(Ref<class Service> Service, Data&& File, Ref<Graphic::Model> Asset);
+        Bool OnLoad(Ref<class Service> Service, Any<Data> File, Ref<Graphic::Model> Asset);
     };
 }
