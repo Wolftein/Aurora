@@ -238,7 +238,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void TCPClient::WhenResolve(Ref<const std::error_code> Error, asio::ip::tcp::resolver::iterator Result)
+    void TCPClient::WhenResolve(Ref<const std::error_code> Error, Ref<asio::ip::tcp::resolver::results_type> Result)
     {
         if (Error)
         {
@@ -246,35 +246,22 @@ namespace Network
         }
         else
         {
-            const asio::ip::tcp::endpoint Endpoint = (* Result);
-
-            const auto OnCompletion = [Self = shared_from_this(), Result = ++Result](const auto Error)
+            const auto OnCompletion = [Self = shared_from_this()](const auto Error, const auto Endpoint)
             {
-                Self->WhenConnect(std::forward<decltype(Error)>(Error), Result);
+                Self->WhenConnect(std::forward<decltype(Error)>(Error));
             };
-            mSocket.async_connect(Endpoint, OnCompletion);
+            asio::async_connect(mSocket, Result, OnCompletion);
         }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void TCPClient::WhenConnect(Ref<const std::error_code> Error, asio::ip::tcp::resolver::iterator Result)
+    void TCPClient::WhenConnect(Ref<const std::error_code> Error)
     {
         if (Error)
         {
-            mSocket.close();
-
-            // try to connect to the next endpoint in the list (if available),
-            // otherwise notify about it.
-            if (Result != asio::ip::tcp::resolver::iterator())
-            {
-                WhenResolve(std::error_code(), Result);
-            }
-            else
-            {
-                WhenError(Error);
-            }
+            WhenError(Error);
         }
         else
         {

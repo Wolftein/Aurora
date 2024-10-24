@@ -43,9 +43,10 @@ namespace Network
     {
         try
         {
-            const asio::ip::tcp::endpoint Endpoint
-                = (* asio::ip::tcp::resolver(mAcceptor.get_executor()).resolve(Address.data(), std::to_string(Port)));
+            asio::ip::tcp::resolver Resolver(mAcceptor.get_executor());
 
+            const asio::ip::tcp::endpoint Endpoint
+                = * Resolver.resolve(Address.data(), std::to_string(Port)).begin();
             mAcceptor.open(Endpoint.protocol());
             mAcceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
             mAcceptor.bind(Endpoint);
