@@ -148,6 +148,10 @@ inline namespace Core
     using Bitset    = std::bitset<Capacity>;
 
     // -=(Undocumented)=-
+    template<typename Key, typename Hash = ankerl::unordered_dense::hash<Key>, typename Predicate = std::equal_to<>>
+    using Set       = ankerl::unordered_dense::set<Key, Hash, Predicate>;
+
+    // -=(Undocumented)=-
     template<typename Key, typename Value, typename Hash = ankerl::unordered_dense::hash<Key>, typename Predicate = std::equal_to<>>
     using Table     = ankerl::unordered_dense::map<Key, Value, Hash, Predicate>;
 
