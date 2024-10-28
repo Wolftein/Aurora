@@ -112,7 +112,7 @@ namespace Graphic
 
     void Renderer::DrawRectangle(Ref<const Array<Vector2f, 4>> Points, Real32 Depth, Ref<const Array<Color, 4>> Tint)
     {
-        Push(Points, Tint, Array<Vector2f, 4> { }, Order::Opaque, Depth, mPipelines[0], nullptr);
+        Push(Points, Tint, Array<Vector2f, 4> { }, Order::Opaque, Depth, mPipelines[0].get(), nullptr);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -218,7 +218,7 @@ namespace Graphic
             Vector2f { Source.GetRight(), Source.GetBottom() }
         };
 
-        Push(Position, Tint, Texture, Order, Depth, Pipeline, Material);
+        Push(Position, Tint, Texture, Order, Depth, Pipeline.get(), Material.get());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -340,8 +340,8 @@ namespace Graphic
             Indices[5] = Index + 2;
         }
 
-        mEncoder.SetPipeline(Drawable.Pipeline);
-        mEncoder.SetMaterial(Drawable.Material);
+        mEncoder.SetPipeline(* Drawable.Pipeline);
+        mEncoder.SetMaterial(* Drawable.Material);
         mEncoder.Draw<Layout>();
     }
 
@@ -366,7 +366,7 @@ namespace Graphic
             Indices[5] = Index + 2;
         }
 
-        mEncoder.SetPipeline(Drawable.Pipeline);
+        mEncoder.SetPipeline(* Drawable.Pipeline);
         mEncoder.Draw<NonTextureLayout>();
     }
 
@@ -387,7 +387,7 @@ namespace Graphic
         Ref<const Array<Vector2f, 4>> Position,
         Ref<const Array<Color, 4>> Tint,
         Ref<const Array<Vector2f, 4>> Texture,
-        Order Order, Real32 Depth, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+        Order Order, Real32 Depth, Ptr<Pipeline> Pipeline, Ptr<Material> Material)
     {
         if (mDrawablesPtr.size() == k_MaxDrawables)
         {
@@ -395,6 +395,7 @@ namespace Graphic
         }
 
         Ref<Drawable> Drawable  = mDrawables[mDrawablesPtr.size()];
+
         Drawable.ID             = GenerateUniqueID(Order, Pipeline->GetID(), Material ? Material->GetID() : 0, Depth);
         Drawable.Depth          = Depth;
         Drawable.Position       = Position;

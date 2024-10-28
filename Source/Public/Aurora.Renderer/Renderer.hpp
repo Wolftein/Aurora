@@ -28,7 +28,7 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        inline constexpr static UInt k_MaxDrawables = 16384;
+        inline constexpr static UInt k_MaxDrawables = 10240;
 
         // -=(Undocumented)=-
         inline constexpr static UInt k_MaxVertices  = 24 * 1024 * 1024; // 24mb
@@ -163,10 +163,10 @@ namespace Graphic
             Array<Vector2f, 4>      Texture;
 
             // -=(Undocumented)=-
-            SPtr<Graphic::Pipeline> Pipeline;
+            Ptr<Graphic::Pipeline>  Pipeline;
 
             // -=(Undocumented)=-
-            SPtr<Graphic::Material> Material;
+            Ptr<Graphic::Material>  Material;
         };
 
         // -=(Undocumented)=-
@@ -185,7 +185,7 @@ namespace Graphic
             Ref<const Array<Vector2f, 4>> Position,
             Ref<const Array<Color, 4>> Tint,
             Ref<const Array<Vector2f, 4>> Texture,
-            Order Order, Real32 Depth, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+            Order Order, Real32 Depth, Ptr<Pipeline> Pipeline, Ptr<Material> Material);
 
         // -=(Undocumented)=-
         void WriteGeometry(Ptr<const Drawable> Drawable, Ptr<Layout> Buffer);

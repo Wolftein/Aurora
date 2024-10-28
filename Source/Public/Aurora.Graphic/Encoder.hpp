@@ -92,18 +92,18 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetPipeline(ConstSPtr<const Pipeline> Pipeline)
+        void SetPipeline(Ref<const Pipeline> Pipeline)
         {
-            mInFlyBatch.Pipeline = Pipeline->GetID();
+            mInFlyBatch.Pipeline = Pipeline.GetID();
         }
 
         // -=(Undocumented)=-
-        void SetMaterial(ConstSPtr<const Material> Material)
+        void SetMaterial(Ref<const Material> Material)
         {
             // Apply material's sources(s)
             for (UInt Slot = 0; Slot < Graphic::k_MaxSources; ++Slot)
             {
-                if (ConstSPtr<Texture> Texture = Material->GetTexture(Slot))
+                if (ConstSPtr<Texture> Texture = Material.GetTexture(Slot))
                 {
                     mInFlyBatch.Textures[Slot] = Texture->GetID();
                 }
@@ -112,11 +112,11 @@ namespace Graphic
                     mInFlyBatch.Textures[Slot] = 0;
                 }
 
-                mInFlyBatch.Samplers[Slot] = Material->GetSampler(Slot);
+                mInFlyBatch.Samplers[Slot] = Material.GetSampler(Slot);
             }
 
             // Apply material's parameter(s)
-            const CPtr<const Vector4f> Parameters = Material->GetParameters();
+            const CPtr<const Vector4f> Parameters = Material.GetParameters();
             if (Parameters.empty())
             {
                 mInFlyRanges[k_UniformBlockPerMaterial] = TransientRange();
