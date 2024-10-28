@@ -35,9 +35,6 @@ namespace Network
         Packet() = default;
 
         // -=(Undocumented)=-
-        virtual ~Packet() = default;
-
-        // -=(Undocumented)=-
         UInt32 GetID() const
         {
             return k_ID;

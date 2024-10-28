@@ -112,31 +112,39 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    void Kernel::Poll()
+    {
+        const Real64 Time = SDL_GetTicksNS() / static_cast<Real64>(SDL_NS_PER_SECOND);
+
+        // Tick subsystems (order matters)
+        Execute([Time](Ref<Core::Subsystem> Service)
+        {
+            Service.OnTick(Time);
+        });
+
+        // Tick application
+        OnTick(Time);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void Kernel::Run()
     {
-        const auto OnMainTick = [this]()
-        {
-            const Real64 Time = SDL_GetTicksNS() / static_cast<Real64>(SDL_NS_PER_SECOND);
-
-            // Tick subsystems (order matters)
-            Execute([Time](Ref<Core::Subsystem> Service)
-            {
-                Service.OnTick(Time);
-            });
-
-            // Tick application
-            OnTick(Time);
-        };
-
 #ifdef    __EMSCRIPTEN__
 
-        emscripten_set_main_loop(OnMainTick, 0, true);
+        const auto OnPoll = [this]()
+        {
+            Poll();
+        };
+
+        emscripten_set_main_loop(OnPoll, 0, true);
 
 #else
 
         while (mActive)
         {
-            OnMainTick();
+            Poll();
         }
 
 #endif // __EMSCRIPTEN__

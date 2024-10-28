@@ -47,19 +47,19 @@ CMRC_ADD_RESOURCE_LIBRARY(Engine-Resources
 ## Dependency (SDL)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-SET(SDL_SHARED             OFF)
-SET(SDL_STATIC             ON)
-SET(SDL_TEST_LIBRARY       OFF)
-SET(SDL_DISABLE_UNINSTALL  ON)
-SET(SDL_AUDIO_DEFAULT      ON)
-SET(SDL_VIDEO_DEFAULT      ON)
-SET(SDL_JOYSTICK_DEFAULT   OFF)
-SET(SDL_HAPTIC_DEFAULT     OFF)
-SET(SDL_HIDAPI_DEFAULT     ON)
-SET(SDL_POWER_DEFAULT      OFF)
-SET(SDL_SENSOR_DEFAULT     OFF)
-SET(SDL_DIALOG_DEFAULT     OFF)
-SET(SDL_CAMERA_DEFAULT     OFF)
+SET(SDL_SHARED             OFF CACHE BOOL "" FORCE)
+SET(SDL_STATIC             ON  CACHE BOOL "" FORCE)
+SET(SDL_TEST_LIBRARY       OFF CACHE BOOL "" FORCE)
+SET(SDL_DISABLE_UNINSTALL  ON  CACHE BOOL "" FORCE)
+SET(SDL_AUDIO_DEFAULT      ON  CACHE BOOL "" FORCE)
+SET(SDL_VIDEO_DEFAULT      ON  CACHE BOOL "" FORCE)
+SET(SDL_JOYSTICK_DEFAULT   OFF CACHE BOOL "" FORCE)
+SET(SDL_HAPTIC_DEFAULT     OFF CACHE BOOL "" FORCE)
+SET(SDL_HIDAPI_DEFAULT     ON  CACHE BOOL "" FORCE)
+SET(SDL_POWER_DEFAULT      OFF CACHE BOOL "" FORCE)
+SET(SDL_SENSOR_DEFAULT     OFF CACHE BOOL "" FORCE)
+SET(SDL_DIALOG_DEFAULT     OFF CACHE BOOL "" FORCE)
+SET(SDL_CAMERA_DEFAULT     OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(External_SDL
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
@@ -72,14 +72,15 @@ LIST(APPEND PROJECT_DEPENDENCIES "SDL3-static")
 ## Dependency (FAudio)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-SET(XNASONG            OFF)
-SET(BUILD_SHARED_LIBS, OFF)
-SET(BUILD_SDL3         ON)
-SET(SDL3_INCLUDE_DIRS  ${external_sdl_SOURCE_DIR}/include)
-SET(SDL3_LIBRARIES     "SDL3-static")
+SET(XNASONG            OFF                                CACHE BOOL   "" FORCE)
+SET(BUILD_SHARED_LIBS, OFF                                CACHE BOOL   "" FORCE)
+SET(BUILD_SDL3         ON                                 CACHE BOOL   "" FORCE)
+SET(SDL3_INCLUDE_DIRS  ${external_sdl_SOURCE_DIR}/include CACHE STRING "" FORCE)
+SET(SDL3_LIBRARIES     "SDL3-static"                      CACHE STRING "" FORCE)
 
 FetchContent_Declare(External_FAudio
-        GIT_REPOSITORY https://github.com/Wolftein/FAudio)
+        GIT_REPOSITORY https://github.com/Wolftein/FAudio
+        EXCLUDE_FROM_ALL)
 FetchContent_MakeAvailable(External_FAudio)
 
 LIST(APPEND PROJECT_DEPENDENCIES "FAudio-static")

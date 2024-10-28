@@ -330,7 +330,7 @@ namespace Input
                 break;
             case SDL_EVENT_TEXT_INPUT:
                 Result.Type                = Event::Type::KeyType;
-                Result.KeyType.Codepoint   = Event.text.text[0]; // TODO
+                Result.KeyType.Codepoint   = Event.text.text[0]; // @TODO: Android support
                 break;
             case SDL_EVENT_MOUSE_MOTION:
                 Result.Type                = Event::Type::MouseMove;
