@@ -41,7 +41,7 @@ inline namespace Core
         template<typename Type>
         static constexpr auto BASIC_DELETER  = [](Ptr<void> Address)
         {
-            delete static_cast<Ptr<Type>>(Address);
+            delete[] static_cast<Ptr<Type>>(Address);
         };
 
     public:
