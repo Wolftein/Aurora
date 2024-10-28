@@ -27,87 +27,81 @@ inline namespace Math
 
         // -=(Undocumented)=-
         constexpr Color()
-            : mComponents { 0.0f, 0.0f, 0.0f, 0.0f }
+            : mValue { 0 }
         {
         }
 
         // -=(Undocumented)=-
         constexpr Color(Real32 Red, Real32 Green, Real32 Blue, Real32 Alpha)
-            : mComponents { Red, Green, Blue, Alpha }
+            : mValue { PackFloatColor(Red, Green, Blue, Alpha) }
         {
         }
 
         // -=(Undocumented)=-
         constexpr Color(UInt32 Color)
-            : mComponents { GetComponents(Color) }
+            : mValue { Color }
         {
         }
 
         // -=(Undocumented)=-
-        void SetRed(Real32 Value)
+        void SetRed(UInt32 Value)
         {
-            mComponents[0] = Value;
+            mValue = (mValue & ~(0xFF << 24)) | ((Value & 0xFF) << 24);
         }
 
         // -=(Undocumented)=-
-        constexpr Real32 GetRed() const
+        constexpr UInt32 GetRed() const
         {
-            return mComponents[0];
+            return ((mValue >> 24) & 0xFF);
         }
 
         // -=(Undocumented)=-
-        void SetGreen(Real32 Value)
+        void SetGreen(UInt32 Value)
         {
-            mComponents[1] = Value;
+            mValue = (mValue & ~(0xFF << 16)) | ((Value & 0xFF) << 16);
         }
 
         // -=(Undocumented)=-
-        constexpr Real32 GetGreen() const
+        constexpr UInt32 GetGreen() const
         {
-            return mComponents[1];
+            return ((mValue >> 16) & 0xFF);
         }
 
         // -=(Undocumented)=-
-        void SetBlue(Real32 Value)
+        void SetBlue(UInt32 Value)
         {
-            mComponents[2] = Value;
+            mValue = (mValue & ~(0xFF << 8)) | ((Value & 0xFF) << 8);
         }
 
         // -=(Undocumented)=-
-        constexpr Real32 GetBlue() const
+        constexpr UInt32 GetBlue() const
         {
-            return mComponents[2];
+            return ((mValue >> 8) & 0xFF);
         }
 
         // -=(Undocumented)=-
-        void SetAlpha(Real32 Value)
+        void SetAlpha(UInt32 Value)
         {
-            mComponents[3] = Value;
+            mValue = (mValue & ~0xFF) | (Value & 0xFF);
         }
 
         // -=(Undocumented)=-
-        constexpr Real32 GetAlpha() const
+        constexpr UInt32 GetAlpha() const
         {
-            return mComponents[3];
+            return (mValue & 0xFF);
         }
 
         // -=(Undocumented)=-
         constexpr UInt32 AsPacked() const
         {
-            return (static_cast<UInt32>(GetRed()   * UINT8_MAX) << 24
-                  | static_cast<UInt32>(GetGreen() * UINT8_MAX) << 16
-                  | static_cast<UInt32>(GetBlue()  * UINT8_MAX) << 8
-                  | static_cast<UInt32>(GetAlpha() * UINT8_MAX));
+            return mValue;
         }
 
         // \see Serializable::OnSerialize
         template<typename Stream>
         void OnSerialize(Stream Archive)
         {
-            Archive.SerializeNumber(mComponents[0]);
-            Archive.SerializeNumber(mComponents[1]);
-            Archive.SerializeNumber(mComponents[2]);
-            Archive.SerializeNumber(mComponents[3]);
+            Archive.SerializeNumber(mValue);
         }
 
     public:
@@ -125,13 +119,12 @@ inline namespace Math
     private:
 
         // -=(Undocumented)=-
-        static constexpr Array<Real32, 4> GetComponents(UInt32 Value)
+        static constexpr UInt32 PackFloatColor(Real32 Red, Real32 Green, Real32 Blue, Real32 Alpha)
         {
-            const Real32 Red   = (Value >> 24) & 0xFF;
-            const Real32 Green = (Value >> 16) & 0xFF;
-            const Real32 Blue  = (Value >> 8 ) & 0xFF;
-            const Real32 Alpha = (Value      ) & 0xFF;
-            return Array<Real32, 4> { Red / UINT8_MAX, Green / UINT8_MAX, Blue / UINT8_MAX, Alpha / UINT8_MAX };
+            return   (static_cast<UInt32>(Red   * UINT8_MAX) << 24)
+                   | (static_cast<UInt32>(Green * UINT8_MAX) << 16)
+                   | (static_cast<UInt32>(Blue  * UINT8_MAX) << 8)
+                   | (static_cast<UInt32>(Alpha * UINT8_MAX));
         }
 
     private:
@@ -139,6 +132,6 @@ inline namespace Math
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Array<Real32, 4> mComponents;
+        UInt32 mValue;
     };
 }

@@ -858,7 +858,10 @@ namespace Graphic
                 if (Target != Clear::Auxiliary)
                 {
                     const Array<FLOAT, 4> Color {
-                        Tint.GetRed(), Tint.GetGreen(), Tint.GetBlue(), Tint.GetAlpha()
+                        static_cast<Real32>(Tint.GetRed())   / UINT8_MAX,
+                        static_cast<Real32>(Tint.GetGreen()) / UINT8_MAX,
+                        static_cast<Real32>(Tint.GetBlue())  / UINT8_MAX,
+                        static_cast<Real32>(Tint.GetAlpha()) / UINT8_MAX
                     };
                     mDeviceImmediate->ClearRenderTargetView(View.Get(), Color.data());
                 }

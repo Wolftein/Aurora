@@ -444,46 +444,26 @@ namespace Graphic
 
     UInt64 Renderer::GenerateUniqueID(Order Order, UInt Pipeline, UInt Material, Real32 Depth) const
     {
-        union
+        UInt32 ID = 0;
+
+        if (Order == Order::Opaque)
         {
-            UInt64 Value;
+            const UInt32 DepthBits = std::bit_cast<UInt32>(1.0f + Depth);
 
-            struct
-            {
-                UInt64 iDepth        : 32;
-                UInt64 iMaterial     : 16;
-                UInt64 iTechnique    : 8;
-                UInt64 iTranslucency : 8;
-            } Opaque;
-
-            struct
-            {
-                UInt64 iMaterial     : 16;
-                UInt64 iTechnique    : 8;
-                UInt64 iDepth        : 32;
-                UInt64 iTranslucency : 8;
-            } Transparent;
-        } ID { 0 }; // @TODO: Refactor with proper masking
-
-        switch (Order)
-        {
-        case Order::Subtractive:
-        case Order::Additive:
-        case Order::Normal:
-            ID.Transparent.iMaterial     = Material;
-            ID.Transparent.iTechnique    = Pipeline;
-            ID.Transparent.iDepth        = * reinterpret_cast<Ptr<const UInt32>>(& Depth);
-            ID.Transparent.iTranslucency = CastEnum(Order);
-            break;
-        case Order::Opaque:
-            const Real32 DepthInv = (1.0f + Depth);
-
-            ID.Opaque.iMaterial          = Material;
-            ID.Opaque.iTechnique         = Pipeline;
-            ID.Opaque.iDepth             = * reinterpret_cast<Ptr<const UInt32>>(& DepthInv);
-            ID.Opaque.iTranslucency      = CastEnum(Order);
-            break;
+            ID |= static_cast<UInt64>(DepthBits)                << 32;
+            ID |= static_cast<UInt64>(Material        & 0xFFFF) << 16;
+            ID |= static_cast<UInt64>(Pipeline        & 0xFF)   << 8;
+            ID |= static_cast<UInt64>(CastEnum(Order) & 0xFF);
         }
-        return ID.Value;
+        else
+        {
+            const UInt32 DepthBits = std::bit_cast<UInt32>(Depth);
+
+            ID |= static_cast<UInt64>(Material        & 0xFFFF) << 48;
+            ID |= static_cast<UInt64>(Pipeline        & 0xFF)   << 40;
+            ID |= static_cast<UInt64>(DepthBits)                << 8;
+            ID |= static_cast<UInt64>(CastEnum(Order) & 0xFF);
+        }
+        return ID;
     }
 }
