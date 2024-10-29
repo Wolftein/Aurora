@@ -679,10 +679,11 @@ namespace Graphic
         {
             D3D11_RASTERIZER_DESC Description = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
 
-            Description.CullMode		  = As(Properties.Cull);
-            Description.ScissorEnable     = TRUE;
-            Description.MultisampleEnable = TRUE;
-            Description.FillMode          = Properties.Fill ? D3D11_FILL_SOLID : D3D11_FILL_WIREFRAME;
+            Description.FrontCounterClockwise = TRUE;
+            Description.CullMode              = As(Properties.Cull);
+            Description.ScissorEnable         = TRUE;
+            Description.MultisampleEnable     = TRUE;
+            Description.FillMode              = Properties.Fill ? D3D11_FILL_SOLID : D3D11_FILL_WIREFRAME;
 
             CheckIfFail(mDevice->CreateRasterizerState(& Description, Pipeline.RS.GetAddressOf()));
         }
@@ -691,15 +692,15 @@ namespace Graphic
             D3D11_INPUT_ELEMENT_DESC Description[k_MaxAttributes];
             UInt                     Count = 0;
 
-            for (; Count < k_MaxAttributes && Properties.InputLayout[Count].Slot >= 0; ++Count)
+            for (; Count < k_MaxAttributes && Properties.InputLayout[Count].ID >= 0; ++Count)
             {
                 D3D11_INPUT_ELEMENT_DESC  & Element = Description[Count];
 
                 Element.SemanticName         = "ATTRIBUTE";
-                Element.SemanticIndex        = Properties.InputLayout[Count].Slot;
+                Element.SemanticIndex        = Properties.InputLayout[Count].ID;
                 Element.Format               = As(Properties.InputLayout[Count].Format);
                 Element.AlignedByteOffset    = Properties.InputLayout[Count].Offset;
-                Element.InputSlot            = 0;
+                Element.InputSlot            = Properties.InputLayout[Count].Slot;
                 Element.InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
                 Element.InstanceDataStepRate = 0;
             }
@@ -906,8 +907,9 @@ namespace Graphic
                 OldestSubmission.Indices.Stride != NewestSubmission.Indices.Stride)
             {
                 Ref<const D3D11Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
-                const DXGI_FORMAT      Format = (NewestSubmission.Indices.Stride == sizeof(UInt16)
-                    ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT);
+                const DXGI_FORMAT      Format =
+                    (NewestSubmission.Indices.Stride == sizeof(UInt8)  ? DXGI_FORMAT_R8_UINT  :
+                     NewestSubmission.Indices.Stride == sizeof(UInt16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT);
                 mDeviceImmediate->IASetIndexBuffer(Buffer.Object.Get(), Format, NewestSubmission.Indices.Offset);
             }
 

@@ -111,9 +111,9 @@ namespace Content
 
         if (Attributes.IsNull() || Attributes.IsEmpty())
         {
-            Description.InputLayout[0] = { 0, 0,  Graphic::VertexFormat::Float32x3   };
-            Description.InputLayout[1] = { 1, 12, Graphic::VertexFormat::UIntNorm8x4 };
-            Description.InputLayout[2] = { 2, 16, Graphic::VertexFormat::Float32x2   };
+            Description.InputLayout[0] = { 0, 0, 0,  Graphic::VertexFormat::Float32x3   };
+            Description.InputLayout[1] = { 1, 0, 12, Graphic::VertexFormat::UIntNorm8x4 };
+            Description.InputLayout[2] = { 2, 0, 16, Graphic::VertexFormat::Float32x2   };
         }
         else
         {
@@ -121,9 +121,10 @@ namespace Content
             {
                 const TOMLArray Values = Attributes.GetArray(Attribute);
 
-                Description.InputLayout[Attribute].Slot   = Values.GetNumber(0);
-                Description.InputLayout[Attribute].Offset = Values.GetNumber(1);
-                Description.InputLayout[Attribute].Format = CastEnum(Values.GetString(2), Graphic::VertexFormat::Float32x4);
+                Description.InputLayout[Attribute].ID     = Values.GetNumber(0);
+                Description.InputLayout[Attribute].Slot   = Values.GetNumber(1);
+                Description.InputLayout[Attribute].Offset = Values.GetNumber(2);
+                Description.InputLayout[Attribute].Format = CastEnum(Values.GetString(3), Graphic::VertexFormat::Float32x4);
             }
         }
 

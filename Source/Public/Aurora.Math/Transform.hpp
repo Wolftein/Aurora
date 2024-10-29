@@ -161,7 +161,7 @@ inline namespace Math
         // -=(Undocumented)=-
         Ref<Transform> Rotate(Base Angle, Ref<const Vector3<Base>> Axis)
         {
-            return Rotate(Quaternion<Base>(Axis, Angle));
+            return Rotate(Quaternion<Base>::FromAngles(Angle, Axis));
         }
 
         // -=(Undocumented)=-

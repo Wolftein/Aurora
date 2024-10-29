@@ -345,7 +345,10 @@ namespace Graphic
     struct Attribute
     {
         // -=(Undocumented)=-
-        SInt16       Slot   = -1;
+        SInt16       ID     = -1;
+
+        // -=(Undocumented)=-
+        SInt16       Slot   = 0;
 
         // -=(Undocumented)=-
         SInt16       Offset = -1;
