@@ -37,7 +37,7 @@ namespace Graphic
         k_MaxBuffers     = 0x0080,
 
         // -=(Undocumented)=-
-        k_MaxFetches     = 0x0004,
+        k_MaxFetches     = 0x0008,
 
         // -=(Undocumented)=-
         k_MaxMaterials   = 0x1000,

@@ -38,7 +38,7 @@ namespace Graphic
             mDirty   = false;
 
             // Calculate the view matrix from the transformation and calculate world matrix
-            mWorld   = mProjection * (mView = mTransformation.AsMatrix());
+            mWorld   = mProjection * (mView = mTransformation.AsReverseMatrix());
 
             // Calculate the inverse of the world matrix
             mInverse = mWorld.Inverse();

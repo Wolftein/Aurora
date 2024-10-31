@@ -213,6 +213,10 @@ ADD_DEFINITIONS(-DAE_CONTENT_LOADER_EFFECT)     # .effect, .shader
 ADD_DEFINITIONS(-DAE_CONTENT_LOADER_ARTERY)     # .arfont
 ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MODEL)      # .gltf
 
+IF    (WIN32)
+    ADD_DEFINITIONS(-DNOMINMAX)
+ENDIF (WIN32)
+
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Library
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

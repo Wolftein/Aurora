@@ -167,7 +167,13 @@ inline namespace Math
         // -=(Undocumented)=-
         Matrix4<Base> AsMatrix() const
         {
-            return Matrix4<Base>::CreateTransform(-mPosition, mRotation, mScale);
+            return Matrix4<Base>::CreateTransform(mPosition, mRotation, mScale);
+        }
+
+        // -=(Undocumented)=-
+        Matrix4<Base> AsReverseMatrix() const
+        {
+            return Matrix4<Base>::CreateTransform(- mPosition, mRotation, mScale);
         }
 
     private:
