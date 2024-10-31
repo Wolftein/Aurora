@@ -23,6 +23,11 @@
 #include <string>
 #include <unordered_dense.h>
 #include <vector>
+
+#if       defined(_WIN32) || defined(_WIN64) || defined(_WINDOWS)
+    #define NOMINMAX
+#endif // _WIN32 || _WIN64 || _WINDOWS
+
 #include <SDL3/SDL.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

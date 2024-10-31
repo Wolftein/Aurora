@@ -13,9 +13,9 @@
 [Properties.Layout]
 
 	Attributes      = [
-		[0, 0,  "Float32x3"  ],
-		[1, 12, "UIntNorm8x4"],
-		[2, 16, "Float32x2"  ]
+		[0, 0, 0,  "Float32x3"  ],
+		[1, 0, 12, "UIntNorm8x4"],
+		[2, 0, 16, "Float32x2"  ]
 	]
 
 [Program.Vertex]
