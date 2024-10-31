@@ -122,8 +122,8 @@ namespace Graphic
     {
         const Real DestinationX1 = Rectangle.GetLeft();
         const Real DestinationX2 = Rectangle.GetRight();
-        const Real DestinationX3 = Rectangle.GetLeft();
-        const Real DestinationX4 = Rectangle.GetRight();
+        const Real DestinationX3 = Rectangle.GetRight();
+        const Real DestinationX4 = Rectangle.GetLeft();
 
         const Real DestinationY1 = Rectangle.GetTop();
         const Real DestinationY2 = Rectangle.GetTop();
@@ -174,13 +174,13 @@ namespace Graphic
 
         const Real DestinationX1 = Rectangle.GetLeft();
         const Real DestinationX2 = Rectangle.GetRight();
-        const Real DestinationX3 = Rectangle.GetLeft();
-        const Real DestinationX4 = Rectangle.GetRight();
+        const Real DestinationX3 = Rectangle.GetRight();
+        const Real DestinationX4 = Rectangle.GetLeft();
 
-        const Real DestinationY1 = Rectangle.GetTop();
-        const Real DestinationY2 = Rectangle.GetTop();
-        const Real DestinationY3 = Rectangle.GetBottom();
-        const Real DestinationY4 = Rectangle.GetBottom();
+        const Real DestinationY1 = Rectangle.GetBottom();
+        const Real DestinationY2 = Rectangle.GetBottom();
+        const Real DestinationY3 = Rectangle.GetTop();
+        const Real DestinationY4 = Rectangle.GetTop();
 
         Array<Vector2f, 4> Position;
 
@@ -212,10 +212,10 @@ namespace Graphic
         }
 
         Array<Vector2f, 4> Texture {
-            Vector2f { Source.GetLeft(),  Source.GetTop() },
-            Vector2f { Source.GetRight(), Source.GetTop() },
             Vector2f { Source.GetLeft(),  Source.GetBottom() },
-            Vector2f { Source.GetRight(), Source.GetBottom() }
+            Vector2f { Source.GetRight(), Source.GetBottom() },
+            Vector2f { Source.GetRight(), Source.GetTop() },
+            Vector2f { Source.GetLeft(),  Source.GetTop() }
         };
 
         Push(Position, Tint, Texture, Order, Depth, Pipeline.get(), Material.get());
@@ -335,9 +335,9 @@ namespace Graphic
             Indices[0] = Index;
             Indices[1] = Index + 1;
             Indices[2] = Index + 2;
-            Indices[3] = Index + 1;
-            Indices[4] = Index + 3;
-            Indices[5] = Index + 2;
+            Indices[3] = Index;
+            Indices[4] = Index + 2;
+            Indices[5] = Index + 3;
         }
 
         mEncoder.SetPipeline(* Drawable.Pipeline);
