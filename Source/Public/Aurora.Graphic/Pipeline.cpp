@@ -22,8 +22,8 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Pipeline::Pipeline(Ref<const Content::Uri> Key)
-        : AbstractResource(Key),
+    Pipeline::Pipeline(Any<Content::Uri> Key)
+        : AbstractResource(Move(Key)),
           mID { 0 }
     {
     }

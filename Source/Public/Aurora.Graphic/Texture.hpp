@@ -29,7 +29,7 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        Texture(Ref<const Content::Uri> Key);
+        explicit Texture(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
         void Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Layer, Any<Data> Data);

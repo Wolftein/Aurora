@@ -27,7 +27,8 @@ namespace Audio
 
         // -=(Undocumented)=-
         Emitter()
-            : mDirty { true }
+            : mDirty  { true },
+              mRadius { 0.0f }
         {
         }
 

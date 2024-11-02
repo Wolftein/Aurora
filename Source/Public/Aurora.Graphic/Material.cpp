@@ -22,8 +22,8 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Material::Material(Ref<const Content::Uri> Key)
-        : AbstractResource(Key),
+    Material::Material(Any<Content::Uri> Key)
+        : AbstractResource(Move(Key)),
           mID        { 0 },
           mResidence { false }
     {

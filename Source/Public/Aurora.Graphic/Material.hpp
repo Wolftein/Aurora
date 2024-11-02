@@ -33,7 +33,7 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        Material(Ref<const Content::Uri> Key);
+        explicit Material(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
         Object GetID() const

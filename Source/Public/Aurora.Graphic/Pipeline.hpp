@@ -29,7 +29,7 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        Pipeline(Ref<const Content::Uri> Key);
+        explicit Pipeline(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
         void Load(Any<Array<Data, k_MaxStages>> Stages, Any<Descriptor> Properties);

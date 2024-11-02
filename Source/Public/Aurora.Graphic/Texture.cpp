@@ -22,8 +22,8 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Texture::Texture(Ref<const Content::Uri> Key)
-        : AbstractResource(Key),
+    Texture::Texture(Any<Content::Uri> Key)
+        : AbstractResource(Move(Key)),
           mID     { 0 },
           mFormat { TextureFormat::RGBA8UInt },
           mLayout { TextureLayout::Dual },

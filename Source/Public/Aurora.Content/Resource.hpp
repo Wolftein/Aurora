@@ -34,8 +34,8 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
-        Resource(ConstRef<Uri> Key)
-            : mKey      { Key },
+        explicit Resource(Any<Uri> Key)
+            : mKey      { Move(Key) },
               mMemory   { 0 },
               mStatus   { Status::None }
         {

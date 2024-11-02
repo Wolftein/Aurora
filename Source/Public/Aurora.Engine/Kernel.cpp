@@ -114,7 +114,7 @@ namespace Engine
 
     void Kernel::Poll()
     {
-        const Real64 Time = SDL_GetTicksNS() / static_cast<Real64>(SDL_NS_PER_SECOND);
+        const Real64 Time = static_cast<Real64>(SDL_GetTicksNS()) / static_cast<Real64>(SDL_NS_PER_SECOND);
 
         // Tick subsystems (order matters)
         Execute([Time](Ref<Core::Subsystem> Service)

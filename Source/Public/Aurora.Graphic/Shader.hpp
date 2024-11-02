@@ -29,7 +29,7 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        Shader(Ref<const Content::Uri> Key);
+        explicit Shader(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
         void SetBytecode(CStr Bytecode)

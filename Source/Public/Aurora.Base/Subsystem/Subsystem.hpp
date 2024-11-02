@@ -31,7 +31,7 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        Subsystem(Ref<Context> Context)
+        explicit Subsystem(Ref<Context> Context)
             : mContext { Context }
         {
         }

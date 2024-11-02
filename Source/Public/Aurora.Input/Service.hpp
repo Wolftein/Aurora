@@ -29,7 +29,7 @@ namespace Input
     public:
 
         // -=(Undocumented)=-
-        Service(Ref<Context> System);
+        explicit Service(Ref<Context> System);
 
         // \see Subsystem::OnTick(Real64)
         void OnTick(Real64 Time) override;

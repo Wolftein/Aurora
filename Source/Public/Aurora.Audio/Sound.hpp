@@ -29,7 +29,7 @@ namespace Audio
     public:
 
         // -=(Undocumented)=-
-        Sound(Ref<const Content::Uri> Key);
+        explicit Sound(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
         void Load(Kind Kind, UInt32 Duration, UInt8 Depth, UInt8 Channel, UInt32 Frequency, UPtr<Decoder> Decoder);
@@ -79,10 +79,10 @@ namespace Audio
     private:
 
         // \see Resource::OnCreate(Ref<Subsystem::Context>)
-        Bool OnCreate(Ref<Subsystem::Context> Context);
+        Bool OnCreate(Ref<Subsystem::Context> Context) override;
 
         // \see Resource::OnDelete(Ref<Subsystem::Context>)
-        void OnDelete(Ref<Subsystem::Context> Context);
+        void OnDelete(Ref<Subsystem::Context> Context) override;
 
     private:
 

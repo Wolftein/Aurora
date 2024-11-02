@@ -28,7 +28,7 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
-        Service(Ref<Context> Context);
+        explicit Service(Ref<Context> Context);
 
         // \see Subsystem::OnTick(Real64)
         void OnTick(Real64 Time) override;

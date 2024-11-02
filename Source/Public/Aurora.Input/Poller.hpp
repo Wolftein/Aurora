@@ -31,6 +31,9 @@ namespace Input
     public:
 
         // -=(Undocumented)=-
+        Poller();
+
+        // -=(Undocumented)=-
         CPtr<const Event> Poll();
 
     private:

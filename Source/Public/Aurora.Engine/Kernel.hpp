@@ -41,7 +41,7 @@ namespace Engine
         Kernel();
 
         // -=(Undocumented)=-
-        virtual ~Kernel();
+        ~Kernel() override;
 
         // -=(Undocumented)=-
         void Initialize(Mode Mode, Ref<const Properties> Properties);
@@ -88,7 +88,7 @@ namespace Engine
             Ref<Kernel> Kernel;
 
             // -=(Undocumented)=-
-            ProxyInputListener(Ref<Engine::Kernel> Kernel)
+            explicit ProxyInputListener(Ref<Engine::Kernel> Kernel)
                 : Kernel { Kernel }
             {
             }

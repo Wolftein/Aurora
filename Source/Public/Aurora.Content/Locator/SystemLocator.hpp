@@ -26,7 +26,7 @@ namespace Content
 	public:
 
 		// -=(Undocumented)=-
-		SystemLocator(CStr Path = "");
+		explicit SystemLocator(CStr Path = "");
 
         // -=(Undocumented)=-
         ~SystemLocator() override = default;

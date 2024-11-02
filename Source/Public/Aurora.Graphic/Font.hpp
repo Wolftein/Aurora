@@ -121,7 +121,7 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        Font(Ref<const Content::Uri> Key);
+        explicit Font(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
         void Load(Any<Metrics> Metrics, Any<Atlas> Atlas, Any<Table<UInt32, Glyph>> Glyphs, Any<Table<UInt64, Real32>> Kerning);
@@ -147,10 +147,7 @@ namespace Graphic
             {
                 return AddressOf(Iterator->second);
             }
-            else
-            {
-                return (Fallback != 0 && Unicode != Fallback ? GetGlyph(Fallback) : nullptr);
-            }
+            return (Fallback != 0 && Unicode != Fallback ? GetGlyph(Fallback) : nullptr);
         }
 
         // -=(Undocumented)=-
