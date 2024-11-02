@@ -24,7 +24,7 @@ namespace Graphic
     // -=(Undocumented)=-
     class Shader final : public Content::AbstractResource<Shader>
     {
-        friend class Content::AbstractResource<Shader>;
+        friend class AbstractResource;
 
     public:
 

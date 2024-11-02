@@ -24,7 +24,7 @@ namespace Graphic
     // -=(Undocumented)=-
     class Texture final : public Content::AbstractResource<Texture>
     {
-        friend class Content::AbstractResource<Texture>;
+        friend class AbstractResource;
 
     public:
 

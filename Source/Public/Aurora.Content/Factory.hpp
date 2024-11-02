@@ -68,9 +68,9 @@ namespace Content
             }
             else if (CreateIfNeeded)
             {
-                Result = NewPtr<Type>(Key);
+                Result = NewPtr<Type>(Move(Key));
 
-                mRegistry.try_emplace(Key.GetPath(), Result);
+                mRegistry.try_emplace(Result->GetKey().GetPath(), Result);
             }
             return Result;
         }

@@ -82,21 +82,21 @@ namespace Content
         CStr GetFolder() const
 		{
 			const CStr   Path   = GetPath();
-			const SInt32 Offset = mUrl.find("/");
+			const SInt32 Offset = mUrl.find('/');
 			return (Offset != CStr::npos ? Path.substr(0, Offset) : "");
 		}
 
 		// -=(Undocumented)=-
         CStr GetFilename() const
 		{
-			const SInt32 Offset = mUrl.rfind("/");
+			const SInt32 Offset = mUrl.rfind('/');
 			return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : GetPath());
 		}
 
 		// -=(Undocumented)=-
         CStr GetExtension() const
 		{
-			const SInt32 Offset = mUrl.rfind(".");
+			const SInt32 Offset = mUrl.rfind('.');
 			return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : "");
 		}
 

@@ -23,12 +23,12 @@ namespace Graphic
     // -=(Undocumented)=-
     class Model final : public Content::AbstractResource<Model>
     {
-        friend class Content::AbstractResource<Model>;
+        friend class AbstractResource;
 
     public:
 
         // -=(Undocumented)=-
-        Model(Ref<const Content::Uri> Key);
+        Model(Any<Content::Uri> Key);
 
     private:
 

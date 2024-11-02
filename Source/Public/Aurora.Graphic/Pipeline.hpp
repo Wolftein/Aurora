@@ -24,7 +24,7 @@ namespace Graphic
     // -=(Undocumented)=-
     class Pipeline final : public Content::AbstractResource<Pipeline>
     {
-        friend class Content::AbstractResource<Pipeline>;
+        friend class AbstractResource;
 
     public:
 

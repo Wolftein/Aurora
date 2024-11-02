@@ -152,8 +152,8 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
-        AbstractResource(Ref<const Uri> Key)
-            : Resource(Key)
+        AbstractResource(Any<Uri> Key)
+            : Resource(Move(Key))
         {
         }
 

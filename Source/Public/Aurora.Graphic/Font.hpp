@@ -23,7 +23,7 @@ namespace Graphic
     // -=(Undocumented)=-
     class Font final : public Content::AbstractResource<Font>
     {
-        friend class Content::AbstractResource<Font>;
+        friend class AbstractResource;
 
     public:
 

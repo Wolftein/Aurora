@@ -23,7 +23,7 @@ namespace Graphic
     // -=(Undocumented)=-
     class Material final : public Content::AbstractResource<Material>
     {
-        friend class Content::AbstractResource<Material>;
+        friend class AbstractResource;
 
     public:
 

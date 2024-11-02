@@ -24,7 +24,7 @@ namespace Audio
     // -=(Undocumented)=-
     class Sound final : public Content::AbstractResource<Sound>
     {
-        friend class Content::AbstractResource<Sound>;
+        friend class AbstractResource;
 
     public:
 

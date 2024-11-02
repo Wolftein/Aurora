@@ -104,7 +104,7 @@ namespace Content
             return It->second->Read(Key.GetPath());
         }
 
-        for (auto [_, Locator] : mLocators)
+        for (const auto & [_, Locator] : mLocators)
         {
             if (Data Data = Locator->Read(Key.GetPath()); Data.HasData())
             {
@@ -201,10 +201,7 @@ namespace Content
                 {
                     return true;
                 }
-                else
-                {
-                    Log::Warn("Resources: Failed to parse '{}'", Key.GetUrl());
-                }
+                Log::Warn("Resources: Failed to parse '{}'", Key.GetUrl());
             }
             else
             {
