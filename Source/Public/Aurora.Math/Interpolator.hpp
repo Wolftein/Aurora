@@ -60,13 +60,13 @@ inline namespace Math
         // -=(Undocumented)=-
         Bool HasFinish() const
         {
-            return (mAccumulator == mTime);
+            return mAccumulator == mTime;
         }
 
         // -=(Undocumented)=-
         Bool HasStarted() const
         {
-            return (mAccumulator != mTime);
+            return mAccumulator != mTime;
         }
 
     private:

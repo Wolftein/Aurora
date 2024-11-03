@@ -31,7 +31,7 @@ namespace Content
 
     Data SystemLocator::Read(CStr Path)
     {
-        if (Ptr<SDL_IOStream> Stream = SDL_IOFromFile(Format("{}{}", mPath, Path).c_str(), "r+b"); Stream)
+        if (const Ptr<SDL_IOStream> Stream = SDL_IOFromFile(Format("{}{}", mPath, Path).c_str(), "r+b"); Stream)
         {
             Data Result(SDL_GetIOSize(Stream));
 
@@ -48,7 +48,7 @@ namespace Content
 
     void SystemLocator::Write(CStr Path, CPtr<const UInt8> Bytes)
     {
-        if (Ptr<SDL_IOStream> Stream = SDL_IOFromFile(Format("{}{}", mPath, Path).c_str(), "w+b"); Stream)
+        if (const Ptr<SDL_IOStream> Stream = SDL_IOFromFile(Format("{}{}", mPath, Path).c_str(), "w+b"); Stream)
         {
             SDL_WriteIO(Stream, Bytes.data(), Bytes.size());
             SDL_CloseIO(Stream);

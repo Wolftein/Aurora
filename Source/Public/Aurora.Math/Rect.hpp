@@ -153,7 +153,7 @@ inline namespace Math
         // -=(Undocumented)=-
         Bool Contains(Ref<const Rect<Base>> Other) const
         {
-            return (mX1 <= Other.mX1 && Other.mX2 >= mX2 && mY1 <= Other.mY1 && Other.mY1 >= mY2);
+            return mX1 <= Other.mX1 && Other.mX2 >= mX2 && mY1 <= Other.mY1 && Other.mY1 >= mY2;
         }
 
         // -=(Undocumented)=-
@@ -165,19 +165,19 @@ inline namespace Math
         // -=(Undocumented)=-
         Bool Intersects(Ref<const Rect<Base>> Other) const
         {
-            return (mX1 <= Other.mX2 && Other.mX1 <= mX2 && mY1 <= Other.mY2 && Other.mY1 <= mY2);
+            return mX1 <= Other.mX2 && Other.mX1 <= mX2 && mY1 <= Other.mY2 && Other.mY1 <= mY2;
         }
 
         // -=(Undocumented)=-
         Bool operator==(Ref<const Rect<Base>> Other) const
         {
-            return (mX1 == Other.mX1 && mY1 == Other.mY1 && mX2 == Other.mX2 && mY2 == Other.mY2);
+            return mX1 == Other.mX1 && mY1 == Other.mY1 && mX2 == Other.mX2 && mY2 == Other.mY2;
         }
 
         // -=(Undocumented)=-
         Bool operator!=(Ref<const Rect<Base>> Other) const
         {
-            return (mX1 != Other.mX1 || mY1 != Other.mY1 || mX2 != Other.mX2 || mY2 != Other.mY2);
+            return mX1 != Other.mX1 || mY1 != Other.mY1 || mX2 != Other.mX2 || mY2 != Other.mY2;
         }
 
         // -=(Undocumented)=-
@@ -350,27 +350,27 @@ inline namespace Math
         // -=(Undocumented)=-
         static Rect<Base> Min(Ref<const Rect<Base>> Lhs, Ref<const Rect<Base>> Rhs)
         {
-            const Base X1 = (Lhs.mX1 < Rhs.mX1 ? Lhs.mX1 : Rhs.mX1);
-            const Base Y1 = (Lhs.mY1 < Rhs.mY1 ? Lhs.mY1 : Rhs.mY1);
-            const Base X2 = (Lhs.mX2 < Rhs.mX2 ? Lhs.mX2 : Rhs.mX2);
-            const Base Y2 = (Lhs.mY2 < Rhs.mY2 ? Lhs.mY2 : Rhs.mY2);
+            const Base X1 = Lhs.mX1 < Rhs.mX1 ? Lhs.mX1 : Rhs.mX1;
+            const Base Y1 = Lhs.mY1 < Rhs.mY1 ? Lhs.mY1 : Rhs.mY1;
+            const Base X2 = Lhs.mX2 < Rhs.mX2 ? Lhs.mX2 : Rhs.mX2;
+            const Base Y2 = Lhs.mY2 < Rhs.mY2 ? Lhs.mY2 : Rhs.mY2;
             return Rect<Base>(X1, Y1, X2, Y2);
         }
 
         // -=(Undocumented)=-
         static Rect<Base> Max(Ref<const Rect<Base>> Lhs, Ref<const Rect<Base>> Rhs)
         {
-            const Base X1 = (Lhs.mX1 < Rhs.mX1 ? Rhs.mX1 : Lhs.mX1);
-            const Base Y1 = (Lhs.mY1 < Rhs.mY1 ? Rhs.mY1 : Lhs.mY1);
-            const Base X2 = (Lhs.mX2 < Rhs.mX2 ? Rhs.mX2 : Lhs.mX2);
-            const Base Y2 = (Lhs.mY2 < Rhs.mY2 ? Rhs.mY2 : Lhs.mY2);
+            const Base X1 = Lhs.mX1 < Rhs.mX1 ? Rhs.mX1 : Lhs.mX1;
+            const Base Y1 = Lhs.mY1 < Rhs.mY1 ? Rhs.mY1 : Lhs.mY1;
+            const Base X2 = Lhs.mX2 < Rhs.mX2 ? Rhs.mX2 : Lhs.mX2;
+            const Base Y2 = Lhs.mY2 < Rhs.mY2 ? Rhs.mY2 : Lhs.mY2;
             return Rect<Base>(X1, Y1, X2, Y2);
         }
 
         // -=(Undocumented)=-
         static Rect<Base> Lerp(Ref<const Rect<Base>> Start, Ref<const Rect<Base>> End, Real32 Percentage)
         {
-            return (Start + (End - Start) * Percentage);
+            return Start + (End - Start) * Percentage;
         }
 
     private:

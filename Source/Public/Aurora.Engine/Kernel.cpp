@@ -117,7 +117,7 @@ namespace Engine
         const Real64 Time = static_cast<Real64>(SDL_GetTicksNS()) / static_cast<Real64>(SDL_NS_PER_SECOND);
 
         // Tick subsystems (order matters)
-        Execute([Time](Ref<Core::Subsystem> Service)
+        Execute([Time](Ref<Subsystem> Service)
         {
             Service.OnTick(Time);
         });
@@ -172,7 +172,7 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Kernel::OnWindowResize(UInt16 Width, UInt16 Height)
+    Bool Kernel::OnWindowResize(SInt32 Width, SInt32 Height)
     {
         GetSubsystem<Graphic::Service>()->Reset(Width, Height);
         return false;

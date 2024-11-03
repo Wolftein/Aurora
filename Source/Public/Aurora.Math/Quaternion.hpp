@@ -203,11 +203,12 @@ inline namespace Math
             const Vector3<Base> Right = Vector3<Base>::Normalize(Vector3<Base>::Cross(Up, Forward));
             const Vector3<Base> UpVector = Vector3<Base>::Cross(Forward, Right);
 
-            const Base W = Math::Sqrt(1.0 + Right.GetX() + UpVector.GetY() + Forward.GetZ()) * 0.5;
-            const Base InvW = (4.0 * W);
-            const Base X = (UpVector.GetZ() - Forward.GetY()) / InvW;
-            const Base Y = (Forward.GetX() - Right.GetZ()) / InvW;
-            const Base Z = (Right.GetY() - UpVector.GetX()) / InvW;
+            const Base W    = Math::Sqrt(1.0 + Right.GetX() + UpVector.GetY() + Forward.GetZ()) * 0.5;
+            const Base InvScaleW = 1.0 / (2.0 * W);
+
+            const Base X    = (UpVector.GetZ() - Forward.GetY()) * InvScaleW;
+            const Base Y    = (Forward.GetX() - Right.GetZ()) * InvScaleW;
+            const Base Z    = (Right.GetY() - UpVector.GetX()) * InvScaleW;
 
             return Quaternion<Base>(X, Y, Z, W);
         }

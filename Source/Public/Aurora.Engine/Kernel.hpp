@@ -58,7 +58,7 @@ namespace Engine
         // -=(Undocumented)=-
         Ref<Device> GetDevice()
         {
-            return (* mDevice);
+            return * mDevice;
         }
 
     private:
@@ -83,7 +83,7 @@ namespace Engine
     private:
 
         // -=(Undocumented)=-
-        struct ProxyInputListener final : public Input::Listener
+        struct ProxyInputListener final : Listener
         {
             Ref<Kernel> Kernel;
 
@@ -104,7 +104,7 @@ namespace Engine
         Bool OnWindowExit() override;
 
         // \see Listener::OnWindowResize
-        Bool OnWindowResize(UInt16 Width, UInt16 Height) override;
+        Bool OnWindowResize(SInt32 Width, SInt32 Height) override;
 
     private:
 

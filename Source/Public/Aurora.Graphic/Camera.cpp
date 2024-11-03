@@ -81,13 +81,13 @@ namespace Graphic
 
     Vector3f Camera::GetScreenCoordinates(Ref<const Vector3f> Position, Ref<const Rectf> Viewport) const
     {
-        const Vector3f Point = (mWorld * Position);
+        const Vector3f Point = mWorld * Position;
 
         const Real32 Width  = Viewport.GetWidth();
         const Real32 Height = Viewport.GetHeight();
 
-        const Real32 X = (Width  * (Point.GetX() + 1.0f)) * 0.5f + Viewport.GetX();
-        const Real32 Y = Height - (Height * (Point.GetY() + 1.0f)) * 0.5f + Viewport.GetY();
+        const Real32 X = Width  * (Point.GetX() + 1.0f) * 0.5f + Viewport.GetX();
+        const Real32 Y = Height - Height * (Point.GetY() + 1.0f) * 0.5f + Viewport.GetY();
         const Real32 Z = (Point.GetZ() + 1.0f) * 0.5f;
 
         return Vector3f(X, Y, Z);

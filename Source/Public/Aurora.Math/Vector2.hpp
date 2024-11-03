@@ -88,7 +88,7 @@ inline namespace Math
         // -=(Undocumented)=-
         Real32 GetAngle(Ref<const Vector2<Base>> Other) const
         {
-            const Real32 Divisor = (GetLength() * Other.GetLength());
+            const Real32 Divisor = GetLength() * Other.GetLength();
 
             if (Divisor != 0)
             {
@@ -308,16 +308,16 @@ inline namespace Math
         // -=(Undocumented)=-
         static Vector2<Base> Min(Ref<const Vector2<Base>> P0, Ref<const Vector2<Base>> P1)
         {
-            const Base X = (P0.GetX() < P1.GetX() ? P0.GetX() : P1.GetX());
-            const Base Y = (P0.GetY() < P1.GetY() ? P0.GetY() : P1.GetY());
+            const Base X = P0.GetX() < P1.GetX() ? P0.GetX() : P1.GetX();
+            const Base Y = P0.GetY() < P1.GetY() ? P0.GetY() : P1.GetY();
             return Vector2<Base>(X, Y);
         }
 
         // -=(Undocumented)=-
         static Vector2<Base> Max(Ref<const Vector2<Base>> P0, Ref<const Vector2<Base>> P1)
         {
-            const Base X = (P0.GetX() < P1.GetX() ? P1.GetX() : P0.GetX());
-            const Base Y = (P0.GetY() < P1.GetY() ? P1.GetY() : P0.GetY());
+            const Base X = P0.GetX() < P1.GetX() ? P1.GetX() : P0.GetX();
+            const Base Y = P0.GetY() < P1.GetY() ? P1.GetY() : P0.GetY();
             return Vector2<Base>(X, Y);
         }
 

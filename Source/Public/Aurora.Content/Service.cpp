@@ -145,41 +145,41 @@ namespace Content
 
     void Service::RegisterDefaultResources()
     {
-        AddLocator("Engine://", NewPtr<Content::MemoryLocator>());
+        AddLocator("Engine://", NewPtr<MemoryLocator>());
 
         if (IsClientMode())
         {
 #ifdef    AE_CONTENT_LOADER_MP3
-            AddLoader(NewPtr<Content::MP3Loader>());
+            AddLoader(NewPtr<MP3Loader>());
 #endif // AE_CONTENT_LOADER_MP3
 
 #ifdef    AE_CONTENT_LOADER_WAV
-            AddLoader(NewPtr<Content::WAVLoader>());
+            AddLoader(NewPtr<WAVLoader>());
 #endif // AE_CONTENT_LOADER_WAV
 
 #ifdef    AE_CONTENT_LOADER_STB
-            AddLoader(NewPtr<Content::STBLoader>());
+            AddLoader(NewPtr<STBLoader>());
 #endif // AE_CONTENT_LOADER_STB
 
 #ifdef    AE_CONTENT_LOADER_EFFECT
-            AddLoader(NewPtr<Content::ShaderLoader>());
+            AddLoader(NewPtr<ShaderLoader>());
 #endif // AE_CONTENT_LOADER_EFFECT
 
 #ifdef    AE_CONTENT_LOADER_EFFECT
             if (ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>())
             {
                 Ref<const Graphic::Capabilities> GraphicCapabilities = Graphics->GetCapabilities();
-                AddLoader(NewPtr<Content::PipelineLoader>(
+                AddLoader(NewPtr<PipelineLoader>(
                     GraphicCapabilities.Backend, GraphicCapabilities.Language));
             }
 #endif // AE_CONTENT_LOADER_EFFECT
 
 #ifdef    AE_CONTENT_LOADER_ARTERY
-            AddLoader(NewPtr<Content::ArteryFontLoader>());
+            AddLoader(NewPtr<ArteryFontLoader>());
 #endif // AE_CONTENT_LOADER_ARTERY
 
 #ifdef    AE_CONTENT_LOADER_MODEL
-            AddLoader(NewPtr<Content::GLTFLoader>());
+            AddLoader(NewPtr<GLTFLoader>());
 #endif // AE_CONTENT_LOADER_MODEL
         }
     }

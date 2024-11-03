@@ -40,7 +40,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Vector2f Font::Measure(CStr16 Text, Real32 Size)
+    Vector2f Font::Measure(CStr16 Text, Real32 Size) const
     {
         const Real32 Scale = Size / mMetrics.Size;
 
@@ -63,7 +63,7 @@ namespace Graphic
                 default:
                 {
                     const Ptr<const Glyph> Glyph = GetGlyph(Codepoint);
-                    CurrentX += (GetKerning(Previous, Codepoint) * Scale) + (Glyph->Advance * Scale);
+                    CurrentX += GetKerning(Previous, Codepoint) * Scale + Glyph->Advance * Scale;
                     MaximumX = Max(MaximumX, CurrentX);
                     break;
                 }
@@ -76,7 +76,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Rectf Font::Calculate(CStr16 Text, Real32 Size, Ref<const Vector2f> Position, Alignment Alignment)
+    Rectf Font::Calculate(CStr16 Text, Real32 Size, Ref<const Vector2f> Position, Alignment Alignment) const
     {
         const Vector2f Measurement = Measure(Text, Size);
 
@@ -85,44 +85,44 @@ namespace Graphic
 
         switch (Alignment)
         {
-        case Font::Alignment::LeftTop:
+        case Alignment::LeftTop:
             break;
-        case Font::Alignment::LeftMiddle:
-            OffsetY -= (mMetrics.Ascender * 0.5f) * Size;
+        case Alignment::LeftMiddle:
+            OffsetY -= mMetrics.Ascender * 0.5f * Size;
             break;
-        case Font::Alignment::LeftBottom:
+        case Alignment::LeftBottom:
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Font::Alignment::LeftBaseline:
+        case Alignment::LeftBaseline:
             OffsetY -= mMetrics.Ascender * Size;
             break;
-        case Font::Alignment::CenterTop:
+        case Alignment::CenterTop:
             OffsetX -= Measurement.GetX() * 0.5f;
             break;
-        case Font::Alignment::CenterMiddle:
+        case Alignment::CenterMiddle:
             OffsetX -= Measurement.GetX() * 0.5f;
-            OffsetY -= (mMetrics.Ascender * 0.5f) * Size;
+            OffsetY -= mMetrics.Ascender * 0.5f * Size;
             break;
-        case Font::Alignment::CenterBottom:
+        case Alignment::CenterBottom:
             OffsetX -= Measurement.GetX() * 0.5f;
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Font::Alignment::CenterBaseline:
+        case Alignment::CenterBaseline:
             OffsetX -= Measurement.GetX() * 0.5f;
             OffsetY -= mMetrics.Ascender * Size;
             break;
-        case Font::Alignment::RightTop:
+        case Alignment::RightTop:
             OffsetX -= Measurement.GetX();
             break;
-        case Font::Alignment::RightMiddle:
+        case Alignment::RightMiddle:
             OffsetX -= Measurement.GetX();
-            OffsetY -= (mMetrics.Ascender * 0.5f) * Size;
+            OffsetY -= mMetrics.Ascender * 0.5f * Size;
             break;
-        case Font::Alignment::RightBottom:
+        case Alignment::RightBottom:
             OffsetX -= Measurement.GetX();
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Font::Alignment::RightBaseline:
+        case Alignment::RightBaseline:
             OffsetX -= Measurement.GetX();
             OffsetY -= mMetrics.Ascender * Size;
             break;
@@ -135,14 +135,12 @@ namespace Graphic
 
     Bool Font::OnCreate(Ref<Subsystem::Context> Context)
     {
-        Bool Success;
-
         // Allocates texture for the atlas
         const SPtr<Texture> Atlas = NewPtr<Texture>("_Private");
         Atlas->Load(
-            Graphic::TextureFormat::RGBA8UIntNorm,
-            Graphic::TextureLayout::Source, mAtlas.Width, mAtlas.Height, 1, Move(mAtlas.Bytes));
-        Success = Atlas->Create(Context);
+            TextureFormat::RGBA8UIntNorm,
+            TextureLayout::Source, mAtlas.Width, mAtlas.Height, 1, Move(mAtlas.Bytes));
+        Bool Success = Atlas->Create(Context);
 
         // Allocates material for the font
         mMaterial = NewPtr<Graphic::Material>("_Private");

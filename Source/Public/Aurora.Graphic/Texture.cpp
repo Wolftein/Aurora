@@ -53,11 +53,11 @@ namespace Graphic
     {
         SetMemory(mData.GetSize());
 
-        mID = Context.GetSubsystem<Graphic::Service>()->CreateTexture(mFormat, mLayout, mWidth, mHeight, mLayer, mData);
+        mID = Context.GetSubsystem<Service>()->CreateTexture(mFormat, mLayout, mWidth, mHeight, mLayer, mData);
 
         mData.Clear();
 
-        return (mID > 0);
+        return mID > 0;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -65,7 +65,7 @@ namespace Graphic
 
     void Texture::OnDelete(Ref<Subsystem::Context> Context)
     {
-        Context.GetSubsystem<Graphic::Service>()->DeleteTexture(mID);
+        Context.GetSubsystem<Service>()->DeleteTexture(mID);
 
         mID = 0;
     }

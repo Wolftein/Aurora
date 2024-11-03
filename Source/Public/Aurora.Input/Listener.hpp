@@ -43,10 +43,10 @@ namespace Input
         virtual Bool OnKeyDown(Key Key);
 
         // -=(Undocumented)=-
-        virtual Bool OnMouseMove(UInt16 X, UInt16 Y);
+        virtual Bool OnMouseMove(SInt32 X, SInt32 Y);
 
         // -=(Undocumented)=-
-        virtual Bool OnMouseScroll(SInt16 X, SInt16 Y);
+        virtual Bool OnMouseScroll(SInt32 X, SInt32 Y);
 
         // -=(Undocumented)=-
         virtual Bool OnMouseUp(Button Button);
@@ -58,7 +58,7 @@ namespace Input
         virtual Bool OnWindowFocus(Bool Focused);
 
         // -=(Undocumented)=-
-        virtual Bool OnWindowResize(UInt16 Width, UInt16 Height);
+        virtual Bool OnWindowResize(SInt32 Width, SInt32 Height);
 
         // -=(Undocumented)=-
         virtual Bool OnWindowExit();

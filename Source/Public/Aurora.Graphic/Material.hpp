@@ -75,14 +75,12 @@ namespace Graphic
         template<typename Type>
         void SetParameter(UInt Offset, Type Parameter)
         {
-            constexpr UInt Size = sizeof(Type) / sizeof(Vector4f) + 1;
-
-            if (Offset + Size > mParameters.size())
+            if (constexpr UInt Size = sizeof(Type) / sizeof(Vector4f) + 1; Offset + Size > mParameters.size())
             {
                 mParameters.resize(mParameters.size() + Align(Size, k_Alignment));
             }
 
-            * (reinterpret_cast<Ptr<Type>>(reinterpret_cast<UInt>(mParameters.data() + Offset))) = Parameter;
+            * reinterpret_cast<Ptr<Type>>(reinterpret_cast<UInt>(mParameters.data() + Offset)) = Parameter;
         }
 
         // -=(Undocumented)=-

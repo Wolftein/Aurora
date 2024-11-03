@@ -27,7 +27,7 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        constexpr static inline UInt k_Invalid = 0;
+        constexpr static UInt k_Invalid = 0;
 
     public:
 
@@ -40,7 +40,7 @@ inline namespace Core
         // -=(Undocumented)=-
         Bool IsFull() const
         {
-            return (mPool.empty() && mHead >= T);
+            return mPool.empty() && mHead >= T;
         }
 
         // -=(Undocumented)=-
@@ -55,10 +55,10 @@ inline namespace Core
         {
             if (mPool.empty())
             {
-                return (mHead >= T ? k_Invalid : ++mHead);
+                return mHead >= T ? k_Invalid : ++mHead;
             }
 
-            const UInt Handle = (mPool.empty() ? k_Invalid : mPool.back());
+            const UInt Handle = mPool.empty() ? k_Invalid : mPool.back();
 
             if (Handle != k_Invalid)
             {

@@ -56,13 +56,13 @@ inline namespace Core
         // -=(Undocumented)=-
         Bool IsClientMode() const
         {
-            return (mMode != Mode::Server);
+            return mMode != Mode::Server;
         }
 
         // -=(Undocumented)=-
         Bool IsServerMode() const
         {
-            return (mMode != Mode::Client);
+            return mMode != Mode::Client;
         }
 
         // -=(Undocumented)=-
@@ -100,9 +100,9 @@ inline namespace Core
         template<typename T>
         void RemoveSubsystem()
         {
-            std::erase_if(mSubsystems, [](ConstSPtr<Subsystem> SubsystemPtr)
+            std::erase_if(mSubsystems, []([[maybe_unused]] ConstSPtr<Subsystem> SubsystemPtr)
             {
-                return (typeid(T) == typeid(* SubsystemPtr));
+                return typeid(T) == typeid(* SubsystemPtr);
             });
         }
 

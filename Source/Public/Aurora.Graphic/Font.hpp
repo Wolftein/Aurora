@@ -127,10 +127,10 @@ namespace Graphic
         void Load(Any<Metrics> Metrics, Any<Atlas> Atlas, Any<Table<UInt32, Glyph>> Glyphs, Any<Table<UInt64, Real32>> Kerning);
 
         // -=(Undocumented)=-
-        Vector2f Measure(CStr16 Text, Real32 Size);
+        Vector2f Measure(CStr16 Text, Real32 Size) const;
 
         // -=(Undocumented)=-
-        Rectf Calculate(CStr16 Text, Real32 Size, Ref<const Vector2f> Position, Alignment Alignment);
+        Rectf Calculate(CStr16 Text, Real32 Size, Ref<const Vector2f> Position, Alignment Alignment) const;
 
         // -=(Undocumented)=-
         Ref<const Metrics> GetMetrics() const
@@ -141,24 +141,22 @@ namespace Graphic
         // -=(Undocumented)=-
         Ptr<const Glyph> GetGlyph(UInt32 Unicode, UInt32 Fallback = '?') const
         {
-            const auto Iterator = mGlyphs.find(Unicode);
-
-            if (Iterator != mGlyphs.end())
+            if (const auto Iterator = mGlyphs.find(Unicode); Iterator != mGlyphs.end())
             {
                 return AddressOf(Iterator->second);
             }
-            return (Fallback != 0 && Unicode != Fallback ? GetGlyph(Fallback) : nullptr);
+            return Fallback != 0 && Unicode != Fallback ? GetGlyph(Fallback, 0) : nullptr;
         }
 
         // -=(Undocumented)=-
         Real32 GetKerning(UInt32 First, UInt32 Second) const
         {
             const auto Iterator = mKerning.find(static_cast<UInt64>(First) << 32 | Second);
-            return (Iterator == mKerning.end() ? 0.0f : Iterator->second);
+            return Iterator == mKerning.end() ? 0.0f : Iterator->second;
         }
 
         // -=(Undocumented)=-
-        ConstSPtr<Graphic::Material> GetMaterial() const
+        ConstSPtr<Material> GetMaterial() const
         {
             return mMaterial;
         }

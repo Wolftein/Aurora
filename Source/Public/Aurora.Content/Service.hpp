@@ -143,9 +143,7 @@ namespace Content
         template<typename Type>
         void Prune(Bool Force)
         {
-            const Vector<SPtr<Type>> Assets = Type::GetFactory().Prune(Force);
-
-            for (ConstSPtr<Type> Asset : Assets)
+            for (const Vector<SPtr<Type>> Assets = Type::GetFactory().Prune(Force); ConstSPtr<Type> Asset : Assets)
             {
                 Process(Asset, false);
             }

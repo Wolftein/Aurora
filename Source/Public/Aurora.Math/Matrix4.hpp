@@ -414,10 +414,10 @@ inline namespace Math
             const Base Z = Vector.GetZ();
             const Base W = Vector.GetW();
 
-            const Base VectorX = (GetComponent(0) * X + GetComponent(4) * Y + GetComponent(8)  * Z + GetComponent(12) * W);
-            const Base VectorY = (GetComponent(1) * X + GetComponent(5) * Y + GetComponent(9)  * Z + GetComponent(13) * W);
-            const Base VectorZ = (GetComponent(2) * X + GetComponent(6) * Y + GetComponent(10) * Z + GetComponent(14) * W);
-            const Base VectorW = (GetComponent(3) * X + GetComponent(7) * Y + GetComponent(11) * Z + GetComponent(15) * W);
+            const Base VectorX = GetComponent(0) * X + GetComponent(4) * Y + GetComponent(8)  * Z + GetComponent(12) * W;
+            const Base VectorY = GetComponent(1) * X + GetComponent(5) * Y + GetComponent(9)  * Z + GetComponent(13) * W;
+            const Base VectorZ = GetComponent(2) * X + GetComponent(6) * Y + GetComponent(10) * Z + GetComponent(14) * W;
+            const Base VectorW = GetComponent(3) * X + GetComponent(7) * Y + GetComponent(11) * Z + GetComponent(15) * W;
 
             return Vector4<Base>(VectorX, VectorY, VectorZ, VectorW);
         }

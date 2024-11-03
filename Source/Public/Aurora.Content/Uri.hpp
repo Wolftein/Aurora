@@ -67,36 +67,36 @@ namespace Content
 		// -=(Undocumented)=-
         CStr GetSchema() const
 		{
-			const SInt32 Offset = mUrl.find("://");
+			const UInt Offset = mUrl.find("://");
 			return (Offset != CStr::npos ? GetUrl().substr(0, Offset) : "");
 		}
 
 		// -=(Undocumented)=-
         CStr GetPath() const
 		{
-			const SInt32 Offset = mUrl.find("://");
+			const UInt Offset = mUrl.find("://");
 			return (Offset != CStr::npos ? GetUrl().substr(Offset + 3, mUrl.length()) : mUrl);
 		}
 
 		// -=(Undocumented)=-
         CStr GetFolder() const
 		{
-			const CStr   Path   = GetPath();
-			const SInt32 Offset = mUrl.find('/');
+			const CStr Path   = GetPath();
+			const UInt Offset = mUrl.find('/');
 			return (Offset != CStr::npos ? Path.substr(0, Offset) : "");
 		}
 
 		// -=(Undocumented)=-
         CStr GetFilename() const
 		{
-			const SInt32 Offset = mUrl.rfind('/');
+			const UInt Offset = mUrl.rfind('/');
 			return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : GetPath());
 		}
 
 		// -=(Undocumented)=-
         CStr GetExtension() const
 		{
-			const SInt32 Offset = mUrl.rfind('.');
+			const UInt Offset = mUrl.rfind('.');
 			return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : "");
 		}
 

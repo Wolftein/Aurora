@@ -43,7 +43,7 @@ namespace Content
     private:
 
         // -=(Undocumented)=-
-        SStr CreatePath(CStr Path);
+		static SStr CreatePath(CStr Path);
 
 	private:
 

@@ -38,7 +38,7 @@ namespace Graphic
 
         mID = Context.GetSubsystem<Graphic::Service>()->CreateMaterial();
 
-        return (mID > 0);
+        return mID > 0;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -57,7 +57,7 @@ namespace Graphic
             }
         }
 
-        Context.GetSubsystem<Graphic::Service>()->DeleteMaterial(mID);
+        Context.GetSubsystem<Service>()->DeleteMaterial(mID);
 
         mID = 0;
     }

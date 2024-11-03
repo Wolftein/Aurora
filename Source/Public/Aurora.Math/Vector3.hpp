@@ -104,7 +104,7 @@ inline namespace Math
         // -=(Undocumented)=-
         Real32 GetAngle(Ref<const Vector3<Base>> Other) const
         {
-            const Real32 Divisor = (GetLength() * Other.GetLength());
+            const Real32 Divisor = GetLength() * Other.GetLength();
 
             if (Divisor != 0)
             {
@@ -327,25 +327,25 @@ inline namespace Math
         // -=(Undocumented)=-
         static Vector3<Base> Min(Ref<const Vector3<Base>> P0, Ref<const Vector3<Base>> P1)
         {
-            const Base X = (P0.GetX() < P1.GetX() ? P0.GetX() : P1.GetX());
-            const Base Y = (P0.GetY() < P1.GetY() ? P0.GetY() : P1.GetY());
-            const Base Z = (P0.GetZ() < P1.GetZ() ? P0.GetZ() : P1.GetZ());
+            const Base X = P0.GetX() < P1.GetX() ? P0.GetX() : P1.GetX();
+            const Base Y = P0.GetY() < P1.GetY() ? P0.GetY() : P1.GetY();
+            const Base Z = P0.GetZ() < P1.GetZ() ? P0.GetZ() : P1.GetZ();
             return Vector3<Base>(X, Y, Z);
         }
 
         // -=(Undocumented)=-
         static Vector3<Base> Max(Ref<const Vector3<Base>> P0, Ref<const Vector3<Base>> P1)
         {
-            const Base X = (P0.GetX() < P1.GetX() ? P1.GetX() : P0.GetX());
-            const Base Y = (P0.GetY() < P1.GetY() ? P1.GetY() : P0.GetY());
-            const Base Z = (P0.GetZ() < P1.GetZ() ? P1.GetZ() : P0.GetZ());
+            const Base X = P0.GetX() < P1.GetX() ? P1.GetX() : P0.GetX();
+            const Base Y = P0.GetY() < P1.GetY() ? P1.GetY() : P0.GetY();
+            const Base Z = P0.GetZ() < P1.GetZ() ? P1.GetZ() : P0.GetZ();
             return Vector3<Base>(X, Y, Z);
         }
 
         // -=(Undocumented)=-
         static Vector3<Base> Lerp(Ref<const Vector3<Base>> Start, Ref<const Vector3<Base>> End, Real32 Percentage)
         {
-            return (Start + (End - Start) * Percentage);
+            return Start + (End - Start) * Percentage;
         }
 
         // -=(Undocumented)=-
@@ -356,7 +356,7 @@ inline namespace Math
 
             const Vector3<Base> Relative = Normalize(End - Start * Dot);
 
-            return (Start * Cosine(Theta)) + (Relative * Sine(Theta));
+            return Start * Cosine(Theta) + (Relative * Sine(Theta));
         }
 
     private:

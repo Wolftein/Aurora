@@ -184,27 +184,16 @@ namespace Input
         case SDLK_F12:
             return Key::F12;
         case SDLK_F13:
-            return Key::Unknown;
         case SDLK_F14:
-            return Key::Unknown;
         case SDLK_F15:
-            return Key::Unknown;
         case SDLK_F16:
-            return Key::Unknown;
         case SDLK_F17:
-            return Key::Unknown;
         case SDLK_F18:
-            return Key::Unknown;
         case SDLK_F19:
-            return Key::Unknown;
         case SDLK_F20:
-            return Key::Unknown;
         case SDLK_F21:
-            return Key::Unknown;
         case SDLK_F22:
-            return Key::Unknown;
         case SDLK_F23:
-            return Key::Unknown;
         case SDLK_F24:
             return Key::Unknown;
         case SDLK_KP_0:
@@ -286,7 +275,7 @@ namespace Input
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Poller::Poller()
-        : mBuffer { 0 }
+        : mBuffer { }
     {
     }
 
@@ -308,7 +297,7 @@ namespace Input
         for (Ref<const SDL_Event> Event : CPtr<const SDL_Event>(Stack.data(), Count))
         {
             Ref<Input::Event> Result = mBuffer[Element++];
-            Result.Time = Event.common.timestamp / SDL_NS_PER_SECOND;
+            Result.Time = static_cast<Real64>(Event.common.timestamp) / SDL_NS_PER_SECOND;
 
             switch (Event.type)
             {
@@ -342,8 +331,8 @@ namespace Input
                 break;
             case SDL_EVENT_MOUSE_MOTION:
                 Result.Type                = Event::Type::MouseMove;
-                Result.MouseAxis.X         = Event.motion.x;
-                Result.MouseAxis.Y         = Event.motion.y;
+                Result.MouseAxis.X         = static_cast<SInt32>(Event.motion.x);
+                Result.MouseAxis.Y         = static_cast<SInt32>(Event.motion.y);
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 Result.Type                = Event::Type::MouseDown;
@@ -355,8 +344,8 @@ namespace Input
                 break;
             case SDL_EVENT_MOUSE_WHEEL:
                 Result.Type                = Event::Type::MouseScroll;
-                Result.MouseAxis.X         = Event.wheel.x;
-                Result.MouseAxis.Y         = Event.wheel.y;
+                Result.MouseAxis.X         = static_cast<SInt32>(Event.wheel.x);
+                Result.MouseAxis.Y         = static_cast<SInt32>(Event.wheel.y);
                 break;
             default:
                 Result.Type                = Event::Type::Unknown;

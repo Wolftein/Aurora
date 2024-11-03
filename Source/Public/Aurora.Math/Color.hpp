@@ -38,7 +38,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Color(UInt32 Color)
+        explicit constexpr Color(UInt32 Color)
             : mValue { Color }
         {
         }
@@ -52,25 +52,25 @@ inline namespace Math
         // -=(Undocumented)=-
         constexpr UInt32 GetRed() const
         {
-            return ((mValue >> 24) & 0xFF);
+            return mValue >> 24 & 0xFF;
         }
 
         // -=(Undocumented)=-
         void SetGreen(UInt32 Value)
         {
-            mValue = (mValue & ~(0xFF << 16)) | ((Value & 0xFF) << 16);
+            mValue = mValue & ~(0xFF << 16) | (Value & 0xFF) << 16;
         }
 
         // -=(Undocumented)=-
         constexpr UInt32 GetGreen() const
         {
-            return ((mValue >> 16) & 0xFF);
+            return mValue >> 16 & 0xFF;
         }
 
         // -=(Undocumented)=-
         void SetBlue(UInt32 Value)
         {
-            mValue = (mValue & ~(0xFF << 8)) | ((Value & 0xFF) << 8);
+            mValue = mValue & ~(0xFF << 8) | (Value & 0xFF) << 8;
         }
 
         // -=(Undocumented)=-
@@ -82,13 +82,13 @@ inline namespace Math
         // -=(Undocumented)=-
         void SetAlpha(UInt32 Value)
         {
-            mValue = (mValue & ~0xFF) | (Value & 0xFF);
+            mValue = mValue & ~0xFF | Value & 0xFF;
         }
 
         // -=(Undocumented)=-
         constexpr UInt32 GetAlpha() const
         {
-            return (mValue & 0xFF);
+            return mValue & 0xFF;
         }
 
         // -=(Undocumented)=-

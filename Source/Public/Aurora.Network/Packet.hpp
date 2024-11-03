@@ -27,7 +27,7 @@ namespace Network
     public:
 
         // -=(Undocumented)=-
-        constexpr static inline UInt32 k_ID = ID;
+        constexpr static UInt32 k_ID = ID;
 
     public:
 

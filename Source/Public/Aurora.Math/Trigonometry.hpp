@@ -167,6 +167,6 @@ inline namespace Math
     template<typename Type>
     Type Lerp(Type Start, Type End, Real32 Percentage)
     {
-        return (Start + Percentage * (End - Start));
+        return Start + Percentage * (End - Start);
     }
 }

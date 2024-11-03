@@ -29,7 +29,8 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Properties::Properties()
-        : mWindowTitle      { DEFAULT_TITLE  },
+        : mWindowHandle     { 0 },
+          mWindowTitle      { DEFAULT_TITLE  },
           mWindowWidth      { DEFAULT_WIDTH  },
           mWindowHeight     { DEFAULT_HEIGHT },
           mWindowFullscreen { false },

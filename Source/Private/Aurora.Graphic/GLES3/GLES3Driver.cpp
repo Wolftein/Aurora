@@ -73,7 +73,7 @@ namespace Graphic
     {
         constexpr static UInt k_Mapping[] = {
             GL_NONE,                            // Cull::None
-            GL_BACK,                            // Cull::None
+            GL_BACK,                            // Cull::Back
             GL_FRONT,                           // Cull::Front
         };
         return k_Mapping[CastEnum(Value)];

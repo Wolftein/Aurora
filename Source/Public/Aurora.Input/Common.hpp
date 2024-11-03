@@ -188,8 +188,8 @@ namespace Input
 
             struct
             {
-                Real32 X;
-                Real32 Y;
+                SInt32 X;
+                SInt32 Y;
             } MouseAxis;
 
             struct

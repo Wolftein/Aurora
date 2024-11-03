@@ -97,7 +97,7 @@ namespace Input
         // -=(Undocumented)=-
         void Detach(ConstSPtr<Listener> Listener)
         {
-            mDispatcher.erase(std::remove(mDispatcher.begin(), mDispatcher.end(), Listener));
+            mDispatcher.erase(std::ranges::remove(mDispatcher, Listener).begin());
         }
 
         // TODO: Action, Binding and Setting serialization

@@ -59,20 +59,20 @@ namespace Audio
     struct Adapter
     {
         // -=(Undocumented)=-
-        SStr   Name;
+        SStr Name;
 
         // -=(Undocumented)=-
-        Bool   Default;
+        Bool Default;
     };
 
     // -=(Undocumented)=-
     struct Capabilities
     {
         // -=(Undocumented)=-
-        Backend Backend  = Backend::None;
+        Backend         Backend  = Backend::None;
 
         // -=(Undocumented)=-
-        SStr    Device;
+        SStr            Device;
 
         // -=(Undocumented)=-
         Vector<Adapter> Adapters;

@@ -83,4 +83,32 @@ namespace Log
     {
         spdlog::shutdown();
     }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void SetLevel(Level Level)
+    {
+        switch (Level)
+        {
+        case Level::None:
+            spdlog::set_level(spdlog::level::off);
+            break;
+        case Level::Debug:
+            spdlog::set_level(spdlog::level::debug);
+            break;
+        case Level::Information:
+            spdlog::set_level(spdlog::level::info);
+            break;
+        case Level::Warning:
+            spdlog::set_level(spdlog::level::warn);
+            break;
+        case Level::Error:
+            spdlog::set_level(spdlog::level::err);
+            break;
+        case Level::Critical:
+            spdlog::set_level(spdlog::level::critical);
+            break;
+        }
+    }
 }

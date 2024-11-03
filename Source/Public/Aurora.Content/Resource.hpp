@@ -152,7 +152,7 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
-        AbstractResource(Any<Uri> Key)
+        explicit AbstractResource(Any<Uri> Key)
             : Resource(Move(Key))
         {
         }
@@ -182,7 +182,7 @@ namespace Content
     public:
 
         // -=(Undocumented)=-
-        static inline Ref<Factory<Impl>> GetFactory()
+        static Ref<Factory<Impl>> GetFactory()
         {
             static Factory<Impl> RTTI_FACTORY;
             return RTTI_FACTORY;

@@ -51,14 +51,14 @@ namespace Graphic
 
         SetMemory(Memory);
 
-        mID = Context.GetSubsystem<Graphic::Service>()->CreatePipeline(mStages[0], mStages[1], mStages[2], mProperties);
+        mID = Context.GetSubsystem<Service>()->CreatePipeline(mStages[0], mStages[1], mStages[2], mProperties);
 
         for (Ref<Data> Stage : mStages)
         {
             Stage.Clear();
         }
 
-        return (mID > 0);
+        return mID > 0;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -66,7 +66,7 @@ namespace Graphic
 
     void Pipeline::OnDelete(Ref<Subsystem::Context> Context)
     {
-        Context.GetSubsystem<Graphic::Service>()->DeletePipeline(mID);
+        Context.GetSubsystem<Service>()->DeletePipeline(mID);
 
         mID = 0;
     }

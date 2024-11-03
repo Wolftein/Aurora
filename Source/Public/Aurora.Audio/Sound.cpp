@@ -22,7 +22,12 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Sound::Sound(Any<Content::Uri> Key)
-        : AbstractResource(Move(Key))
+        : AbstractResource(Move(Key)),
+          mKind      { Kind::PCM },
+          mDuration  { 0 },
+          mDepth     { 0 },
+          mChannel   { 0 },
+          mFrequency { 0 }
     {
     }
 
