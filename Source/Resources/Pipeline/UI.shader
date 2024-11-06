@@ -28,7 +28,7 @@ struct PixelShaderInput
 
 // VS Main
 
-PixelShaderInput vertex(float3 Position : ATTRIBUTE0, float4 Color : ATTRIBUTE1, float2 UV : ATTRIBUTE2)
+PixelShaderInput vertex(float3 Position : POSITION, float4 Color : COLOR, float2 UV : TEXCOORD0)
 {
     PixelShaderInput Result;
 

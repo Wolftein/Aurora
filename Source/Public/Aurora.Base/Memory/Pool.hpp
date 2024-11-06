@@ -12,35 +12,56 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Graphic/Material.hpp"
+#include "Handle.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Graphic
+inline namespace Core
 {
     // -=(Undocumented)=-
-    class Model final : public Content::AbstractResource<Model>
+    template<typename Type, UInt Count>
+    class Pool final
     {
-        friend class AbstractResource;
-
     public:
 
         // -=(Undocumented)=-
-        Model(Any<Content::Uri> Key);
+        Bool IsFull() const
+        {
+            return mAllocator.IsFull();
+        }
 
-    private:
+        // -=(Undocumented)=-
+        void Clear()
+        {
+            mAllocator.Clear();
+        }
 
-        // \see Resource::OnCreate(Ref<Subsystem::Context>)
-        Bool OnCreate(Ref<Subsystem::Context> Context) override;
+        // -=(Undocumented)=-
+        UInt Allocate()
+        {
+            return mAllocator.Allocate();
+        }
 
-        // \see Resource::OnDelete(Ref<Subsystem::Context>)
-        void OnDelete(Ref<Subsystem::Context> Context) override;
+        // -=(Undocumented)=-
+        UInt Free(UInt Handle)
+        {
+            return mAllocator.Free(Handle);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Type> operator[](UInt Handle)
+        {
+            return mPool[Handle];
+        }
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Handle<Count>      mAllocator;
+        Array<Type, Count> mPool;
     };
 }

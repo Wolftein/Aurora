@@ -73,15 +73,15 @@ namespace Audio
 
     static auto GetAzimuth(UInt32 Channels)
     {
-        constexpr static Real32 K_Left         = 3 * Math::kMathPI / 2;
-        constexpr static Real32 k_Right        = Math::kMathPI / 2;
-        constexpr static Real32 k_FrontLeft    = 7 * Math::kMathPI / 4;
-        constexpr static Real32 k_FrontRight   = Math::kMathPI / 4;
+        constexpr static Real32 K_Left         = 3 * kMathPI / 2;
+        constexpr static Real32 k_Right        = kMathPI / 2;
+        constexpr static Real32 k_FrontLeft    = 7 * kMathPI / 4;
+        constexpr static Real32 k_FrontRight   = kMathPI / 4;
         constexpr static Real32 k_FrontCenter  = 0.0f;
-        constexpr static Real32 k_LowFrequency = Math::kMathPI;
-        constexpr static Real32 k_BackLeft     = 5 * Math::kMathPI / 4;
-        constexpr static Real32 k_BackRight    = 3 * Math::kMathPI / 4;
-        constexpr static Real32 k_BackCenter   = Math::kMathPI;
+        constexpr static Real32 k_LowFrequency = kMathPI;
+        constexpr static Real32 k_BackLeft     = 5 * kMathPI / 4;
+        constexpr static Real32 k_BackRight    = 3 * kMathPI / 4;
+        constexpr static Real32 k_BackCenter   = kMathPI;
 
         constexpr static Real32 k_Mapping[9][8] =
             {
@@ -103,7 +103,7 @@ namespace Audio
 
     static auto GetKey(ConstSPtr<Sound> Sound)
     {
-        const UInt Key = (Sound->GetChannel() << 16) | (Sound->GetDepth() << 8) | CastEnum(Sound->GetKind());
+        const UInt Key = Sound->GetChannel() << 16 | Sound->GetDepth() << 8 | CastEnum(Sound->GetKind());
         return Key;
     }
 
@@ -218,7 +218,7 @@ namespace Audio
 
         for (auto Iterator = mMixes.begin(); Iterator != mMixes.end(); )
         {
-            Ptr<FAudioInstance> InstancePtr = (* Iterator);
+            const Ptr<FAudioInstance> InstancePtr = * Iterator;
 
             FAudioVoiceState State;
             FAudioSourceVoice_GetState(InstancePtr->Source, & State, FAUDIO_VOICE_NOSAMPLESPLAYED);
@@ -227,7 +227,7 @@ namespace Audio
             {
                 mVoices.push_back(FAudioChannel { GetKey(InstancePtr->Sound), InstancePtr->Source });
 
-                mPool.Free(InstancePtr->ID);
+                mInstances.Free(InstancePtr->ID);
 
                 Iterator = mMixes.erase(Iterator);
             }
@@ -314,28 +314,28 @@ namespace Audio
 
     Object FAudioDriver::Play(UInt8 Submix, ConstSPtr<Sound> Sound, ConstSPtr<Emitter> Emitter, Bool Repeat)
     {
-        const Object ID = mPool.Allocate();
+        const Object ID = mInstances.Allocate();
 
         if (ID > 0)
         {
             // Create a \see FAudioSourceVoice from a pool of reusable object(s).
-            FAudioSendDescriptor SendDescriptor[]
+            FAudioSendDescriptor   SendDescriptor[]
             {
                 { FAUDIO_SEND_USEFILTER, mSubmixes[Submix] },
             };
-            FAudioVoiceSends     SendList
+            const FAudioVoiceSends SendList
             {
                 1, SendDescriptor
             };
 
-            Ptr<FAudioSourceVoice> Source = GetOrCreateVoice(Sound);
-            FAudioVoice_SetOutputVoices(Source, & SendList);
+            const Ptr<FAudioSourceVoice> Source = GetOrCreateVoice(Sound);
+            FAudioVoice_SetOutputVoices(Source, AddressOf(SendList));
             FAudioVoice_SetVolume(Source, 1.0f, FAUDIO_COMMIT_NOW);
             FAudioSourceVoice_SetFrequencyRatio(Source, 1.0f, FAUDIO_COMMIT_NOW);
             FAudioSourceVoice_SetSourceSampleRate(Source, Sound->GetFrequency());
 
             // Create a \see FAudioInstance from a pool of reusable object(s).
-            Ref<FAudioInstance> Instance = mPool[ID];
+            Ref<FAudioInstance> Instance = mInstances[ID];
             Instance.ID      = ID;
             Instance.Finish  = false;
             Instance.Loop    = Repeat;
@@ -349,7 +349,7 @@ namespace Audio
 
             for (UInt Stream = 0; Stream < k_MaxBuffers && !Instance.Finish; ++Stream)
             {
-                FAudioDriver::Write(Instance);
+                Write(Instance);
             }
 
             mMixes.push_back(& Instance);
@@ -362,9 +362,7 @@ namespace Audio
 
     void FAudioDriver::SetGain(Object Instance, Real32 Gain)
     {
-        const Ptr<FAudioInstance> InstancePtr = Find(Instance);
-
-        if (InstancePtr)
+        if (const Ptr<FAudioInstance> InstancePtr = Find(Instance))
         {
             FAudioVoice_SetVolume(InstancePtr->Source, Gain, FAUDIO_COMMIT_NOW);
         }
@@ -375,9 +373,7 @@ namespace Audio
 
     void FAudioDriver::Start(Object Instance)
     {
-        const Ptr<FAudioInstance> InstancePtr = Find(Instance);
-
-        if (InstancePtr)
+        if (const Ptr<FAudioInstance> InstancePtr = Find(Instance))
         {
             FAudioSourceVoice_Start(InstancePtr->Source, 0, FAUDIO_COMMIT_NOW);
         }
@@ -388,9 +384,7 @@ namespace Audio
 
     void FAudioDriver::Pause(Object Instance)
     {
-        const Ptr<FAudioInstance> InstancePtr = Find(Instance);
-
-        if (InstancePtr)
+        if (const Ptr<FAudioInstance> InstancePtr = Find(Instance))
         {
             FAudioSourceVoice_Stop(InstancePtr->Source, 0, FAUDIO_COMMIT_NOW);
         }
@@ -401,9 +395,7 @@ namespace Audio
 
     void FAudioDriver::Stop(Object Instance, Bool Immediately)
     {
-        const Ptr<FAudioInstance> InstancePtr = Find(Instance);
-
-        if (InstancePtr)
+        if (const Ptr<FAudioInstance> InstancePtr = Find(Instance))
         {
             InstancePtr->Finish = true;
 
@@ -422,7 +414,7 @@ namespace Audio
 
     void FAudioDriver::Stop(ConstSPtr<Emitter> Emitter, Bool Immediately)
     {
-        for (Ptr<FAudioInstance> InstancePtr : mMixes)
+        for (const Ptr<FAudioInstance> InstancePtr : mMixes)
         {
             if (InstancePtr->Emitter == Emitter)
             {
@@ -451,7 +443,7 @@ namespace Audio
 
         Ptr<FAudioSourceVoice> Voice = nullptr;
 
-        if (const auto Iterator = std::find_if(mVoices.begin(), mVoices.end(), FindByKey); Iterator != mVoices.end())
+        if (const auto Iterator = std::ranges::find_if(mVoices, FindByKey); Iterator != mVoices.end())
         {
             Voice = Iterator->Voice;
 
@@ -459,8 +451,7 @@ namespace Audio
         }
         else
         {
-            FAudioWaveFormatEx Description { 0 };
-
+            FAudioWaveFormatEx Description { };
             Description.wFormatTag      = GetFormat(Sound->GetKind());
             Description.wBitsPerSample  = Sound->GetDepth();
             Description.nChannels       = Sound->GetChannel();
@@ -473,7 +464,7 @@ namespace Audio
             {
                 [](Ptr<FAudioVoiceCallback>, Ptr<void> Context)
                 {
-                    FAudioDriver::Write(* static_cast<Ptr<FAudioInstance>>(Context));
+                    Write(* static_cast<Ptr<FAudioInstance>>(Context));
                 },
                 [](Ptr<FAudioVoiceCallback>, Ptr<void>) {},
                 [](Ptr<FAudioVoiceCallback>, Ptr<void>) {},
@@ -509,12 +500,12 @@ namespace Audio
         Instance.Finish = (Instance.Sound)->Read(Frame) && !Instance.Loop;
 
         // Submit the frame into the \see FAudioSourceVoice
-        FAudioBuffer Buffer { 0 };
+        FAudioBuffer Buffer { };
         Buffer.pAudioData = Frame.data();
         Buffer.AudioBytes = Frame.size_bytes();
-        Buffer.Flags      = (Instance.Finish) ? FAUDIO_END_OF_STREAM : 0;
-        Buffer.pContext   = & Instance;
-        Buffer.LoopCount  = (Instance.Finish && Instance.Loop) ? FAUDIO_LOOP_INFINITE : 0;
+        Buffer.Flags      = Instance.Finish ? FAUDIO_END_OF_STREAM : 0;
+        Buffer.pContext   = AddressOf(Instance);
+        Buffer.LoopCount  = Instance.Finish && Instance.Loop ? FAUDIO_LOOP_INFINITE : 0;
         FAudioSourceVoice_SubmitSourceBuffer(Instance.Source, & Buffer, nullptr);
     }
 
@@ -523,12 +514,12 @@ namespace Audio
 
     void FAudioDriver::Process(Ref<FAudioInstance> Instance, Ref<F3DAUDIO_LISTENER> Listener)
     {
-        UInt Flags = F3DAUDIO_CALCULATE_MATRIX | F3DAUDIO_CALCULATE_DOPPLER | F3DAUDIO_CALCULATE_LPF_DIRECT;
+        constexpr UInt Flags = F3DAUDIO_CALCULATE_MATRIX | F3DAUDIO_CALCULATE_DOPPLER | F3DAUDIO_CALCULATE_LPF_DIRECT;
 
         FAudioVoiceDetails Details;
         FAudioVoice_GetVoiceDetails(mMaster, & Details);
 
-        F3DAUDIO_EMITTER Emitter { 0 };
+        F3DAUDIO_EMITTER Emitter { };
         Emitter.Position            = GetVector(Instance.Emitter->GetPosition());
         Emitter.Velocity            = GetVector(Instance.Emitter->GetVelocity());
         Emitter.OrientFront         = GetVector(Instance.Emitter->GetOrientation().GetForward());
@@ -538,16 +529,16 @@ namespace Audio
         Emitter.DopplerScaler       = 1.0f;
         Emitter.CurveDistanceScaler = 1.0f;
         Emitter.InnerRadius         = Instance.Emitter->GetRadius();
-        Emitter.InnerRadiusAngle    = Math::kMathPI / 4.0;
+        Emitter.InnerRadiusAngle    = kMathPI / 4.0;
         Emitter.pChannelAzimuths    = GetAzimuth(Emitter.ChannelCount);
 
-        F3DAUDIO_DSP_SETTINGS Settings { 0 };
-        Real32 Matrix[FAUDIO_MAX_AUDIO_CHANNELS * 8] = { 0 };
+        F3DAUDIO_DSP_SETTINGS Settings { };
+        Real32 Matrix[FAUDIO_MAX_AUDIO_CHANNELS * 8] = { };
         Settings.SrcChannelCount = Emitter.ChannelCount;
         Settings.DstChannelCount = Details.InputChannels;
         Settings.pMatrixCoefficients = Matrix;
 
-        F3DAudioCalculate(mProcessor, & Listener, & Emitter, Flags, & Settings);
+        F3DAudioCalculate(mProcessor, & Listener, AddressOf(Emitter), Flags, & Settings);
 
         FAudioSourceVoice_SetFrequencyRatio(Instance.Source, Settings.DopplerFactor, FAUDIO_COMMIT_NOW);
         FAudioVoice_SetOutputMatrix(
@@ -577,7 +568,7 @@ namespace Audio
 
             Ref<Adapter> Adapter = mCapabilities.Adapters.emplace_back();
             Adapter.Name    = As(reinterpret_cast<Ptr<wchar_t>>(Details.DisplayName));
-            Adapter.Default = (Details.Role & FAudioDeviceRole::FAudioDefaultGameDevice);
+            Adapter.Default = Details.Role & FAudioDefaultGameDevice;
 
             if (Adapter.Name == Device)
             {

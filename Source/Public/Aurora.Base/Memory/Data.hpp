@@ -157,7 +157,7 @@ inline namespace Core
         template<typename Type>
         operator CPtr<Type>() const
         {
-            return CPtr<Type>(static_cast<Ptr<Type>>(mData), mSize / sizeof(Type));
+            return GetSpan<Type>();
         }
 
     private:

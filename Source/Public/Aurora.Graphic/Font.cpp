@@ -135,24 +135,22 @@ namespace Graphic
 
     Bool Font::OnCreate(Ref<Subsystem::Context> Context)
     {
+        SetMemory(mGlyphs.size() * sizeof(Glyph));
+
         // Allocates texture for the atlas
         const SPtr<Texture> Atlas = NewPtr<Texture>("_Private");
         Atlas->Load(
             TextureFormat::RGBA8UIntNorm,
             TextureLayout::Source, mAtlas.Width, mAtlas.Height, 1, Move(mAtlas.Bytes));
-        Bool Success = Atlas->Create(Context);
 
         // Allocates material for the font
-        mMaterial = NewPtr<Graphic::Material>("_Private");
+        mMaterial = NewPtr<Material>("_Private");
         mMaterial->SetResidence(true);
         mMaterial->SetTexture(0, Atlas);
         mMaterial->SetSampler(0, Sampler { TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear });
         mMaterial->SetParameter(0, Vector3f(Atlas->GetWidth(), Atlas->GetHeight(), mMetrics.Distance));
 
-        Success = Success && mMaterial->Create(Context);
-
-        SetMemory(mGlyphs.size() * sizeof(Glyph));
-        return Success;
+        return mMaterial->Create(Context);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

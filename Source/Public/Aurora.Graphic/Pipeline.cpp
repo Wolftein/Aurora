@@ -51,12 +51,8 @@ namespace Graphic
 
         SetMemory(Memory);
 
-        mID = Context.GetSubsystem<Service>()->CreatePipeline(mStages[0], mStages[1], mStages[2], mProperties);
-
-        for (Ref<Data> Stage : mStages)
-        {
-            Stage.Clear();
-        }
+        mID = Context.GetSubsystem<Service>()->CreatePipeline(
+            Move(mStages[0]), Move(mStages[1]), Move(mStages[2]), mProperties);
 
         return mID > 0;
     }

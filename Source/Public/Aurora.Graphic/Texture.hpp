@@ -32,7 +32,7 @@ namespace Graphic
         explicit Texture(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Layer, Any<Data> Data);
+        void Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, Any<Data> Data);
 
         // -=(Undocumented)=-
         Object GetID() const
@@ -53,21 +53,21 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        UInt GetWidth() const
+        UInt16 GetWidth() const
         {
             return mWidth;
         }
 
         // -=(Undocumented)=-
-        UInt GetHeight() const
+        UInt16 GetHeight() const
         {
             return mHeight;
         }
 
         // -=(Undocumented)=-
-        UInt GetLayer() const
+        UInt8 GetLevel() const
         {
-            return mLayer;
+            return mLevel;
         }
 
     private:
@@ -88,7 +88,7 @@ namespace Graphic
         TextureLayout mLayout;
         UInt16        mWidth;
         UInt16        mHeight;
-        UInt8         mLayer;
+        UInt8         mLevel;
         Data          mData;
     };
 }

@@ -10,8 +10,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Texture.hpp"
-#include "Service.hpp"
+#include "Model.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,49 +21,56 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Texture::Texture(Any<Content::Uri> Key)
-        : AbstractResource(Move(Key)),
-          mID     { 0 },
-          mFormat { TextureFormat::RGBA8UInt },
-          mLayout { TextureLayout::Dual },
-          mWidth  { 0 },
-          mHeight { 0 },
-          mLevel  { 0 }
+    Model::Model(Any<Content::Uri> Key)
+        : AbstractResource(Move(Key))
     {
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Texture::Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, Any<Data> Data)
+    void Model::Load(ConstSPtr<Mesh> Mesh, Any<Array<SPtr<Material>, Mesh::k_MaxPrimitives>> Materials)
     {
-        mFormat = Format;
-        mLayout = Layout;
-        mWidth  = Width;
-        mHeight = Height;
-        mLevel  = Level;
-        mData   = Move(Data);
+        mMesh      = Mesh;
+        mMaterials = Move(Materials);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Texture::OnCreate(Ref<Subsystem::Context> Context)
+    Bool Model::OnCreate(Ref<Subsystem::Context> Context)
     {
-        SetMemory(mData.GetSize());
+        // Create mesh
+        mMesh->Create(Context);
 
-        mID = Context.GetSubsystem<Service>()->CreateTexture(mFormat, mLayout, mWidth, mHeight, mLevel, Move(mData));
+        // Create each material
+        for (ConstSPtr<Material> Material : mMaterials)
+        {
+            if (Material)
+            {
+                Material->Create(Context);
+            }
+        }
 
-        return mID > 0;
+        SetMemory(mMesh->GetMemory());
+        return true;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Texture::OnDelete(Ref<Subsystem::Context> Context)
+    void Model::OnDelete(Ref<Subsystem::Context> Context)
     {
-        Context.GetSubsystem<Service>()->DeleteTexture(mID);
+        // Delete mesh
+        mMesh->Delete(Context);
 
-        mID = 0;
+        // Delete each material
+        for (ConstSPtr<Material> Material : mMaterials)
+        {
+            if (Material)
+            {
+                Material->Delete(Context);
+            }
+        }
     }
 }

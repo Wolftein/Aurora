@@ -36,7 +36,18 @@ namespace Graphic
     {
         SetMemory(mParameters.size() * sizeof(Vector4f));
 
-        mID = Context.GetSubsystem<Graphic::Service>()->CreateMaterial();
+        mID = Context.GetSubsystem<Service>()->CreateMaterial();
+
+        if (mResidence)
+        {
+            for (ConstSPtr<Texture> Texture : mTextures)
+            {
+                if (Texture)
+                {
+                    Texture->Create(Context);
+                }
+            }
+        }
 
         return mID > 0;
     }

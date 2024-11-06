@@ -23,6 +23,7 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
+    // TODO: Need Rework
     class Encoder final
     {
     public:

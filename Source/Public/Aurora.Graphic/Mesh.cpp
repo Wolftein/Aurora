@@ -10,7 +10,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Model.hpp"
+#include "Mesh.hpp"
+#include "Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,7 +22,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Model::Model(Any<Content::Uri> Key)
+    Mesh::Mesh(Any<Content::Uri> Key)
         : AbstractResource(Move(Key))
     {
     }
@@ -29,15 +30,36 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Model::OnCreate(Ref<Subsystem::Context> Context)
+    void Mesh::Load(Any<Data> Vertices, Any<Data> Indices)
     {
+        mData[0] = Move(Vertices);
+        mData[1] = Move(Indices);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool Mesh::OnCreate(Ref<Subsystem::Context> Context)
+    {
+        SetMemory(mData[0].GetSize() + mData[1].GetSize());
+
+        const SPtr<Service> Graphics = Context.GetSubsystem<Service>();
+        mBuffers[0] = Graphics->CreateBuffer(Usage::Vertex, mData[0].GetSize(), Move(mData[0]));
+        mBuffers[1] = Graphics->CreateBuffer(Usage::Index, mData[1].GetSize(), Move(mData[1]));
+
         return true;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Model::OnDelete(Ref<Subsystem::Context> Context)
+    void Mesh::OnDelete(Ref<Subsystem::Context> Context)
     {
+        const SPtr<Service> Graphics = Context.GetSubsystem<Service>();
+
+        for (const Object Buffer : mBuffers)
+        {
+            Graphics->DeleteBuffer(Buffer);
+        }
     }
 }

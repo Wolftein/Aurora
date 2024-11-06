@@ -12,101 +12,54 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Handle.hpp"
+#include "Material.hpp"
+#include "Mesh.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Core
+namespace Graphic
 {
     // -=(Undocumented)=-
-    template<typename Type, UInt Count>
-    class Stack final
+    class Model final : public Content::AbstractResource<Model>
     {
+        friend class AbstractResource;
+
     public:
 
         // -=(Undocumented)=-
-      	Stack()
-          	: mSize { 0 }
-     	{
-        }
+        Model(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
-        Bool IsEmpty() const
+        void Load(ConstSPtr<Mesh> Mesh, Any<Array<SPtr<Material>, Mesh::k_MaxPrimitives>> Materials);
+
+        // -=(Undocumented)=-
+        ConstSPtr<Mesh> GetMesh() const
         {
-            return mSize == 0;
+            return mMesh;
         }
 
         // -=(Undocumented)=-
-        Bool IsFull() const
+        ConstSPtr<Material> GetMaterial(UInt32 Slot) const
         {
-            return mSize == Count;
+            return mMaterials[Slot];
         }
-
-        // -=(Undocumented)=-
-        auto GetData()
-      	{
-      	    return CPtr<Type>(mPool.data(), mSize);   
-      	}
-        
-        // -=(Undocumented)=-
-        auto GetData() const
-      	{
-      	    return CPtr<const Type>(mPool.data(), mSize);   
-      	}
-
-    	// -=(Undocumented)=-
-    	auto GetSize() const
-      	{
-      		return mSize;
-      	}
-
-        // -=(Undocumented)=-
-        void Clear(Bool Dispose)
-        {
-      		if (Dispose)
-      		{
-      			Destroy();
-      		}
-            mSize = 0;
-        }
-
-        // -=(Undocumented)=-
-        Ptr<Type> Allocate()
-        {
-      	    return IsFull() ? nullptr : AddressOf(mPool[mSize++]);
-        }
-
-        // -=(Undocumented)=-
-        Ref<Type> operator[](UInt Handle)
-        {
-            return mPool[Handle];
-        }
-
-    	// -=(Undocumented)=-
-    	Ref<const Type> operator[](UInt Handle) const
-    	{
-    		return mPool[Handle];
-    	}
 
     private:
 
-    	// -=(Undocumented)=-
-    	void Destroy()
-    	{
-    		for (Ref<Type> Object : GetData())
-    		{
-    			Object.~Type();
-    		}
-    	}
+        // \see Resource::OnCreate(Ref<Subsystem::Context>)
+        Bool OnCreate(Ref<Subsystem::Context> Context) override;
+
+        // \see Resource::OnDelete(Ref<Subsystem::Context>)
+        void OnDelete(Ref<Subsystem::Context> Context) override;
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Array<Type, Count> mPool;
-        UInt32			   mSize;
+        SPtr<Mesh>                                   mMesh;
+        Array<SPtr<Material>, Mesh::k_MaxPrimitives> mMaterials;
     };
 }

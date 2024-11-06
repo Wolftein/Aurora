@@ -12,7 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Texture.hpp"
+#include "Common.hpp"
+#include "Aurora.Content/Resource.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,72 +22,85 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    class Material final : public Content::AbstractResource<Material>
+    class Mesh final : public Content::AbstractResource<Mesh>
     {
         friend class AbstractResource;
 
     public:
 
         // -=(Undocumented)=-
-        static constexpr UInt k_Alignment = 16;
+        static constexpr UInt k_MaxBuffers    = 2;
+
+        // -=(Undocumented)=-
+        static constexpr UInt k_MaxPrimitives = 16;
+
+        // -=(Undocumented)=-
+        struct Attribute
+        {
+            // -=(Undocumented)=-
+            UInt32 Length = 0;
+
+            // -=(Undocumented)=-
+            UInt32 Offset = 0;
+
+            // -=(Undocumented)=-
+            UInt32 Stride = 0;
+        };
+
+        // -=(Undocumented)=-
+        struct Primitive
+        {
+            // -=(Undocumented)=-
+            SInt8                             Material = -1;
+
+            // -=(Undocumented)=-
+            Attribute                         Indices;
+
+            // -=(Undocumented)=-
+            Array<Attribute, k_MaxAttributes> Attributes;
+
+            // -=(Undocumented)=-
+            Ref<const Attribute> GetAttribute(VertexSemantic Semantic) const
+            {
+                return Attributes[CastEnum(Semantic)];
+            }
+        };
 
     public:
 
         // -=(Undocumented)=-
-        explicit Material(Any<Content::Uri> Key);
+        explicit Mesh(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
-        Object GetID() const
+        void Load(Any<Data> Vertices, Any<Data> Indices);
+
+        // -=(Undocumented)=-
+        Object GetBuffer(Usage Usage) const
         {
-            return mID;
+            return mBuffers[CastEnum(Usage)];
         }
 
         // -=(Undocumented)=-
-        void SetResidence(Bool Residence)
+        Bool AddPrimitive(Any<Primitive> Data)
         {
-            mResidence = Residence;
-        }
-
-        // -=(Undocumented)=-
-        void SetTexture(UInt Slot, ConstSPtr<Texture> Texture)
-        {
-            mTextures[Slot] = Texture;
-        }
-
-        // -=(Undocumented)=-
-        ConstSPtr<Texture> GetTexture(UInt Slot) const
-        {
-            return mTextures[Slot];
-        }
-
-        // -=(Undocumented)=-
-        void SetSampler(UInt Slot, Ref<const Sampler> Sampler)
-        {
-            mSamplers[Slot] = Sampler;
-        }
-
-        // -=(Undocumented)=-
-        Ref<const Sampler> GetSampler(UInt Slot) const
-        {
-            return mSamplers[Slot];
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type>
-        void SetParameter(UInt Offset, Type Parameter)
-        {
-            if (constexpr UInt Size = sizeof(Type) / sizeof(Vector4f) + 1; Offset + Size > mParameters.size())
+            if (const Ptr<Primitive> Allocation = mPrimitives.Allocate())
             {
-                mParameters.resize(mParameters.size() + Align(Size, k_Alignment));
+                * Allocation = Move(Data);
+                return true;
             }
-
-            * reinterpret_cast<Ptr<Type>>(reinterpret_cast<UInt>(mParameters.data() + Offset)) = Parameter;
+            return false;
         }
 
         // -=(Undocumented)=-
-        CPtr<const Vector4f> GetParameters() const
+        Ref<const Primitive> GetPrimitive(UInt8 Primitive) const
         {
-            return mParameters;
+            return mPrimitives[Primitive];
+        }
+
+        // -=(Undocumented)=-
+        CPtr<const Primitive> GetPrimitives() const
+        {
+            return mPrimitives.GetData();
         }
 
     private:
@@ -102,10 +116,8 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Object                             mID;
-        Bool                               mResidence;
-        Array<SPtr<Texture>, k_MaxSources> mTextures;   // TODO: Stack
-        Array<Sampler, k_MaxSources>       mSamplers;   // TODO: Stack
-        Vector<Vector4f>                   mParameters; // TODO: Replace with pre allocated chunked memory
+        Array<Data, k_MaxBuffers>         mData;
+        Array<Object, k_MaxBuffers>       mBuffers;
+        Stack<Primitive, k_MaxPrimitives> mPrimitives;
     };
 }

@@ -213,7 +213,7 @@ namespace Graphic
 
     void Encoder::CreateTransientBuffer(Ref<TransientBuffer> Buffer, Usage Type, UInt Capacity)
     {
-        Buffer.ID       = mGraphics->CreateBuffer<UInt8>(Type, Capacity);
+        Buffer.ID       = mGraphics->CreateBuffer(Type, Capacity);
         Buffer.Memory   = NewUniquePtr<UInt8[]>(Capacity);
         Buffer.Capacity = Capacity;
     }
@@ -229,8 +229,8 @@ namespace Graphic
         {
             const Bool Discard = (Buffer.Reader == 0);
 
-            mGraphics->UpdateBuffer(Buffer.ID, Discard, Buffer.Reader,
-                CPtr<UInt8>(AddressOf(Buffer.Memory[Buffer.Reader]), Count));
+            Data Memory(AddressOf(Buffer.Memory[Buffer.Reader]), Count, Data::EMPTY_DELETER);
+            mGraphics->UpdateBuffer(Buffer.ID, Discard, Buffer.Reader, Move(Memory));
 
             Buffer.Reader = Buffer.Writer;
         }

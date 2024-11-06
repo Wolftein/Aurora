@@ -12,7 +12,6 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Base.hpp"
 #include "Aurora.Math/Math.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -31,13 +30,13 @@ namespace Graphic
         k_MaxAttachments = 0x0004,
 
         // -=(Undocumented)=-
-        k_MaxAttributes  = 0x0008,
+        k_MaxAttributes  = 0x000C,
 
         // -=(Undocumented)=-
-        k_MaxBuffers     = 0x0080,
+        k_MaxBuffers     = 0x1000,
 
         // -=(Undocumented)=-
-        k_MaxFetches     = 0x0008,
+        k_MaxFetches     = 0x000C,
 
         // -=(Undocumented)=-
         k_MaxMaterials   = 0x1000,
@@ -55,17 +54,16 @@ namespace Graphic
         k_MaxSamplers    = 0x00FF,
 
         // -=(Undocumented)=-
-        k_MaxSources     = 0x0004,
+        k_MaxSources     = 0x0008,
 
         // -=(Undocumented)=-
         k_MaxStages      = 0x0003,
 
         // -=(Undocumented)=-
-        k_MaxTextures    = 0x0800,
+        k_MaxTextures    = 0x1000,
 
         // -=(Undocumented)=-
         k_MaxUniforms    = 0x0004,
-
     };
 
     // -=(Undocumented)=-
@@ -197,6 +195,7 @@ namespace Graphic
         Nearest,
         Bilinear,
         Trilinear,
+        Anisotropic,
     };
 
     // -=(Undocumented)=-
@@ -299,6 +298,24 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
+    enum class VertexSemantic
+    {
+        None,
+        Position,
+        Normal,
+        Color,
+        Tangent,
+        TexCoord0,
+        TexCoord1,
+        TexCoord2,
+        TexCoord3,
+        TexCoord4,
+        TexCoord5,
+        TexCoord6,
+        TexCoord7,
+    };
+
+    // -=(Undocumented)=-
     enum class VertexTopology
     {
         Point,
@@ -345,16 +362,16 @@ namespace Graphic
     struct Attribute
     {
         // -=(Undocumented)=-
-        SInt16       ID     = -1;
+        VertexSemantic ID     = VertexSemantic::None;
 
         // -=(Undocumented)=-
-        SInt16       Slot   = 0;
+        VertexFormat   Format = VertexFormat::Float32x4;
 
         // -=(Undocumented)=-
-        SInt16       Offset = -1;
+        UInt16         Slot   = 0;
 
         // -=(Undocumented)=-
-        VertexFormat Format = VertexFormat::Float32x4;
+        UInt16         Offset = 0;
     };
 
     // -=(Undocumented)=-
@@ -464,20 +481,20 @@ namespace Graphic
     struct Instance
     {
         // -=(Undocumented)=-
-        UInt Count  = 0;
+        UInt32 Count  = 0;
 
         // -=(Undocumented)=-
-        UInt Base   = 0;
+        SInt32 Base   = 0;
 
         // -=(Undocumented)=-
-        UInt Offset = 0;
+        UInt32 Offset = 0;
     };
 
     // -=(Undocumented)=-
     struct Submission
     {
         // -=(Undocumented)=-
-        Binding   Vertices[k_MaxFetches];
+        Binding   Vertices[k_MaxFetches];           // TODO: Stack?
 
         // -=(Undocumented)=-
         Binding   Indices;
@@ -492,13 +509,13 @@ namespace Graphic
         Object    Pipeline               = 0;
 
         // -=(Undocumented)=-
-        Binding   Uniforms[k_MaxUniforms];          // TODO: Split in different stages
+        Binding   Uniforms[k_MaxUniforms];          // TODO: Split in different stages Stack?
 
         // -=(Undocumented)=-
-        Sampler   Samplers[k_MaxSources];           // TODO: Split in different stages
+        Sampler   Samplers[k_MaxSources];           // TODO: Split in different stages Stack?
 
         // -=(Undocumented)=-
-        Object    Textures[k_MaxSources] = { 0 };   // TODO: Split in different stages
+        Object    Textures[k_MaxSources] = { };     // TODO: Split in different stages Stack?
 
         // -=(Undocumented)=-
         Instance  Primitive;

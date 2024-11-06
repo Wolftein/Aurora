@@ -128,7 +128,7 @@ namespace Audio
         using Submixes  = Array<Ptr<FAudioSubmixVoice>, k_MaxSubmixes>;
 
         // -=(Undocumented)=-
-        using Pool      = Stack<FAudioInstance, k_MaxMixes>;
+        using Instances = Pool<FAudioInstance, k_MaxMixes>;
 
         // -=(Undocumented)=-
         using Mixes     = Vector<Ptr<FAudioInstance>>;
@@ -176,6 +176,6 @@ namespace Audio
         F3DAUDIO_HANDLE           mProcessor;
         Listener                  mListener;
         Mixes                     mMixes;
-        Pool                      mPool;
+        Instances                 mInstances;
     };
 }

@@ -21,6 +21,7 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
+    // @TODO: Needs improvement over the interface for ease use.
     class Service final : public Subsystem
     {
     public:
@@ -35,7 +36,7 @@ namespace Graphic
         Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height);
 
         // -=(Undocumented)=-
-        void Reset(UInt16 Width, UInt16 Height);
+        void Reset(UInt32 Width, UInt32 Height);
 
         // -=(Undocumented)=-
         Ref<const Capabilities> GetCapabilities() const
@@ -44,25 +45,19 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        template<typename T>
-        Object CreateBuffer(Usage Type, UInt Capacity, CPtr<T> Data = CPtr<T>())
+        Object CreateBuffer(Usage Type, UInt32 Capacity)
         {
-            const CPtr<UInt8> Bytes = CPtr<UInt8>(reinterpret_cast<Ptr<UInt8>>(Data.data()), Data.size_bytes());
-
-            return CreateBuffer(Type, Capacity * sizeof(T), Bytes);
+            return CreateBuffer(Type, Capacity, Data());
         }
 
         // -=(Undocumented)=-
-        Object CreateBuffer(Usage Type, UInt Capacity, CPtr<UInt8> Data = CPtr<UInt8>());
+        Object CreateBuffer(Usage Type, UInt32 Capacity, Any<Data> Data);
 
         // -=(Undocumented)=-
-        template<typename T>
-        void UpdateBuffer(Object ID, Bool Discard, UInt Offset, CPtr<T> Data)
-        {
-            const CPtr<UInt8> Bytes = CPtr<UInt8>(reinterpret_cast<Ptr<UInt8>>(Data.data()), Data.size_bytes());
+        void CopyBuffer(Object Destination, UInt32 DstOffset, Object Source, UInt32 SrcOffset, UInt32 Size);
 
-            mDriver->UpdateBuffer(ID, Discard, Offset, Bytes);
-        }
+        // -=(Undocumented)=-
+        void UpdateBuffer(Object ID, Bool Discard, UInt32 Offset, Any<Data> Data);
 
         // -=(Undocumented)=-
         void DeleteBuffer(Object ID);
@@ -80,37 +75,22 @@ namespace Graphic
         void DeletePass(Object ID);
 
         // -=(Undocumented)=-
-        Object CreatePipeline(CPtr<UInt8> Vertex, CPtr<UInt8> Fragment, CPtr<UInt8> Geometry, Ref<const Descriptor> Properties);
+        Object CreatePipeline(Any<Data> Vertex, Any<Data> Fragment, Any<Data> Geometry, Ref<const Descriptor> Properties);
 
         // -=(Undocumented)=-
         void DeletePipeline(Object ID);
 
         // -=(Undocumented)=-
-        template<typename T>
-        Object CreateTexture(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Layer, CPtr<T> Data)
-        {
-            const CPtr<UInt8> Bytes = CPtr<UInt8>(reinterpret_cast<Ptr<UInt8>>(Data.data()), Data.size_bytes());
-
-            return CreateTexture(Format, Layout, Width, Height, Layer, Bytes);
-        }
+        Object CreateTexture(TextureFormat Format, TextureLayout Layout, UInt32 Width ,UInt32 Height, UInt8 Level, Any<Data> Data);
 
         // -=(Undocumented)=-
-        Object CreateTexture(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Layer, CPtr<UInt8> Data = CPtr<UInt8>());
+        void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, Any<Data> Data);
 
         // -=(Undocumented)=-
-        template<typename T>
-        void UpdateTexture(Object ID, UInt8 Level, Recti Offset, UInt Pitch, CPtr<T> Data)
-        {
-            const CPtr<UInt8> Bytes = CPtr<UInt8>(reinterpret_cast<Ptr<UInt8>>(Data.data()), Data.size_bytes());
-
-            mDriver->UpdateTexture(ID, Level, Offset, Pitch, Bytes);
-        }
+        void CopyTexture(Object Destination, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object Source, UInt8 SrcLevel, Ref<const Recti> SrcOffset);
 
         // -=(Undocumented)=-
-        void CopyTexture(Object Destination, UInt8 DstLevel, Vector3f DstOffset, Object Source, UInt8 SrcLevel, Recti SrcOffset);
-
-        // -=(Undocumented)=-
-        Data ReadTexture(Object ID, UInt8 Level, Recti Offset);
+        Data ReadTexture(Object ID, UInt8 Level, Ref<const Recti> Offset);
 
         // -=(Undocumented)=-
         UInt QueryTexture(Object ID);
@@ -119,7 +99,7 @@ namespace Graphic
         void DeleteTexture(Object ID);
 
         // -=(Undocumented)=-
-        void Prepare(Object ID, Rectf Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
+        void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
 
         // -=(Undocumented)=-
         void Submit(CPtr<Submission> Submissions);
