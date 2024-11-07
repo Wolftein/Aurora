@@ -31,9 +31,9 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Pipeline::Load(Any<Array<Data, k_MaxStages>> Stages, Any<Descriptor> Properties)
+    void Pipeline::Load(Any<Array<Data, k_MaxStages>> Shaders, Any<Descriptor> Properties)
     {
-        mStages     = Move(Stages);
+        mShaders    = Move(Shaders);
         mProperties = Move(Properties);
     }
 
@@ -42,17 +42,13 @@ namespace Graphic
 
     Bool Pipeline::OnCreate(Ref<Subsystem::Context> Context)
     {
-        UInt Memory = 0;
-
-        for (Ref<const Data> Stage : mStages)
+        for (Ref<const Data> Stage : mShaders)
         {
-            Memory += Stage.GetSize();
+            SetMemory(GetMemory() + Stage.GetSize());
         }
 
-        SetMemory(Memory);
-
         mID = Context.GetSubsystem<Service>()->CreatePipeline(
-            Move(mStages[0]), Move(mStages[1]), Move(mStages[2]), mProperties);
+            Move(mShaders[0]), Move(mShaders[1]), Move(mShaders[2]), mProperties);
 
         return mID > 0;
     }

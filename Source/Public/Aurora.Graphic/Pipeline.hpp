@@ -32,7 +32,7 @@ namespace Graphic
         explicit Pipeline(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(Any<Array<Data, k_MaxStages>> Stages, Any<Descriptor> Properties);
+        void Load(Any<Array<Data, k_MaxStages>> Shaders, Any<Descriptor> Properties);
 
         // -=(Undocumented)=-
         Object GetID() const
@@ -60,7 +60,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Object                   mID;
-        Array<Data, k_MaxStages> mStages;
+        Array<Data, k_MaxStages> mShaders;
         Descriptor               mProperties;
     };
 }

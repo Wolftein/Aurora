@@ -286,6 +286,16 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        void Look(Ref<const Vector3f> Eye, Ref<const Vector3f> Center, Ref<const Vector3f> Up)
+        {
+            // Calculate the view matrix from the transformation and calculate world matrix
+            mWorld   = mProjection * (mView = Matrix4f::CreateLook(Eye, Center, Up));
+
+            // Calculate the inverse of the world matrix
+            mInverse = mWorld.Inverse();
+        }
+
+        // -=(Undocumented)=-
         Vector3f GetWorldCoordinates(Ref<const Vector3f> Position, Ref<const Rectf> Viewport) const;
 
         // -=(Undocumented)=-

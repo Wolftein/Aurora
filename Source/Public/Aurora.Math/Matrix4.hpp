@@ -547,18 +547,16 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> CreateLook(Ref<const Vector3<Base>> At, Ref<const Vector3<Base>> Eye, Ref<const Vector3<Base>> Up)
+        static constexpr Matrix4<Base> CreateLook(Ref<const Vector3<Base>> Eye, Ref<const Vector3<Base>> Center, Ref<const Vector3<Base>> Up)
         {
-            Vector3<Base> Axes[4];
-            Axes[2] = Vector3<Base>::Normalize(At - Eye);
-            Axes[0] = Vector3<Base>::Normalize(Vector3<Base>::Cross(Up, Axes[2]));
-            Axes[1] = Vector3<Base>::Cross(Axes[2], Axes[0]);
-            Axes[3] = Vector3<Base>(-Axes[0].Dot(Eye), -Axes[1].Dot(Eye), -Axes[2].Dot(Eye));
+            const Vector3<Base> vForward = Vector3<Base>::Normalize(Center - Eye);
+            const Vector3<Base> vRight   = Vector3<Base>::Normalize(Vector3<Base>::Cross(Up, vForward));
+            const Vector3<Base> vUp      = Vector3<Base>::Cross(vForward, vRight);
 
-            const Vector4<Base> C0(Axes[0].GetX(), Axes[1].GetX(), Axes[2].GetX(), 0);
-            const Vector4<Base> C1(Axes[0].GetY(), Axes[1].GetY(), Axes[2].GetY(), 0);
-            const Vector4<Base> C2(Axes[0].GetZ(), Axes[1].GetZ(), Axes[2].GetZ(), 0);
-            const Vector4<Base> C3(Axes[3].GetX(), Axes[3].GetY(), Axes[3].GetZ(), 1);
+            const Vector4<Base> C0(vRight.GetX(), vRight.GetY(), vRight.GetZ(), 0);
+            const Vector4<Base> C1(vUp.GetX(), vUp.GetY(), vUp.GetZ(), 0);
+            const Vector4<Base> C2(vForward.GetX(), vForward.GetY(), vForward.GetZ(), 0);
+            const Vector4<Base> C3(Eye.GetX(), Eye.GetY(), Eye.GetZ(), 1);
 
             return Matrix4<Base>(C0, C1, C2, C3);
         }
