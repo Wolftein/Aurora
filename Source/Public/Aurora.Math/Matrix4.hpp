@@ -512,13 +512,15 @@ inline namespace Math
         // -=(Undocumented)=-
         static constexpr Matrix4<Base> CreatePerspective(Base Eyes, Base Aspect, Base ZNear, Base ZFar)
         {
-            const Base Y = 1 / Tangent(Eyes * 0.5);
-            const Base X = Y / Aspect;
+            const Base Fov    = 0.5f * Eyes;
+            const Base Height = Cosine(Fov) / Sine(Fov);
+            const Base Width  = Height / Aspect;
+            const Base Range  = ZFar / (ZFar - ZNear);
 
-            return Matrix4<Base>(X, 0,  0, 0,
-                                 0, Y,  0, 0,
-                                 0, 0, - (ZFar + ZNear) / (ZFar - ZNear), -1,
-                                 0, 0, 2 * ZFar * ZNear / (ZFar - ZNear), 0);
+            return Matrix4<Base>(Width, 0,       0,             0,
+                                 0,     Height,  0,             0,
+                                 0,     0,       Range,         1,
+                                 0,     0,      -Range * ZNear, 0);
         }
 
         // -=(Undocumented)=-
