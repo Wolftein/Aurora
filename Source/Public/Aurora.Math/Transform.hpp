@@ -167,13 +167,19 @@ inline namespace Math
         // -=(Undocumented)=-
         Matrix4<Base> AsMatrix() const
         {
-            return Matrix4<Base>::CreateTransform(mPosition, mRotation, mScale);
+            const Matrix4<Base> Scale       = Matrix4<Base>::FromScale(mScale);
+            const Matrix4<Base> Rotation    = Matrix4<Base>::FromRotation(mRotation);
+            const Matrix4<Base> Translation = Matrix4<Base>::FromTranslation(mPosition);
+            return Translation * Rotation * Scale;
         }
 
         // -=(Undocumented)=-
         Matrix4<Base> AsReverseMatrix() const
         {
-            return Matrix4<Base>::CreateTransform(- mPosition, mRotation, mScale);
+            const Matrix4<Base> Scale       = Matrix4<Base>::FromScale(mScale);
+            const Matrix4<Base> Rotation    = Matrix4<Base>::FromRotation(mRotation);
+            const Matrix4<Base> Translation = Matrix4<Base>::FromTranslation(-mPosition);
+            return Translation * Rotation * Scale;
         }
 
     private:

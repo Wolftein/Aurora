@@ -36,7 +36,7 @@ namespace Input
         case Event::Type::MouseDown:
             return OnMouseDown(Event.MouseAction.Button);
         case Event::Type::MouseMove:
-            return OnMouseMove(Event.MouseAxis.X, Event.MouseAxis.Y);
+            return OnMouseMove(Event.MouseAxis.X, Event.MouseAxis.Y, Event.MouseAxis.XDelta, Event.MouseAxis.YDelta);
         case Event::Type::MouseScroll:
             return OnMouseScroll(Event.MouseAxis.X, Event.MouseAxis.Y);
         case Event::Type::WindowFocus:
@@ -77,7 +77,7 @@ namespace Input
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Listener::OnMouseMove(SInt32 X, SInt32 Y)
+    Bool Listener::OnMouseMove(SInt32 X, SInt32 Y, Real32 DeltaX, Real32 DeltaY)
     {
         return false;
     }

@@ -141,6 +141,18 @@ namespace Engine
             return SDL_GetClipboardText();
         }
 
+        // -=(Undocumented)=-
+        void SetConstrain(Bool Constrain)
+        {
+            SDL_SetWindowRelativeMouseMode(mHandle, Constrain);
+        }
+
+        // -=(Undocumented)=-
+        Bool IsConstrained() const
+        {
+            return SDL_GetWindowRelativeMouseMode(mHandle);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

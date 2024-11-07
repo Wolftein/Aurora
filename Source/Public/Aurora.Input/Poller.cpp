@@ -332,7 +332,9 @@ namespace Input
             case SDL_EVENT_MOUSE_MOTION:
                 Result.Type                = Event::Type::MouseMove;
                 Result.MouseAxis.X         = static_cast<SInt32>(Event.motion.x);
+                Result.MouseAxis.XDelta    = Event.motion.xrel;
                 Result.MouseAxis.Y         = static_cast<SInt32>(Event.motion.y);
+                Result.MouseAxis.YDelta    = Event.motion.yrel;
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 Result.Type                = Event::Type::MouseDown;

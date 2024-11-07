@@ -43,7 +43,7 @@ namespace Input
         virtual Bool OnKeyDown(Key Key);
 
         // -=(Undocumented)=-
-        virtual Bool OnMouseMove(SInt32 X, SInt32 Y);
+        virtual Bool OnMouseMove(SInt32 X, SInt32 Y, Real32 DeltaX, Real32 DeltaY);
 
         // -=(Undocumented)=-
         virtual Bool OnMouseScroll(SInt32 X, SInt32 Y);
