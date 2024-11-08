@@ -87,18 +87,18 @@ inline namespace Math
         Vector3<Base> GetForward() const
         {
             return Vector3<Base>(
-                2 * (mComplexes.GetX() * mComplexes.GetZ() + mReal * mComplexes.GetY()),
-                2 * (mComplexes.GetY() * mComplexes.GetZ() - mReal * mComplexes.GetX()),
-                1 - 2 * (mComplexes.GetX() * mComplexes.GetX() + mComplexes.GetY() * mComplexes.GetY()));
+                2.0 * (mComplexes.GetX() * mComplexes.GetZ() + mReal * mComplexes.GetY()),
+                2.0 * (mComplexes.GetY() * mComplexes.GetZ() - mReal * mComplexes.GetX()),
+                1.0 - 2.0 * (mComplexes.GetX() * mComplexes.GetX() + mComplexes.GetY() * mComplexes.GetY()));
         }
 
         // -=(Undocumented)=-
         Vector3<Base> GetUp() const
         {
             return Vector3<Base>(
-                2 * (mComplexes.GetX() * mComplexes.GetY() - mReal * mComplexes.GetZ()),
-                1 - 2 * (mComplexes.GetX() * mComplexes.GetX() + mComplexes.GetZ() * mComplexes.GetZ()),
-                2 * (mComplexes.GetY() * mComplexes.GetZ() + mReal * mComplexes.GetX()));
+                2.0 * (mComplexes.GetX() * mComplexes.GetY() - mReal * mComplexes.GetZ()),
+                1.0 - 2.0 * (mComplexes.GetX() * mComplexes.GetX() + mComplexes.GetZ() * mComplexes.GetZ()),
+                2.0 * (mComplexes.GetY() * mComplexes.GetZ() + mReal * mComplexes.GetX()));
         }
 
         // -=(Undocumented)=-
@@ -128,8 +128,7 @@ inline namespace Math
         // -=(Undocumented)=-
         Quaternion<Base> operator*(Ref<const Quaternion<Base>> Other) const
         {
-            const Vector3<Base> Complexes
-                = Other.mComplexes * mReal + mComplexes * Other.mReal
+            const Vector3<Base> Complexes = Other.mComplexes * mReal + mComplexes * Other.mReal
                     + Vector3<Base>::Cross(mComplexes, Other.mComplexes);
             return Quaternion<Base>(Complexes, mReal * Other.mReal - mComplexes.Dot(Other.mComplexes));
         }
@@ -137,9 +136,10 @@ inline namespace Math
         // -=(Undocumented)=-
         Vector3<Base> operator*(Ref<const Vector3<Base>> Vector) const
         {
+            const Vector3<Base> Cross = Vector3<Base>::Cross(mComplexes, Vector);
+
             const Base Real = mReal + mReal;
-            return Real * Vector3<Base>::Cross(mComplexes, Vector)
-                    + (Real * mReal - 1) * Vector + 2 * mComplexes.Dot(Vector) * mComplexes;
+            return Real * Cross + (Real * mReal - 1) * Vector + 2 * mComplexes.Dot(Vector) * mComplexes;
         }
 
         // -=(Undocumented)=-
@@ -192,6 +192,49 @@ inline namespace Math
         static Quaternion<Base> Conjugate(Ref<const Quaternion<Base>> Value)
         {
             return Quaternion<Base>(- Value.mComplexes, Value.mReal);
+        }
+
+        // -=(Undocumented)=-
+        static Quaternion<Base> FromDirection(Ref<const Vector3<Base>> Direction, Ref<const Vector3<Base>> Up)
+        {
+            const Vector3<Base> vForward = Vector3<Base>::Normalize(Direction);
+            const Vector3<Base> vRight   = Vector3<Base>::Normalize(Vector3<Base>::Cross(Up, vForward));
+            const Vector3<Base> vUp      = Vector3<Base>::Cross(vForward, vRight);
+
+            const Base M00 = vRight.GetX();
+            const Base M01 = vRight.GetY();
+            const Base M02 = vRight.GetZ();
+            const Base M10 = vUp.GetX();
+            const Base M11 = vUp.GetY();
+            const Base M12 = vUp.GetZ();
+            const Base M20 = vForward.GetX();
+            const Base M21 = vForward.GetY();
+            const Base M22 = vForward.GetZ();
+
+            if (const Base Trace = M00 + M11 + M22; Trace > 0.0)
+            {
+                const Base InvSqrt = 0.5 / Sqrt(Trace + 1.0);
+                return Quaternion<Base>(
+                        (M12 - M21) * InvSqrt, (M20 - M02) * InvSqrt, (M01 - M10) * InvSqrt, 0.25 / InvSqrt);
+            }
+            else if (M00 > M11 && M00 > M22)
+            {
+                const Base InvSqrt = 2.0 * Sqrt(1.0 + M00 - M11 - M22);
+                return Quaternion<Base>(
+                        0.25 * InvSqrt, (M10 + M01) / InvSqrt, (M20 + M02) / InvSqrt, (M12 - M21) / InvSqrt);
+            }
+            else if (M11 > M22)
+            {
+                const Base InvSqrt = 2.0 * Sqrt(1.0 + M11 - M00 - M22);
+                return Quaternion<Base>(
+                        (M10 + M01) / InvSqrt, 0.25 * InvSqrt, (M21 + M12) / InvSqrt, (M20 - M02) / InvSqrt);
+            }
+            else
+            {
+                const Base InvSqrt = 2.0 * Sqrt(1.0 + M22 - M00 - M11);
+                return Quaternion<Base>(
+                        (M20 + M02) / InvSqrt, (M21 + M12) / InvSqrt, 0.25 * InvSqrt, (M01 - M10) / InvSqrt);
+            }
         }
 
         // -=(Undocumented)=-

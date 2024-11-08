@@ -196,6 +196,20 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        void SetRotation(Ref<const Vector3f> Direction, Ref<const Vector3f> Up)
+        {
+            mTransformation.SetRotation(Quaternionf::FromDirection(Direction, Up));
+            mDirty = true;
+        }
+
+        // -=(Undocumented)=-
+        void SetRotation(Ref<const Vector3f> Eye, Ref<const Vector3f> Focus, Ref<const Vector3f> Up)
+        {
+            mTransformation.SetRotation(Quaternionf::FromDirection(Focus - Eye, Up));
+            mDirty = true;
+        }
+
+        // -=(Undocumented)=-
         Ref<const Quaternionf> GetRotation() const
         {
             return mTransformation.GetRotation();
