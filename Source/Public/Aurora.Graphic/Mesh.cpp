@@ -44,9 +44,15 @@ namespace Graphic
         SetMemory(mData[0].GetSize() + mData[1].GetSize());
 
         const SPtr<Service> Graphics = Context.GetSubsystem<Service>();
-        mBuffers[0] = Graphics->CreateBuffer(Usage::Vertex, mData[0].GetSize(), Move(mData[0]));
-        mBuffers[1] = Graphics->CreateBuffer(Usage::Index, mData[1].GetSize(), Move(mData[1]));
 
+        if (mData[0].HasData())
+        {
+            mBuffers[0] = Graphics->CreateBuffer(Usage::Vertex, mData[0].GetSize(), Move(mData[0]));
+        }
+        if (mData[1].HasData())
+        {
+            mBuffers[1] = Graphics->CreateBuffer(Usage::Index, mData[1].GetSize(), Move(mData[1]));
+        }
         return true;
     }
 

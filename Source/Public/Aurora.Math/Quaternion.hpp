@@ -248,19 +248,28 @@ inline namespace Math
         // -=(Undocumented)=-
         static constexpr Quaternion<Base> FromEulerAngles(Ref<const Vector3<Base>> Angles)
         {
-            const Vector3<Base> HalfAngles = Angles * static_cast<Base>(0.5);
+            return FromEulerAngles(Angles.GetX(), Angles.GetY(), Angles.GetZ());
+        }
 
-            const Base SinX = Sine(HalfAngles.GetX());
-            const Base CosX = Cosine(HalfAngles.GetX());
-            const Base SinY = Sine(HalfAngles.GetY());
-            const Base CosY = Cosine(HalfAngles.GetY());
-            const Base SinZ = Sine(HalfAngles.GetZ());
-            const Base CosZ = Cosine(HalfAngles.GetZ());
+        // -=(Undocumented)=-
+        static constexpr Quaternion<Base> FromEulerAngles(Base Pitch, Base Yaw, Base Roll)
+        {
+            const Base HalfPitch = Pitch * 0.5f;
+            const Base HalfYaw   = Yaw * 0.5f;
+            const Base HalfRoll  = Roll * 0.5f;
 
-            return Quaternion<Base>(CosX * CosY * CosZ + SinX * SinY * SinZ,
-                                    SinX * CosY * CosZ - CosX * SinY * SinZ,
-                                    CosX * SinY * CosZ + SinX * CosY * SinZ,
-                                    CosX * CosY * SinZ - SinX * SinY * CosZ);
+            const Base SinPitch = Sine(HalfPitch);
+            const Base CosPitch = Cosine(HalfPitch);
+            const Base SinYaw = Sine(HalfYaw);
+            const Base CosYaw = Cosine(HalfYaw);
+            const Base SinRoll = Sine(HalfRoll);
+            const Base CosRoll = Cosine(HalfRoll);
+
+            return Quaternion<Base>(
+                    CosRoll * SinPitch * CosYaw + SinRoll * CosPitch * SinYaw,
+                    CosRoll * CosPitch * SinYaw - SinRoll * SinPitch * CosYaw,
+                    SinRoll * CosPitch * CosYaw - CosRoll * SinPitch * SinYaw,
+                    CosRoll * CosPitch * CosYaw + SinRoll * SinPitch * SinYaw);
         }
 
         // -=(Undocumented)=-

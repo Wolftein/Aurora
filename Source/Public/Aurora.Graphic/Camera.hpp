@@ -196,6 +196,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        void SetRotation(Real32 Pitch, Real32 Yaw, Real32 Roll)
+        {
+            mTransformation.SetRotation(Quaternionf::FromEulerAngles(Pitch, Yaw, Roll));
+            mDirty = true;
+        }
+
+        // -=(Undocumented)=-
         void SetRotation(Ref<const Vector3f> Direction, Ref<const Vector3f> Up)
         {
             mTransformation.SetRotation(Quaternionf::FromDirection(Direction, Up));

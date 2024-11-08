@@ -497,21 +497,25 @@ inline namespace Math
         // -=(Undocumented)=-
         static constexpr Matrix4<Base> CreateOrthographic(Base Left, Base Right, Base Bottom, Base Top, Base ZNear, Base ZFar)
         {
-            return Matrix4<Base>(2.0 / (Right - Left),
+            const Base ReciprocalWidth  = 1.0 / (Right - Left);
+            const Base ReciprocalHeight = 1.0 / (Top - Bottom);
+            const Base ReciprocalRange  = 1.0 / (ZFar - ZNear);
+
+            return Matrix4<Base>(ReciprocalWidth + ReciprocalWidth,
                                  0.0,
                                  0.0,
                                  0.0,
                                  0.0,
-                                 2.0 / (Top - Bottom),
+                                 ReciprocalHeight + ReciprocalHeight,
                                  0.0,
                                  0.0,
                                  0.0,
                                  0.0,
-                                 1.0 / (ZFar - ZNear),
+                                 ReciprocalRange,
                                  0.0,
-                                 -(Left + Right) / (Right - Left),
-                                 -(Top + Bottom) / (Top - Bottom),
-                                 -ZNear / (ZFar - ZNear),
+                                 -(Left + Right) * ReciprocalWidth,
+                                 -(Top + Bottom) * ReciprocalHeight,
+                                 -ReciprocalRange * ZNear,
                                  1);
         }
 
