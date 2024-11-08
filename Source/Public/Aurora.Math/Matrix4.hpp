@@ -31,7 +31,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         using Column = Vector4<Base>;
-        
+
     public:
 
         // -=(Undocumented)=-
@@ -80,11 +80,11 @@ inline namespace Math
         // -=(Undocumented)=-
         Base GetDeterminant() const
         {
-            const Base Sub11 =  GetComponent(4) * GetComponent(8) - GetComponent(5) * GetComponent(7);
-            const Base Sub12 = -GetComponent(1) * GetComponent(8) + GetComponent(2) * GetComponent(7);
-            const Base Sub13 =  GetComponent(1) * GetComponent(5) - GetComponent(2) * GetComponent(4);
-
-            return GetComponent(0) * Sub11 + GetComponent(3) * Sub12 + GetComponent(6) * Sub13;
+            const Base Sub0 = GetComponent(5) * GetComponent(10) - GetComponent(6) * GetComponent(9);
+            const Base Sub1 = GetComponent(1) * GetComponent(10) - GetComponent(2) * GetComponent(9);
+            const Base Sub2 = GetComponent(1) * GetComponent(6) - GetComponent(2) * GetComponent(5);
+            const Base Sub3 = GetComponent(1) * GetComponent(6) * GetComponent(11) - GetComponent(2) * GetComponent(5) * GetComponent(11);
+            return GetComponent(0) *Sub0 - GetComponent(4) *Sub1 + GetComponent(8) * Sub2 - GetComponent(12) * Sub3;
         }
 
         // -=(Undocumented)=-
@@ -468,33 +468,47 @@ inline namespace Math
     public:
 
         // -=(Undocumented)=-
+        static constexpr Matrix4<Base> Transpose(Ref<const Matrix4<Base>> Matrix)
+        {
+            return Matrix4<Base>(Matrix.GetComponent(0),  Matrix.GetComponent(4),
+                                 Matrix.GetComponent(8),  Matrix.GetComponent(12),
+                                 Matrix.GetComponent(1),  Matrix.GetComponent(5),
+                                 Matrix.GetComponent(9),  Matrix.GetComponent(13),
+                                 Matrix.GetComponent(2),  Matrix.GetComponent(6),
+                                 Matrix.GetComponent(10), Matrix.GetComponent(14),
+                                 Matrix.GetComponent(3),  Matrix.GetComponent(7),
+                                 Matrix.GetComponent(11), Matrix.GetComponent(15));
+        }
+
+        // -=(Undocumented)=-
         static constexpr Matrix4<Base> CreatePerspective(Base Eyes, Base Aspect, Base ZNear, Base ZFar)
         {
-            const Base Height = Cosine(0.5f * Eyes) / Sine(0.5f * Eyes);
+            const Base Fov    = 0.5f * Eyes;
+            const Base Height = Cosine(Fov) / Sine(Fov);
             const Base Width  = Height / Aspect;
             const Base Range  = ZFar / (ZFar - ZNear);
 
-            return Matrix4<Base>(Width, 0,       0,              0,
-                                 0,     Height,  0,              0,
-                                 0,     0,       Range,          1,
-                                 0,     0,       -Range * ZNear, 0);
+            return Matrix4<Base>(Width, 0.0,    0.0,            0.0,
+                                   0.0, Height, 0.0,            0.0,
+                                   0.0, 0.0,    Range,          1.0,
+                                   0.0, 0.0,    -Range * ZNear, 0.0);
         }
 
         // -=(Undocumented)=-
         static constexpr Matrix4<Base> CreateOrthographic(Base Left, Base Right, Base Bottom, Base Top, Base ZNear, Base ZFar)
         {
             return Matrix4<Base>(2.0 / (Right - Left),
-                                 0,
-                                 0,
-                                 0,
-                                 0,
+                                 0.0,
+                                 0.0,
+                                 0.0,
+                                 0.0,
                                  2.0 / (Top - Bottom),
-                                 0,
-                                 0,
-                                 0,
-                                 0,
+                                 0.0,
+                                 0.0,
+                                 0.0,
+                                 0.0,
                                  1.0 / (ZFar - ZNear),
-                                 0,
+                                 0.0,
                                  -(Left + Right) / (Right - Left),
                                  -(Top + Bottom) / (Top - Bottom),
                                  -ZNear / (ZFar - ZNear),
@@ -502,18 +516,18 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> CreateLook(Ref<const Vector3<Base>> Eye, Ref<const Vector3<Base>> Center, Ref<const Vector3<Base>> Up)
+        static constexpr Matrix4<Base> CreateLook(Ref<const Vector3<Base>> Eye, Ref<const Vector3<Base>> Focus, Ref<const Vector3<Base>> Up)
         {
-            const Vector3<Base> vForward = Vector3<Base>::Normalize(Center - Eye);
+            const Vector3<Base> vForward = Vector3<Base>::Normalize(Focus - Eye);
             const Vector3<Base> vRight   = Vector3<Base>::Normalize(Vector3<Base>::Cross(Up, vForward));
             const Vector3<Base> vUp      = Vector3<Base>::Cross(vForward, vRight);
+            const Vector3<Base> vEye     = -Eye;
 
-            const Vector4<Base> C0(vRight.GetX(), vUp.GetX(), vForward.GetX(), 0);
-            const Vector4<Base> C1(vRight.GetY(), vUp.GetY(), vForward.GetY(), 0);
-            const Vector4<Base> C2(vRight.GetZ(), vUp.GetZ(), vForward.GetZ(), 0);
-            const Vector4<Base> C3(-vRight.Dot(Eye), -vUp.Dot(Eye), -vForward.Dot(Eye), 1);
-
-            return Matrix4<Base>(C0, C1, C2, C3);
+            return Matrix4<Base>(
+                     vRight.GetX(),    vUp.GetX(),    vForward.GetX(),    0.0,
+                     vRight.GetY(),    vUp.GetY(),    vForward.GetY(),    0.0,
+                     vRight.GetZ(),    vUp.GetZ(),    vForward.GetZ(),    0.0,
+                     vRight.Dot(vEye), vUp.Dot(vEye), vForward.Dot(vEye), 1.0);
         }
 
         // -=(Undocumented)=-
@@ -569,24 +583,23 @@ inline namespace Math
         // -=(Undocumented)=-
         static constexpr Matrix4<Base> FromRotation(Ref<const Quaternion<Base>> Rotation)
         {
-            const Vector3<Base> Vector(Rotation.GetX(), Rotation.GetY(), Rotation.GetZ());
+            const Vector4<Base> Vector(Rotation.GetX(), Rotation.GetY(), Rotation.GetZ(), Rotation.GetW());
 
             const Base XX = Vector.GetX() * Vector.GetX();
             const Base YY = Vector.GetY() * Vector.GetY();
             const Base ZZ = Vector.GetZ() * Vector.GetZ();
-            const Base SX = Vector.GetX() * Rotation.GetW();
-            const Base SY = Vector.GetY() * Rotation.GetW();
-            const Base SZ = Vector.GetZ() * Rotation.GetW();
             const Base XZ = Vector.GetX() * Vector.GetZ();
             const Base YZ = Vector.GetY() * Vector.GetZ();
             const Base XY = Vector.GetX() * Vector.GetY();
+            const Base WX = Vector.GetW() * Vector.GetX();
+            const Base WY = Vector.GetW() * Vector.GetY();
+            const Base WZ = Vector.GetW() * Vector.GetZ();
 
-            const Vector4<Base> C0(1 - 2 * (YY + ZZ), 2 * (XY + SZ), 2 * (XZ - SY), 0);
-            const Vector4<Base> C1(2 * (XY - SZ), 1 - 2 * (XX + ZZ), 2 * (SX + YZ), 0);
-            const Vector4<Base> C2(2 * (SY + XZ), 2 * (YZ - SX), 1 - 2 * (XX + YY), 0);
-            const Vector4<Base> C3(0, 0, 0, 1);
-
-            return Matrix4<Base>(C0, C1, C2, C3);
+            return Matrix4<Base>(
+                    1.0 - 2.0 * (YY + ZZ), 2.0 * (XY + WZ), 2.0 * (XZ - WY), 0.0,
+                    2.0 * (XY - WZ), 1.0 - 2.0 * (XX + ZZ), 2.0 * (WX + YZ), 0.0,
+                    2.0 * (WY + XZ), 2.0 * (YZ - WX), 1.0 - 2.0 * (XX + YY), 0.0,
+                    0.0,             0.0,             0.0,                   1.0);
         }
 
     private:
@@ -599,7 +612,7 @@ inline namespace Math
 
     // -=(Undocumented)=-
     using Matrix4f = Matrix4<Real32>;
-    
+
     // -=(Undocumented)=-
     using Matrix4d = Matrix4<Real64>;
 }

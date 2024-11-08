@@ -170,7 +170,6 @@ inline namespace Math
             if (Length > 0)
             {
                 const Base InvLength = 1.0f / Length;
-
                 return Quaternion<Base>(Value.mComplexes * InvLength, Value.mReal * InvLength);
             }
             return Value;
@@ -179,12 +178,11 @@ inline namespace Math
         // -=(Undocumented)=-
         static Quaternion<Base> Invert(Ref<const Quaternion<Base>> Value)
         {
-            const Base Length = Value.GetLength();
+            const Base Length = Value.GetLengthSquared();
 
             if (Length > 0)
             {
                 const Base InvLength = 1.0f / Length;
-
                 return Quaternion<Base>(Value.mComplexes * -InvLength, Value.mReal * InvLength);
             }
             return Value;
@@ -194,23 +192,6 @@ inline namespace Math
         static Quaternion<Base> Conjugate(Ref<const Quaternion<Base>> Value)
         {
             return Quaternion<Base>(- Value.mComplexes, Value.mReal);
-        }
-
-        // -=(Undocumented)=-
-        static Quaternion<Base> LookAt(Ref<const Vector3<Base>> Origin, Ref<const Vector3<Base>> Target, Ref<const Vector3<Base>> Up)
-        {
-            const Vector3<Base> Forward = Vector3<Base>::Normalize(Target - Origin);
-            const Vector3<Base> Right = Vector3<Base>::Normalize(Vector3<Base>::Cross(Up, Forward));
-            const Vector3<Base> UpVector = Vector3<Base>::Cross(Forward, Right);
-
-            const Base W    = Math::Sqrt(1.0 + Right.GetX() + UpVector.GetY() + Forward.GetZ()) * 0.5;
-            const Base InvScaleW = 1.0 / (2.0 * W);
-
-            const Base X    = (UpVector.GetZ() - Forward.GetY()) * InvScaleW;
-            const Base Y    = (Forward.GetX() - Right.GetZ()) * InvScaleW;
-            const Base Z    = (Right.GetY() - UpVector.GetX()) * InvScaleW;
-
-            return Quaternion<Base>(X, Y, Z, W);
         }
 
         // -=(Undocumented)=-
