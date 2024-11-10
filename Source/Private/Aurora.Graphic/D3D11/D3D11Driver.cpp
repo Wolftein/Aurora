@@ -366,8 +366,16 @@ namespace Graphic
             { "TEXCOORD", 3 },     // VertexSemantic::TexCoord3
             { "TEXCOORD", 4 },     // VertexSemantic::TexCoord4
             { "TEXCOORD", 5 },     // VertexSemantic::TexCoord5
-            { "TEXCOORD", 6 },     // VertexSemantic::TexCoord6
+            { "TEXCOORD", 6 },     // Ve            rtexSemantic::TexCoord6
             { "TEXCOORD", 7 },     // VertexSemantic::TexCoord7
+            { "CUSTOM",   0 },     // VertexSemantic::Custom0
+            { "CUSTOM",   1 },     // VertexSemantic::Custom1
+            { "CUSTOM",   2 },     // VertexSemantic::Custom2
+            { "CUSTOM",   3 },     // VertexSemantic::Custom3
+            { "CUSTOM",   4 },     // VertexSemantic::Custom4
+            { "CUSTOM",   5 },     // VertexSemantic::Custom5
+            { "CUSTOM",   6 },     // VertexSemantic::Custom6
+            { "CUSTOM",   7 },     // VertexSemantic::Custom7
         };
         return std::get<Data>(k_Mapping[CastEnum(Value)]);
     }
@@ -732,15 +740,16 @@ namespace Graphic
 
             for (; Count < k_MaxAttributes && Properties.InputLayout[Count].ID != VertexSemantic::None; ++Count)
             {
-                Ref<D3D11_INPUT_ELEMENT_DESC> Element = Description[Count];
+                Ref<const Attribute>		  Element    = Properties.InputLayout[Count];
+                Ref<D3D11_INPUT_ELEMENT_DESC> Descriptor = Description[Count];
 
-                Element.SemanticName         = As<0>(Properties.InputLayout[Count].ID);
-                Element.SemanticIndex        = As<1>(Properties.InputLayout[Count].ID);
-                Element.Format               = As(Properties.InputLayout[Count].Format);
-                Element.AlignedByteOffset    = Properties.InputLayout[Count].Offset;
-                Element.InputSlot            = Properties.InputLayout[Count].Slot;
-                Element.InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
-                Element.InstanceDataStepRate = 0;
+                Descriptor.SemanticName         = As<0>(Element.ID);
+                Descriptor.SemanticIndex        = As<1>(Element.ID);
+                Descriptor.Format               = As(Element.Format);
+                Descriptor.AlignedByteOffset    = Element.Offset;
+                Descriptor.InputSlot            = Element.Slot;
+                Descriptor.InputSlotClass       = Element.Divisor > 0 ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
+                Descriptor.InstanceDataStepRate = Element.Divisor;
             }
 
             CheckIfFail(mDevice->CreateInputLayout(Description, Count, Vertex.data(), Vertex.size(), Pipeline.IL.GetAddressOf()));
@@ -1020,18 +1029,34 @@ namespace Graphic
             // Issue draw command
             if (NewestSubmission.Indices.Buffer)
             {
-                const UInt32 IndicesCount          = NewestSubmission.Primitive.Count;
-                const UInt32 IndicesStartLocation  = NewestSubmission.Primitive.Offset;
-                const SInt32 VerticesStartLocation = NewestSubmission.Primitive.Base;
+                const UInt32 Count     = NewestSubmission.Primitive.Count;
+                const UInt32 Offset    = NewestSubmission.Primitive.Offset;
+                const SInt32 Base      = NewestSubmission.Primitive.Base;
+                const UInt32 Instances = NewestSubmission.Primitive.Instances;
 
-                mDeviceImmediate->DrawIndexed(IndicesCount, IndicesStartLocation, VerticesStartLocation);
+                if (Instances)
+                {
+                    mDeviceImmediate->DrawIndexedInstanced(Count, Instances, Offset, Base, 0);
+                }
+                else
+                {
+                    mDeviceImmediate->DrawIndexed(Count, Offset, Base);
+                }
             }
             else
             {
-                const UInt32 VerticesCount         = NewestSubmission.Primitive.Count;
-                const UInt32 VerticesStartLocation = NewestSubmission.Primitive.Offset;
+                const UInt32 Count     = NewestSubmission.Primitive.Count;
+                const UInt32 Offset    = NewestSubmission.Primitive.Offset;
+                const UInt32 Instances = NewestSubmission.Primitive.Instances;
 
-                mDeviceImmediate->Draw(VerticesCount, VerticesStartLocation);
+                if (Instances)
+                {
+                    mDeviceImmediate->DrawInstanced(Count, Instances, Offset, 0);
+                }
+                else
+                {
+                    mDeviceImmediate->Draw(Count, Offset);
+                }
             }
         }
     }

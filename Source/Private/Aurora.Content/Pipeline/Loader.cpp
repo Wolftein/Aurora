@@ -112,9 +112,9 @@ namespace Content
 
         if (Attributes.IsNull() || Attributes.IsEmpty())
         {
-            Description.InputLayout[0] = { Graphic::VertexSemantic::Position,  Graphic::VertexFormat::Float32x3,   0, 0,  };
-            Description.InputLayout[1] = { Graphic::VertexSemantic::Color,     Graphic::VertexFormat::UIntNorm8x4, 0, 12, };
-            Description.InputLayout[2] = { Graphic::VertexSemantic::TexCoord0, Graphic::VertexFormat::Float32x2,   0, 16, };
+            Description.InputLayout[0] = { Graphic::VertexSemantic::Position,  Graphic::VertexFormat::Float32x3,   0, 0 };
+            Description.InputLayout[1] = { Graphic::VertexSemantic::Color,     Graphic::VertexFormat::UIntNorm8x4, 0, 12 };
+            Description.InputLayout[2] = { Graphic::VertexSemantic::TexCoord0, Graphic::VertexFormat::Float32x2,   0, 16 };
         }
         else
         {
@@ -122,10 +122,11 @@ namespace Content
             {
                 const TOMLArray Values = Attributes.GetArray(Attribute);
 
-                Description.InputLayout[Attribute].ID     = CastEnum(Values.GetString(0), Graphic::VertexSemantic::None);
-                Description.InputLayout[Attribute].Format = CastEnum(Values.GetString(1), Graphic::VertexFormat::Float32x4);
-                Description.InputLayout[Attribute].Slot   = Values.GetNumber(2);
-                Description.InputLayout[Attribute].Offset = Values.GetNumber(3);
+                Description.InputLayout[Attribute].ID      = CastEnum(Values.GetString(0), Graphic::VertexSemantic::None);
+                Description.InputLayout[Attribute].Format  = CastEnum(Values.GetString(1), Graphic::VertexFormat::Float32x4);
+                Description.InputLayout[Attribute].Slot    = Values.GetNumber(2);
+                Description.InputLayout[Attribute].Offset  = Values.GetNumber(3);
+                Description.InputLayout[Attribute].Divisor = Values.GetNumber(4);
             }
         }
 

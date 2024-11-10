@@ -334,6 +334,14 @@ namespace Graphic
         TexCoord5,
         TexCoord6,
         TexCoord7,
+        Custom0,
+        Custom1,
+        Custom2,
+        Custom3,
+        Custom4,
+        Custom5,
+        Custom6,
+        Custom7,
     };
 
     // -=(Undocumented)=-
@@ -383,16 +391,19 @@ namespace Graphic
     struct Attribute
     {
         // -=(Undocumented)=-
-        VertexSemantic ID     = VertexSemantic::None;
+        VertexSemantic ID      = VertexSemantic::None;
 
         // -=(Undocumented)=-
-        VertexFormat   Format = VertexFormat::Float32x4;
+        VertexFormat   Format  = VertexFormat::Float32x4;
 
         // -=(Undocumented)=-
-        UInt16         Slot   = 0;
+        UInt16         Slot    = 0;
 
         // -=(Undocumented)=-
-        UInt16         Offset = 0;
+        UInt16         Offset  = 0;
+
+		// -=(Undocumented)=-
+        UInt16         Divisor = 0;
     };
 
     // -=(Undocumented)=-
@@ -502,13 +513,16 @@ namespace Graphic
     struct Instance
     {
         // -=(Undocumented)=-
-        UInt32 Count  = 0;
+        UInt32 Count     = 0;
 
         // -=(Undocumented)=-
-        SInt32 Base   = 0;
+        SInt32 Base      = 0;
 
         // -=(Undocumented)=-
-        UInt32 Offset = 0;
+        UInt32 Offset    = 0;
+
+		// -=(Undocumented)=-
+        UInt32 Instances = 0;
     };
 
     // -=(Undocumented)=-

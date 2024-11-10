@@ -22,7 +22,6 @@
 
 namespace Content
 {
-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -53,46 +52,46 @@ namespace Content
 
         switch (GLTFSampler.wrapS)
         {
-            case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
-                Sampler.EdgeU = Graphic::TextureEdge::Clamp;
-                break;
-            case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
-                Sampler.EdgeU = Graphic::TextureEdge::Mirror;
-                break;
-            default:
-                Sampler.EdgeU = Graphic::TextureEdge::Repeat;
-                break;
+		case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+            Sampler.EdgeU = Graphic::TextureEdge::Clamp;
+            break;
+        case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
+            Sampler.EdgeU = Graphic::TextureEdge::Mirror;
+            break;
+        default:
+            Sampler.EdgeU = Graphic::TextureEdge::Repeat;
+            break;
         }
         switch (GLTFSampler.wrapT)
         {
-            case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
-                Sampler.EdgeV = Graphic::TextureEdge::Clamp;
-                break;
-            case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
-                Sampler.EdgeV = Graphic::TextureEdge::Mirror;
-                break;
-            default:
-                Sampler.EdgeU = Graphic::TextureEdge::Repeat;
-                break;
+        case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+            Sampler.EdgeV = Graphic::TextureEdge::Clamp;
+            break;
+        case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
+            Sampler.EdgeV = Graphic::TextureEdge::Mirror;
+            break;
+        default:
+            Sampler.EdgeU = Graphic::TextureEdge::Repeat;
+            break;
         }
 
         switch (GLTFSampler.minFilter)
         {
-            case TINYGLTF_TEXTURE_FILTER_NEAREST:
-            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:    // @NOT_SUPPORTED
-            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:     // @NOT_SUPPORTED
-                Sampler.Filter = Graphic::TextureFilter::Nearest;
-                break;
-            case TINYGLTF_TEXTURE_FILTER_LINEAR:
-            case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:     // @NOT_SUPPORTED
-                Sampler.Filter = Graphic::TextureFilter::Bilinear;
-                break;
-            case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
-                Sampler.Filter = Graphic::TextureFilter::Trilinear;
-                break;
-            default:
-                Sampler.Filter = Graphic::TextureFilter::Nearest;
-                break;
+        case TINYGLTF_TEXTURE_FILTER_NEAREST:
+        case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:    // @NOT_SUPPORTED
+        case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:     // @NOT_SUPPORTED
+            Sampler.Filter = Graphic::TextureFilter::Nearest;
+            break;
+        case TINYGLTF_TEXTURE_FILTER_LINEAR:
+        case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:     // @NOT_SUPPORTED
+            Sampler.Filter = Graphic::TextureFilter::Bilinear;
+            break;
+        case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
+            Sampler.Filter = Graphic::TextureFilter::Trilinear;
+            break;
+        default:
+            Sampler.Filter = Graphic::TextureFilter::Nearest;
+            break;
         }
         return Sampler;
     }
