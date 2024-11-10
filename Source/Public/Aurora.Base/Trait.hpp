@@ -120,10 +120,31 @@ inline namespace Core
     }
 
     // -=(Undocumented)=-
+    template<typename Type>
+    constexpr Type GetMask(Type Count)
+    {
+        return static_cast<Type>(-(Count != 0)) & static_cast<Type>(-1) >> (sizeof(Type) * CHAR_BIT - Count);
+    }
+
+    // -=(Undocumented)=-
     template<typename Type, Type Mask, Type Shift>
     constexpr Type GetBit(Type Field)
     {
         return (Field & Mask) >> Shift;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    constexpr Bool HasBit(Type Field, Type Value)
+    {
+        return (Field & Value) == Value;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    constexpr Type SetBit(Type Field, Type Value)
+    {
+        return Field | Value;
     }
 
     // -=(Undocumented)=-
@@ -135,8 +156,8 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
-    constexpr Type GetMask(Type Count)
+    constexpr Type ClearBit(Type Field, Type Value)
     {
-        return static_cast<Type>(-(Count != 0)) & static_cast<Type>(-1) >> sizeof(Type) * CHAR_BIT - Count;
+        return Field & ~Value;
     }
 }

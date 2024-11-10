@@ -31,17 +31,24 @@ namespace Graphic
 
     Bool Camera::Compute()
     {
-        const Bool Dirty = mDirty;
+        const Bool Dirty = (mDirty > 0);
 
         if (Dirty)
         {
-            mDirty   = false;
+            // Calculate the inverse scene matrix from the transformation (if applied)
+            if (HasBit(mDirty, k_DirtyBitTransformation))
+            {
+                mScene = mTransformation.AsMatrix().Inverse();
+            }
 
-            // Calculate the inverse view matrix from the transformation and calculate world matrix
-            mWorld   = mProjection * (mView = mTransformation.AsMatrix().Inverse());
+            // Calculate the world matrix
+            mWorld   = mProjection * mScene;
 
             // Calculate the inverse of the world matrix
             mInverse = mWorld.Inverse();
+
+            // Reset dirty flags
+            mDirty   = 0;
         }
         return Dirty;
     }
