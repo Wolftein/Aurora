@@ -104,7 +104,8 @@ inline namespace IO
 
     Bool TOMLArray::GetBool(UInt Index) const
     {
-        return (* mArray)[Index].value_or(false);
+        Ptr<toml::node> Node = mArray->get(Index);
+        return Node ? Node->value_or(false) : false;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -120,7 +121,8 @@ inline namespace IO
 
     CStr TOMLArray::GetString(UInt Index) const
     {
-        return (* mArray)[Index].value_or("");
+        Ptr<toml::node> Node = mArray->get(Index);
+        return Node ? Node->value_or("") : 0;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -136,7 +138,8 @@ inline namespace IO
 
     SInt TOMLArray::GetNumber(UInt Index) const
     {
-        return (* mArray)[Index].value_or(Index);
+        Ptr<toml::node> Node = mArray->get(Index);
+        return Node ? Node->value_or(0) : 0;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -152,6 +155,7 @@ inline namespace IO
 
     Real TOMLArray::GetReal(UInt Index) const
     {
-        return (* mArray)[Index].value_or(0.0);
+        Ptr<toml::node> Node = mArray->get(Index);
+        return Node ? Node->value_or(0.0) : 0.0;
     }
 }
