@@ -48,27 +48,27 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetTexture(UInt Slot, ConstSPtr<Texture> Texture)
+        void SetTexture(Source Source, ConstSPtr<Texture> Texture)
         {
-            mTextures[Slot] = Texture;
+            mTextures[CastEnum(Source)] = Texture;
         }
 
         // -=(Undocumented)=-
-        ConstSPtr<Texture> GetTexture(UInt Slot) const
+        ConstSPtr<Texture> GetTexture(Source Source) const
         {
-            return mTextures[Slot];
+            return mTextures[CastEnum(Source)];
         }
 
         // -=(Undocumented)=-
-        void SetSampler(UInt Slot, Ref<const Sampler> Sampler)
+        void SetSampler(Source Source, Ref<const Sampler> Sampler)
         {
-            mSamplers[Slot] = Sampler;
+            mSamplers[CastEnum(Source)] = Sampler;
         }
 
         // -=(Undocumented)=-
-        Ref<const Sampler> GetSampler(UInt Slot) const
+        Ref<const Sampler> GetSampler(Source Source) const
         {
-            return mSamplers[Slot];
+            return mSamplers[CastEnum(Source)];
         }
 
         // -=(Undocumented)=-
@@ -104,8 +104,8 @@ namespace Graphic
 
         Object                             mID;
         Bool                               mResidence;
-        Array<SPtr<Texture>, k_MaxSources> mTextures;   // TODO: Stack
-        Array<Sampler, k_MaxSources>       mSamplers;   // TODO: Stack
+        Array<SPtr<Texture>, k_MaxSources> mTextures;   // TODO: Sparse
+        Array<Sampler, k_MaxSources>       mSamplers;   // TODO: Sparse
         Vector<Vector4f>                   mParameters; // TODO: Replace with pre allocated chunked memory
     };
 }

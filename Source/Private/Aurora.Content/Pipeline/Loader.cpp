@@ -76,6 +76,7 @@ namespace Content
 
         TOMLParser        Parser(File.GetText());
         const TOMLSection Properties = Parser.GetSection("Properties");
+        const TOMLSection Program    = Parser.GetSection("Program");
 
         // Parse 'blend' section
         const TOMLSection Blend = Properties.GetSection("Blend");
@@ -130,9 +131,19 @@ namespace Content
 
         Description.InputTopology = CastEnum(Layout.GetString("Topology"), Graphic::VertexTopology::Triangle);
 
-        // Parse program section by loading each shader
-        const TOMLSection Program = Parser.GetSection("Program");
+        // Parse 'textures' section
+        const TOMLSection Textures = Program.GetSection("Textures");
 
+        Array<Graphic::Source, Graphic::k_MaxSlots> Slots;
+        for (const Graphic::Source Source : magic_enum::enum_values<Graphic::Source>())
+        {
+            if (const SInt32 Slot = Textures.GetNumber(magic_enum::enum_name(Source), -1); Slot != -1)
+            {
+                Slots[Slot] = Source;
+            }
+        }
+
+        // Parse 'shader' section
         Array<Data, Graphic::k_MaxStages> Stages;
         Stages[0] = Compile(Service, Program.GetSection("Vertex"), Graphic::Stage::Vertex);
         Stages[1] = Compile(Service, Program.GetSection("Fragment"), Graphic::Stage::Fragment);
@@ -140,7 +151,7 @@ namespace Content
 
         if (Stages[0].HasData() && Stages[1].HasData())
         {
-            Asset.Load(Move(Stages), Move(Description));
+            Asset.Load(Move(Stages), Move(Slots), Move(Description));
             return true;
         }
 

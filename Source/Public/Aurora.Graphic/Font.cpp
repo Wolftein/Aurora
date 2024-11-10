@@ -144,10 +144,10 @@ namespace Graphic
             TextureLayout::Source, mAtlas.Width, mAtlas.Height, 1, Move(mAtlas.Bytes));
 
         // Allocates material for the font
-        mMaterial = NewPtr<Material>("_Private");
+        mMaterial = NewPtr<Material>("Private");
         mMaterial->SetResidence(true);
-        mMaterial->SetTexture(0, Atlas);
-        mMaterial->SetSampler(0, Sampler { TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear });
+        mMaterial->SetTexture(Source::Diffuse, Atlas);
+        mMaterial->SetSampler(Source::Diffuse, { TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear });
         mMaterial->SetParameter(0, Vector3f(Atlas->GetWidth(), Atlas->GetHeight(), mMetrics.Distance));
 
         return mMaterial->Create(Context);

@@ -96,15 +96,22 @@ namespace Graphic
         void SetPipeline(Ref<const Pipeline> Pipeline)
         {
             mInFlyBatch.Pipeline = Pipeline.GetID();
+            mInFlyPipeline       = AddressOf(Pipeline);
         }
 
         // -=(Undocumented)=-
         void SetMaterial(Ref<const Material> Material)
         {
             // Apply material's sources(s)
-            for (UInt Slot = 0; Slot < Graphic::k_MaxSources; ++Slot)
+            for (UInt Slot = 0; Slot < Graphic::k_MaxSlots; ++Slot)
             {
-                if (ConstSPtr<Texture> Texture = Material.GetTexture(Slot))
+                const Source Source = mInFlyPipeline->GetSlot(Slot);
+                if (Source == Source::None)
+                {
+                    break;
+                }
+
+                if (ConstSPtr<Texture> Texture = Material.GetTexture(Source))
                 {
                     mInFlyBatch.Textures[Slot] = Texture->GetID();
                 }
@@ -112,8 +119,7 @@ namespace Graphic
                 {
                     mInFlyBatch.Textures[Slot] = 0;
                 }
-
-                mInFlyBatch.Samplers[Slot] = Material.GetSampler(Slot);
+                mInFlyBatch.Samplers[Slot] = Material.GetSampler(Source);
             }
 
             // Apply material's parameter(s)
@@ -232,5 +238,6 @@ namespace Graphic
         Submission                mInFlyBatch;
         Array<TransientBuffer, 3> mInFlyBuffers;
         Array<TransientRange,  4> mInFlyRanges;
+        Ptr<const Pipeline>       mInFlyPipeline;
     };
 }

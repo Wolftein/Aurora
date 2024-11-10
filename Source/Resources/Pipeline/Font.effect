@@ -20,12 +20,16 @@
 
     Topology        = "Triangle"
 
+[Program.Textures]
+
+    Diffuse         = 0
+
 [Program.Vertex]
 
-	Entry    = "vertex"
-	Filename = "Engine://Pipeline/Font.shader"
+	Entry           = "vertex"
+	Filename        = "Engine://Pipeline/Font.shader"
 
 [Program.Fragment]
 
-	Entry    = "fragment"
-	Filename = "Engine://Pipeline/Font.shader"
+	Entry           = "fragment"
+	Filename        = "Engine://Pipeline/Font.shader"

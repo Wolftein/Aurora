@@ -7,12 +7,16 @@
 
     Topology        = "Triangle"
 
+[Program.Textures]
+
+    Diffuse         = 0
+
 [Program.Vertex]
 
-	Entry    = "vertex"
-	Filename = "Engine://Pipeline/Geometry.shader"
+	Entry           = "vertex"
+	Filename        = "Engine://Pipeline/Geometry.shader"
 
 [Program.Fragment]
 
-	Entry    = "fragment"
-	Filename = "Engine://Pipeline/Geometry.shader"
+	Entry           = "fragment"
+	Filename        = "Engine://Pipeline/Geometry.shader"

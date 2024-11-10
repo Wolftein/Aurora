@@ -1232,11 +1232,11 @@ namespace Graphic
 
     void D3D11Driver::ApplySamplerResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
     {
-        Ptr<ID3D11SamplerState> Array[k_MaxSources];
-        UInt Min = k_MaxSources;
+        Ptr<ID3D11SamplerState> Array[k_MaxSlots];
+        UInt Min = k_MaxSlots;
         UInt Max = 0u;
 
-        for (UInt Element = 0; Element < k_MaxSources; ++Element)
+        for (UInt Element = 0; Element < k_MaxSlots; ++Element)
         {
             Ref<const D3D11Sampler> PrevSampler = GetOrCreateSampler(Oldest.Samplers[Element]);
             Ref<const D3D11Sampler> NextSampler = GetOrCreateSampler(Newest.Samplers[Element]);
@@ -1249,7 +1249,7 @@ namespace Graphic
             Array[Element] = NextSampler.Resource.Get();
         }
 
-        if (Min != k_MaxSources && Max > 0)
+        if (Min != k_MaxSlots && Max > 0)
         {
             const UInt Count = Max - Min;
             mDeviceImmediate->PSSetSamplers(Min, Count, Array + Min); // TODO: Do we also need other stages?
@@ -1261,11 +1261,11 @@ namespace Graphic
 
     void D3D11Driver::ApplyTextureResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
     {
-        Ptr<ID3D11ShaderResourceView> Array[k_MaxSources];
-        UInt Min = k_MaxSources;
+        Ptr<ID3D11ShaderResourceView> Array[k_MaxSlots];
+        UInt Min = k_MaxSlots;
         UInt Max = 0u;
 
-        for (UInt Element = 0; Element < k_MaxSources && Newest.Textures[Element] != 0; ++Element)
+        for (UInt Element = 0; Element < k_MaxSlots && Newest.Textures[Element] != 0; ++Element)
         {
             if (Oldest.Textures[Element] != Newest.Textures[Element])
             {
@@ -1275,7 +1275,7 @@ namespace Graphic
             Array[Element] = mTextures[Newest.Textures[Element]].Resource.Get();
         }
 
-        if (Min != k_MaxSources && Max > 0)
+        if (Min != k_MaxSlots && Max > 0)
         {
             const UInt Count = Max - Min;
             mDeviceImmediate->PSSetShaderResources(Min, Count, Array + Min);    // TODO: Do we also need other stages?

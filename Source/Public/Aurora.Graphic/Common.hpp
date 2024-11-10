@@ -54,7 +54,10 @@ namespace Graphic
         k_MaxSamplers    = 0x00FF,
 
         // -=(Undocumented)=-
-        k_MaxSources     = 0x0008,
+        k_MaxSlots       = 0x0008,
+
+        // -=(Undocumented)=-
+        k_MaxSources     = 0x000C,
 
         // -=(Undocumented)=-
         k_MaxStages      = 0x0003,
@@ -145,6 +148,24 @@ namespace Graphic
         Version_4,
         Version_5,
         Version_6,
+    };
+
+    // -=(Undocumented)=-
+    enum class Source
+    {
+        None,
+        Diffuse,
+        Normal,
+        Roughness,
+        Metallic,
+        Specular,
+        Emissive,
+        Displacement,
+        Occlusion,
+        Height,
+        Ambient,
+        Detail,
+        Translucency,
     };
 
     // -=(Undocumented)=-
@@ -509,13 +530,13 @@ namespace Graphic
         Object    Pipeline               = 0;
 
         // -=(Undocumented)=-
-        Binding   Uniforms[k_MaxUniforms];          // TODO: Split in different stages Stack?
+        Binding   Uniforms[k_MaxUniforms];        // TODO: Split in different stages Stack?
 
         // -=(Undocumented)=-
-        Sampler   Samplers[k_MaxSources];           // TODO: Split in different stages Stack?
+        Sampler   Samplers[k_MaxSlots];           // TODO: Split in different stages Stack?
 
         // -=(Undocumented)=-
-        Object    Textures[k_MaxSources] = { };     // TODO: Split in different stages Stack?
+        Object    Textures[k_MaxSlots] = { };     // TODO: Split in different stages Stack?
 
         // -=(Undocumented)=-
         Instance  Primitive;

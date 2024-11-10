@@ -21,12 +21,16 @@
 
     Topology        = "Triangle"
 
+[Program.Textures]
+
+    Diffuse         = 0
+
 [Program.Vertex]
 
-	Entry    = "vertex"
-	Filename = "Engine://Pipeline/UI.shader"
+	Entry           = "vertex"
+	Filename        = "Engine://Pipeline/UI.shader"
 
 [Program.Fragment]
 
-	Entry    = "fragment"
-	Filename = "Engine://Pipeline/UI.shader"
+	Entry           = "fragment"
+	Filename        = "Engine://Pipeline/UI.shader"

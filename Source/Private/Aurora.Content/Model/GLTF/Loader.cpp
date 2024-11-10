@@ -22,58 +22,6 @@
 
 namespace Content
 {
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    Graphic::Sampler As(Ref<const tinygltf::Sampler> GLTFSampler)
-    {
-        Graphic::Sampler Sampler;
-
-        switch (GLTFSampler.wrapS)
-        {
-        case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
-            Sampler.EdgeU = Graphic::TextureEdge::Clamp;
-            break;
-        case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
-            Sampler.EdgeU = Graphic::TextureEdge::Mirror;
-            break;
-        default:
-            Sampler.EdgeU = Graphic::TextureEdge::Repeat;
-            break;
-        }
-        switch (GLTFSampler.wrapT)
-        {
-        case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
-            Sampler.EdgeV = Graphic::TextureEdge::Clamp;
-            break;
-        case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
-            Sampler.EdgeV = Graphic::TextureEdge::Mirror;
-            break;
-        default:
-            Sampler.EdgeU = Graphic::TextureEdge::Repeat;
-            break;
-        }
-
-        switch (GLTFSampler.minFilter)
-        {
-        case TINYGLTF_TEXTURE_FILTER_NEAREST:
-        case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:    // @NOT_SUPPORTED
-        case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:     // @NOT_SUPPORTED
-            Sampler.Filter = Graphic::TextureFilter::Nearest;
-            break;
-        case TINYGLTF_TEXTURE_FILTER_LINEAR:
-        case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:     // @NOT_SUPPORTED
-            Sampler.Filter = Graphic::TextureFilter::Bilinear;
-            break;
-        case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
-            Sampler.Filter = Graphic::TextureFilter::Trilinear;
-            break;
-        default:
-            Sampler.Filter = Graphic::TextureFilter::Nearest;
-            break;
-        }
-        return Sampler;
-    }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -94,6 +42,76 @@ namespace Content
 
         const auto Iterator = kMapping.find(Name.data());
         return (Iterator == kMapping.end() ? Graphic::VertexSemantic::None : Iterator->second);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Graphic::Sampler LoadSampler(Ref<const tinygltf::Sampler> GLTFSampler)
+    {
+        Graphic::Sampler Sampler;
+
+        switch (GLTFSampler.wrapS)
+        {
+            case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+                Sampler.EdgeU = Graphic::TextureEdge::Clamp;
+                break;
+            case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
+                Sampler.EdgeU = Graphic::TextureEdge::Mirror;
+                break;
+            default:
+                Sampler.EdgeU = Graphic::TextureEdge::Repeat;
+                break;
+        }
+        switch (GLTFSampler.wrapT)
+        {
+            case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+                Sampler.EdgeV = Graphic::TextureEdge::Clamp;
+                break;
+            case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
+                Sampler.EdgeV = Graphic::TextureEdge::Mirror;
+                break;
+            default:
+                Sampler.EdgeU = Graphic::TextureEdge::Repeat;
+                break;
+        }
+
+        switch (GLTFSampler.minFilter)
+        {
+            case TINYGLTF_TEXTURE_FILTER_NEAREST:
+            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:    // @NOT_SUPPORTED
+            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:     // @NOT_SUPPORTED
+                Sampler.Filter = Graphic::TextureFilter::Nearest;
+                break;
+            case TINYGLTF_TEXTURE_FILTER_LINEAR:
+            case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:     // @NOT_SUPPORTED
+                Sampler.Filter = Graphic::TextureFilter::Bilinear;
+                break;
+            case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
+                Sampler.Filter = Graphic::TextureFilter::Trilinear;
+                break;
+            default:
+                Sampler.Filter = Graphic::TextureFilter::Nearest;
+                break;
+        }
+        return Sampler;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    SPtr<Graphic::Texture> LoadTexture(Ref<tinygltf::Model> GLTFModel, Ref<const tinygltf::Texture> GLTFTexture)
+    {
+        Ref<const tinygltf::Image>   GLTFImage   = GLTFModel.images[GLTFTexture.source];
+
+        Data Chunk(GLTFImage.image.size());
+        memcpy(Chunk.GetData<UInt8>(), GLTFImage.image.data(), GLTFImage.image.size());
+
+        const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>(Uri { GLTFTexture.name });
+        Texture->Load(
+                Graphic::TextureFormat::RGBA8UIntNorm,
+                Graphic::TextureLayout::Source, GLTFImage.width, GLTFImage.height, 1, Move(Chunk));
+        return Texture;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -161,22 +179,43 @@ namespace Content
             const SPtr<Graphic::Material> Material = NewPtr<Graphic::Material>(Uri { GLTFMaterial.name });
             Material->SetResidence(true);
 
-            // @TODO: Multiple textures (Only color texture is supported)
-            if (Ref<const tinygltf::TextureInfo> GLTFDescription
-                    = GLTFMaterial.pbrMetallicRoughness.baseColorTexture; GLTFDescription.index != -1)
+            if (SInt32 Index = GLTFMaterial.pbrMetallicRoughness.baseColorTexture.index; Index >= 0)
             {
-                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[GLTFDescription.index];
-                Ref<const tinygltf::Image>   GLTFImage   = GLTFModel.images[GLTFTexture.source];
+                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
-                Data Chunk(GLTFImage.image.size());
-                memcpy(Chunk.GetData<UInt8>(), GLTFImage.image.data(), GLTFImage.image.size());
-
-                const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>(Uri { GLTFTexture.name });
-                Texture->Load(
-                    Graphic::TextureFormat::RGBA8UIntNorm, Graphic::TextureLayout::Source, GLTFImage.width, GLTFImage.height, 1, Move(Chunk));
-                Material->SetTexture(0, Texture);
-                Material->SetSampler(0, As(GLTFModel.samplers[GLTFTexture.sampler]));
+                Material->SetTexture(Graphic::Source::Diffuse, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::Source::Diffuse, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
+            if (SInt32 Index = GLTFMaterial.pbrMetallicRoughness.metallicRoughnessTexture.index; Index >= 0)
+            {
+                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
+
+                Material->SetTexture(Graphic::Source::Roughness, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::Source::Roughness, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
+            }
+            if (SInt32 Index = GLTFMaterial.normalTexture.index; Index >= 0)
+            {
+                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
+
+                Material->SetTexture(Graphic::Source::Normal, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::Source::Normal, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
+            }
+            if (SInt32 Index = GLTFMaterial.emissiveTexture.index; Index >= 0)
+            {
+                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
+
+                Material->SetTexture(Graphic::Source::Emissive, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::Source::Emissive, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
+            }
+            if (SInt32 Index = GLTFMaterial.occlusionTexture.index; Index >= 0)
+            {
+                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
+
+                Material->SetTexture(Graphic::Source::Occlusion, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::Source::Occlusion, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
+            }
+
+            // @TODO: Create uniform buffer for the PBR / Custom properties
 
             Materials[ID++] = Material;
         }
