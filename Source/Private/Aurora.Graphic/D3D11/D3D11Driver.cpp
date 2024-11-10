@@ -366,7 +366,7 @@ namespace Graphic
             { "TEXCOORD", 3 },     // VertexSemantic::TexCoord3
             { "TEXCOORD", 4 },     // VertexSemantic::TexCoord4
             { "TEXCOORD", 5 },     // VertexSemantic::TexCoord5
-            { "TEXCOORD", 6 },     // Ve            rtexSemantic::TexCoord6
+            { "TEXCOORD", 6 },     // VertexSemantic::TexCoord6
             { "TEXCOORD", 7 },     // VertexSemantic::TexCoord7
             { "CUSTOM",   0 },     // VertexSemantic::Custom0
             { "CUSTOM",   1 },     // VertexSemantic::Custom1
@@ -740,7 +740,7 @@ namespace Graphic
 
             for (; Count < k_MaxAttributes && Properties.InputLayout[Count].ID != VertexSemantic::None; ++Count)
             {
-                Ref<const Attribute>		  Element    = Properties.InputLayout[Count];
+                Ref<const Attribute>          Element    = Properties.InputLayout[Count];
                 Ref<D3D11_INPUT_ELEMENT_DESC> Descriptor = Description[Count];
 
                 Descriptor.SemanticName         = As<0>(Element.ID);
