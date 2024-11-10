@@ -183,7 +183,7 @@ SET(SPDLOG_USE_STD_FORMAT ON)
 
 FetchContent_Declare(External_SPDLOG
         GIT_REPOSITORY https://github.com/gabime/spdlog
-        GIT_TAG v2.x)
+        GIT_TAG v1.x)
 FetchContent_MakeAvailable(External_SPDLOG)
 
 LIST(APPEND PROJECT_DEPENDENCIES "spdlog::spdlog")
