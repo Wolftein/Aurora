@@ -79,7 +79,7 @@ namespace Graphic
         void DeleteTexture(Object ID) override;
 
         // \see Driver::Prepare
-        void Begin(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) override;
+        void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) override;
 
         // \see Driver::Submit
         void Submit(CPtr<Submission> Submissions) override;

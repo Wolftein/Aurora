@@ -80,7 +80,7 @@ namespace Graphic
         virtual void DeleteTexture(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void Begin(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) = 0;
+        virtual void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) = 0;
 
         // -=(Undocumented)=-
         virtual void Submit(CPtr<Submission> Submissions) = 0;

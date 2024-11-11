@@ -99,7 +99,7 @@ namespace Graphic
         void DeleteTexture(Object ID);
 
         // -=(Undocumented)=-
-        void Begin(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
+        void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
 
         // -=(Undocumented)=-
         void Submit(CPtr<Submission> Submissions);
