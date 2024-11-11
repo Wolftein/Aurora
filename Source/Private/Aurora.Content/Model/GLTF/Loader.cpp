@@ -175,7 +175,7 @@ namespace Content
         }
 
         // Parse each material from the model
-        Array<SPtr<Graphic::Material>, Graphic::Mesh::k_MaxPrimitives> Materials;
+        Array<SPtr<Graphic::Material>, Graphic::Mesh::k_MaxPrimitives> Materials { };
         for (UInt32 ID = 0; Ref<const tinygltf::Material> GLTFMaterial : GLTFModel.materials)
         {
             const SPtr<Graphic::Material> Material = NewPtr<Graphic::Material>(Uri { GLTFMaterial.name });
