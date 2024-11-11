@@ -1279,6 +1279,9 @@ namespace Graphic
         ComPtr<ID3D11Texture2D> Depth;
         CheckIfFail(mDevice->CreateTexture2D(& Description, nullptr, Depth.GetAddressOf()));
         CheckIfFail(mDevice->CreateDepthStencilView(Depth.Get(), nullptr, Pass.Auxiliary.GetAddressOf()));
+
+        // Keep track on how many samples the swapchain has.
+        mCapabilities.Samples = Samples;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
