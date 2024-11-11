@@ -1066,19 +1066,14 @@ namespace Graphic
         // Resolve multisample texture(s)
         for (UInt32 Slot = 0; Slot < k_MaxAttachments; ++Slot)    // @TODO Stack
         {
-            if (Ref<const D3D11Attachment> Destination = Pass.Resolves[Slot]; Destination.Object)
+            if (Ref<const D3D11Attachment> Resolve = Pass.Resolves[Slot]; Resolve.Object)
             {
+                D3D11_RENDER_TARGET_VIEW_DESC Description;
+                Resolve.Resource->GetDesc(AddressOf(Description));
+
                 Ref<const D3D11Attachment> Source = Pass.Color[Slot];
-
-                CD3D11_RENDER_TARGET_VIEW_DESC Description; // @TODO Cache somewhere
-                Destination.Resource->GetDesc(AddressOf(Description));
-
                 mDeviceImmediate->ResolveSubresource(
-                        Destination.Object.Get(),
-                        Destination.Level,
-                        Source.Object.Get(),
-                        Source.Level,
-                        Description.Format);
+                        Resolve.Object.Get(), Resolve.Level, Source.Object.Get(), Source.Level, Description.Format);
             }
         }
 
@@ -1271,7 +1266,7 @@ namespace Graphic
         Description.Height     = Height;
         Description.MipLevels  = 1;
         Description.ArraySize  = 1;
-        Description.Format     = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+        Description.Format     = DXGI_FORMAT_D24_UNORM_S8_UINT;
         Description.SampleDesc = mLimits.Multisample[Samples];
         Description.Usage      = D3D11_USAGE_DEFAULT;
         Description.BindFlags  = D3D11_BIND_DEPTH_STENCIL;
