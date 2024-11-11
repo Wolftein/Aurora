@@ -28,10 +28,10 @@ namespace Graphic
     public:
 
         // \see Driver::Initialize
-        Bool Initialize(Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height) override;
+        Bool Initialize(Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples) override;
 
         // \see Driver::Reset
-        void Reset(UInt32 Width, UInt32 Height) override;
+        void Reset(UInt16 Width, UInt16 Height, UInt8 Samples) override;
 
         // \see Driver::GetCapabilities
         Ref<const Capabilities> GetCapabilities() const override;
@@ -49,7 +49,7 @@ namespace Graphic
         void DeleteBuffer(Object ID) override;
 
         // \see Driver::CreatePass
-        void CreatePass(Object ID, CPtr<Object> Colors, Object Auxiliary) override;
+        void CreatePass(Object ID, CPtr<Attachment> Colors, CPtr<Attachment> Resolves, Attachment Auxiliary) override;
 
         // \see Driver::DeletePass
         void DeletePass(Object ID) override;
@@ -61,7 +61,7 @@ namespace Graphic
         void DeletePipeline(Object ID) override;
 
         // \see Driver::CreateTexture
-        void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt32 Width, UInt32 Height, UInt8 Level, CPtr<const UInt8> Data) override;
+        void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt32 Width, UInt32 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) override;
 
         // \see Driver::UpdateTexture
         void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data) override;
@@ -78,8 +78,8 @@ namespace Graphic
         // \see Driver::DeleteTexture
         void DeleteTexture(Object ID) override;
 
-        // \see Driver::Prepare
-        void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) override;
+        // \see Driver::Begin
+        void Begin(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) override;
 
         // \see Driver::Submit
         void Submit(CPtr<Submission> Submissions) override;

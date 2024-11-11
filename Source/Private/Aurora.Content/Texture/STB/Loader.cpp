@@ -37,7 +37,10 @@ namespace Content
                 stbi_image_free(Data);
             });
 
-            Asset.Load(Graphic::TextureFormat::RGBA8UIntNorm, Graphic::TextureLayout::Source, Width, Height, 1, Move(Chunk));
+            constexpr UInt8 k_DefaultMipmaps = 1;
+            constexpr UInt8 k_DefaultSamples = 1;
+            Asset.Load(Graphic::TextureFormat::RGBA8UIntNorm,
+                       Graphic::TextureLayout::Source, Width, Height, k_DefaultMipmaps, k_DefaultSamples, Move(Chunk));
 
             return true;
         }

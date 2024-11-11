@@ -21,9 +21,10 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    constexpr CStr DEFAULT_TITLE  = "Aurora Engine";
-    constexpr UInt DEFAULT_WIDTH  = 800;
-    constexpr UInt DEFAULT_HEIGHT = 600;
+    constexpr CStr DEFAULT_TITLE   = "Aurora Engine";
+    constexpr UInt DEFAULT_WIDTH   = 800;
+    constexpr UInt DEFAULT_HEIGHT  = 600;
+    constexpr UInt DEFAULT_SAMPLES = 1;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -33,6 +34,7 @@ namespace Engine
           mWindowTitle      { DEFAULT_TITLE  },
           mWindowWidth      { DEFAULT_WIDTH  },
           mWindowHeight     { DEFAULT_HEIGHT },
+          mWindowSamples    { DEFAULT_SAMPLES },
           mWindowFullscreen { false },
           mWindowBorderless { false }
     {

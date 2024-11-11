@@ -36,14 +36,15 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Texture::Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, Any<Data> Data)
+    void Texture::Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, Any<Data> Data)
     {
-        mFormat = Format;
-        mLayout = Layout;
-        mWidth  = Width;
-        mHeight = Height;
-        mLevel  = Level;
-        mData   = Move(Data);
+        mFormat  = Format;
+        mLayout  = Layout;
+        mWidth   = Width;
+        mHeight  = Height;
+        mLevel   = Level;
+        mSamples = Samples;
+        mData    = Move(Data);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -53,7 +54,7 @@ namespace Graphic
     {
         SetMemory(mData.GetSize());
 
-        mID = Context.GetSubsystem<Service>()->CreateTexture(mFormat, mLayout, mWidth, mHeight, mLevel, Move(mData));
+        mID = Context.GetSubsystem<Service>()->CreateTexture(mFormat, mLayout, mWidth, mHeight, mLevel, mSamples, Move(mData));
 
         return mID > 0;
     }

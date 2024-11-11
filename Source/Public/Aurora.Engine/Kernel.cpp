@@ -71,7 +71,7 @@ namespace Engine
             Log::Info("Kernel: Creating graphics service");
             ConstSPtr<Graphic::Service> GraphicService = AddSubsystem<Graphic::Service>();
             if (! GraphicService->Initialize(
-                GraphicBackend, mDevice->GetHandle(), mDevice->GetWidth(), mDevice->GetHeight()))
+                GraphicBackend, mDevice->GetHandle(), mDevice->GetWidth(), mDevice->GetHeight(), Properties.GetWindowSamples()))
             {
                 Log::Warn("Kernel: Failed to create graphics service, disabling service.");
                 RemoveSubsystem<Graphic::Service>();
@@ -174,7 +174,8 @@ namespace Engine
 
     Bool Kernel::OnWindowResize(SInt32 Width, SInt32 Height)
     {
-        GetSubsystem<Graphic::Service>()->Reset(Width, Height);
+        ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>();
+        Graphics->Reset(Width, Height, Graphics->GetCapabilities().Samples);
         return false;
     }
 }

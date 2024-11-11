@@ -33,10 +33,10 @@ namespace Graphic
         void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
-        Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height);
+        Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples);
 
         // -=(Undocumented)=-
-        void Reset(UInt32 Width, UInt32 Height);
+        void Reset(UInt16 Width, UInt16 Height, UInt8 Samples);
 
         // -=(Undocumented)=-
         Ref<const Capabilities> GetCapabilities() const
@@ -69,7 +69,7 @@ namespace Graphic
         void DeleteMaterial(Object ID);
 
         // -=(Undocumented)=-
-        Object CreatePass(CPtr<Object> Colors, Object Auxiliary);
+        Object CreatePass(CPtr<Attachment> Colors, CPtr<Attachment> Resolves, Attachment Auxiliary);
 
         // -=(Undocumented)=-
         void DeletePass(Object ID);
@@ -81,7 +81,7 @@ namespace Graphic
         void DeletePipeline(Object ID);
 
         // -=(Undocumented)=-
-        Object CreateTexture(TextureFormat Format, TextureLayout Layout, UInt32 Width ,UInt32 Height, UInt8 Level, Any<Data> Data);
+        Object CreateTexture(TextureFormat Format, TextureLayout Layout, UInt32 Width ,UInt32 Height, UInt8 Level, UInt8 Samples, Any<Data> Data);
 
         // -=(Undocumented)=-
         void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, Any<Data> Data);
@@ -99,7 +99,7 @@ namespace Graphic
         void DeleteTexture(Object ID);
 
         // -=(Undocumented)=-
-        void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
+        void Begin(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
 
         // -=(Undocumented)=-
         void Submit(CPtr<Submission> Submissions);

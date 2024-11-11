@@ -77,6 +77,18 @@ namespace Engine
         }
 
         // -=(Undocumented)=-
+        void SetWindowSamples(UInt8 Samples)
+        {
+            mWindowSamples = Samples;
+        }
+
+        // -=(Undocumented)=-
+        UInt16 GetWindowSamples() const
+        {
+            return mWindowSamples;
+        }
+
+        // -=(Undocumented)=-
         void SetWindowFullscreen(Bool Fullscreen)
         {
             mWindowFullscreen = Fullscreen;
@@ -145,6 +157,7 @@ namespace Engine
         SStr   mWindowTitle;
         UInt16 mWindowWidth;
         UInt16 mWindowHeight;
+        UInt8  mWindowSamples;
         Bool   mWindowFullscreen;
         Bool   mWindowBorderless;
         SStr   mAudioDevice;

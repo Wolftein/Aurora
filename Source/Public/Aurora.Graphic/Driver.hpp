@@ -29,10 +29,10 @@ namespace Graphic
         virtual ~Driver() = default;
 
         // -=(Undocumented)=-
-        virtual Bool Initialize(Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height) = 0;
+        virtual Bool Initialize(Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples) = 0;
 
         // -=(Undocumented)=-
-        virtual void Reset(UInt32 Width, UInt32 Height) = 0;
+        virtual void Reset(UInt16 Width, UInt16 Height, UInt8 Samples) = 0;
 
         // -=(Undocumented)=-
         virtual Ref<const Capabilities> GetCapabilities() const = 0;
@@ -50,7 +50,7 @@ namespace Graphic
         virtual void DeleteBuffer(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreatePass(Object ID, CPtr<Object> Colors, Object Auxiliary) = 0;
+        virtual void CreatePass(Object ID, CPtr<Attachment> Colors, CPtr<Attachment> Resolves, Attachment Auxiliary) = 0;
 
         // -=(Undocumented)=-
         virtual void DeletePass(Object ID) = 0;
@@ -62,7 +62,7 @@ namespace Graphic
         virtual void DeletePipeline(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt32 Width, UInt32 Height, UInt8 Level, CPtr<const UInt8> Data) = 0;
+        virtual void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt32 Width, UInt32 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) = 0;
 
         // -=(Undocumented)=-
         virtual void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data) = 0;
@@ -80,7 +80,7 @@ namespace Graphic
         virtual void DeleteTexture(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) = 0;
+        virtual void Begin(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) = 0;
 
         // -=(Undocumented)=-
         virtual void Submit(CPtr<Submission> Submissions) = 0;

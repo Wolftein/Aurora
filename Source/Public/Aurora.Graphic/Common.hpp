@@ -51,6 +51,9 @@ namespace Graphic
         k_MaxPipelines   = 0x00C0,
 
         // -=(Undocumented)=-
+        k_MaxSamples     = 0x0008,
+
+        // -=(Undocumented)=-
         k_MaxSamplers    = 0x00FF,
 
         // -=(Undocumented)=-
@@ -388,6 +391,16 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
+    struct Attachment
+    {
+        // -=(Undocumented)=-
+        Object Texture = 0;
+
+        // -=(Undocumented)=-
+        UInt32 Level   = 0;
+    };
+
+    // -=(Undocumented)=-
     struct Attribute
     {
         // -=(Undocumented)=-
@@ -433,6 +446,9 @@ namespace Graphic
 
         // -=(Undocumented)=-
         Bool     Adaptive = false;
+
+        // -=(Undocumented)=-
+        UInt8    Samples  = 1;
 
         // -=(Undocumented)=-
         Vector<Adapter> Adapters;

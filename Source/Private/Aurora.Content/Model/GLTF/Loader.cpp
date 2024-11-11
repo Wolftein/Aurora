@@ -106,10 +106,13 @@ namespace Content
         Data Chunk(GLTFImage.image.size());
         memcpy(Chunk.GetData<UInt8>(), GLTFImage.image.data(), GLTFImage.image.size());
 
+        constexpr UInt8 k_DefaultMipmaps = 1;
+        constexpr UInt8 k_DefaultSamples = 1;
+
         const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>(Uri { GLTFTexture.name });
         Texture->Load(
                 Graphic::TextureFormat::RGBA8UIntNorm,
-                Graphic::TextureLayout::Source, GLTFImage.width, GLTFImage.height, 1, Move(Chunk));
+                Graphic::TextureLayout::Source, GLTFImage.width, GLTFImage.height, k_DefaultMipmaps, k_DefaultSamples, Move(Chunk));
         return Texture;
     }
 

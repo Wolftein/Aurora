@@ -138,10 +138,13 @@ namespace Graphic
         SetMemory(mGlyphs.size() * sizeof(Glyph));
 
         // Allocates texture for the atlas
+        constexpr UInt8 k_DefaultMipmaps = 1;
+        constexpr UInt8 k_DefaultSamples = 1;
+
         const SPtr<Texture> Atlas = NewPtr<Texture>("_Private");
         Atlas->Load(
             TextureFormat::RGBA8UIntNorm,
-            TextureLayout::Source, mAtlas.Width, mAtlas.Height, 1, Move(mAtlas.Bytes));
+            TextureLayout::Source, mAtlas.Width, mAtlas.Height, k_DefaultMipmaps, k_DefaultSamples, Move(mAtlas.Bytes));
 
         // Allocates material for the font
         mMaterial = NewPtr<Material>("Private");

@@ -32,7 +32,7 @@ namespace Graphic
         explicit Texture(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, Any<Data> Data);
+        void Load(TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, Any<Data> Data);
 
         // -=(Undocumented)=-
         Object GetID() const
@@ -70,6 +70,12 @@ namespace Graphic
             return mLevel;
         }
 
+        // -=(Undocumented)=-
+        UInt8 GetSamples() const
+        {
+            return mSamples;
+        }
+
     private:
 
         // \see Resource::OnCreate(Ref<Subsystem::Context>)
@@ -89,6 +95,7 @@ namespace Graphic
         UInt16        mWidth;
         UInt16        mHeight;
         UInt8         mLevel;
+        UInt8         mSamples;
         Data          mData;
     };
 }

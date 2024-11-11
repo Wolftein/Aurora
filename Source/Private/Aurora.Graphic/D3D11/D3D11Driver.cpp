@@ -21,7 +21,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    inline Bool CheckIfFail(HRESULT Result)
+    static Bool CheckIfFail(HRESULT Result)
     {
         if (FAILED(Result))
         {
@@ -406,7 +406,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool D3D11Driver::Initialize(Ptr<SDL_Window> Swapchain, UInt32 Width, UInt32 Height)
+    Bool D3D11Driver::Initialize(Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples)
     {
         decltype(& D3D11CreateDevice)  D3D11CreateDevicePtr = nullptr;
         decltype(& CreateDXGIFactory1) CreateDXGIFactoryPtr = nullptr;
@@ -508,7 +508,7 @@ namespace Graphic
                     {
                         const Ptr<void> Display = SDL_GetPointerProperty(
                             SDL_GetWindowProperties(Swapchain), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
-                        CreatePass(k_Default, reinterpret_cast<UInt>(Display), Width, Height);
+                        CreateSwapchain(mPasses[k_Default], reinterpret_cast<UInt>(Display), Width, Height, Samples);
                     }
                 }
             }
@@ -519,22 +519,24 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::Reset(UInt32 Width, UInt32 Height)
+    void D3D11Driver::Reset(UInt16 Width, UInt16 Height, UInt8 Samples)
     {
         if (mDeviceImmediate)
         {
             mDeviceImmediate->ClearState();
         }
 
-        mPasses[k_Default].Color[k_Default]->Release();
+        // Release all reference(s) to back buffer
+        mPasses[k_Default].Color[k_Default].~D3D11Attachment();
+        mPasses[k_Default].Resolves[k_Default].~D3D11Attachment();
         mPasses[k_Default].Auxiliary->Release();
 
         // Changes the swap chain's back buffer size, format, and number of buffers
         const UINT Flags = mCapabilities.Adaptive ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
-        CheckIfFail(mPasses[k_Default].Display->ResizeBuffers(0, Width, Height, DXGI_FORMAT_UNKNOWN, Flags));
+        CheckIfFail(mPasses[k_Default].Display->ResizeBuffers(0, Width, Height, DXGI_FORMAT_B8G8R8A8_UNORM, Flags));
 
         // Recreate the swap chain's resources
-        CreateSwapchainResources(mPasses[k_Default], Width, Height);
+        CreateSwapchainResources(mPasses[k_Default], Width, Height, Samples);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -601,54 +603,40 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreatePass(Object ID, UInt Display, UInt Width, UInt Height)
-    {
-        DXGI_SWAP_CHAIN_DESC Description { };
-        Description.BufferCount       = 3;
-        Description.BufferUsage       = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        Description.Flags             = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
-             | (mCapabilities.Adaptive ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
-        Description.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        Description.BufferDesc.Width  = Width;
-        Description.BufferDesc.Height = Height;
-        Description.SampleDesc        = { 1, 0 };
-        Description.OutputWindow      = reinterpret_cast<HWND>(Display);
-        Description.Windowed          = true;
-
-        ComPtr<IDXGIFactory4> DXGIFactor4;
-        if (SUCCEEDED(mDeviceFactory.As<IDXGIFactory4>(& DXGIFactor4)))
-        {
-            Description.SwapEffect = mCapabilities.Adaptive ? DXGI_SWAP_EFFECT_FLIP_DISCARD : DXGI_SWAP_EFFECT_DISCARD;
-        }
-        else
-        {
-            Description.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-        }
-
-        CheckIfFail(mDeviceFactory->CreateSwapChain(mDevice.Get(), & Description, mPasses[ID].Display.GetAddressOf()));
-        CheckIfFail(mDeviceFactory->MakeWindowAssociation(Description.OutputWindow, DXGI_MWA_NO_WINDOW_CHANGES));
-
-        CreateSwapchainResources(mPasses[ID], Width, Height);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void D3D11Driver::CreatePass(Object ID, CPtr<UInt> Colors, UInt Auxiliary)
+    void D3D11Driver::CreatePass(Object ID, CPtr<Attachment> Colors, CPtr<Attachment> Resolves, Attachment Auxiliary)
     {
         Ref<D3D11Pass> Pass = mPasses[ID];
 
-        for (UInt Index = 0; Index < Colors.size(); ++Index)
+        // Create all color(s) attachment(s).
+        for (UInt Slot = 0; Slot < Colors.size(); ++Slot)
         {
-            const Ptr<ID3D11Texture2D> Attachment = mTextures[Colors[Index]].Object.Get();
-            const CD3D11_RENDER_TARGET_VIEW_DESC Description(D3D11_RTV_DIMENSION_TEXTURE2D);
-            CheckIfFail(mDevice->CreateRenderTargetView(Attachment, & Description, Pass.Color[Index].GetAddressOf()));
+            Ref<D3D11Attachment> Attachment = Pass.Color[Slot];
+            Attachment.Object = mTextures[Colors[Slot].Texture].Object;
+            Attachment.Level  = Colors[Slot].Level;
+
+            const CD3D11_RENDER_TARGET_VIEW_DESC Description(D3D11_RTV_DIMENSION_TEXTURE2D, DXGI_FORMAT_UNKNOWN, Attachment.Level);
+            CheckIfFail(mDevice->CreateRenderTargetView(
+                    Attachment.Object.Get(), & Description, Attachment.Resource.GetAddressOf()));
         }
 
-        if (Auxiliary)
+        // Create all multisample color(s) attachment(s).
+        for (UInt Slot = 0; Slot < Resolves.size(); ++Slot)
         {
-            const Ptr<ID3D11Texture2D> Attachment = mTextures[Auxiliary].Object.Get();
-            const CD3D11_DEPTH_STENCIL_VIEW_DESC Description(D3D11_DSV_DIMENSION_TEXTURE2D);
+            Ref<D3D11Attachment> Attachment = Pass.Resolves[Slot];
+            Attachment.Object = mTextures[Resolves[Slot].Texture].Object;
+            Attachment.Level  = Resolves[Slot].Level;
+
+            const CD3D11_RENDER_TARGET_VIEW_DESC Description(D3D11_RTV_DIMENSION_TEXTURE2DMS, DXGI_FORMAT_UNKNOWN, Attachment.Level);
+            CheckIfFail(mDevice->CreateRenderTargetView(
+                    Attachment.Object.Get(), & Description, Attachment.Resource.GetAddressOf()));
+        }
+
+        // Create depth attachment.
+        if (Auxiliary.Texture > 0)
+        {
+            const Ptr<ID3D11Texture2D> Attachment = mTextures[Auxiliary.Texture].Object.Get();
+            const CD3D11_DEPTH_STENCIL_VIEW_DESC Description(
+                    D3D11_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_UNKNOWN, Auxiliary.Level);
             CheckIfFail(mDevice->CreateDepthStencilView(Attachment, & Description, Pass.Auxiliary.GetAddressOf()));
         }
     }
@@ -729,6 +717,7 @@ namespace Graphic
             Description.CullMode              = As(Properties.Cull);
             Description.ScissorEnable         = TRUE;
             Description.MultisampleEnable     = TRUE;
+            Description.AntialiasedLineEnable = TRUE;
             Description.FillMode              = Properties.Fill ? D3D11_FILL_SOLID : D3D11_FILL_WIREFRAME;
 
             CheckIfFail(mDevice->CreateRasterizerState(& Description, Pipeline.RS.GetAddressOf()));
@@ -769,12 +758,13 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt32 Width, UInt32 Height, UInt8 Level, CPtr<const UInt8> Data)
+    void D3D11Driver::CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt32 Width, UInt32 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data)
     {
         CD3D11_TEXTURE2D_DESC Description(As(Format), Width, Height, 1, Level);
-        Description.Usage     = Data.empty() ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
-        Description.BindFlags = Layout != TextureLayout::Destination ? D3D11_BIND_SHADER_RESOURCE : 0;
-        Description.MiscFlags = Level < 1 ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+        Description.Usage      = Data.empty() ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
+        Description.BindFlags  = Layout != TextureLayout::Destination ? D3D11_BIND_SHADER_RESOURCE : 0;
+        Description.MiscFlags  = Level < 1 ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+        Description.SampleDesc = mLimits.Multisample[Samples];
 
         if (Layout != TextureLayout::Source)
         {
@@ -798,9 +788,12 @@ namespace Graphic
 
         if (Layout != TextureLayout::Destination)
         {
-            const CD3D11_SHADER_RESOURCE_VIEW_DESC Type(D3D11_SRV_DIMENSION_TEXTURE2D, As(Format), 0, Level);
+            const D3D11_SRV_DIMENSION Type
+                = Samples > 1 ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
+
+            const CD3D11_SHADER_RESOURCE_VIEW_DESC Descriptor(Type, As(Format), 0, Level);
             CheckIfFail(mDevice->CreateShaderResourceView(
-                mTextures[ID].Object.Get(), & Type, mTextures[ID].Resource.GetAddressOf()));
+                mTextures[ID].Object.Get(), AddressOf(Descriptor), mTextures[ID].Resource.GetAddressOf()));
         }
     }
 
@@ -899,13 +892,15 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
+    void D3D11Driver::Begin(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
     {
+        Ref<D3D11Pass> Pass = mPasses[ID];
+
         Array<Ptr<ID3D11RenderTargetView>, k_MaxAttachments> Attachments { };
 
         for (UInt Index = 0; Index < k_MaxAttachments; ++Index)
         {
-            if (Ref<const ComPtr<ID3D11RenderTargetView>> View = mPasses[ID].Color[Index])
+            if (Ref<const ComPtr<ID3D11RenderTargetView>> View = Pass.Color[Index].Resource)
             {
                 Attachments[Index] = View.Get();
 
@@ -926,10 +921,10 @@ namespace Graphic
         {
             constexpr UINT Mode = D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL;
 
-            mDeviceImmediate->ClearDepthStencilView(mPasses[ID].Auxiliary.Get(), Mode, Depth, Stencil);
+            mDeviceImmediate->ClearDepthStencilView(Pass.Auxiliary.Get(), Mode, Depth, Stencil);
         }
 
-        mDeviceImmediate->OMSetRenderTargets(Attachments.size(), Attachments.data(), mPasses[ID].Auxiliary.Get());
+        mDeviceImmediate->OMSetRenderTargets(Attachments.size(), Attachments.data(), Pass.Auxiliary.Get());
 
         const CD3D11_VIEWPORT Rect(
             Viewport.GetX(),
@@ -1066,7 +1061,29 @@ namespace Graphic
 
     void D3D11Driver::Commit(Object ID, Bool Synchronised)
     {
-        if (Ref<const ComPtr<IDXGISwapChain>> Display = mPasses[ID].Display)
+        Ref<const D3D11Pass> Pass = mPasses[ID];
+
+        // Resolve multisample texture(s)
+        for (UInt32 Slot = 0; Slot < k_MaxAttachments; ++Slot)    // @TODO Stack
+        {
+            if (Ref<const D3D11Attachment> Destination = Pass.Resolves[Slot]; Destination.Object)
+            {
+                Ref<const D3D11Attachment> Source = Pass.Color[Slot];
+
+                CD3D11_RENDER_TARGET_VIEW_DESC Description; // @TODO Cache somewhere
+                Destination.Resource->GetDesc(AddressOf(Description));
+
+                mDeviceImmediate->ResolveSubresource(
+                        Destination.Object.Get(),
+                        Destination.Level,
+                        Source.Object.Get(),
+                        Source.Level,
+                        Description.Format);
+            }
+        }
+
+        // Resolve swapchain
+        if (Ref<const ComPtr<IDXGISwapChain>> Display = Pass.Display)
         {
             const UInt Sync = Synchronised ? 1 : 0;
             const UInt Flag = Synchronised ? 0 : mCapabilities.Adaptive ? DXGI_PRESENT_ALLOW_TEARING : 0;
@@ -1161,24 +1178,101 @@ namespace Graphic
                 DXGI_FEATURE_PRESENT_ALLOW_TEARING, & AllowAdaptive, sizeof(AllowAdaptive)));
             mCapabilities.Adaptive = AllowAdaptive;
         }
+
+        // Check multisample quality support level(s).
+        for (UInt32 Level = 1, Last = 1; Level <= k_MaxSamples; ++Level)
+        {
+            UInt32 Quality = 0;
+
+            // @TODO: check other formats?
+            const HRESULT Result
+                = mDevice->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, Level, AddressOf(Quality));
+
+            if (SUCCEEDED(Result) && Quality > 0)
+            {
+                mLimits.Multisample[Level] = DXGI_SAMPLE_DESC { Level, Quality - 1 };
+            }
+            else
+            {
+                mLimits.Multisample[Level] = mLimits.Multisample[Last];
+            }
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreateSwapchainResources(Ref<D3D11Pass> Pass, UInt Width, UInt Height)
+    void D3D11Driver::CreateSwapchain(Ref<D3D11Pass> Pass, UInt Display, UInt16 Width, UInt16 Height, UInt8 Samples)
     {
-        ComPtr<ID3D11Texture2D> Color;
-        CheckIfFail(Pass.Display->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(Color.GetAddressOf())));
-        CheckIfFail(mDevice->CreateRenderTargetView(Color.Get(), nullptr, Pass.Color[k_Default].GetAddressOf()));
+        DXGI_SWAP_CHAIN_DESC Description { };
+        Description.BufferCount       = 2;
+        Description.BufferUsage       = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        Description.Flags             = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
+            | (mCapabilities.Adaptive ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
+        Description.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        Description.BufferDesc.Width  = Width;
+        Description.BufferDesc.Height = Height;
+        Description.SampleDesc        = { 1, 0 };
+        Description.OutputWindow      = reinterpret_cast<HWND>(Display);
+        Description.Windowed          = true;
 
+        ComPtr<IDXGIFactory4> DXGIFactor4;
+        if (SUCCEEDED(mDeviceFactory.As<IDXGIFactory4>(& DXGIFactor4)))
+        {
+            Description.SwapEffect = mCapabilities.Adaptive ? DXGI_SWAP_EFFECT_FLIP_DISCARD : DXGI_SWAP_EFFECT_DISCARD;
+        }
+        else
+        {
+            Description.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+        }
+
+        CheckIfFail(mDeviceFactory->CreateSwapChain(mDevice.Get(), & Description, Pass.Display.GetAddressOf()));
+        CheckIfFail(mDeviceFactory->MakeWindowAssociation(Description.OutputWindow, DXGI_MWA_NO_WINDOW_CHANGES));
+
+        CreateSwapchainResources(Pass, Width, Height, Samples);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::CreateSwapchainResources(Ref<D3D11Pass> Pass, UInt16 Width, UInt16 Height, UInt8 Samples)
+    {
+        // Check if we need to create a multisample texture for the swap-chain
+        if (Samples > 1)
+        {
+            D3D11_TEXTURE2D_DESC Description { };
+            Description.Width      = Width;
+            Description.Height     = Height;
+            Description.MipLevels  = 1;
+            Description.ArraySize  = 1;
+            Description.Format     = DXGI_FORMAT_B8G8R8A8_UNORM;
+            Description.SampleDesc = mLimits.Multisample[Samples];
+            Description.Usage      = D3D11_USAGE_DEFAULT;
+            Description.BindFlags  = D3D11_BIND_RENDER_TARGET;
+
+            Ref<D3D11Attachment> Color = Pass.Color[k_Default];
+            CheckIfFail(mDevice->CreateTexture2D(
+                    & Description, nullptr, reinterpret_cast<ID3D11Texture2D **>(Color.Object.GetAddressOf())));
+
+            const CD3D11_RENDER_TARGET_VIEW_DESC Desc(D3D11_RTV_DIMENSION_TEXTURE2DMS);
+            CheckIfFail(mDevice->CreateRenderTargetView(
+                    Color.Object.Get(), & Desc, Color.Resource.GetAddressOf()));
+        }
+
+        // Create a view for the back-buffer texture
+        Ref<D3D11Attachment> Color = Samples > 1 ? Pass.Resolves[k_Default] : Pass.Color[k_Default];
+        CheckIfFail(Pass.Display->GetBuffer(
+                0, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(Color.Object.GetAddressOf())));
+        CheckIfFail(mDevice->CreateRenderTargetView(Color.Object.Get(), nullptr, Color.Resource.GetAddressOf()));
+
+        // Create a depth texture
         D3D11_TEXTURE2D_DESC Description { };
         Description.Width      = Width;
         Description.Height     = Height;
         Description.MipLevels  = 1;
         Description.ArraySize  = 1;
         Description.Format     = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
-        Description.SampleDesc = { 1, 0 };
+        Description.SampleDesc = mLimits.Multisample[Samples];
         Description.Usage      = D3D11_USAGE_DEFAULT;
         Description.BindFlags  = D3D11_BIND_DEPTH_STENCIL;
 
