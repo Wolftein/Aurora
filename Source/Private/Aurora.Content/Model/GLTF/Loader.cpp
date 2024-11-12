@@ -135,6 +135,14 @@ namespace Content
             return false;
         }
 
+        // Safe-guard against big model(s).
+        if (GLTFModel.meshes.size() > Graphic::Mesh::k_MaxPrimitives)
+        {
+            Log::Warn("GLTFLoader: Exceeding maximum sub-mesh support of {} with {}",
+                Graphic::Mesh::k_MaxPrimitives, GLTFModel.meshes.size());
+            return false;
+        }
+
         // Find how many bytes we need for buffer(s) and create them
         UInt32 BytesForVertices = 0;
         UInt32 BytesForIndices  = 0;
