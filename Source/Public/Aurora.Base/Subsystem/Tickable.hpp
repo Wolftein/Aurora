@@ -12,39 +12,20 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Driver.hpp"
+#include "Aurora.Base/Type.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Network
+inline namespace Core
 {
     // -=(Undocumented)=-
-    class Service final : public AbstractSubsystem<Service>, public Tickable
+    class Tickable
     {
     public:
 
         // -=(Undocumented)=-
-        explicit Service(Ref<Context> System);
-
-        // \see Tickable::OnTick(Real64, Real64)
-        void OnTick(Real64 Time, Real64 Delta) override;
-
-        // -=(Undocumented)=-
-        Bool Initialize(UInt Workers);
-
-        // -=(Undocumented)=-
-        SPtr<Server> Listen(CStr Address, UInt16 Port);
-
-        // -=(Undocumented)=-
-        SPtr<Client> Connect(CStr Address, UInt16 Port);
-
-    private:
-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        UPtr<Driver> mDriver;
+        virtual void OnTick(Real64 Time, Real64 Delta) = 0;
     };
 }

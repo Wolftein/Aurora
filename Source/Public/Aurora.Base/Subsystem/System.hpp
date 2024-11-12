@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Trait.hpp"
+#include "Tickable.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -66,12 +66,11 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        template<typename T>
-        void Execute(T Functor)
+        void Tick(Real64 Time, Real64 Delta)
         {
-            for (ConstSPtr<Subsystem> SubsystemPtr : mSubsystems)
+            for (const Ptr<Tickable> Tickable : mTickables)
             {
-                Functor(* SubsystemPtr);
+                Tickable->OnTick(Time, Delta);
             }
         }
 
@@ -79,16 +78,23 @@ inline namespace Core
         template<typename T, typename ... Args>
         SPtr<T> AddSubsystem(Any<Args> ... Arguments)
         {
-            return CastPtr<T>(mSubsystems.emplace_back(NewPtr<T>(* this, Arguments...)));
+            const SPtr<T> SubsystemPtr = NewPtr<T>(* this, Arguments...);
+            mRegistry.push_back(SubsystemPtr);
+
+            if constexpr (std::is_base_of_v<Tickable, T>)
+            {
+                mTickables.push_back(SubsystemPtr.get());
+            }
+            return SubsystemPtr;
         }
 
         // -=(Undocumented)=-
         template<typename T>
         SPtr<T> GetSubsystem()
         {
-            for (ConstSPtr<Subsystem> SubsystemPtr : mSubsystems)
+            for (ConstSPtr<Subsystem> SubsystemPtr : mRegistry)
             {
-                if (typeid(T) == typeid(* SubsystemPtr))
+                if (Hash<T>() == SubsystemPtr->GetID())
                 {
                     return CastPtr<T>(SubsystemPtr);
                 }
@@ -100,10 +106,22 @@ inline namespace Core
         template<typename T>
         void RemoveSubsystem()
         {
-            std::erase_if(mSubsystems, []([[maybe_unused]] ConstSPtr<Subsystem> SubsystemPtr)
+            constexpr auto FindByID = [](ConstSPtr<Subsystem> SubsystemPtr)
             {
-                return typeid(T) == typeid(* SubsystemPtr);
-            });
+                return SubsystemPtr->GetID() == Hash<T>();
+            };
+
+            auto Iterator = std::find_if(mRegistry.begin(), mRegistry.end(), FindByID);
+            if (Iterator != mRegistry.end())
+            {
+                if constexpr (std::is_base_of_v<Tickable, T>)
+                {
+                    const Ptr<Tickable> TickablePtr = reinterpret_cast<Ptr<Tickable>>(Iterator->get());
+                    mTickables.erase(
+                            std::remove(mTickables.begin(), mTickables.end(), TickablePtr), mTickables.end());
+                }
+                mRegistry.erase(Iterator, mRegistry.end());
+            }
         }
 
     private:
@@ -112,6 +130,7 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Mode                    mMode;
-        Vector<SPtr<Subsystem>> mSubsystems;
+        Vector<Ptr<Tickable>>   mTickables;
+        Vector<SPtr<Subsystem>> mRegistry;
     };
 }

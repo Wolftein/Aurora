@@ -31,13 +31,20 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        explicit Subsystem(Ref<Context> Context)
-            : mContext { Context }
+        explicit Subsystem(Ref<Context> Context, UInt ID)
+            : mContext { Context },
+              mID      { ID }
         {
         }
 
         // -=(Undocumented)=-
         virtual ~Subsystem() = default;
+
+        // -=(Undocumented)=-
+        UInt GetID() const
+        {
+            return mID;
+        }
 
         // -=(Undocumented)=-
         virtual void OnTick(Real64 Time)
@@ -84,5 +91,24 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Ref<Context> mContext;
+        UInt         mID;
+    };
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    class AbstractSubsystem : public Subsystem
+    {
+    public:
+
+        // -=(Undocumented)=-
+        static constexpr UInt k_ID = Hash<Type>();
+
+    public:
+
+        // -=(Undocumented)=-
+        explicit AbstractSubsystem(Ref<Subsystem::Context> Context)
+            : Subsystem { Context, k_ID }
+        {
+        }
     };
 }

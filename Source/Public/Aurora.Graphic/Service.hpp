@@ -22,15 +22,12 @@ namespace Graphic
 {
     // -=(Undocumented)=-
     // @TODO: Needs improvement over the interface for ease use.
-    class Service final : public Subsystem
+    class Service final : public AbstractSubsystem<Service>
     {
     public:
 
         // -=(Undocumented)=-
         explicit Service(Ref<Context> Context);
-
-        // \see Subsystem::OnTick(Real64)
-        void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
         Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples);

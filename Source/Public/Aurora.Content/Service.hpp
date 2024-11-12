@@ -23,15 +23,12 @@
 namespace Content
 {
     // -=(Undocumented)=-
-    class Service final : public Subsystem
+    class Service final : public AbstractSubsystem<Service>
     {
     public:
 
         // -=(Undocumented)=-
         explicit Service(Ref<Context> Context);
-
-        // \see Subsystem::OnTick(Real64)
-        void OnTick(Real64 Time) override;
 
         // -=(Undocumented)=-
         void AddLoader(ConstSPtr<Loader> Loader);

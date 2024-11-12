@@ -160,4 +160,26 @@ inline namespace Core
     {
         return Field & ~Value;
     }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    constexpr CStr Name()
+    {
+        return { __FUNCSIG__ };
+    }
+
+    // -=(Undocumented)=-
+    constexpr UInt Hash(CStr Block, UInt Counter = 14695981039346656037ull)
+    {
+        return Block.size() > 0
+            ? Hash(CStr(Block.data() + 1, Block.size() - 1), (Counter ^ Block[0]) * 1099511628211ull)
+            : Counter;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    consteval UInt Hash()
+    {
+        return Hash(Name<Type>());
+    }
 }

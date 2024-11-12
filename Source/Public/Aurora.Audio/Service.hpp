@@ -21,15 +21,15 @@
 namespace Audio
 {
     // -=(Undocumented)=-
-    class Service final : public Subsystem
+    class Service final : public AbstractSubsystem<Service>, public Tickable
     {
     public:
 
         // -=(Undocumented)=-
         explicit Service(Ref<Context> Context);
 
-        // \see Subsystem::OnTick(Real64)
-        void OnTick(Real64 Time) override;
+        // \see Tickable::OnTick(Real64, Real64)
+        void OnTick(Real64 Time, Real64 Delta) override;
 
         // -=(Undocumented)=-
         Bool Initialize(Backend Backend, CStr Device);

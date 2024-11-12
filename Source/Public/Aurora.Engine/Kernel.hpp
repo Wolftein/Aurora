@@ -33,7 +33,7 @@
 namespace Engine
 {
     // -=(Undocumented)=-
-    class Kernel : public Subsystem::Context, public Input::Listener
+    class Kernel : public Subsystem::Context, public Input::Listener, public Tickable
     {
     public:
 
@@ -75,8 +75,8 @@ namespace Engine
 
         }
 
-        // -=(Undocumented)=-
-        virtual void OnTick(Real64 Time)
+        // \see Tickable::OnTick(Real64, Real64)
+        virtual void OnTick(Real64 Time, Real64 Delta) override
         {
         }
 
@@ -112,6 +112,7 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Bool         mActive;
+        Real64       mTime;
         UPtr<Device> mDevice;
     };
 }
