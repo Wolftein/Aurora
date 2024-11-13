@@ -28,21 +28,21 @@ inline namespace Math
 
         // -=(Undocumented)=-
         constexpr Quaternion(Base X = 0, Base Y = 0, Base Z = 0, Base W = 1)
-            : mComplexes { X, Y, Z },
+            : mImaginary { X, Y, Z },
               mReal      { W }
         {
         }
 
         // -=(Undocumented)=-
         constexpr Quaternion(Ref<const Vector3<Base>> Complexes, Base Real)
-            : mComplexes { Complexes },
+            : mImaginary { Complexes },
               mReal      { Real }
         {
         }
 
         // -=(Undocumented)=-
         constexpr Quaternion(Ref<const Quaternion> Other)
-            : mComplexes { Other.mComplexes },
+            : mImaginary { Other.mImaginary },
               mReal      { Other.mReal }
         {
         }
@@ -50,19 +50,19 @@ inline namespace Math
         // -=(Undocumented)=-
         Base GetX() const
         {
-            return mComplexes.GetX();
+            return mImaginary.GetX();
         }
 
         // -=(Undocumented)=-
         Base GetY() const
         {
-            return mComplexes.GetY();
+            return mImaginary.GetY();
         }
 
         // -=(Undocumented)=-
         Base GetZ() const
         {
-            return mComplexes.GetZ();
+            return mImaginary.GetZ();
         }
 
         // -=(Undocumented)=-
@@ -87,76 +87,73 @@ inline namespace Math
         Vector3<Base> GetForward() const
         {
             return Vector3<Base>(
-                2.0 * (mComplexes.GetX() * mComplexes.GetZ() + mReal * mComplexes.GetY()),
-                2.0 * (mComplexes.GetY() * mComplexes.GetZ() - mReal * mComplexes.GetX()),
-                1.0 - 2.0 * (mComplexes.GetX() * mComplexes.GetX() + mComplexes.GetY() * mComplexes.GetY()));
+                2.0 * (mImaginary.GetX() * mImaginary.GetZ() + mReal * mImaginary.GetY()),
+                2.0 * (mImaginary.GetY() * mImaginary.GetZ() - mReal * mImaginary.GetX()),
+                1.0 - 2.0 * (mImaginary.GetX() * mImaginary.GetX() + mImaginary.GetY() * mImaginary.GetY()));
         }
 
         // -=(Undocumented)=-
         Vector3<Base> GetUp() const
         {
             return Vector3<Base>(
-                2.0 * (mComplexes.GetX() * mComplexes.GetY() - mReal * mComplexes.GetZ()),
-                1.0 - 2.0 * (mComplexes.GetX() * mComplexes.GetX() + mComplexes.GetZ() * mComplexes.GetZ()),
-                2.0 * (mComplexes.GetY() * mComplexes.GetZ() + mReal * mComplexes.GetX()));
+                2.0 * (mImaginary.GetX() * mImaginary.GetY() - mReal * mImaginary.GetZ()),
+                1.0 - 2.0 * (mImaginary.GetX() * mImaginary.GetX() + mImaginary.GetZ() * mImaginary.GetZ()),
+                2.0 * (mImaginary.GetY() * mImaginary.GetZ() + mReal * mImaginary.GetX()));
         }
 
         // -=(Undocumented)=-
         Real32 Dot(Ref<const Quaternion<Base>> Other) const
         {
-            return mReal * Other.mReal + mComplexes.Dot(Other.mComplexes);
+            return mReal * Other.mReal + mImaginary.Dot(Other.mImaginary);
         }
 
         // -=(Undocumented)=-
         Quaternion<Base> operator+(Ref<const Quaternion<Base>> Other) const
         {
-            return Quaternion<Base>(mComplexes + Other.mComplexes, mReal + Other.mReal);
+            return Quaternion<Base>(mImaginary + Other.mImaginary, mReal + Other.mReal);
         }
 
         // -=(Undocumented)=-
         Quaternion<Base> operator-() const
         {
-            return Quaternion<Base>(-mComplexes, -mReal);
+            return Quaternion<Base>(-mImaginary, -mReal);
         }
 
         // -=(Undocumented)=-
         Quaternion<Base> operator-(Ref<const Quaternion<Base>> Other) const
         {
-            return Quaternion<Base>(mComplexes - Other.mComplexes, mReal - Other.mReal);
+            return Quaternion<Base>(mImaginary - Other.mImaginary, mReal - Other.mReal);
         }
 
         // -=(Undocumented)=-
         Quaternion<Base> operator*(Ref<const Quaternion<Base>> Other) const
         {
-            const Vector3<Base> Complexes = Other.mComplexes * mReal + mComplexes * Other.mReal
-                    + Vector3<Base>::Cross(mComplexes, Other.mComplexes);
-            return Quaternion<Base>(Complexes, mReal * Other.mReal - mComplexes.Dot(Other.mComplexes));
-        }
-
-        // -=(Undocumented)=-
-        Vector3<Base> operator*(Ref<const Vector3<Base>> Vector) const
-        {
-            const Vector3<Base> Cross = Vector3<Base>::Cross(mComplexes, Vector);
-
-            const Base Real = mReal + mReal;
-            return Real * Cross + (Real * mReal - 1) * Vector + 2 * mComplexes.Dot(Vector) * mComplexes;
+            const Vector3<Base> Imaginary
+                = Other.mImaginary * mReal + mImaginary * Other.mReal + Vector3<Base>::Cross(mImaginary, Other.mImaginary);
+            return Quaternion<Base>(Imaginary, mReal * Other.mReal - mImaginary.Dot(Other.mImaginary));
         }
 
         // -=(Undocumented)=-
         Ref<Quaternion<Base>> operator+=(Ref<const Quaternion<Base>> Other)
         {
-            mComplexes += Other.mComplexes;
+            mImaginary += Other.mImaginary;
             mReal      += Other.mReal;
-
             return (* this);
         }
 
         // -=(Undocumented)=-
         Ref<Quaternion<Base>> operator-=(Ref<const Quaternion<Base>> Other)
         {
-            mComplexes -= Other.mComplexes;
+            mImaginary -= Other.mImaginary;
             mReal      -= Other.mReal;
+            return (* this);
+        }
 
+        // -=(Undocumented)=-
+        Ref<Quaternion<Base>> operator*=(Ref<const Quaternion<Base>> Other)
+        {
+            mImaginary = Other.mImaginary * mReal + mImaginary * Other.mReal + Vector3<Base>::Cross(mImaginary, Other.mImaginary);
+            mReal      = Other.mReal * mReal - mImaginary.Dot(Other.mImaginary);
             return (* this);
         }
 
@@ -164,7 +161,7 @@ inline namespace Math
         template<typename Stream>
         void OnSerialize(Stream Archive)
         {
-            Archive.SerializeObject(mComplexes);
+            Archive.SerializeObject(mImaginary);
             Archive.SerializeNumber(mReal);
         }
 
@@ -178,7 +175,7 @@ inline namespace Math
             if (Length > 0)
             {
                 const Base InvLength = 1.0f / Length;
-                return Quaternion<Base>(Value.mComplexes * InvLength, Value.mReal * InvLength);
+                return Quaternion<Base>(Value.mImaginary * InvLength, Value.mReal * InvLength);
             }
             return Value;
         }
@@ -191,7 +188,7 @@ inline namespace Math
             if (Length > 0)
             {
                 const Base InvLength = 1.0f / Length;
-                return Quaternion<Base>(Value.mComplexes * -InvLength, Value.mReal * InvLength);
+                return Quaternion<Base>(Value.mImaginary * -InvLength, Value.mReal * InvLength);
             }
             return Value;
         }
@@ -199,7 +196,7 @@ inline namespace Math
         // -=(Undocumented)=-
         static Quaternion<Base> Conjugate(Ref<const Quaternion<Base>> Value)
         {
-            return Quaternion<Base>(- Value.mComplexes, Value.mReal);
+            return Quaternion<Base>(- Value.mImaginary, Value.mReal);
         }
 
         // -=(Undocumented)=-
@@ -303,7 +300,7 @@ inline namespace Math
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Vector3<Base> mComplexes;
+        Vector3<Base> mImaginary;
         Base          mReal;
     };
 
