@@ -22,7 +22,7 @@ inline namespace Math
 {
     // -=(Undocumented)=-
     template<typename Base>
-    class Quaternion final
+    class Quaternion final : public Serializable<Quaternion<Base>>
     {
     public:
 
@@ -158,6 +158,14 @@ inline namespace Math
             mReal      -= Other.mReal;
 
             return (* this);
+        }
+
+        // \see Serializable::OnSerialize
+        template<typename Stream>
+        void OnSerialize(Stream Archive)
+        {
+            Archive.SerializeObject(mComplexes);
+            Archive.SerializeNumber(mReal);
         }
 
     public:

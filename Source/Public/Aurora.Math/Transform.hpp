@@ -22,7 +22,7 @@ inline namespace Math
 {
     // -=(Undocumented)=-
     template<typename Base>
-    class Transform final
+    class Transform final : public Serializable<Transform<Base>>
     {
     public:
 
@@ -50,7 +50,6 @@ inline namespace Math
         Ref<Transform> SetPosition(Ref<const Vector3<Base>> Position)
         {
             mPosition = Position;
-
             return (* this);
         }
 
@@ -70,7 +69,6 @@ inline namespace Math
         Ref<Transform> SetScale(Ref<const Vector3<Base>> Scale)
         {
             mScale = Scale;
-
             return (* this);
         }
 
@@ -84,7 +82,6 @@ inline namespace Math
         Ref<Transform> SetRotation(Ref<const Quaternion<Base>> Rotation)
         {
             mRotation = Rotation;
-
             return (* this);
         }
 
@@ -131,30 +128,27 @@ inline namespace Math
         Ref<Transform> Rotate(Ref<const Quaternion<Base>> Rotation)
         {
             mRotation = mRotation * Rotation;
-
             return (* this);
         }
 
         // -=(Undocumented)=-
         Ref<Transform> Rotate(Ref<const Vector2<Base>> Angles)
         {
-            const Quaternionf XAxis(Vector3<Base>(1, 0, 0), Angles.GetX());
-            const Quaternionf YAxis(Vector3<Base>(0, 1, 0), Angles.GetY());
+            const Quaternionf XAxis(Quaternion<Base>::FromAngles(Angles.GetX(), Vector3<Base>(1, 0, 0)));
+            const Quaternionf YAxis(Quaternion<Base>::FromAngles(Angles.GetY(), Vector3<Base>(0, 1, 0)));
 
-            mRotation = YAxis * mRotation * XAxis;
-
+            mRotation = mRotation * XAxis * YAxis;
             return (* this);
         }
 
         // -=(Undocumented)=-
         Ref<Transform> Rotate(Ref<const Vector3<Base>> Angles)
         {
-            const Quaternionf XAxis(Vector3<Base>(1, 0, 0), Angles.GetX());
-            const Quaternionf YAxis(Vector3<Base>(0, 1, 0), Angles.GetY());
-            const Quaternionf ZAxis(Vector3<Base>(0, 0, 1), Angles.GetZ());
+            const Quaternionf XAxis(Quaternion<Base>::FromAngles(Angles.GetX(), Vector3<Base>(1, 0, 0)));
+            const Quaternionf YAxis(Quaternion<Base>::FromAngles(Angles.GetY(), Vector3<Base>(0, 1, 0)));
+            const Quaternionf ZAxis(Quaternion<Base>::FromAngles(Angles.GetZ(), Vector3<Base>(0, 0, 1)));
 
             mRotation = mRotation * XAxis * YAxis * ZAxis;
-
             return (* this);
         }
 
@@ -171,6 +165,15 @@ inline namespace Math
             const Matrix4<Base> Rotation    = Matrix4<Base>::FromRotation(mRotation);
             const Matrix4<Base> Translation = Matrix4<Base>::FromTranslation(mPosition);
             return Translation * Rotation * Scale;
+        }
+
+        // \see Serializable::OnSerialize
+        template<typename Stream>
+        void OnSerialize(Stream Archive)
+        {
+            Archive.SerializeObject(mPosition);
+            Archive.SerializeObject(mScale);
+            Archive.SerializeObject(mRotation);
         }
 
     private:
