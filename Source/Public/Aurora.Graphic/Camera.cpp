@@ -38,7 +38,7 @@ namespace Graphic
             // Calculate the inverse scene matrix from the transformation (if applied)
             if (HasBit(mDirty, k_DirtyBitTransformation))
             {
-                mScene = mTransformation.AsMatrix().Inverse();
+                mScene = mTransformation.Compute().Inverse();
             }
 
             // Calculate the world matrix

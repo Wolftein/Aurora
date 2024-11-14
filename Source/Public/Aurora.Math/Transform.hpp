@@ -28,16 +28,43 @@ inline namespace Math
 
         // -=(Undocumented)=-
         Transform()
-            : mScale { 1, 1, 1 }
+            : mScale { 1.0, 1.0, 1.0 }
         {
         }
 
         // -=(Undocumented)=-
-        Transform(Ref<const Transform> Other)
-            : mPosition { Other.GetPosition() },
-              mRotation { Other.GetRotation() },
-              mScale    { Other.GetScale() }
+        Transform(Ref<const Transform> Other) = default;
+
+        // -=(Undocumented)=-
+        Transform(Ref<const Vector3f> Position, Ref<const Vector3f> Scale, Ref<const Quaternionf> Rotation)
         {
+            SetPosition(Position);
+            SetScale(Scale);
+            SetRotation(Rotation);
+        }
+
+        // -=(Undocumented)=-
+        Transform(Ref<const Vector3f> Position, Ref<const Quaternionf> Rotation)
+            : Transform()
+        {
+            SetPosition(Position);
+            SetRotation(Rotation);
+        }
+
+        // -=(Undocumented)=-
+        Transform(Ref<const Vector3f> Position)
+                : Transform()
+        {
+            SetPosition(Position);
+        }
+
+        // -=(Undocumented)=-
+        Matrix4<Base> Compute() const
+        {
+            const Matrix4<Base> Scale       = Matrix4<Base>::FromScale(mScale);
+            const Matrix4<Base> Rotation    = Matrix4<Base>::FromRotation(mRotation);
+            const Matrix4<Base> Translation = Matrix4<Base>::FromTranslation(mPosition);
+            return Translation * Rotation * Scale;
         }
 
         // -=(Undocumented)=-
@@ -156,15 +183,6 @@ inline namespace Math
         Ref<Transform> Rotate(Base Angle, Ref<const Vector3<Base>> Axis)
         {
             return Rotate(Quaternion<Base>::FromAngles(Angle, Axis));
-        }
-
-        // -=(Undocumented)=-
-        Matrix4<Base> AsMatrix() const
-        {
-            const Matrix4<Base> Scale       = Matrix4<Base>::FromScale(mScale);
-            const Matrix4<Base> Rotation    = Matrix4<Base>::FromRotation(mRotation);
-            const Matrix4<Base> Translation = Matrix4<Base>::FromTranslation(mPosition);
-            return Translation * Rotation * Scale;
         }
 
         // \see Serializable::OnSerialize
