@@ -89,10 +89,10 @@ namespace Graphic
             GL_REPLACE,               // TestAction::Replace
             GL_ZERO,                  // TestAction::Zero
             GL_DECR,                  // TestAction::Decrease
-            GL_DECR_WRAP,             // TestAction::DecreaseOrWrap
+            GL_DECR_WRAP,             // TestAction::DecreaseSaturate
             GL_INVERT,                // TestAction::Invert
             GL_INCR,                  // TestAction::Increase
-            GL_INCR_WRAP              // TestAction::IncreaseOrWrap
+            GL_INCR_WRAP              // TestAction::IncreaseSaturate
         };
         return k_Mapping[CastEnum(Value)];
     }
@@ -321,7 +321,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void GLES3Driver::CreatePass(Object ID, CPtr<Attachment> Colors, CPtr<Attachment> Resolves, Attachment Auxiliary)
+    void GLES3Driver::CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary)
     {
     }
 

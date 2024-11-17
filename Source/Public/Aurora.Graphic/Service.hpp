@@ -66,7 +66,7 @@ namespace Graphic
         void DeleteMaterial(Object ID);
 
         // -=(Undocumented)=-
-        Object CreatePass(CPtr<Attachment> Colors, CPtr<Attachment> Resolves, Attachment Auxiliary);
+        Object CreatePass(CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary);
 
         // -=(Undocumented)=-
         void DeletePass(Object ID);

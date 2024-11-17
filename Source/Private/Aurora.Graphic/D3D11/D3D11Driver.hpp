@@ -49,7 +49,7 @@ namespace Graphic
         void DeleteBuffer(Object ID) override;
 
         // \see Driver::CreatePass
-        void CreatePass(Object ID, CPtr<Attachment> Colors, CPtr<Attachment> Resolves, Attachment Auxiliary) override;
+        void CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary) override;
 
         // \see Driver::DeletePass
         void DeletePass(Object ID) override;

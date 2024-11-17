@@ -186,10 +186,10 @@ namespace Graphic
         Replace,
         Zero,
         Decrement,
-        DecrementWrap,
+        DecrementSaturate,
         Invert,
         Increment,
-        IncrementWrap,
+        IncrementSaturate,
     };
 
     // -=(Undocumented)=-

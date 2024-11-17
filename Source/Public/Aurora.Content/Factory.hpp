@@ -123,5 +123,4 @@ namespace Content
         UInt                    mBudget;
         UInt                    mUsage;
     };
-
 }

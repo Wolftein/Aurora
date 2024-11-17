@@ -100,10 +100,10 @@ namespace Graphic
             D3D11_STENCIL_OP_REPLACE,               // TestAction::Replace
             D3D11_STENCIL_OP_ZERO,                  // TestAction::Zero
             D3D11_STENCIL_OP_DECR,                  // TestAction::Decrease
-            D3D11_STENCIL_OP_DECR_SAT,              // TestAction::DecreaseOrWrap
+            D3D11_STENCIL_OP_DECR_SAT,              // TestAction::DecrementSaturate
             D3D11_STENCIL_OP_INVERT,                // TestAction::Invert
             D3D11_STENCIL_OP_INCR,                  // TestAction::Increase
-            D3D11_STENCIL_OP_INCR_SAT               // TestAction::IncreaseOrWrap
+            D3D11_STENCIL_OP_INCR_SAT               // TestAction::IncreaseSaturate
         };
         return k_Mapping[CastEnum(Value)];
     }
@@ -603,7 +603,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreatePass(Object ID, CPtr<Attachment> Colors, CPtr<Attachment> Resolves, Attachment Auxiliary)
+    void D3D11Driver::CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary)
     {
         Ref<D3D11Pass> Pass = mPasses[ID];
 

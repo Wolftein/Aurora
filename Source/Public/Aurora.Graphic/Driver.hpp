@@ -50,7 +50,7 @@ namespace Graphic
         virtual void DeleteBuffer(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreatePass(Object ID, CPtr<Attachment> Colors, CPtr<Attachment> Resolves, Attachment Auxiliary) = 0;
+        virtual void CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary) = 0;
 
         // -=(Undocumented)=-
         virtual void DeletePass(Object ID) = 0;
