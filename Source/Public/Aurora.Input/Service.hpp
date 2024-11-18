@@ -59,12 +59,6 @@ namespace Input
         }
 
         // -=(Undocumented)=-
-        Vector2i GetMouseDelta() const
-        {
-            return mMouse.GetDelta();
-        }
-
-        // -=(Undocumented)=-
         Vector2i GetMouseScroll() const
         {
             return mMouse.GetScroll();

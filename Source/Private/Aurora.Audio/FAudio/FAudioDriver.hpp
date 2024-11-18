@@ -43,7 +43,7 @@ namespace Audio
         Bool Initialize(CStr Device, UInt8 Submixes) override;
 
         // \see Driver::GetCapabilities
-        Ref<const Capabilities> GetCapabilities() const override;
+        ConstRef<Capabilities> GetCapabilities() const override;
 
         // \see Driver::Tick
         void Tick() override;

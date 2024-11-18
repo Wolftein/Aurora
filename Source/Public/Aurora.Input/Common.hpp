@@ -188,9 +188,9 @@ namespace Input
 
             struct
             {
-                SInt32 X;
+                Real32 X;
+                Real32 Y;
                 Real32 XDelta;
-                SInt32 Y;
                 Real32 YDelta;
             } MouseAxis;
 
@@ -206,8 +206,8 @@ namespace Input
 
             struct
             {
-                UInt16 Width;
-                UInt16 Height;
+                UInt32 Width;
+                UInt32 Height;
             } WindowResize;
         };
     };

@@ -61,9 +61,9 @@ namespace Audio
             }
             else
             {
-                Ref<const Capabilities> Capabilities = mDriver->GetCapabilities();
+                ConstRef<Capabilities> Capabilities = mDriver->GetCapabilities();
 
-                for (Ref<const Adapter> Adapter : Capabilities.Adapters)
+                for (ConstRef<Adapter> Adapter : Capabilities.Adapters)
                 {
                     Log::Info("Audio: Found Device '{}' {}", Adapter.Name, Adapter.Default ? "(Default)" : "");
                 }
@@ -88,7 +88,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Ref<const Capabilities> Service::GetCapabilities() const
+    ConstRef<Capabilities> Service::GetCapabilities() const
     {
         return mDriver->GetCapabilities();
     }

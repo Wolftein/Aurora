@@ -37,7 +37,7 @@ namespace Input
         mKeyboard.Poll(Stack);
 
         // Dispatch all event(s)
-        for (Ref<const Event> Event : Stack)
+        for (ConstRef<Event> Event : Stack)
         {
             for (ConstSPtr<Listener> Listener : mDispatcher)
             {

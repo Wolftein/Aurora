@@ -38,7 +38,7 @@ namespace Audio
         Bool Reset(CStr Device);
 
         // -=(Undocumented)=-
-        Ref<const Capabilities> GetCapabilities() const;
+        ConstRef<Capabilities> GetCapabilities() const;
 
         // -=(Undocumented)=-
         void Suspend();

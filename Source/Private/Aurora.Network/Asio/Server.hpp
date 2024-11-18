@@ -43,7 +43,7 @@ namespace Network
     private:
 
         // -=(Undocumented)=-
-        void WhenAccept(Ref<const std::error_code> Error);
+        void WhenAccept(ConstRef<std::error_code> Error);
 
     private:
 

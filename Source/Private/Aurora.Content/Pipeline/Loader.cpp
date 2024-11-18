@@ -238,10 +238,9 @@ namespace Content
 
             if (SUCCEEDED(Result))
             {
-                const auto OnRelease = [Bytecode](Ptr<void> Address) {
-                    Bytecode->Release();
-                };
-                Compilation = Data(Bytecode->GetBufferPointer(), Bytecode->GetBufferSize(), OnRelease);
+                Compilation = Data(Bytecode->GetBufferSize());
+                Compilation.Copy(Bytecode->GetBufferPointer(), Bytecode->GetBufferSize());
+                Bytecode->Release();
             }
             else
             {

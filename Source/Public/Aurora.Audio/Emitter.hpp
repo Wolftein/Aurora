@@ -52,7 +52,7 @@ namespace Audio
         }
 
         // -=(Undocumented)=-
-        Ref<const Vector3f> GetPosition() const
+        ConstRef<Vector3f> GetPosition() const
         {
             return mPosition;
         }
@@ -65,20 +65,20 @@ namespace Audio
         }
 
         // -=(Undocumented)=-
-        Ref<const Vector3f> GetVelocity() const
+        ConstRef<Vector3f> GetVelocity() const
         {
             return mVelocity;
         }
 
         // -=(Undocumented)=-
-        void SetOrientation(Ref<const Quaternionf> Orientation)
+        void SetOrientation(ConstRef<Quaternionf> Orientation)
         {
             SetDirty(true);
             mOrientation = Orientation;
         }
 
         // -=(Undocumented)=-
-        Ref<const Quaternionf> GetOrientation() const
+        ConstRef<Quaternionf> GetOrientation() const
         {
             return mOrientation;
         }

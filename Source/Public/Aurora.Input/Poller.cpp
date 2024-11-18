@@ -267,16 +267,8 @@ namespace Input
         case SDL_BUTTON_X2:
             return Button::Forward;
         default:
-                return Button::Unknown;
+            return Button::Unknown;
         }
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    Poller::Poller()
-        : mBuffer { }
-    {
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -294,7 +286,7 @@ namespace Input
         // Transform SDL event(s) to Aurora event(s)
         UInt32 Element = 0;
 
-        for (Ref<const SDL_Event> Event : CPtr<const SDL_Event>(Stack.data(), Count))
+        for (ConstRef<SDL_Event> Event : CPtr<const SDL_Event>(Stack.data(), Count))
         {
             Ref<Input::Event> Result = mBuffer[Element++];
             Result.Time = static_cast<Real64>(Event.common.timestamp) / SDL_NS_PER_SECOND;
@@ -331,9 +323,9 @@ namespace Input
                 break;
             case SDL_EVENT_MOUSE_MOTION:
                 Result.Type                = Event::Type::MouseMove;
-                Result.MouseAxis.X         = static_cast<SInt32>(Event.motion.x);
+                Result.MouseAxis.X         = Event.motion.x;
+                Result.MouseAxis.Y         = Event.motion.y;
                 Result.MouseAxis.XDelta    = Event.motion.xrel;
-                Result.MouseAxis.Y         = static_cast<SInt32>(Event.motion.y);
                 Result.MouseAxis.YDelta    = Event.motion.yrel;
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -346,8 +338,8 @@ namespace Input
                 break;
             case SDL_EVENT_MOUSE_WHEEL:
                 Result.Type                = Event::Type::MouseScroll;
-                Result.MouseAxis.X         = static_cast<SInt32>(Event.wheel.x);
-                Result.MouseAxis.Y         = static_cast<SInt32>(Event.wheel.y);
+                Result.MouseAxis.XDelta    = Event.wheel.x;
+                Result.MouseAxis.YDelta    = Event.wheel.y;
                 break;
             default:
                 Result.Type                = Event::Type::Unknown;

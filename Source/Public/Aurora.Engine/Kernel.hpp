@@ -44,7 +44,7 @@ namespace Engine
         ~Kernel() override;
 
         // -=(Undocumented)=-
-        void Initialize(Mode Mode, Ref<const Properties> Properties);
+        void Initialize(Mode Mode, ConstRef<Properties> Properties);
 
         // -=(Undocumented)=-
         void Poll();
@@ -94,7 +94,7 @@ namespace Engine
             }
 
             // \see Listener::OnEvent
-            Bool OnEvent(Ref<const Input::Event> Event) override
+            Bool OnEvent(ConstRef<Input::Event> Event) override
             {
                 return Kernel.OnEvent(Event);
             }
@@ -104,7 +104,7 @@ namespace Engine
         Bool OnWindowExit() override;
 
         // \see Listener::OnWindowResize
-        Bool OnWindowResize(SInt32 Width, SInt32 Height) override;
+        Bool OnWindowResize(UInt32 Width, UInt32 Height) override;
 
     private:
 

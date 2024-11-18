@@ -33,7 +33,7 @@ namespace Network
         ~TCPDriver();
 
         // \see Driver::Initialize
-        Bool Initialize(UInt32 Workers) override;
+        Bool Initialize(UInt32 Threads) override;
 
         // \see Driver::Tick
         void Tick() override;

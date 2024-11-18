@@ -42,7 +42,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Any>
-        constexpr Vector2(Ref<const Vector2<Any>> Other)
+        constexpr Vector2(ConstRef<Vector2<Any>> Other)
             : mX { static_cast<Base>(Other.GetX()) },
               mY { static_cast<Base>(Other.GetY()) }
         {
@@ -86,7 +86,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Real32 GetAngle(Ref<const Vector2<Base>> Other) const
+        Real32 GetAngle(ConstRef<Vector2<Base>> Other) const
         {
             const Real32 Divisor = GetLength() * Other.GetLength();
 
@@ -100,7 +100,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Real32 GetDistance(Ref<const Vector2<Base>> Other) const
+        Real32 GetDistance(ConstRef<Vector2<Base>> Other) const
         {
             const Vector2<Base> Result = (* this) - Other;
 
@@ -120,13 +120,13 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Real32 Dot(Ref<const Vector2<Base>> Other) const
+        Real32 Dot(ConstRef<Vector2<Base>> Other) const
         {
             return (mX * Other.mX) + (mY * Other.mY);
         }
 
         // -=(Undocumented)=-
-        constexpr Vector2<Base> operator+(Ref<const Vector2<Base>> Vector) const
+        constexpr Vector2<Base> operator+(ConstRef<Vector2<Base>> Vector) const
         {
             return Vector2<Base>(mX + Vector.mX, mY + Vector.mY);
         }
@@ -144,7 +144,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Vector2<Base> operator-(Ref<const Vector2<Base>> Vector) const
+        constexpr Vector2<Base> operator-(ConstRef<Vector2<Base>> Vector) const
         {
             return Vector2<Base>(mX - Vector.mX, mY - Vector.mY);
         }
@@ -156,7 +156,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Vector2<Base> operator*(Ref<const Vector2<Base>> Vector) const
+        constexpr Vector2<Base> operator*(ConstRef<Vector2<Base>> Vector) const
         {
             return Vector2<Base>(mX * Vector.mX, mY * Vector.mY);
         }
@@ -168,7 +168,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Vector2<Base> operator/(Ref<const Vector2<Base>> Vector) const
+        constexpr Vector2<Base> operator/(ConstRef<Vector2<Base>> Vector) const
         {
             return Vector2<Base>(mX / Vector.mX, mY / Vector.mY);
         }
@@ -196,7 +196,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Ref<Vector2<Base>> operator+=(Ref<const Vector2<Base>> Vector)
+        constexpr Ref<Vector2<Base>> operator+=(ConstRef<Vector2<Base>> Vector)
         {
             mX += Vector.mX;
             mY += Vector.mY;
@@ -212,7 +212,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Ref<Vector2<Base>> operator-=(Ref<const Vector2<Base>> Vector)
+        constexpr Ref<Vector2<Base>> operator-=(ConstRef<Vector2<Base>> Vector)
         {
             mX -= Vector.mX;
             mY -= Vector.mY;
@@ -228,7 +228,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Ref<Vector2<Base>> operator*=(Ref<const Vector2<Base>> Vector)
+        constexpr Ref<Vector2<Base>> operator*=(ConstRef<Vector2<Base>> Vector)
         {
             mX *= Vector.mX;
             mY *= Vector.mY;
@@ -244,7 +244,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Ref<Vector2<Base>> operator/=(Ref<const Vector2<Base>> Vector)
+        constexpr Ref<Vector2<Base>> operator/=(ConstRef<Vector2<Base>> Vector)
         {
             mX /= Vector.mX;
             mY /= Vector.mY;
@@ -260,19 +260,19 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Bool operator==(Ref<const Vector2<Base>> Vector) const
+        constexpr Bool operator==(ConstRef<Vector2<Base>> Vector) const
         {
             return mX == Vector.mX && mY == Vector.mY;
         }
 
         // -=(Undocumented)=-
-        constexpr Bool operator<(Ref<const Vector2<Base>> Vector) const
+        constexpr Bool operator<(ConstRef<Vector2<Base>> Vector) const
         {
             return mX < Vector.mX || (mX == Vector.mX && mY < Vector.mY);
         }
 
         // -=(Undocumented)=-
-        constexpr Bool operator>(Ref<const Vector2<Base>> Vector) const
+        constexpr Bool operator>(ConstRef<Vector2<Base>> Vector) const
         {
             return mX > Vector.mX || (mX == Vector.mX && mY > Vector.mY);
         }
@@ -288,7 +288,7 @@ inline namespace Math
     public:
 
         // -=(Undocumented)=-
-        static Vector2<Base> Normalize(Ref<const Vector2<Base>> Vector)
+        static Vector2<Base> Normalize(ConstRef<Vector2<Base>> Vector)
         {
             const Real32 Length = Vector.GetLength();
 
@@ -300,13 +300,13 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static Base Cross(Ref<const Vector2<Base>> P0, Ref<const Vector2<Base>> P1)
+        static Base Cross(ConstRef<Vector2<Base>> P0, ConstRef<Vector2<Base>> P1)
         {
             return P0.GetX() * P1.GetY() - P0.GetY() * P1.GetX();
         }
 
         // -=(Undocumented)=-
-        static Vector2<Base> Min(Ref<const Vector2<Base>> P0, Ref<const Vector2<Base>> P1)
+        static Vector2<Base> Min(ConstRef<Vector2<Base>> P0, ConstRef<Vector2<Base>> P1)
         {
             const Base X = P0.GetX() < P1.GetX() ? P0.GetX() : P1.GetX();
             const Base Y = P0.GetY() < P1.GetY() ? P0.GetY() : P1.GetY();
@@ -314,7 +314,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static Vector2<Base> Max(Ref<const Vector2<Base>> P0, Ref<const Vector2<Base>> P1)
+        static Vector2<Base> Max(ConstRef<Vector2<Base>> P0, ConstRef<Vector2<Base>> P1)
         {
             const Base X = P0.GetX() < P1.GetX() ? P1.GetX() : P0.GetX();
             const Base Y = P0.GetY() < P1.GetY() ? P1.GetY() : P0.GetY();
@@ -322,13 +322,13 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static Vector2<Base> Lerp(Ref<const Vector2<Base>> Start, Ref<const Vector2<Base>> End, Real32 Percentage)
+        static Vector2<Base> Lerp(ConstRef<Vector2<Base>> Start, ConstRef<Vector2<Base>> End, Real32 Percentage)
         {
             return (Start + (End - Start) * Percentage);
         }
 
         // -=(Undocumented)=-
-        static Vector2<Base> Slerp(Ref<const Vector2<Base>> Start, Ref<const Vector2<Base>> End, Real32 Percentage)
+        static Vector2<Base> Slerp(ConstRef<Vector2<Base>> Start, ConstRef<Vector2<Base>> End, Real32 Percentage)
         {
             const Base Dot   = Clamp(Start.Dot(End), -1.0, +1.0);
             const Base Theta = InvCosine(Dot) * Percentage;

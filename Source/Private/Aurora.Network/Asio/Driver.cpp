@@ -44,9 +44,9 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool TCPDriver::Initialize(UInt32 Workers)
+    Bool TCPDriver::Initialize(UInt32 Threads)
     {
-        for (UInt32 Core = 0; Core < Workers; ++Core)
+        for (UInt32 Core = 0; Core < Threads; ++Core)
         {
             mWorkers.emplace_back([this]()
             {

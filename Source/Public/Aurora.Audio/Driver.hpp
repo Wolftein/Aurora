@@ -34,7 +34,7 @@ namespace Audio
         virtual Bool Initialize(CStr Device, UInt8 Submixes) = 0;
 
         // -=(Undocumented)=-
-        virtual Ref<const Capabilities> GetCapabilities() const = 0;
+        virtual ConstRef<Capabilities> GetCapabilities() const = 0;
 
         // -=(Undocumented)=-
         virtual void Tick() = 0;

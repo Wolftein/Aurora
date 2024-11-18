@@ -38,7 +38,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Initialize(UInt Workers)
+    Bool Service::Initialize(UInt32 Threads)
     {
         Bool Successful = true;
 
@@ -46,11 +46,11 @@ namespace Network
         {
             mDriver = NewUniquePtr<TCPDriver>();
 
-            Successful = mDriver && mDriver->Initialize(Workers);
+            Successful = mDriver && mDriver->Initialize(Threads);
 
             if (Successful)
             {
-                Log::Info("Network - Initialized with {} threads", Workers);
+                Log::Info("Network - Initialized with {} threads", Threads);
             }
             else
             {

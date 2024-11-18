@@ -29,7 +29,7 @@ namespace Input
         virtual ~Listener() = default;
 
         // -=(Undocumented)=-
-        virtual Bool OnEvent(Ref<const Event> Event);
+        virtual Bool OnEvent(ConstRef<Event> Event);
 
     private:
 
@@ -43,10 +43,10 @@ namespace Input
         virtual Bool OnKeyDown(Key Key);
 
         // -=(Undocumented)=-
-        virtual Bool OnMouseMove(SInt32 X, SInt32 Y, Real32 DeltaX, Real32 DeltaY);
+        virtual Bool OnMouseMove(Real32 X, Real32 Y, Real32 DeltaX, Real32 DeltaY);
 
         // -=(Undocumented)=-
-        virtual Bool OnMouseScroll(SInt32 X, SInt32 Y);
+        virtual Bool OnMouseScroll(Real32 DeltaX, Real32 DeltaY);
 
         // -=(Undocumented)=-
         virtual Bool OnMouseUp(Button Button);
@@ -58,7 +58,7 @@ namespace Input
         virtual Bool OnWindowFocus(Bool Focused);
 
         // -=(Undocumented)=-
-        virtual Bool OnWindowResize(SInt32 Width, SInt32 Height);
+        virtual Bool OnWindowResize(UInt32 Width, UInt32 Height);
 
         // -=(Undocumented)=-
         virtual Bool OnWindowExit();

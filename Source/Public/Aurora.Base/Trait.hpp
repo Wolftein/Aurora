@@ -63,6 +63,13 @@ inline namespace Core
     }
 
     // -=(Undocumented)=-
+    template<typename Type>
+    constexpr void Swap(Ref<Type> First, Ref<Type> Second)
+    {
+        std::swap(First, Second);
+    }
+
+    // -=(Undocumented)=-
     template<typename Type, typename... Args>
     SPtr<Type> NewPtr(Any<Args> ... Arguments)
     {

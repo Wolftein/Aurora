@@ -33,10 +33,10 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Transform(Ref<const Transform> Other) = default;
+        Transform(ConstRef<Transform> Other) = default;
 
         // -=(Undocumented)=-
-        Transform(Ref<const Vector3f> Position, Ref<const Vector3f> Scale, Ref<const Quaternionf> Rotation)
+        Transform(ConstRef<Vector3f> Position, ConstRef<Vector3f> Scale, ConstRef<Quaternionf> Rotation)
         {
             SetPosition(Position);
             SetScale(Scale);
@@ -44,7 +44,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Transform(Ref<const Vector3f> Position, Ref<const Quaternionf> Rotation)
+        Transform(ConstRef<Vector3f> Position, ConstRef<Quaternionf> Rotation)
             : Transform()
         {
             SetPosition(Position);
@@ -52,7 +52,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Transform(Ref<const Vector3f> Position)
+        Transform(ConstRef<Vector3f> Position)
                 : Transform()
         {
             SetPosition(Position);
@@ -68,64 +68,64 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> SetPosition(Ref<const Vector2<Base>> Position)
+        Ref<Transform> SetPosition(ConstRef<Vector2<Base>> Position)
         {
             return SetPosition(Vector3<Base>(Position.GetX(), Position.GetY(), 0));
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> SetPosition(Ref<const Vector3<Base>> Position)
+        Ref<Transform> SetPosition(ConstRef<Vector3<Base>> Position)
         {
             mPosition = Position;
             return (* this);
         }
 
         // -=(Undocumented)=-
-        Ref<const Vector3<Base>> GetPosition() const
+        ConstRef<Vector3<Base>> GetPosition() const
         {
             return mPosition;
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> SetScale(Ref<const Vector2<Base>> Scale)
+        Ref<Transform> SetScale(ConstRef<Vector2<Base>> Scale)
         {
             return SetScale(Vector3<Base>(Scale.GetX(), Scale.GetY(), 1));
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> SetScale(Ref<const Vector3<Base>> Scale)
+        Ref<Transform> SetScale(ConstRef<Vector3<Base>> Scale)
         {
             mScale = Scale;
             return (* this);
         }
 
         // -=(Undocumented)=-
-        Ref<const Vector3<Base>> GetScale() const
+        ConstRef<Vector3<Base>> GetScale() const
         {
             return mScale;
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> SetRotation(Ref<const Quaternion<Base>> Rotation)
+        Ref<Transform> SetRotation(ConstRef<Quaternion<Base>> Rotation)
         {
             mRotation = Rotation;
             return (* this);
         }
 
         // -=(Undocumented)=-
-        Ref<const Quaternion<Base>> GetRotation() const
+        ConstRef<Quaternion<Base>> GetRotation() const
         {
             return mRotation;
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> Translate(Ref<const Vector2<Base>> Translation)
+        Ref<Transform> Translate(ConstRef<Vector2<Base>> Translation)
         {
             return Translate(Vector3<Base>(Translation.GetX(), Translation.GetY(), 0));
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> Translate(Ref<const Vector3<Base>> Translation)
+        Ref<Transform> Translate(ConstRef<Vector3<Base>> Translation)
         {
             mPosition += Translation;
             return (* this);
@@ -139,27 +139,27 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> Scale(Ref<const Vector2<Base>> Vector)
+        Ref<Transform> Scale(ConstRef<Vector2<Base>> Vector)
         {
             return Scale(Vector3<Base>(Vector.GetX(), Vector.GetY(), 1));
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> Scale(Ref<const Vector3<Base>> Vector)
+        Ref<Transform> Scale(ConstRef<Vector3<Base>> Vector)
         {
             mScale *= Vector;
             return (* this);
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> Rotate(Ref<const Quaternion<Base>> Rotation)
+        Ref<Transform> Rotate(ConstRef<Quaternion<Base>> Rotation)
         {
             mRotation = mRotation * Rotation;
             return (* this);
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> Rotate(Ref<const Vector2<Base>> Angles)
+        Ref<Transform> Rotate(ConstRef<Vector2<Base>> Angles)
         {
             const Quaternionf XAxis(Quaternion<Base>::FromAngles(Angles.GetX(), Vector3<Base>(1, 0, 0)));
             const Quaternionf YAxis(Quaternion<Base>::FromAngles(Angles.GetY(), Vector3<Base>(0, 1, 0)));
@@ -169,7 +169,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> Rotate(Ref<const Vector3<Base>> Angles)
+        Ref<Transform> Rotate(ConstRef<Vector3<Base>> Angles)
         {
             const Quaternionf XAxis(Quaternion<Base>::FromAngles(Angles.GetX(), Vector3<Base>(1, 0, 0)));
             const Quaternionf YAxis(Quaternion<Base>::FromAngles(Angles.GetY(), Vector3<Base>(0, 1, 0)));
@@ -180,7 +180,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Transform> Rotate(Base Angle, Ref<const Vector3<Base>> Axis)
+        Ref<Transform> Rotate(Base Angle, ConstRef<Vector3<Base>> Axis)
         {
             return Rotate(Quaternion<Base>::FromAngles(Angle, Axis));
         }

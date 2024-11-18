@@ -21,7 +21,7 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    template<typename Type, UInt Count>
+    template<typename Type, UInt32 Count>
     class Pool final
     {
     public:
@@ -39,19 +39,19 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        UInt Allocate()
+        UInt32 Allocate()
         {
             return mAllocator.Allocate();
         }
 
         // -=(Undocumented)=-
-        UInt Free(UInt Handle)
+        UInt32 Free(UInt32 Handle)
         {
             return mAllocator.Free(Handle);
         }
 
         // -=(Undocumented)=-
-        Ref<Type> operator[](UInt Handle)
+        Ref<Type> operator[](UInt32 Handle)
         {
             return mPool[Handle];
         }

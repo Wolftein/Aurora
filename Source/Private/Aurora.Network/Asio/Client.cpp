@@ -238,7 +238,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void TCPClient::WhenResolve(Ref<const std::error_code> Error, Ref<asio::ip::tcp::resolver::results_type> Result)
+    void TCPClient::WhenResolve(ConstRef<std::error_code> Error, Ref<asio::ip::tcp::resolver::results_type> Result)
     {
         if (Error)
         {
@@ -257,7 +257,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void TCPClient::WhenConnect(Ref<const std::error_code> Error)
+    void TCPClient::WhenConnect(ConstRef<std::error_code> Error)
     {
         if (Error)
         {
@@ -272,7 +272,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void TCPClient::WhenError(Ref<const std::error_code> Error)
+    void TCPClient::WhenError(ConstRef<std::error_code> Error)
     {
         if (Error && Error != asio::error::eof)
         {
@@ -284,7 +284,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void TCPClient::WhenRead(Ref<const std::error_code> Error, CPtr<UInt8> Block, Bool Body)
+    void TCPClient::WhenRead(ConstRef<std::error_code> Error, CPtr<UInt8> Block, Bool Body)
     {
         if (mState != State::Connected)
         {
@@ -322,7 +322,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void TCPClient::WhenWrite(Ref<const std::error_code> Error, CPtr<UInt8> Block)
+    void TCPClient::WhenWrite(ConstRef<std::error_code> Error, CPtr<UInt8> Block)
     {
         if (mState == State::Closed)
         {

@@ -42,7 +42,7 @@ inline namespace IO
         try
         {
             mTable = toml::parse(Text);
-        } catch (Ref<const toml::ex::parse_error> Error)
+        } catch (ConstRef<toml::ex::parse_error> Error)
         {
             return false;
         }

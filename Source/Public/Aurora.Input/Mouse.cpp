@@ -24,10 +24,9 @@ namespace Input
     void Mouse::Poll(CPtr<const Event> Events)
     {
         mThisMouseScroll.Set(0, 0);
-        mLastMousePosition = mThisMousePosition;
-        mLastButtons       = mThisButtons;
+        mLastButtons = mThisButtons;
 
-        for (Ref<const Event> Event : Events)
+        for (ConstRef<Event> Event : Events)
         {
             switch (Event.Type)
             {
@@ -54,7 +53,6 @@ namespace Input
 
     void Mouse::Reset()
     {
-        mLastMousePosition.Set(0, 0);
         mThisMousePosition.Set(0, 0);
         mThisMouseScroll.Set(0, 0);
         mLastButtons.reset();

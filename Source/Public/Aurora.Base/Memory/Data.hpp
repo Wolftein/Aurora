@@ -13,6 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Aurora.Base/Trait.hpp"
+#include "Aurora.Base/IO/Serializable.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,12 +22,12 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    class Data final
+    class Data final : public Serializable<Data>
     {
     public:
 
         // -=(Undocumented)=-
-        using Deleter = FPtr<void(Ptr<void>)>;
+        using Deleter = void (*)(Ptr<void>);
 
         // -=(Undocumented)=-
         using Pointer = Ptr<void>;
@@ -55,7 +56,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Data(UInt Size)
+        Data(UInt32 Size)
             : mDeleter { BASIC_DELETER<UInt8> },
               mData    { new UInt8[Size] },
               mSize    { Size }
@@ -63,7 +64,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Data(Pointer Data, UInt Size, Deleter Destructor)
+        Data(Pointer Data, UInt32 Size, Deleter Destructor)
             : mDeleter { Destructor },
               mData    { Data },
               mSize    { Size }
@@ -72,7 +73,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Type>
-        Data(Type Data, UInt Size, Deleter Destructor)
+        Data(Type Data, UInt32 Size, Deleter Destructor)
             : mDeleter { Destructor },
               mData    { Data },
               mSize    { Size }
@@ -133,6 +134,20 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        void Reset()
+        {
+            mData = nullptr;
+            mSize = 0;
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void Copy(Ptr<const Type> Source, UInt32 Length = sizeof(Type))
+        {
+            std::memcpy(mData, Source, Length);
+        }
+
+        // -=(Undocumented)=-
         void Clear()
         {
             if (mData)
@@ -160,6 +175,20 @@ inline namespace Core
             return GetSpan<Type>();
         }
 
+        // \see Serializable::OnSerialize
+        template<typename Stream>
+        void OnSerialize(Stream Archive)
+        {
+            Archive.SerializeInt(reinterpret_cast<Ref<UInt>>(mDeleter));
+            Archive.SerializeInt(reinterpret_cast<Ref<UInt>>(mData));
+            Archive.SerializeInt(mSize);
+
+            if constexpr (Stream::k_Writer)
+            {
+                Reset();
+            }
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -167,6 +196,6 @@ inline namespace Core
 
         Deleter mDeleter;
         Pointer mData;
-        UInt    mSize;
+        UInt32  mSize;
     };
 }

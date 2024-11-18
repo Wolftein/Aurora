@@ -21,13 +21,13 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    template<UInt T>
+    template<UInt32 T>
     class Handle final
     {
     public:
 
         // -=(Undocumented)=-
-        constexpr static UInt k_Invalid = 0;
+        constexpr static UInt32 k_Invalid = 0;
 
     public:
 
@@ -51,14 +51,14 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        UInt Allocate()
+        UInt32 Allocate()
         {
             if (mPool.empty())
             {
                 return mHead >= T ? k_Invalid : ++mHead;
             }
 
-            const UInt Handle = mPool.empty() ? k_Invalid : mPool.back();
+            const UInt32 Handle = mPool.empty() ? k_Invalid : mPool.back();
 
             if (Handle != k_Invalid)
             {
@@ -68,7 +68,7 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        UInt Free(UInt Handle)
+        UInt32 Free(UInt32 Handle)
         {
             mPool.emplace_back(Handle);
             return Handle;
@@ -80,6 +80,6 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Vector<UInt> mPool;
-        UInt         mHead;
+        UInt32       mHead;
     };
 }

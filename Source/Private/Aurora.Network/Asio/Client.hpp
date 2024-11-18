@@ -83,19 +83,19 @@ namespace Network
         void DoFlush();
 
         // -=(Undocumented)=-
-        void WhenResolve(Ref<const std::error_code> Error, Ref<asio::ip::tcp::resolver::results_type> Result);
+        void WhenResolve(ConstRef<std::error_code> Error, Ref<asio::ip::tcp::resolver::results_type> Result);
 
         // -=(Undocumented)=-
-        void WhenConnect(Ref<const std::error_code> Error);
+        void WhenConnect(ConstRef<std::error_code> Error);
 
         // -=(Undocumented)=-
-        void WhenError(Ref<const std::error_code> Error);
+        void WhenError(ConstRef<std::error_code> Error);
 
         // -=(Undocumented)=-
-        void WhenRead(Ref<const std::error_code> Error, CPtr<UInt8> Block, Bool Body);
+        void WhenRead(ConstRef<std::error_code> Error, CPtr<UInt8> Block, Bool Body);
 
         // -=(Undocumented)=-
-        void WhenWrite(Ref<const std::error_code> Error, CPtr<UInt8> Block);
+        void WhenWrite(ConstRef<std::error_code> Error, CPtr<UInt8> Block);
 
     private:
 

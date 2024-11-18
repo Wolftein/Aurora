@@ -25,7 +25,7 @@ namespace Input
     {
         mLastKeys = mThisKeys;
 
-        for (Ref<const Event> Event : Events)
+        for (ConstRef<Event> Event : Events)
         {
             switch (Event.Type)
             {

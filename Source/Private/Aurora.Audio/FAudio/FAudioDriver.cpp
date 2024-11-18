@@ -123,7 +123,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    static auto GetVector(Ref<const Vector3f> Vector)
+    static auto GetVector(ConstRef<Vector3f> Vector)
     {
         F3DAUDIO_VECTOR Conversion;
         Conversion.x = Vector.GetX();
@@ -200,7 +200,7 @@ namespace Audio
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Ref<const Capabilities> FAudioDriver::GetCapabilities() const
+    ConstRef<Capabilities> FAudioDriver::GetCapabilities() const
     {
         return mCapabilities;
     }
@@ -436,7 +436,7 @@ namespace Audio
 
     Ptr<FAudioSourceVoice> FAudioDriver::GetOrCreateVoice(ConstSPtr<Sound> Sound)
     {
-        const auto FindByKey = [Key = GetKey(Sound)](Ref<const FAudioChannel> Channel)
+        const auto FindByKey = [Key = GetKey(Sound)](ConstRef<FAudioChannel> Channel)
         {
             return Channel.Key == Key;
         };
@@ -567,7 +567,7 @@ namespace Audio
             FAudio_GetDeviceDetails(mDevice, Element, & Details);
 
             Ref<Adapter> Adapter = mCapabilities.Adapters.emplace_back();
-            Adapter.Name    = As(reinterpret_cast<Ptr<wchar_t>>(Details.DisplayName));
+            Adapter.Name    = As(reinterpret_cast<Ptr<Char16>>(Details.DisplayName));
             Adapter.Default = Details.Role & FAudioDefaultGameDevice;
 
             if (Adapter.Name == Device)

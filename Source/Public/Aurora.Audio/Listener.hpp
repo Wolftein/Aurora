@@ -44,40 +44,40 @@ namespace Audio
         }
 
         // -=(Undocumented)=-
-        void SetPosition(Ref<const Vector3f> Position)
+        void SetPosition(ConstRef<Vector3f> Position)
         {
             SetDirty(true);
             mPosition = Position;
         }
 
         // -=(Undocumented)=-
-        Ref<const Vector3f> GetPosition() const
+        ConstRef<Vector3f> GetPosition() const
         {
             return mPosition;
         }
 
         // -=(Undocumented)=-
-        void SetVelocity(Ref<const Vector3f> Velocity)
+        void SetVelocity(ConstRef<Vector3f> Velocity)
         {
             SetDirty(true);
             mVelocity = Velocity;
         }
 
         // -=(Undocumented)=-
-        Ref<const Vector3f> GetVelocity() const
+        ConstRef<Vector3f> GetVelocity() const
         {
             return mVelocity;
         }
 
         // -=(Undocumented)=-
-        void SetOrientation(Ref<const Quaternionf> Orientation)
+        void SetOrientation(ConstRef<Quaternionf> Orientation)
         {
             SetDirty(true);
             mOrientation = Orientation;
         }
 
         // -=(Undocumented)=-
-        Ref<const Quaternionf> GetOrientation() const
+        ConstRef<Quaternionf> GetOrientation() const
         {
             return mOrientation;
         }

@@ -38,7 +38,7 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Kernel::Initialize(Mode Mode, Ref<const Properties> Properties)
+    void Kernel::Initialize(Mode Mode, ConstRef<Properties> Properties)
     {
         // Creates the logging service
         Log::Initialize("Aurora.log");
@@ -172,9 +172,9 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Kernel::OnWindowResize(SInt32 Width, SInt32 Height)
+    Bool Kernel::OnWindowResize(UInt32 Width, UInt32 Height)
     {
-        ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>();
+        const ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>();
         Graphics->Reset(Width, Height, Graphics->GetCapabilities().Samples);
         return false;
     }

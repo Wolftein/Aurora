@@ -30,7 +30,7 @@ namespace Network
         virtual ~Driver() = default;
 
         // -=(Undocumented)=-
-        virtual Bool Initialize(UInt32 Cores) = 0;
+        virtual Bool Initialize(UInt32 Threads) = 0;
 
         // -=(Undocumented)=-
         virtual void Tick() = 0;

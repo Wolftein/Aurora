@@ -38,19 +38,13 @@ namespace Input
         void Reset();
 
         // -=(Undocumented)=-
-        Vector2i GetPosition() const
+        ConstRef<Vector2f> GetPosition() const
         {
             return mThisMousePosition;
         }
 
         // -=(Undocumented)=-
-        Vector2i GetDelta() const
-        {
-            return mThisMousePosition - mLastMousePosition;
-        }
-
-        // -=(Undocumented)=-
-        Vector2i GetScroll() const
+        ConstRef<Vector2f> GetScroll() const
         {
             return mThisMouseScroll;
         }
@@ -78,9 +72,9 @@ namespace Input
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Vector2i             mLastMousePosition;
-        Vector2i             mThisMousePosition;
-        Vector2i             mThisMouseScroll;
+        Vector2f             mThisMousePosition;
+        Vector2f             mThisMouseDelta;
+        Vector2f             mThisMouseScroll;
         Bitset<k_MaxButtons> mLastButtons;
         Bitset<k_MaxButtons> mThisButtons;
     };

@@ -52,7 +52,7 @@ namespace Network
             mAcceptor.bind(Endpoint);
             mAcceptor.listen();
 
-            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
+            const auto OnCompletion = [Self = shared_from_this()](ConstRef<std::error_code> Error)
             {
                 Self->WhenAccept(Error);
             };
@@ -69,7 +69,7 @@ namespace Network
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void TCPServer::WhenAccept(Ref<const std::error_code> Error)
+    void TCPServer::WhenAccept(ConstRef<std::error_code> Error)
     {
         if (Error)
         {
@@ -81,7 +81,7 @@ namespace Network
             Connection->SetProtocol(GetProtocol());
             Connection->Start();
 
-            const auto OnCompletion = [Self = shared_from_this()](Ref<const std::error_code> Error)
+            const auto OnCompletion = [Self = shared_from_this()](ConstRef<std::error_code> Error)
             {
                 CastPtr<TCPServer>(Self)->WhenAccept(Error);
             };

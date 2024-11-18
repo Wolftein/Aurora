@@ -41,7 +41,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Matrix4(Ref<const Column> C1, Ref<const Column> C2, Ref<const Column> C3, Ref<const Column> C4)
+        constexpr Matrix4(ConstRef<Column> C1, ConstRef<Column> C2, ConstRef<Column> C3, ConstRef<Column> C4)
             : mColumns { C1, C2, C3, C4 }
         {
         }
@@ -60,7 +60,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<const Column> GetColumn(UInt Column) const
+        ConstRef<Column> GetColumn(UInt Column) const
         {
             return mColumns[Column];
         }
@@ -80,11 +80,14 @@ inline namespace Math
         // -=(Undocumented)=-
         Base GetDeterminant() const
         {
-            const Base Sub0 = GetComponent(5) * GetComponent(10) - GetComponent(6) * GetComponent(9);
-            const Base Sub1 = GetComponent(1) * GetComponent(10) - GetComponent(2) * GetComponent(9);
-            const Base Sub2 = GetComponent(1) * GetComponent(6) - GetComponent(2) * GetComponent(5);
-            const Base Sub3 = GetComponent(1) * GetComponent(6) * GetComponent(11) - GetComponent(2) * GetComponent(5) * GetComponent(11);
-            return GetComponent(0) *Sub0 - GetComponent(4) *Sub1 + GetComponent(8) * Sub2 - GetComponent(12) * Sub3;
+            const Base Sub0  = GetComponent(5) * GetComponent(10) - GetComponent(6) * GetComponent(9);
+            const Base Sub1  = GetComponent(1) * GetComponent(10) - GetComponent(2) * GetComponent(9);
+            const Base Sub2  = GetComponent(1) * GetComponent(6) - GetComponent(2) * GetComponent(5);
+            const Base Sub3  = GetComponent(1) * GetComponent(6) * GetComponent(11) - GetComponent(2);
+
+            const Base Sub01 = GetComponent(0) * Sub0 - GetComponent(4) * Sub1;
+            const Base Sub23 = GetComponent(8) * Sub2 - GetComponent(12) * Sub3 * GetComponent(5) * GetComponent(11);
+            return Sub01 + Sub23;
         }
 
         // -=(Undocumented)=-
@@ -275,13 +278,13 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<const Base> operator[](UInt Component) const
+        ConstRef<Base> operator[](UInt Component) const
         {
             return reinterpret_cast<Ptr<const Base>>(mColumns)[Component];
         }
 
         // -=(Undocumented)=-
-        Matrix4<Base> operator+(Ref<const Matrix4<Base>> Matrix) const
+        Matrix4<Base> operator+(ConstRef<Matrix4<Base>> Matrix) const
         {
             return Matrix4<Base>(mColumns[0] + Matrix.mColumns[0],
                                  mColumns[1] + Matrix.mColumns[1],
@@ -302,7 +305,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Matrix4<Base> operator-(Ref<const Matrix4<Base>> Matrix) const
+        Matrix4<Base> operator-(ConstRef<Matrix4<Base>> Matrix) const
         {
             return Matrix4<Base>(mColumns[0] - Matrix.mColumns[0],
                                  mColumns[1] - Matrix.mColumns[1],
@@ -317,7 +320,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Matrix4<Base> operator*(Ref<const Matrix4<Base>> Matrix) const
+        Matrix4<Base> operator*(ConstRef<Matrix4<Base>> Matrix) const
         {
             Matrix4<Base> Result;
 
@@ -328,7 +331,7 @@ inline namespace Math
 
             for (UInt32 Column = 0; Column < 4; ++Column)
             {
-                Ref<const Matrix4<Base>::Column> Vector = Matrix.GetColumn(Column);
+                ConstRef<Matrix4<Base>::Column> Vector = Matrix.GetColumn(Column);
                 Result[Column * 4 + 0] = Vector.Dot(R0);
                 Result[Column * 4 + 1] = Vector.Dot(R1);
                 Result[Column * 4 + 2] = Vector.Dot(R2);
@@ -339,7 +342,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Vector2<Base> operator*(Ref<const Vector2<Base>> Vector) const
+        Vector2<Base> operator*(ConstRef<Vector2<Base>> Vector) const
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -352,7 +355,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Vector3<Base> operator*(Ref<const Vector3<Base>> Vector) const
+        Vector3<Base> operator*(ConstRef<Vector3<Base>> Vector) const
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -367,7 +370,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Vector4<Base> operator*(Ref<const Vector4<Base>> Vector) const
+        Vector4<Base> operator*(ConstRef<Vector4<Base>> Vector) const
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -395,7 +398,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Matrix4<Base>> operator+=(Ref<const Matrix4<Base>> Matrix)
+        Ref<Matrix4<Base>> operator+=(ConstRef<Matrix4<Base>> Matrix)
         {
             mColumns[0] += Matrix.mColumns[0];
             mColumns[1] += Matrix.mColumns[1];
@@ -415,7 +418,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Matrix4<Base>> operator-=(Ref<const Matrix4<Base>> Matrix)
+        Ref<Matrix4<Base>> operator-=(ConstRef<Matrix4<Base>> Matrix)
         {
             mColumns[0] -= Matrix.mColumns[0];
             mColumns[1] -= Matrix.mColumns[1];
@@ -435,7 +438,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Matrix4<Base>> operator*=(Ref<const Matrix4<Base>> Matrix)
+        Ref<Matrix4<Base>> operator*=(ConstRef<Matrix4<Base>> Matrix)
         {
             const Matrix4<Base> Result = (* this) * Matrix;
             mColumns[0] = Result.mColumns[0];
@@ -468,7 +471,7 @@ inline namespace Math
     public:
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> Transpose(Ref<const Matrix4<Base>> Matrix)
+        static constexpr Matrix4<Base> Transpose(ConstRef<Matrix4<Base>> Matrix)
         {
             return Matrix4<Base>(Matrix.GetComponent(0),  Matrix.GetComponent(4),
                                  Matrix.GetComponent(8),  Matrix.GetComponent(12),
@@ -520,7 +523,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> CreateLook(Ref<const Vector3<Base>> Eye, Ref<const Vector3<Base>> Focus, Ref<const Vector3<Base>> Up)
+        static constexpr Matrix4<Base> CreateLook(ConstRef<Vector3<Base>> Eye, ConstRef<Vector3<Base>> Focus, ConstRef<Vector3<Base>> Up)
         {
             const Vector3<Base> vForward = Vector3<Base>::Normalize(Focus - Eye);
             const Vector3<Base> vRight   = Vector3<Base>::Normalize(Vector3<Base>::Cross(Up, vForward));
@@ -535,7 +538,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> FromTranslation(Ref<const Vector2<Base>> Vector)
+        static constexpr Matrix4<Base> FromTranslation(ConstRef<Vector2<Base>> Vector)
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -547,7 +550,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> FromTranslation(Ref<const Vector3<Base>> Vector)
+        static constexpr Matrix4<Base> FromTranslation(ConstRef<Vector3<Base>> Vector)
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -560,7 +563,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> FromScale(Ref<const Vector2<Base>> Vector)
+        static constexpr Matrix4<Base> FromScale(ConstRef<Vector2<Base>> Vector)
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -572,7 +575,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> FromScale(Ref<const Vector3<Base>> Vector)
+        static constexpr Matrix4<Base> FromScale(ConstRef<Vector3<Base>> Vector)
         {
             const Base X = Vector.GetX();
             const Base Y = Vector.GetY();
@@ -585,7 +588,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static constexpr Matrix4<Base> FromRotation(Ref<const Quaternion<Base>> Rotation)
+        static constexpr Matrix4<Base> FromRotation(ConstRef<Quaternion<Base>> Rotation)
         {
             const Vector4<Base> Vector(Rotation.GetX(), Rotation.GetY(), Rotation.GetZ(), Rotation.GetW());
 
