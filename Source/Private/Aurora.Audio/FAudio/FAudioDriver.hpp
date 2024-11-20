@@ -93,7 +93,7 @@ namespace Audio
         struct FAudioChannel
         {
             // -=(Undocumented)=-
-            UInt                   Key;
+            UInt32                 Key;
 
             // -=(Undocumented)=-
             Ptr<FAudioSourceVoice> Voice;
@@ -103,7 +103,7 @@ namespace Audio
         struct FAudioInstance
         {
             // -=(Undocumented)=-
-            UInt                   ID;
+            Object                 ID;
 
             // -=(Undocumented)=-
             Bool                   Finish;

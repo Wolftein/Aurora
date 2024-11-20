@@ -38,14 +38,14 @@ namespace Audio
     };
 
     // -=(Undocumented)=-
-    enum class Backend
+    enum class Backend : UInt8
     {
         None,
         FAudio,
     };
 
     // -=(Undocumented)=-
-    enum class Kind
+    enum class Kind : UInt8
     {
         ADPCM,
         PCM,
@@ -53,7 +53,7 @@ namespace Audio
     };
 
     // -=(Undocumented)=-
-    using Object = UInt;
+    using Object = UInt16;
 
     // -=(Undocumented)=-
     struct Adapter

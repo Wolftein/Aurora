@@ -174,7 +174,8 @@ namespace Engine
 
     Bool Kernel::OnWindowResize(UInt32 Width, UInt32 Height)
     {
-        const ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>();
+        ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>();
+
         Graphics->Reset(Width, Height, Graphics->GetCapabilities().Samples);
         return false;
     }

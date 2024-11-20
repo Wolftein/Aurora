@@ -103,7 +103,7 @@ namespace Audio
 
     static auto GetKey(ConstSPtr<Sound> Sound)
     {
-        const UInt Key = Sound->GetChannel() << 16 | Sound->GetDepth() << 8 | CastEnum(Sound->GetKind());
+        const UInt32 Key = Sound->GetChannel() << 16 | Sound->GetDepth() << 8 | CastEnum(Sound->GetKind());
         return Key;
     }
 

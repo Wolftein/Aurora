@@ -110,13 +110,7 @@ namespace Content
         const TOMLSection Layout     = Properties.GetSection("Layout");
         const TOMLArray   Attributes = Layout.GetArray("Attributes");
 
-        if (Attributes.IsNull() || Attributes.IsEmpty())
-        {
-            Description.InputLayout[0] = { Graphic::VertexSemantic::Position,  Graphic::VertexFormat::Float32x3,   0, 0 };
-            Description.InputLayout[1] = { Graphic::VertexSemantic::Color,     Graphic::VertexFormat::UIntNorm8x4, 0, 12 };
-            Description.InputLayout[2] = { Graphic::VertexSemantic::TexCoord0, Graphic::VertexFormat::Float32x2,   0, 16 };
-        }
-        else
+        if (!Attributes.IsNull() && !Attributes.IsEmpty())
         {
             for(UInt Attribute = 0, Size = Attributes.GetSize(); Attribute < Size; ++Attribute)
             {

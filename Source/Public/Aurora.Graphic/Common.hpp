@@ -73,7 +73,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class Backend
+    enum class Backend : UInt8
     {
         None,
         D3D11,
@@ -81,7 +81,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class BlendColor
+    enum class BlendColor : UInt8
     {
         RGBA = 0b00001111,
         RGB  = 0b00000111,
@@ -102,7 +102,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class BlendFactor
+    enum class BlendFactor : UInt8
     {
         Zero,
         One,
@@ -117,7 +117,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class BlendFunction
+    enum class BlendFunction : UInt8
     {
         Add,
         Subtract,
@@ -127,7 +127,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class Clear
+    enum class Clear : UInt8
     {
         Color,
         Auxiliary,
@@ -135,7 +135,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class Cull
+    enum class Cull : UInt8
     {
         None,
         Back,
@@ -143,7 +143,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class Language
+    enum class Language : UInt8
     {
         Version_1,
         Version_2,
@@ -154,7 +154,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class Source
+    enum class Source : UInt8
     {
         None,
         Diffuse,
@@ -172,7 +172,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class Stage
+    enum class Stage : UInt8
     {
         Vertex,
         Fragment,
@@ -180,7 +180,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class TestAction
+    enum class TestAction : UInt8
     {
         Keep,
         Replace,
@@ -193,7 +193,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class TestCondition
+    enum class TestCondition : UInt8
     {
         Always,
         Never,
@@ -206,7 +206,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class TextureEdge
+    enum class TextureEdge : UInt8
     {
         Clamp,
         Repeat,
@@ -214,7 +214,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class TextureFilter
+    enum class TextureFilter : UInt8
     {
         Nearest,
         Bilinear,
@@ -223,7 +223,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class TextureFormat
+    enum class TextureFormat : UInt8
     {
         BC1UIntNorm,
         BC1UIntNorm_sRGB,
@@ -283,7 +283,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class TextureLayout
+    enum class TextureLayout : UInt8
     {
         Source,
         Destination,
@@ -291,7 +291,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class Usage
+    enum class Usage : UInt8
     {
         Vertex,
         Index,
@@ -299,7 +299,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class VertexFormat
+    enum class VertexFormat : UInt8
     {
         Float16x2,
         Float16x4,
@@ -322,7 +322,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class VertexSemantic
+    enum class VertexSemantic : UInt8
     {
         None,
         Position,
@@ -348,7 +348,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class VertexTopology
+    enum class VertexTopology : UInt8
     {
         Point,
         Line,
@@ -397,7 +397,7 @@ namespace Graphic
         Object Texture = 0;
 
         // -=(Undocumented)=-
-        UInt32 Level   = 0;
+        UInt8 Level    = 0;
     };
 
     // -=(Undocumented)=-
@@ -415,7 +415,7 @@ namespace Graphic
         // -=(Undocumented)=-
         UInt16         Offset  = 0;
 
-		// -=(Undocumented)=-
+        // -=(Undocumented)=-
         UInt16         Divisor = 0;
     };
 
@@ -426,13 +426,13 @@ namespace Graphic
         Object Buffer = 0;
 
         // -=(Undocumented)=-
-        UInt   Length = 0;
+        UInt32 Length = 0;
 
         // -=(Undocumented)=-
-        UInt   Offset = 0;
+        UInt32 Offset = 0;
 
         // -=(Undocumented)=-
-        UInt   Stride = 0;
+        UInt32 Stride = 0;
     };
 
     // -=(Undocumented)=-
@@ -537,7 +537,7 @@ namespace Graphic
         // -=(Undocumented)=-
         UInt32 Offset    = 0;
 
-		// -=(Undocumented)=-
+        // -=(Undocumented)=-
         UInt32 Instances = 0;
     };
 
