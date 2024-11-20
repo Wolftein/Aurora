@@ -43,7 +43,7 @@ inline namespace Core
     using Char      = char;
 
     // -=(Undocumented)=-
-    using Char16    = char16_t;
+    using Char16    = wchar_t;
 
     // -=(Undocumented)=-
     using SInt      = intptr_t;
@@ -85,16 +85,16 @@ inline namespace Core
     using Real64    = double_t;
 
     // -=(Undocumented)=-
-    using SStr      = std::string;
+    using SStr      = std::basic_string<Char>;
 
     // -=(Undocumented)=-
-    using CStr      = std::string_view;
+    using CStr      = std::basic_string_view<Char>;
 
     // -=(Undocumented)=-
-    using SStr16    = std::wstring;
+    using SStr16    = std::basic_string<Char16>;
 
     // -=(Undocumented)=-
-    using CStr16    = std::wstring_view;
+    using CStr16    = std::basic_string_view<Char16>;
 
     // -=(Undocumented)=-
     template<typename Type>
@@ -131,10 +131,6 @@ inline namespace Core
     // -=(Undocumented)=-
     template<typename Type, typename Deleter = std::default_delete<Type>>
     using UPtr      = std::unique_ptr<Type, Deleter>;
-
-    // -=(Undocumented)=-
-    template<typename Type>
-    using ConstUPtr = Ref<const UPtr<Type>>;
 
     // -=(Undocumented)=-
     template<typename Type>
@@ -197,4 +193,10 @@ inline namespace Core
     // -=(Undocumented)=-
     template<typename Type>
     using Atomic      = std::atomic<Type>;
+
+    // -=(Undocumented)=-
+    using Atomic_Flag = std::atomic_flag;
+
+    // -=(Undocumented)=-
+    using Thread      = std::jthread;
 }

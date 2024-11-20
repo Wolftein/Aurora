@@ -40,10 +40,10 @@ namespace Graphic
 
     Bool Model::OnCreate(Ref<Subsystem::Context> Context)
     {
-        // Create mesh
+        // Create mesh.
         mMesh->Create(Context);
 
-        // Create each material
+        // Create each material.
         for (ConstSPtr<Material> Material : mMaterials)
         {
             if (Material)

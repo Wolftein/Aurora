@@ -187,7 +187,7 @@ namespace Content
         for (UInt32 ID = 0; Ref<const tinygltf::Material> GLTFMaterial : GLTFModel.materials)
         {
             const SPtr<Graphic::Material> Material = NewPtr<Graphic::Material>(Uri { GLTFMaterial.name });
-            Material->SetResidence(true);
+            Material->SetOwnership(true);
 
             if (SInt32 Index = GLTFMaterial.pbrMetallicRoughness.baseColorTexture.index; Index >= 0)
             {

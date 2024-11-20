@@ -13,6 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Driver.hpp"
+#include "Encoder.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,7 +22,6 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    // @TODO: Needs improvement over the interface for ease use.
     class Service final : public AbstractSubsystem<Service>
     {
     public:
@@ -30,16 +30,21 @@ namespace Graphic
         explicit Service(Ref<Context> Context);
 
         // -=(Undocumented)=-
-        Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples);
+        ~Service();
 
         // -=(Undocumented)=-
-        void Reset(UInt16 Width, UInt16 Height, UInt8 Samples);
+        Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples);
 
         // -=(Undocumented)=-
         Ref<const Capabilities> GetCapabilities() const
         {
             return mDriver->GetCapabilities();
         }
+
+        // -=(Undocumented)=-
+        void Reset(UInt16 Width, UInt16 Height, UInt8 Samples);
+
+        // @TODO: AllocateTransientBuffer
 
         // -=(Undocumented)=-
         Object CreateBuffer(Usage Type, UInt32 Capacity)
@@ -51,7 +56,7 @@ namespace Graphic
         Object CreateBuffer(Usage Type, UInt32 Capacity, Any<Data> Data);
 
         // -=(Undocumented)=-
-        void CopyBuffer(Object Destination, UInt32 DstOffset, Object Source, UInt32 SrcOffset, UInt32 Size);
+        void CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size);
 
         // -=(Undocumented)=-
         void UpdateBuffer(Object ID, Bool Discard, UInt32 Offset, Any<Data> Data);
@@ -78,13 +83,13 @@ namespace Graphic
         void DeletePipeline(Object ID);
 
         // -=(Undocumented)=-
-        Object CreateTexture(TextureFormat Format, TextureLayout Layout, UInt32 Width ,UInt32 Height, UInt8 Level, UInt8 Samples, Any<Data> Data);
+        Object CreateTexture(TextureFormat Format, TextureLayout Layout, UInt16 Width ,UInt16 Height, UInt8 Level, UInt8 Samples, Any<Data> Data);
+
+        // -=(Undocumented)=-
+        void CopyTexture(Object DstTexture, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, Ref<const Recti> SrcOffset);
 
         // -=(Undocumented)=-
         void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, Any<Data> Data);
-
-        // -=(Undocumented)=-
-        void CopyTexture(Object Destination, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object Source, UInt8 SrcLevel, Ref<const Recti> SrcOffset);
 
         // -=(Undocumented)=-
         Data ReadTexture(Object ID, UInt8 Level, Ref<const Recti> Offset);
@@ -99,10 +104,43 @@ namespace Graphic
         void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
 
         // -=(Undocumented)=-
-        void Submit(CPtr<Submission> Submissions);
+        void Submit(Ref<Encoder> Encoder, Bool Temporally);
 
         // -=(Undocumented)=-
         void Commit(Object ID, Bool Synchronised);
+
+        // -=(Undocumented)=-
+        void Flush();
+
+    private:
+
+        // -=(Undocumented)=-
+        enum class Command
+        {
+            Initialize,
+            Reset,
+            CreateBuffer,
+            CopyBuffer,
+            UpdateBuffer,
+            DeleteBuffer,
+            CreatePass,
+            DeletePass,
+            CreatePipeline,
+            DeletePipeline,
+            CreateTexture,
+            CopyTexture,
+            UpdateTexture,
+            DeleteTexture,
+            Prepare,
+            Submit,
+            Commit,
+        };
+
+        // -=(Undocumented)=-
+        void OnConsume(std::stop_token Token);
+
+        // -=(Undocumented)=-
+        void OnExecute(Command Type, Ref<Reader> Reader);
 
     private:
 
@@ -110,6 +148,11 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         UPtr<Driver>           mDriver;
+        Thread                 mWorker;
+        Writer                 mEncoder;
+        Writer                 mDecoder;
+        Atomic_Flag            mBusy;
+        Atomic<Bool>           mInitialized;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

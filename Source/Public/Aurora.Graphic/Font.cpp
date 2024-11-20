@@ -141,18 +141,17 @@ namespace Graphic
         constexpr UInt8 k_DefaultMipmaps = 1;
         constexpr UInt8 k_DefaultSamples = 1;
 
-        const SPtr<Texture> Atlas = NewPtr<Texture>("_Private");
+        const SPtr<Texture> Atlas = NewPtr<Texture>(Content::Uri::Merge(GetKey(), "Atlas"));
         Atlas->Load(
             TextureFormat::RGBA8UIntNorm,
             TextureLayout::Source, mAtlas.Width, mAtlas.Height, k_DefaultMipmaps, k_DefaultSamples, Move(mAtlas.Bytes));
 
         // Allocates material for the font
-        mMaterial = NewPtr<Material>("Private");
-        mMaterial->SetResidence(true);
+        mMaterial = NewPtr<Material>(Content::Uri::Merge(GetKey(), "Material"));
+        mMaterial->SetOwnership(true);
         mMaterial->SetTexture(Source::Diffuse, Atlas);
         mMaterial->SetSampler(Source::Diffuse, { TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear });
         mMaterial->SetParameter(0, Vector3f(Atlas->GetWidth(), Atlas->GetHeight(), mMetrics.Distance));
-
         return mMaterial->Create(Context);
     }
 

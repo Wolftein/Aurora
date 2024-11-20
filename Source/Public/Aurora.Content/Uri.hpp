@@ -64,6 +64,13 @@ namespace Content
 			return mUrl;
 		}
 
+        // -=(Undocumented)=-
+        CStr GetUrlWithoutExtension() const
+        {
+            const UInt Offset = mUrl.rfind('.');
+            return (Offset != CStr::npos ? GetUrl().substr(0, Offset) : GetUrl());
+        }
+
 		// -=(Undocumented)=-
         CStr GetSchema() const
 		{
@@ -99,6 +106,14 @@ namespace Content
 			const UInt Offset = mUrl.rfind('.');
 			return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : "");
 		}
+
+    public:
+
+        // -=(Undocumented)=-
+        static Uri Merge(ConstRef<Uri> Parent, CStr Subresource)
+        {
+            return Uri(Format("{}#{}", Parent.GetUrlWithoutExtension(), Subresource));
+        }
 
 	private:
 

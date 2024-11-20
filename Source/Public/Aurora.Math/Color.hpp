@@ -21,7 +21,7 @@
 inline namespace Math
 {
     // -=(Undocumented)=-
-    class Color final : public Serializable<Color>
+    class Color final
     {
     public:
 
@@ -97,9 +97,9 @@ inline namespace Math
             return mValue;
         }
 
-        // \see Serializable::OnSerialize
-        template<typename Stream>
-        void OnSerialize(Stream Archive)
+        // -=(Undocumented)=-
+        template<typename Type>
+        void OnSerialize(Stream<Type> Archive)
         {
             Archive.SerializeNumber(mValue);
         }

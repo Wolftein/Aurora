@@ -571,13 +571,13 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CopyBuffer(Object Destination, UInt32 DstOffset, Object Source, UInt32 SrcOffset, UInt32 Size)
+    void D3D11Driver::CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size)
     {
         const D3D11_BOX Offset       = CD3D11_BOX(SrcOffset, 0, 0, SrcOffset + Size, 1, 1);
         const D3D11_COPY_FLAGS Flags = D3D11_COPY_NO_OVERWRITE;
 
         mDeviceImmediate->CopySubresourceRegion1(
-            mBuffers[Destination].Object.Get(), 0, DstOffset, 0, 0, mBuffers[Source].Object.Get(), 0, & Offset, Flags);
+            mBuffers[DstBuffer].Object.Get(), 0, DstOffset, 0, 0, mBuffers[SrcBuffer].Object.Get(), 0, & Offset, Flags);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -758,7 +758,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt32 Width, UInt32 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data)
+    void D3D11Driver::CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data)
     {
         CD3D11_TEXTURE2D_DESC Description(As(Format), Width, Height, 1, Level);
         Description.Usage      = Data.empty() ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
@@ -802,36 +802,24 @@ namespace Graphic
 
     void D3D11Driver::UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data)
     {
-        const D3D11_BOX Rect {
-            static_cast<UINT>(Offset.GetLeft()),
-            static_cast<UINT>(Offset.GetTop()),
-            0,
-            static_cast<UINT>(Offset.GetRight()),
-            static_cast<UINT>(Offset.GetBottom()),
-            1
-        };
+        const D3D11_BOX Rect = CD3D11_BOX(
+                Offset.GetLeft(), Offset.GetTop(), 0, Offset.GetRight(), Offset.GetBottom(), 1);
         mDeviceImmediate->UpdateSubresource(mTextures[ID].Object.Get(), Level, AddressOf(Rect), Data.data(), Pitch, 0);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CopyTexture(Object Destination, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object Source, UInt8 SrcLevel, Ref<const Recti> SrcOffset)
+    void D3D11Driver::CopyTexture(Object DstTexture, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, Ref<const Recti> SrcOffset)
     {
-        const D3D11_BOX Rect {
-            static_cast<UINT>(SrcOffset.GetLeft()),
-            static_cast<UINT>(SrcOffset.GetTop()),
-            0,
-            static_cast<UINT>(SrcOffset.GetRight()),
-            static_cast<UINT>(SrcOffset.GetBottom()),
-            1
-        };
+        const D3D11_BOX Rect = CD3D11_BOX(
+                SrcOffset.GetLeft(), SrcOffset.GetTop(), 0, SrcOffset.GetRight(), SrcOffset.GetBottom(), 1);
 
-        const Ptr<ID3D11Texture2D> DstTexture = mTextures[Destination].Object.Get();
-        const Ptr<ID3D11Texture2D> SrcTexture = mTextures[Source].Object.Get();
+        const Ptr<ID3D11Texture2D> DstResource = mTextures[DstTexture].Object.Get();
+        const Ptr<ID3D11Texture2D> SrcResource = mTextures[SrcTexture].Object.Get();
 
         mDeviceImmediate->CopySubresourceRegion(
-            DstTexture, DstLevel, DstOffset.GetX(), DstOffset.GetY(), 0, SrcTexture, SrcLevel, AddressOf(Rect));
+            DstResource, DstLevel, DstOffset.GetX(), DstOffset.GetY(), 0, SrcResource, SrcLevel, AddressOf(Rect));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -937,14 +925,17 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::Submit(CPtr<Submission> Submissions)
+    void D3D11Driver::Submit(CPtr<const Submission> Submissions)
     {
-        constexpr Submission k_DefaultSubmission { .Scissor = { 0, 0, 0, 0 } };
+        static Submission s_PreviousFrameCache {
+            .Scissor = Rectf(0, 0, 0, 0)
+        };
 
+        // Apply all job(s).
         for (UInt Batch = 0; Batch < Submissions.size(); ++Batch)
         {
             Ref<const Submission> NewestSubmission = Submissions[Batch];
-            Ref<const Submission> OldestSubmission = Batch > 0 ? Submissions[Batch - 1] : k_DefaultSubmission;
+            Ref<const Submission> OldestSubmission = Batch > 0 ? Submissions[Batch - 1] : s_PreviousFrameCache;
 
             // Apply vertices
             ApplyVertexResources(OldestSubmission, NewestSubmission);
@@ -964,11 +955,12 @@ namespace Graphic
             // Apply the scissor rect
             if (OldestSubmission.Scissor != NewestSubmission.Scissor)
             {
-                const RECT Rect {
-                    NewestSubmission.Scissor.GetLeft(),  NewestSubmission.Scissor.GetTop(),
-                    NewestSubmission.Scissor.GetRight(), NewestSubmission.Scissor.GetBottom()
-                };
-                mDeviceImmediate->RSSetScissorRects(1, & Rect);
+                const RECT Scissor = CD3D11_RECT(
+                        NewestSubmission.Scissor.GetLeft(),
+                        NewestSubmission.Scissor.GetTop(),
+                        NewestSubmission.Scissor.GetRight(),
+                        NewestSubmission.Scissor.GetBottom());
+                mDeviceImmediate->RSSetScissorRects(1, AddressOf(Scissor));
             }
 
             // Apply pipeline or stencil value
@@ -1054,6 +1046,9 @@ namespace Graphic
                 }
             }
         }
+
+        // Apply cache
+        s_PreviousFrameCache = Submissions.back();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

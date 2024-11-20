@@ -43,14 +43,15 @@ namespace Graphic
 
     Bool Pipeline::OnCreate(Ref<Subsystem::Context> Context)
     {
-        for (Ref<const Data> Stage : mShaders)
+        for (ConstRef<Data> Shader : mShaders)
         {
-            SetMemory(GetMemory() + Stage.GetSize());
+            SetMemory(GetMemory() + Shader.GetSize());
         }
 
         mID = Context.GetSubsystem<Service>()->CreatePipeline(
-            Move(mShaders[0]), Move(mShaders[1]), Move(mShaders[2]), mProperties);
-
+            Move(mShaders[0]),
+            Move(mShaders[1]),
+            Move(mShaders[2]), mProperties);
         return mID > 0;
     }
 

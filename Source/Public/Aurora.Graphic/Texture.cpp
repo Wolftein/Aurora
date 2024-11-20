@@ -24,12 +24,13 @@ namespace Graphic
 
     Texture::Texture(Any<Content::Uri> Key)
         : AbstractResource(Move(Key)),
-          mID     { 0 },
-          mFormat { TextureFormat::RGBA8UInt },
-          mLayout { TextureLayout::Dual },
-          mWidth  { 0 },
-          mHeight { 0 },
-          mLevel  { 0 }
+          mID      { 0 },
+          mFormat  { TextureFormat::RGBA8UInt },
+          mLayout  { TextureLayout::Dual },
+          mWidth   { 0 },
+          mHeight  { 0 },
+          mLevel   { 0 },
+          mSamples { 1 }
     {
     }
 

@@ -21,8 +21,8 @@
 namespace Network
 {
     // -=(Undocumented)=-
-    template<typename Derived, UInt32 ID>
-    class Packet : public Serializable<Derived>
+    template<UInt32 ID>
+    class Packet
     {
     public:
 

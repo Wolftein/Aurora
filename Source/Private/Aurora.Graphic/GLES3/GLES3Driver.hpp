@@ -40,7 +40,7 @@ namespace Graphic
         void CreateBuffer(Object ID, Usage Type, UInt32 Capacity, CPtr<const UInt8> Data) override;
 
         // \see Driver::CopyBuffer
-        void CopyBuffer(Object Destination, UInt32 DstOffset, Object Source, UInt32 SrcOffset, UInt32 Size) override;
+        void CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size) override;
 
         // \see Driver::UpdateBuffer
         void UpdateBuffer(Object ID, Bool Discard, UInt32 Offset, CPtr<const UInt8> Data) override;
@@ -61,13 +61,13 @@ namespace Graphic
         void DeletePipeline(Object ID) override;
 
         // \see Driver::CreateTexture
-        void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt32 Width, UInt32 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) override;
+        void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) override;
 
         // \see Driver::UpdateTexture
         void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data) override;
 
         // \see Driver::CopyTexture
-        void CopyTexture(Object Destination, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object Source, UInt8 SrcLevel, Ref<const Recti> SrcOffset) override;
+        void CopyTexture(Object DstTexture, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, Ref<const Recti> SrcOffset) override;
 
         // \see Driver::ReadTexture
         Data ReadTexture(Object ID, UInt8 Level, Ref<const Recti> Offset) override;
@@ -82,7 +82,7 @@ namespace Graphic
         void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) override;
 
         // \see Driver::Submit
-        void Submit(CPtr<Submission> Submissions) override;
+        void Submit(CPtr<const Submission> Submissions) override;
 
         // \see Driver::Commit
         void Commit(Object ID, Bool Synchronised) override;

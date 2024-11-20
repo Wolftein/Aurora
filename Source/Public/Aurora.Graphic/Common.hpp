@@ -36,7 +36,7 @@ namespace Graphic
         k_MaxBuffers     = 0x1000,
 
         // -=(Undocumented)=-
-        k_MaxFetches     = 0x000C,
+        k_MaxFetches     = 0x0008,
 
         // -=(Undocumented)=-
         k_MaxMaterials   = 0x1000,
@@ -356,7 +356,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    using  Object = UInt;
+    using  Object = UInt16;
 
     // -=(Undocumented)=-
     struct Resolution
@@ -545,30 +545,30 @@ namespace Graphic
     struct Submission
     {
         // -=(Undocumented)=-
-        Binding   Vertices[k_MaxFetches];           // TODO: Stack?
+        Array<Binding, k_MaxFetches>  Vertices;
 
         // -=(Undocumented)=-
-        Binding   Indices;
+        Binding                       Indices;
 
         // -=(Undocumented)=-
-        Recti     Scissor                = { 0, 0, UINT16_MAX, UINT16_MAX };
+        Rect<UInt16>                  Scissor   = { 0, 0, UINT16_MAX, UINT16_MAX };
 
         // -=(Undocumented)=-
-        UInt8     Stencil                = 0;
+        UInt8                         Stencil   = 0;
 
         // -=(Undocumented)=-
-        Object    Pipeline               = 0;
+        Object                        Pipeline  = 0;
 
         // -=(Undocumented)=-
-        Binding   Uniforms[k_MaxUniforms];        // TODO: Split in different stages Stack?
+        Array<Binding, k_MaxUniforms> Uniforms;
 
         // -=(Undocumented)=-
-        Sampler   Samplers[k_MaxSlots];           // TODO: Split in different stages Stack?
+        Array<Sampler, k_MaxSlots>    Samplers;
 
         // -=(Undocumented)=-
-        Object    Textures[k_MaxSlots] = { };     // TODO: Split in different stages Stack?
+        Array<Object, k_MaxSlots>     Textures;
 
         // -=(Undocumented)=-
-        Instance  Primitive;
+        Instance                      Primitive;
     };
 }

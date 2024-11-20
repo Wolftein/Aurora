@@ -22,7 +22,7 @@ inline namespace Math
 {
     // -=(Undocumented)=-
     template<typename Base>
-    class Vector4 final : public Serializable<Vector4<Base>>
+    class Vector4 final
     {
     public:
 
@@ -317,9 +317,9 @@ inline namespace Math
             return mX == Vector.mX && mY == Vector.mY && mZ == Vector.mZ && mW == Vector.mW;
         }
 
-        // \see Serializable::OnSerialize
-        template<typename Stream>
-        void OnSerialize(Stream Archive)
+        // -=(Undocumented)=-
+        template<typename Type>
+        void OnSerialize(Stream<Type> Archive)
         {
             Archive.SerializeNumber(mX);
             Archive.SerializeNumber(mY);

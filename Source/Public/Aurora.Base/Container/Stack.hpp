@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Type.hpp"
+#include "Aurora.Base/Trait.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -79,6 +79,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        void Free()
+        {
+            --mSize;
+        }
+
+        // -=(Undocumented)=-
         Ref<Type> operator[](UInt Handle)
         {
             return mPool[Handle];
@@ -93,13 +99,13 @@ inline namespace Core
     private:
 
     	// -=(Undocumented)=-
-    	void Destroy()
-    	{
-    		for (Ref<Type> Object : GetData())
-    		{
-    			Object.~Type();
-    		}
-    	}
+        void Destroy()
+        {
+            for (Ref<Type> Object : GetData())
+            {
+                Object.~Type();
+            }
+        }
 
     private:
 

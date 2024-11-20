@@ -18,7 +18,7 @@
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace IO
+inline namespace Core
 {
     // -=(Undocumented)=-
     class Reader final
@@ -35,7 +35,7 @@ inline namespace IO
 
         // -=(Undocumented)=-
         template<typename Type>
-        explicit Reader(Ptr<Type> Pointer, UInt Length)
+        explicit Reader(Ptr<Type> Pointer, UInt32 Length)
             : mBuffer { reinterpret_cast<Ptr<UInt8>>(Pointer) },
               mLength { Length * sizeof(Type) },
               mOffset { 0 }
@@ -46,7 +46,7 @@ inline namespace IO
         template<typename Type>
         explicit Reader(CPtr<Type> Block)
             : mBuffer { reinterpret_cast<Ptr<UInt8>>(Block.data()) },
-              mLength { Block.size_bytes() },
+              mLength { static_cast<UInt32>(Block.size_bytes()) },
               mOffset { 0 }
         {
         }
@@ -58,32 +58,32 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        UInt GetCapacity() const
+        UInt32 GetCapacity() const
         {
             return mLength;
         }
 
         // -=(Undocumented)=-
-        UInt GetAvailable() const
+        UInt32 GetAvailable() const
         {
             return GetCapacity() - mOffset;
         }
 
         // -=(Undocumented)=-
-        UInt GetOffset() const
+        UInt32 GetOffset() const
         {
             return mOffset;
         }
 
         // -=(Undocumented)=-
-        void Skip(UInt Length)
+        void Skip(UInt32 Length)
         {
             mOffset += (mOffset + Length <= mLength ? Length : 0);
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        Type Peek(UInt Length = sizeof(Type))
+        Type Peek(UInt32 Length = sizeof(Type))
         {
             if (mOffset + Length > mLength)
             {
@@ -102,11 +102,20 @@ inline namespace IO
 
         // -=(Undocumented)=-
         template<typename Type>
-        Type Read(UInt Length = sizeof(Type))
+        Type Read(UInt32 Length = sizeof(Type))
         {
             const Type Result = Peek<Type>(Length);
             mOffset += Length;
             return Result;
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        CPtr<Type> ReadBlock()
+        {
+            const auto Size = ReadInt<UInt32>();
+            const auto Data = Read<Ptr<Type>>(Size * sizeof(Type));
+            return CPtr<Type>(Data, Size);
         }
 
         // -=(Undocumented)=-
@@ -116,11 +125,18 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
+        template<typename Type>
+        Type ReadEnum()
+        {
+            return static_cast<Type>(ReadInt<std::underlying_type_t<Type>>());
+        }
+
+        // -=(Undocumented)=-
         template<typename Type, typename = std::enable_if_t<std::is_integral<Type>::value>>
         Type ReadInt()
         {
-            Type Result   = 0u;
-            UInt Position = 0u;
+            Type   Result   = 0u;
+            UInt32 Position = 0u;
 
             do
             {
@@ -193,18 +209,16 @@ inline namespace IO
         // -=(Undocumented)=-
         CStr ReadString8()
         {
-            const auto Size = ReadInt<UInt>();
+            const auto Size = ReadInt<UInt32>();
             const auto Data = Read<CStr::const_pointer>(Size * sizeof(CStr::value_type));
-
             return CStr(Data, Size);
         }
 
         // -=(Undocumented)=-
         CStr16 ReadString16()
         {
-            const auto Size = ReadInt<UInt>();
+            const auto Size = ReadInt<UInt32>();
             const auto Data = Read<CStr16::const_pointer>(Size * sizeof(CStr16::value_type));
-
             return CStr16(Data, Size);
         }
 
@@ -230,17 +244,19 @@ inline namespace IO
             {
                 return ReadNumber<Type>();
             }
-            else if constexpr (std::is_same<Type, SStr>::value || std::is_same<Type, CStr>::value)
+            else if constexpr (std::is_same_v<Type, SStr> || std::is_same_v<Type, CStr>)
             {
                 return ReadString8();
             }
-            else if constexpr (std::is_same<Type, SStr16>::value || std::is_same<Type, CStr16>::value)
+            else if constexpr (std::is_same_v<Type, SStr16> || std::is_same_v<Type, CStr16>)
             {
                 return ReadString16();
             }
             else
             {
-                return Type::Read(* this);
+                Type Result;
+                Result.template OnSerialize<Reader>(* this);
+                return Result;
             }
         }
 
@@ -250,7 +266,7 @@ inline namespace IO
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Ptr<UInt8> mBuffer;
-        UInt       mLength;
-        UInt       mOffset;
+        UInt32     mLength;
+        UInt32     mOffset;
     };
 }

@@ -468,6 +468,16 @@ inline namespace Math
             return (* this);
         }
 
+        // -=(Undocumented)=-
+        template<typename Type>
+        void OnSerialize(Stream<Type> Archive)
+        {
+            Archive.SerializeObject(mColumns[0]);
+            Archive.SerializeNumber(mColumns[1]);
+            Archive.SerializeNumber(mColumns[2]);
+            Archive.SerializeNumber(mColumns[3]);
+        }
+
     public:
 
         // -=(Undocumented)=-

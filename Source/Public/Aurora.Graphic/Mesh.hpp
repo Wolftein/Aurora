@@ -116,7 +116,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Array<Data, k_MaxBuffers>         mData;
+        Array<Data, k_MaxBuffers>         mBytes;
         Array<Object, k_MaxBuffers>       mBuffers;
         Stack<Primitive, k_MaxPrimitives> mPrimitives;
     };

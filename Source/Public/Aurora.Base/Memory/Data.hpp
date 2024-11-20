@@ -13,7 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Aurora.Base/Trait.hpp"
-#include "Aurora.Base/IO/Serializable.hpp"
+#include "Aurora.Base/IO/Stream.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,7 +22,7 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    class Data final : public Serializable<Data>
+    class Data final
     {
     public:
 
@@ -175,16 +175,21 @@ inline namespace Core
             return GetSpan<Type>();
         }
 
-        // \see Serializable::OnSerialize
-        template<typename Stream>
-        void OnSerialize(Stream Archive)
+        // -=(Undocumented)=-
+        template<typename Type>
+        void OnSerialize(Stream<Type> Archive)
         {
             Archive.SerializeInt(reinterpret_cast<Ref<UInt>>(mDeleter));
             Archive.SerializeInt(reinterpret_cast<Ref<UInt>>(mData));
             Archive.SerializeInt(mSize);
 
-            if constexpr (Stream::k_Writer)
+            if constexpr (Stream<Type>::k_Writer)
             {
+                // Reset the data after writing, as this operation effectively moves the data from the current buffer
+                // to the archive. This ensures that the buffer is cleared and no longer holds stale or
+                // dangling pointers, which could lead to undefined behavior or memory corruption.
+                // By resetting the buffer here, we prepare it for future use, maintaining the integrity and
+                // consistency of our data handling process and avoiding potential issues with data validity.
                 Reset();
             }
         }

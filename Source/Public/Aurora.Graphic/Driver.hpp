@@ -41,7 +41,7 @@ namespace Graphic
         virtual void CreateBuffer(Object ID, Usage Type, UInt32 Capacity, CPtr<const UInt8> Data) = 0;
 
         // -=(Undocumented)=-
-        virtual void CopyBuffer(Object Destination, UInt32 DstOffset, Object Source, UInt32 SrcOffset, UInt32 Size) = 0;
+        virtual void CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size) = 0;
 
         // -=(Undocumented)=
         virtual void UpdateBuffer(Object ID, Bool Discard, UInt32 Offset, CPtr<const UInt8> Data) = 0;
@@ -62,13 +62,13 @@ namespace Graphic
         virtual void DeletePipeline(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt32 Width, UInt32 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) = 0;
+        virtual void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) = 0;
 
         // -=(Undocumented)=-
         virtual void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data) = 0;
 
         // -=(Undocumented)=-
-        virtual void CopyTexture(Object Destination, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object Source, UInt8 SrcLevel, Ref<const Recti> SrcOffset) = 0;
+        virtual void CopyTexture(Object DstTexture, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, Ref<const Recti> SrcOffset) = 0;
 
         // -=(Undocumented)=-
         virtual Data ReadTexture(Object ID, UInt8 Level, Ref<const Recti> Offset) = 0;
@@ -83,7 +83,7 @@ namespace Graphic
         virtual void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) = 0;
 
         // -=(Undocumented)=-
-        virtual void Submit(CPtr<Submission> Submissions) = 0;
+        virtual void Submit(CPtr<const Submission> Submissions) = 0;
 
         // -=(Undocumented)=-
         virtual void Commit(Object ID, Bool Synchronised) = 0;

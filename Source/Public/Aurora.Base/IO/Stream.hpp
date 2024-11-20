@@ -19,7 +19,7 @@
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace IO
+inline namespace Core
 {
     // -=(Undocumented)=-
     template<typename T>
@@ -28,10 +28,10 @@ inline namespace IO
     public:
 
         // -=(Undocumented)=-
-        static constexpr Bool k_Reader = std::is_same<T, Reader>::value;
+        static constexpr Bool k_Reader = std::is_same_v<T, Reader>;
 
         // -=(Undocumented)=-
-        static constexpr Bool k_Writer = std::is_same<T, Writer>::value;
+        static constexpr Bool k_Writer = std::is_same_v<T, Writer>;
 
     public:
 
@@ -55,12 +55,26 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Int>
-        void SerializeInt(Ref<Int> Value)
+        template<typename Type>
+        void SerializeEnum(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = mArchive.template ReadInt<Int>();
+                Value = mArchive.template ReadEnum<Type>();
+            }
+            else
+            {
+                mArchive.template WriteEnum<Type>(static_cast<Type>(Value));
+            }
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void SerializeInt(Ref<Type> Value)
+        {
+            if constexpr (k_Reader)
+            {
+                Value = mArchive.template ReadInt<Type>();
             }
             else
             {
@@ -69,12 +83,12 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Int>
-        void SerializeInt8(Ref<Int> Value)
+        template<typename Type>
+        void SerializeInt8(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = static_cast<Int>(mArchive.ReadInt8());
+                Value = static_cast<Type>(mArchive.ReadInt8());
             }
             else
             {
@@ -83,12 +97,12 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Int>
-        void SerializeUInt8(Ref<Int> Value)
+        template<typename Type>
+        void SerializeUInt8(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = static_cast<Int>(mArchive.ReadUInt8());
+                Value = static_cast<Type>(mArchive.ReadUInt8());
             }
             else
             {
@@ -97,12 +111,12 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Int>
-        void SerializeInt16(Ref<Int> Value)
+        template<typename Type>
+        void SerializeInt16(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = static_cast<Int>(mArchive.ReadInt16());
+                Value = static_cast<Type>(mArchive.ReadInt16());
             }
             else
             {
@@ -111,12 +125,12 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Int>
-        void SerializeUInt16(Ref<Int> Value)
+        template<typename Type>
+        void SerializeUInt16(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = static_cast<Int>(mArchive.ReadUInt16());
+                Value = static_cast<Type>(mArchive.ReadUInt16());
             }
             else
             {
@@ -125,12 +139,12 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Int>
-        void SerializeInt32(Ref<Int> Value)
+        template<typename Type>
+        void SerializeInt32(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = static_cast<Int>(mArchive.ReadInt32());
+                Value = static_cast<Type>(mArchive.ReadInt32());
             }
             else
             {
@@ -139,12 +153,12 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Int>
-        void SerializeUInt32(Ref<Int> Value)
+        template<typename Type>
+        void SerializeUInt32(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = static_cast<Int>(mArchive.ReadUInt32());
+                Value = static_cast<Type>(mArchive.ReadUInt32());
             }
             else
             {
@@ -153,12 +167,12 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Int>
-        void SerializeInt64(Ref<Int> Value)
+        template<typename Type>
+        void SerializeInt64(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = static_cast<Int>(mArchive.ReadInt64());
+                Value = static_cast<Type>(mArchive.ReadInt64());
             }
             else
             {
@@ -167,12 +181,12 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        template<typename Int>
-        void SerializeUInt64(Ref<Int> Value)
+        template<typename Type>
+        void SerializeUInt64(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = static_cast<Int>(mArchive.ReadUInt64());
+                Value = static_cast<Type>(mArchive.ReadUInt64());
             }
             else
             {
@@ -181,70 +195,44 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        void SerializeReal32(Ref<Real32> Value)
+        template<typename Type>
+        void SerializeReal32(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = mArchive.ReadReal32();
+                Value = static_cast<Type>(mArchive.ReadReal32());
             }
             else
             {
-                mArchive.WriteReal32(Value);
+                mArchive.WriteReal32(static_cast<Real32>(Value));
             }
         }
 
         // -=(Undocumented)=-
-        void SerializeReal64(Ref<Real64> Value)
+        template<typename Type>
+        void SerializeReal64(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = mArchive.ReadReal64();
+                Value = static_cast<Type>(mArchive.ReadReal64());
             }
             else
             {
-                mArchive.WriteReal64(Value);
+                mArchive.WriteReal32(static_cast<Real64>(Value));
             }
         }
 
         // -=(Undocumented)=-
-        void SerializeString8(Ref<SStr> Value)
+        template<typename Type>
+        void SerializeString(Ref<Type> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = mArchive.ReadString8();
+                Value = mArchive.template ReadString<Type>();
             }
             else
             {
-                mArchive.WriteString8(Value);
-            }
-        }
-
-        // -=(Undocumented)=-
-        void SerializeString16(Ref<SStr16> Value)
-        {
-            if constexpr (k_Reader)
-            {
-                Value = mArchive.ReadString16();
-            }
-            else
-            {
-                mArchive.WriteString16(Value);
-            }
-        }
-
-        // -=(Undocumented)=-
-        template<typename Enum>
-        void SerializeEnum(Ref<Enum> Value)
-        {
-            using Type = std::underlying_type_t<Enum>;
-
-            if constexpr (k_Reader)
-            {
-                Value = static_cast<Enum>(mArchive.template ReadInt<Type>());
-            }
-            else
-            {
-                mArchive.WriteInt(static_cast<Type>(Value));
+                mArchive.template WriteString<Type>(Value);
             }
         }
 
@@ -268,62 +256,11 @@ inline namespace IO
         {
             if constexpr (k_Reader)
             {
-                Value = mArchive.template ReadObject<Type>();
+                Value = mArchive.template ReadObject<Type>(); // @TODO: In-place serialization
             }
             else
             {
                 mArchive.template WriteObject<Type>(Value);
-            }
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type, UInt Capacity>
-        void SerializeArray(Ref<Array<Type, Capacity>> Value)
-        {
-            if constexpr (k_Reader)
-            {
-                for (Ref<Type> Element : Value)
-                {
-                    Element = mArchive.template ReadObject<Type>();
-                }
-            }
-            else
-            {
-                for (Ref<Type> Element : Value)
-                {
-                    Element = mArchive.template WriteObject<Type>(Element);
-                }
-            }
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type, UInt Capacity = UINT16_MAX>
-        void SerializeList(Ref<Vector<Type>> Value)
-        {
-            if constexpr (k_Reader)
-            {
-                const UInt Length = mArchive.template ReadInt<UInt>();
-                if (Length >= Capacity)
-                {
-                    return;
-                }
-
-                Value.clear();
-                Value.reserve(Length);
-
-                for (UInt Element = 0; Element < Length; ++Element)
-                {
-                    Value.emplace_back(mArchive.template ReadObject<Type>());
-                }
-            }
-            else
-            {
-                mArchive.template WriteInt<UInt>(Value.size());
-
-                for (Ref<Type> Element : Value)
-                {
-                    mArchive.template WriteObject<Type>(Element);
-                }
             }
         }
 

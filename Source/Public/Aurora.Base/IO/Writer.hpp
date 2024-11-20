@@ -18,7 +18,7 @@
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace IO
+inline namespace Core
 {
     // -=(Undocumented)=-
     class Writer final
@@ -31,7 +31,7 @@ inline namespace IO
     public:
 
         // -=(Undocumented)=-
-        explicit Writer(UInt Capacity = kDefaultCapacity)
+        explicit Writer(UInt32 Capacity = kDefaultCapacity)
             : mBuffer ( Capacity, 0 ),
               mOffset { 0 }
         {
@@ -44,19 +44,19 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        UInt GetCapacity() const
+        UInt32 GetCapacity() const
         {
             return mBuffer.size();
         }
 
         // -=(Undocumented)=-
-        UInt GetAvailable() const
+        UInt32 GetAvailable() const
         {
             return GetCapacity() - mOffset;
         }
 
         // -=(Undocumented)=-
-        UInt GetOffset() const
+        UInt32 GetOffset() const
         {
             return mOffset;
         }
@@ -68,13 +68,13 @@ inline namespace IO
         }
 
         // -=(Undocumented)=-
-        void Ensure(UInt Length)
+        void Ensure(UInt32 Length)
         {
-            const UInt Capacity = GetCapacity();
+            const UInt32 Capacity = GetCapacity();
 
             if (mOffset + Length >= Capacity)
             {
-                const UInt Amount = (mOffset + Length - Capacity);
+                const UInt32 Amount = (mOffset + Length - Capacity);
                 mBuffer.resize(Capacity + (Amount / kDefaultCapacity + 1) * kDefaultCapacity);
             }
         }
@@ -87,153 +87,179 @@ inline namespace IO
 
         // -=(Undocumented)=-
         template<typename Type>
-        void Write(Type Data, UInt Length = sizeof(Type))
+        void Write(Type Value, UInt32 Length = sizeof(Type))
         {
             Ensure(Length);
 
             if constexpr (std::is_pointer_v<Type>)
             {
-                std::memcpy(& mBuffer[mOffset], Data, Length);
+                std::memcpy(& mBuffer[mOffset], Value, Length);
             }
             else
             {
-                reinterpret_cast<Ref<Type>>(mBuffer[mOffset]) = Data;
+                reinterpret_cast<Ref<Type>>(mBuffer[mOffset]) = Value;
             }
             mOffset += Length;
         }
 
         // -=(Undocumented)=-
-        void WriteBool(Bool Data)
+        template<typename Type>
+        void WriteBlock(CPtr<const Type> Value)
         {
-            Write<Bool>(Data);
-        }
+            WriteInt<UInt32>(Value.size());
 
-        // -=(Undocumented)=-
-        template<typename Type, typename = std::enable_if_t<std::is_integral<Type>::value>>
-        void WriteInt(Type Data)
-        {
-            for (; Data > 0x7F; Data >>= 7u)
+            if (!Value.empty())
             {
-                WriteUInt8(static_cast<UInt8>(Data & 0x7Fu) | 0x80u);
-            }
-            WriteUInt8(static_cast<UInt8>(Data) & 0x7Fu);
-        }
-
-        // -=(Undocumented)=-
-        void WriteInt8(SInt8 Data)
-        {
-            Write<SInt8>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteUInt8(UInt8 Data)
-        {
-            Write<UInt8>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteInt16(SInt16 Data)
-        {
-            Write<SInt16>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteUInt16(UInt16 Data)
-        {
-            Write<UInt16>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteInt32(SInt32 Data)
-        {
-            Write<SInt32>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteUInt32(UInt32 Data)
-        {
-            Write<UInt32>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteInt64(SInt64 Data)
-        {
-            Write<SInt64>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteUInt64(UInt64 Data)
-        {
-            Write<UInt64>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteReal32(Real32 Data)
-        {
-            Write<Real32>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteReal64(Real64 Data)
-        {
-            Write<Real64>(Data);
-        }
-
-        // -=(Undocumented)=-
-        void WriteString8(CStr Data)
-        {
-            WriteInt(Data.size());
-
-            if (!Data.empty())
-            {
-                Write<CStr::const_pointer>(Data.data(), Data.size() * sizeof(CStr::value_type));
+                Write<Ptr<const Type>>(Value.data(), Value.size_bytes());
             }
         }
 
         // -=(Undocumented)=-
-        void WriteString16(CStr16 Data)
+        void WriteBool(Bool Value)
         {
-            WriteInt(Data.size());
+            Write<Bool>(Value);
+        }
 
-            if (!Data.empty())
+        // -=(Undocumented)=-
+        template<typename Type>
+        void WriteEnum(Type Value)
+        {
+            WriteInt(static_cast<std::underlying_type_t<Type>>(Value));
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type, typename = std::enable_if_t<std::is_integral_v<Type>>>
+        void WriteInt(Type Value)
+        {
+            while (Value > 0x7F)
             {
-                Write<CStr16::const_pointer>(Data.data(), Data.size() * sizeof(CStr16::value_type));
+                WriteUInt8(static_cast<UInt8>(Value & 0x7Fu) | 0x80u);
+                Value >>= 7u;
+            }
+            WriteUInt8(static_cast<UInt8>(Value) & 0x7Fu);
+        }
+
+        // -=(Undocumented)=-
+        void WriteInt8(SInt8 Value)
+        {
+            Write<SInt8>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteUInt8(UInt8 Value)
+        {
+            Write<UInt8>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteInt16(SInt16 Value)
+        {
+            Write<SInt16>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteUInt16(UInt16 Value)
+        {
+            Write<UInt16>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteInt32(SInt32 Value)
+        {
+            Write<SInt32>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteUInt32(UInt32 Value)
+        {
+            Write<UInt32>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteInt64(SInt64 Value)
+        {
+            Write<SInt64>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteUInt64(UInt64 Value)
+        {
+            Write<UInt64>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteReal32(Real32 Value)
+        {
+            Write<Real32>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteReal64(Real64 Value)
+        {
+            Write<Real64>(Value);
+        }
+
+        // -=(Undocumented)=-
+        void WriteString8(CStr Value)
+        {
+            WriteInt(Value.size());
+
+            if (!Value.empty())
+            {
+                Write<CStr::const_pointer>(Value.data(), Value.size() * sizeof(CStr::value_type));
+            }
+        }
+
+        // -=(Undocumented)=-
+        void WriteString16(CStr16 Value)
+        {
+            WriteInt(Value.size());
+
+            if (!Value.empty())
+            {
+                Write<CStr16::const_pointer>(Value.data(), Value.size() * sizeof(CStr16::value_type));
             }
         }
 
         // -=(Undocumented)=-
         template<typename Type, typename = std::enable_if_t<std::is_arithmetic<Type>::value>>
-        void WriteNumber(Type Number)
+        void WriteNumber(Type Value)
         {
             if constexpr (std::is_integral_v<Type>)
             {
-                WriteInt<Type>(Number);
+                WriteInt<Type>(Value);
             }
             else
             {
-                Write<Type>(Number);
+                Write<Type>(Value);
             }
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void WriteObject(ConstRef<Type> Data)
+        template<typename Type, typename Decay = std::decay_t<Type>>
+        void WriteObject(Any<Type> Value)
         {
-            if constexpr (std::is_arithmetic_v<Type>)
+            if constexpr (std::is_same_v<Decay, Bool>)
             {
-                WriteNumber(Data);
+                WriteBool(Value);
             }
-            else if constexpr (std::is_same<Type, SStr>::value || std::is_same<Type, CStr>::value)
+            else if constexpr (std::is_arithmetic_v<Decay>)
             {
-                WriteString8(Data);
+                WriteNumber<Decay>(Value);
             }
-            else if constexpr (std::is_same<Type, SStr16>::value || std::is_same<Type, CStr16>::value)
+            else if constexpr (std::is_same_v<Decay, SStr> || std::is_same_v<Decay, CStr>)
             {
-                WriteString16(Data);
+                WriteString8(Value);
+            }
+            else if constexpr (std::is_same_v<Decay, SStr16> || std::is_same_v<Decay, CStr16>)
+            {
+                WriteString16(Value);
             }
             else
             {
-                Type::Write(* this, const_cast<Ref<Type>>(Data));
+                // Cast away const-ness to enable calling the 'OnSerialize' function, which supports both
+                // read and write operations.
+                const_cast<Ref<Decay>>(Value).template OnSerialize<Writer>(*this);
             }
         }
 
@@ -243,6 +269,6 @@ inline namespace IO
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Vector<UInt8> mBuffer;
-        UInt          mOffset;
+        UInt32        mOffset;
     };
 }

@@ -32,8 +32,8 @@ namespace Graphic
 
     void Mesh::Load(Any<Data> Vertices, Any<Data> Indices)
     {
-        mData[0] = Move(Vertices);
-        mData[1] = Move(Indices);
+        mBytes[0] = Move(Vertices);
+        mBytes[1] = Move(Indices);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -41,17 +41,20 @@ namespace Graphic
 
     Bool Mesh::OnCreate(Ref<Subsystem::Context> Context)
     {
-        SetMemory(mData[0].GetSize() + mData[1].GetSize());
-
-        const SPtr<Service> Graphics = Context.GetSubsystem<Service>();
-
-        if (mData[0].HasData())
+        for (ConstRef<Data> Bytes : mBytes)
         {
-            mBuffers[0] = Graphics->CreateBuffer(Usage::Vertex, mData[0].GetSize(), Move(mData[0]));
+            SetMemory(GetMemory() + Bytes.GetSize());
         }
-        if (mData[1].HasData())
+
+        ConstSPtr<Service> Graphics = Context.GetSubsystem<Service>();
+
+        if (mBytes[0].HasData())
         {
-            mBuffers[1] = Graphics->CreateBuffer(Usage::Index, mData[1].GetSize(), Move(mData[1]));
+            mBuffers[0] = Graphics->CreateBuffer(Usage::Vertex, mBytes[0].GetSize(), Move(mBytes[0]));
+        }
+        if (mBytes[1].HasData())
+        {
+            mBuffers[1] = Graphics->CreateBuffer(Usage::Index, mBytes[1].GetSize(), Move(mBytes[1]));
         }
         return true;
     }
@@ -61,11 +64,8 @@ namespace Graphic
 
     void Mesh::OnDelete(Ref<Subsystem::Context> Context)
     {
-        const SPtr<Service> Graphics = Context.GetSubsystem<Service>();
-
-        for (const Object Buffer : mBuffers)
-        {
-            Graphics->DeleteBuffer(Buffer);
-        }
+        ConstSPtr<Service> Graphics = Context.GetSubsystem<Service>();
+        Graphics->DeleteBuffer(mBuffers[0]);
+        Graphics->DeleteBuffer(mBuffers[1]);
     }
 }

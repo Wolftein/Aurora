@@ -42,9 +42,15 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetResidence(Bool Residence)
+        void SetOwnership(Bool Ownership)
         {
-            mResidence = Residence;
+            mOwnership = Ownership;
+        }
+
+        // -=(Undocumented)=-
+        Bool HasOwnership() const
+        {
+            return mOwnership;
         }
 
         // -=(Undocumented)=-
@@ -103,7 +109,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Object                             mID;
-        Bool                               mResidence;
+        Bool                               mOwnership;
         Array<SPtr<Texture>, k_MaxSources> mTextures;   // TODO: Sparse
         Array<Sampler, k_MaxSources>       mSamplers;   // TODO: Sparse
         Vector<Vector4f>                   mParameters; // TODO: Replace with pre allocated chunked memory

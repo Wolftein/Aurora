@@ -22,7 +22,7 @@ inline namespace Math
 {
     // -=(Undocumented)=-
     template<typename Base>
-    class Rect final : public Serializable<Rect<Base>>
+    class Rect final
     {
     public:
 
@@ -335,9 +335,9 @@ inline namespace Math
             return (* this);
         }
 
-        // \see Serializable::OnSerialize
-        template<typename Stream>
-        void OnSerialize(Stream Archive)
+        // -=(Undocumented)=-
+        template<typename Type>
+        void OnSerialize(Stream<Type> Archive)
         {
             Archive.SerializeNumber(mX1);
             Archive.SerializeNumber(mY1);

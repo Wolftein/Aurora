@@ -22,7 +22,7 @@ inline namespace Math
 {
     // -=(Undocumented)=-
     template<typename Base>
-    class Transform final : public Serializable<Transform<Base>>
+    class Transform final
     {
     public:
 
@@ -185,9 +185,9 @@ inline namespace Math
             return Rotate(Quaternion<Base>::FromAngles(Angle, Axis));
         }
 
-        // \see Serializable::OnSerialize
-        template<typename Stream>
-        void OnSerialize(Stream Archive)
+        // -=(Undocumented)=-
+        template<typename Type>
+        void OnSerialize(Stream<Type> Archive)
         {
             Archive.SerializeObject(mPosition);
             Archive.SerializeObject(mScale);
