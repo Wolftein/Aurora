@@ -89,7 +89,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Data Service::Find(Ref<const Uri> Key)
+    Data Service::Find(ConstRef<Uri> Key)
     {
         if (const auto It = mLocators.find(Key.GetSchema()); It != mLocators.end())
         {
@@ -109,7 +109,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Save(Ref<const Uri> Key, CPtr<const UInt8> Data)
+    Bool Service::Save(ConstRef<Uri> Key, CPtr<const UInt8> Data)
     {
         if (const auto It = mLocators.find(Key.GetSchema()); It != mLocators.end())
         {
@@ -122,7 +122,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool Service::Delete(Ref<const Uri> Key)
+    Bool Service::Delete(ConstRef<Uri> Key)
     {
         if (const auto It = mLocators.find(Key.GetSchema()); It != mLocators.end())
         {
@@ -160,7 +160,7 @@ namespace Content
 #ifdef    AE_CONTENT_LOADER_EFFECT
             if (ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>())
             {
-                Ref<const Graphic::Capabilities> GraphicCapabilities = Graphics->GetCapabilities();
+                ConstRef<Graphic::Capabilities> GraphicCapabilities = Graphics->GetCapabilities();
                 AddLoader(NewPtr<PipelineLoader>(
                     GraphicCapabilities.Backend, GraphicCapabilities.Language));
             }
@@ -181,7 +181,7 @@ namespace Content
 
     Bool Service::Parse(ConstSPtr<Resource> Asset)
     {
-        Ref<const Uri> Key = Asset->GetKey();
+        ConstRef<Uri> Key = Asset->GetKey();
 
         if (const auto Iterator = mLoaders.find(Key.GetExtension()); Iterator != mLoaders.end())
         {

@@ -73,10 +73,10 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        Data Find(Ref<const Uri> Key);
+        Data Find(ConstRef<Uri> Key);
 
         // -=(Undocumented)=-
-        Bool Save(Ref<const Uri> Key, CStr Data)
+        Bool Save(ConstRef<Uri> Key, CStr Data)
         {
             CPtr<const UInt8> Bytes(reinterpret_cast<Ptr<const UInt8>>(Data.data()), Data.size());
 
@@ -84,14 +84,14 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        Bool Save(Ref<const Uri> Key, CPtr<const UInt8> Data);
+        Bool Save(ConstRef<Uri> Key, CPtr<const UInt8> Data);
 
         // -=(Undocumented)=-
-        Bool Delete(Ref<const Uri> Key);
+        Bool Delete(ConstRef<Uri> Key);
 
         // -=(Undocumented)=-
         template<typename Type>
-        SPtr<Type> Load(Ref<const Uri> Key, Bool Async = false)
+        SPtr<Type> Load(ConstRef<Uri> Key, Bool Async = false)
         {
             ConstSPtr<Type> Asset = Type::GetFactory().GetOrCreate(Key, true);
 
@@ -119,7 +119,7 @@ namespace Content
 
         // -=(Undocumented)=-
         template<typename Type>
-        Bool Exist(Ref<const Uri> Key)
+        Bool Exist(ConstRef<Uri> Key)
         {
             return (Type::GetFactory().GetOrCreate(Key, false) != nullptr);
         }

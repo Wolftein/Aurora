@@ -56,7 +56,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Vector3f Camera::GetWorldCoordinates(Ref<const Vector3f> Position, Ref<const Rectf> Viewport) const
+    Vector3f Camera::GetWorldCoordinates(ConstRef<Vector3f> Position, ConstRef<Rectf> Viewport) const
     {
         const Real32 Width  = Viewport.GetWidth();
         const Real32 Height = Viewport.GetHeight();
@@ -76,7 +76,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Vector2f Camera::GetWorldCoordinates(Ref<const Vector2f> Position, Ref<const Rectf> Viewport) const
+    Vector2f Camera::GetWorldCoordinates(ConstRef<Vector2f> Position, ConstRef<Rectf> Viewport) const
     {
         const Vector3f Coordinates = GetWorldCoordinates(Vector3f(Position.GetX(), Position.GetY(), 0), Viewport);
 
@@ -86,7 +86,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Vector3f Camera::GetScreenCoordinates(Ref<const Vector3f> Position, Ref<const Rectf> Viewport) const
+    Vector3f Camera::GetScreenCoordinates(ConstRef<Vector3f> Position, ConstRef<Rectf> Viewport) const
     {
         const Vector3f Point = mWorld * Position;
 
@@ -103,7 +103,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Vector2f Camera::GetScreenCoordinates(Ref<const Vector2f> Position, Ref<const Rectf> Viewport) const
+    Vector2f Camera::GetScreenCoordinates(ConstRef<Vector2f> Position, ConstRef<Rectf> Viewport) const
     {
         const Vector3f Coordinates = GetScreenCoordinates(Vector3f(Position.GetX(), Position.GetY(), 0), Viewport);
 

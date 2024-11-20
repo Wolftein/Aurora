@@ -46,7 +46,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Graphic::Sampler LoadSampler(Ref<const tinygltf::Sampler> GLTFSampler)
+    Graphic::Sampler LoadSampler(ConstRef<tinygltf::Sampler> GLTFSampler)
     {
         Graphic::Sampler Sampler;
 
@@ -99,9 +99,9 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    SPtr<Graphic::Texture> LoadTexture(Ref<tinygltf::Model> GLTFModel, Ref<const tinygltf::Texture> GLTFTexture)
+    SPtr<Graphic::Texture> LoadTexture(Ref<tinygltf::Model> GLTFModel, ConstRef<tinygltf::Texture> GLTFTexture)
     {
-        Ref<const tinygltf::Image>   GLTFImage   = GLTFModel.images[GLTFTexture.source];
+        ConstRef<tinygltf::Image>   GLTFImage   = GLTFModel.images[GLTFTexture.source];
 
         Data Chunk(GLTFImage.image.size());
         memcpy(Chunk.GetData<UInt8>(), GLTFImage.image.data(), GLTFImage.image.size());
@@ -146,7 +146,7 @@ namespace Content
         // Find how many bytes we need for buffer(s) and create them
         UInt32 BytesForVertices = 0;
         UInt32 BytesForIndices  = 0;
-        for (Ref<const tinygltf::BufferView> View : GLTFModel.bufferViews)
+        for (ConstRef<tinygltf::BufferView> View : GLTFModel.bufferViews)
         {
             if (View.target == TINYGLTF_TARGET_ARRAY_BUFFER)
             {
@@ -184,42 +184,42 @@ namespace Content
 
         // Parse each material from the model
         Array<SPtr<Graphic::Material>, Graphic::Mesh::k_MaxPrimitives> Materials { };
-        for (UInt32 ID = 0; Ref<const tinygltf::Material> GLTFMaterial : GLTFModel.materials)
+        for (UInt32 ID = 0; ConstRef<tinygltf::Material> GLTFMaterial : GLTFModel.materials)
         {
             const SPtr<Graphic::Material> Material = NewPtr<Graphic::Material>(Uri { GLTFMaterial.name });
             Material->SetOwnership(true);
 
             if (SInt32 Index = GLTFMaterial.pbrMetallicRoughness.baseColorTexture.index; Index >= 0)
             {
-                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
+                ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
                 Material->SetTexture(Graphic::Source::Diffuse, LoadTexture(GLTFModel, GLTFTexture));
                 Material->SetSampler(Graphic::Source::Diffuse, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
             if (SInt32 Index = GLTFMaterial.pbrMetallicRoughness.metallicRoughnessTexture.index; Index >= 0)
             {
-                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
+                ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
                 Material->SetTexture(Graphic::Source::Roughness, LoadTexture(GLTFModel, GLTFTexture));
                 Material->SetSampler(Graphic::Source::Roughness, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
             if (SInt32 Index = GLTFMaterial.normalTexture.index; Index >= 0)
             {
-                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
+                ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
                 Material->SetTexture(Graphic::Source::Normal, LoadTexture(GLTFModel, GLTFTexture));
                 Material->SetSampler(Graphic::Source::Normal, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
             if (SInt32 Index = GLTFMaterial.emissiveTexture.index; Index >= 0)
             {
-                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
+                ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
                 Material->SetTexture(Graphic::Source::Emissive, LoadTexture(GLTFModel, GLTFTexture));
                 Material->SetSampler(Graphic::Source::Emissive, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
             if (SInt32 Index = GLTFMaterial.occlusionTexture.index; Index >= 0)
             {
-                Ref<const tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
+                ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
                 Material->SetTexture(Graphic::Source::Occlusion, LoadTexture(GLTFModel, GLTFTexture));
                 Material->SetSampler(Graphic::Source::Occlusion, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
@@ -234,7 +234,7 @@ namespace Content
         const SPtr<Graphic::Mesh> Mesh = NewPtr<Graphic::Mesh>(Uri { Asset.GetKey() });
         Mesh->Load(Move(BlockForVertices), Move(BlockForIndices));
 
-        for (Ref<const tinygltf::Mesh> GLTFMesh : GLTFModel.meshes)
+        for (ConstRef<tinygltf::Mesh> GLTFMesh : GLTFModel.meshes)
         {
             if (GLTFMesh.primitives.size() > 1)
             {
@@ -242,7 +242,7 @@ namespace Content
                 continue;
             }
 
-            Ref<const tinygltf::Primitive> GLTFPrimitive = GLTFMesh.primitives[0];
+            ConstRef<tinygltf::Primitive> GLTFPrimitive = GLTFMesh.primitives[0];
 
             // Parse material
             Graphic::Mesh::Primitive Primitive;
@@ -251,12 +251,12 @@ namespace Content
             // Parse vertices
             for (const auto & [Name, Accessor] : GLTFPrimitive.attributes)
             {
-                Ref<const tinygltf::Accessor>   GLTFAccessor = GLTFModel.accessors[Accessor];
-                Ref<const tinygltf::BufferView> GLTFView     = GLTFModel.bufferViews[GLTFAccessor.bufferView];
+                ConstRef<tinygltf::Accessor>   GLTFAccessor = GLTFModel.accessors[Accessor];
+                ConstRef<tinygltf::BufferView> GLTFView     = GLTFModel.bufferViews[GLTFAccessor.bufferView];
 
                 const UInt32 Length = tinygltf::GetComponentSizeInBytes(GLTFAccessor.componentType)
-                              * tinygltf::GetNumComponentsInType(GLTFAccessor.type)
-                              * GLTFAccessor.count;
+                                    * tinygltf::GetNumComponentsInType(GLTFAccessor.type)
+                                    * GLTFAccessor.count;
                 const UInt32 Offset = GLTFView.byteOffset + GLTFAccessor.byteOffset;
                 const UInt32 Stride = GLTFAccessor.ByteStride(GLTFView);
 
@@ -269,12 +269,12 @@ namespace Content
             // Parse indices
             if (GLTFPrimitive.indices >= 0)
             {
-                Ref<const tinygltf::Accessor>   GLTFAccessor = GLTFModel.accessors[GLTFPrimitive.indices];
-                Ref<const tinygltf::BufferView> GLTFView     = GLTFModel.bufferViews[GLTFAccessor.bufferView];
+                ConstRef<tinygltf::Accessor>   GLTFAccessor = GLTFModel.accessors[GLTFPrimitive.indices];
+                ConstRef<tinygltf::BufferView> GLTFView     = GLTFModel.bufferViews[GLTFAccessor.bufferView];
 
                 const UInt32 Length = tinygltf::GetComponentSizeInBytes(GLTFAccessor.componentType)
-                              * tinygltf::GetNumComponentsInType(GLTFAccessor.type)
-                              * GLTFAccessor.count;
+                                    * tinygltf::GetNumComponentsInType(GLTFAccessor.type)
+                                    * GLTFAccessor.count;
                 const UInt32 Offset = GLTFView.byteOffset + GLTFAccessor.byteOffset;
                 const UInt32 Stride = GLTFAccessor.ByteStride(GLTFView);
 

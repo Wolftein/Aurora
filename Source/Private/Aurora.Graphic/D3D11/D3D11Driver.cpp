@@ -542,7 +542,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Ref<const Capabilities> D3D11Driver::GetCapabilities() const
+    ConstRef<Capabilities> D3D11Driver::GetCapabilities() const
     {
         return mCapabilities;
     }
@@ -603,7 +603,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary)
+    void D3D11Driver::CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, ConstRef<Attachment> Auxiliary)
     {
         Ref<D3D11Pass> Pass = mPasses[ID];
 
@@ -652,7 +652,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreatePipeline(Object ID, CPtr<const UInt8> Vertex, CPtr<const UInt8> Fragment, CPtr<const UInt8> Geometry, Ref<const Descriptor> Properties)
+    void D3D11Driver::CreatePipeline(Object ID, CPtr<const UInt8> Vertex, CPtr<const UInt8> Fragment, CPtr<const UInt8> Geometry, ConstRef<Descriptor> Properties)
     {
         Ref<D3D11Pipeline> Pipeline = mPipelines[ID];
 
@@ -729,7 +729,7 @@ namespace Graphic
 
             for (; Count < k_MaxAttributes && Properties.InputLayout[Count].ID != VertexSemantic::None; ++Count)
             {
-                Ref<const Attribute>          Element    = Properties.InputLayout[Count];
+                ConstRef<Attribute>           Element    = Properties.InputLayout[Count];
                 Ref<D3D11_INPUT_ELEMENT_DESC> Descriptor = Description[Count];
 
                 Descriptor.SemanticName         = As<0>(Element.ID);
@@ -800,7 +800,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data)
+    void D3D11Driver::UpdateTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data)
     {
         const D3D11_BOX Rect = CD3D11_BOX(
                 Offset.GetLeft(), Offset.GetTop(), 0, Offset.GetRight(), Offset.GetBottom(), 1);
@@ -810,7 +810,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CopyTexture(Object DstTexture, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, Ref<const Recti> SrcOffset)
+    void D3D11Driver::CopyTexture(Object DstTexture, UInt8 DstLevel, ConstRef<Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, ConstRef<Recti> SrcOffset)
     {
         const D3D11_BOX Rect = CD3D11_BOX(
                 SrcOffset.GetLeft(), SrcOffset.GetTop(), 0, SrcOffset.GetRight(), SrcOffset.GetBottom(), 1);
@@ -825,7 +825,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Data D3D11Driver::ReadTexture(Object ID, UInt8 Level, Ref<const Recti> Offset)
+    Data D3D11Driver::ReadTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset)
     {
         D3D11_TEXTURE2D_DESC Description;
         mTextures[ID].Object->GetDesc(& Description);
@@ -880,7 +880,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
+    void D3D11Driver::Prepare(Object ID, ConstRef<Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
     {
         Ref<D3D11Pass> Pass = mPasses[ID];
 
@@ -888,7 +888,7 @@ namespace Graphic
 
         for (UInt Index = 0; Index < k_MaxAttachments; ++Index)
         {
-            if (Ref<const ComPtr<ID3D11RenderTargetView>> View = Pass.Color[Index].Resource)
+            if (ConstRef<ComPtr<ID3D11RenderTargetView>> View = Pass.Color[Index].Resource)
             {
                 Attachments[Index] = View.Get();
 
@@ -934,8 +934,8 @@ namespace Graphic
         // Apply all job(s).
         for (UInt Batch = 0; Batch < Submissions.size(); ++Batch)
         {
-            Ref<const Submission> NewestSubmission = Submissions[Batch];
-            Ref<const Submission> OldestSubmission = Batch > 0 ? Submissions[Batch - 1] : s_PreviousFrameCache;
+            ConstRef<Submission> NewestSubmission = Submissions[Batch];
+            ConstRef<Submission> OldestSubmission = Batch > 0 ? Submissions[Batch - 1] : s_PreviousFrameCache;
 
             // Apply vertices
             ApplyVertexResources(OldestSubmission, NewestSubmission);
@@ -945,7 +945,7 @@ namespace Graphic
                 OldestSubmission.Indices.Offset != NewestSubmission.Indices.Offset ||
                 OldestSubmission.Indices.Stride != NewestSubmission.Indices.Stride)
             {
-                Ref<const D3D11Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
+                ConstRef<D3D11Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
                 const DXGI_FORMAT      Format =
                     NewestSubmission.Indices.Stride == sizeof(UInt8)  ? DXGI_FORMAT_R8_UINT  :
                     NewestSubmission.Indices.Stride == sizeof(UInt16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
@@ -966,8 +966,8 @@ namespace Graphic
             // Apply pipeline or stencil value
             if (OldestSubmission.Pipeline != NewestSubmission.Pipeline)
             {
-                Ref<const D3D11Pipeline> Old = mPipelines[OldestSubmission.Pipeline];
-                Ref<const D3D11Pipeline> New = mPipelines[NewestSubmission.Pipeline];
+                ConstRef<D3D11Pipeline> Old = mPipelines[OldestSubmission.Pipeline];
+                ConstRef<D3D11Pipeline> New = mPipelines[NewestSubmission.Pipeline];
 
                 if (Old.VS != New.VS)
                 {
@@ -1056,24 +1056,24 @@ namespace Graphic
 
     void D3D11Driver::Commit(Object ID, Bool Synchronised)
     {
-        Ref<const D3D11Pass> Pass = mPasses[ID];
+        ConstRef<D3D11Pass> Pass = mPasses[ID];
 
         // Resolve multisample texture(s)
         for (UInt32 Slot = 0; Slot < k_MaxAttachments; ++Slot)    // @TODO Stack
         {
-            if (Ref<const D3D11Attachment> Resolve = Pass.Resolves[Slot]; Resolve.Object)
+            if (ConstRef<D3D11Attachment> Resolve = Pass.Resolves[Slot]; Resolve.Object)
             {
                 D3D11_RENDER_TARGET_VIEW_DESC Description;
                 Resolve.Resource->GetDesc(AddressOf(Description));
 
-                Ref<const D3D11Attachment> Source = Pass.Color[Slot];
+                ConstRef<D3D11Attachment> Source = Pass.Color[Slot];
                 mDeviceImmediate->ResolveSubresource(
                         Resolve.Object.Get(), Resolve.Level, Source.Object.Get(), Source.Level, Description.Format);
             }
         }
 
         // Resolve swapchain
-        if (Ref<const ComPtr<IDXGISwapChain>> Display = Pass.Display)
+        if (ConstRef<ComPtr<IDXGISwapChain>> Display = Pass.Display)
         {
             const UInt Sync = Synchronised ? 1 : 0;
             const UInt Flag = Synchronised ? 0 : mCapabilities.Adaptive ? DXGI_PRESENT_ALLOW_TEARING : 0;
@@ -1277,7 +1277,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Ref<D3D11Driver::D3D11Sampler> D3D11Driver::GetOrCreateSampler(Ref<const Sampler> Descriptor)
+    Ref<D3D11Driver::D3D11Sampler> D3D11Driver::GetOrCreateSampler(ConstRef<Sampler> Descriptor)
     {
         Ref<D3D11Sampler> Sampler = mSamplers[
             static_cast<UInt>(Descriptor.EdgeU)       |
@@ -1308,7 +1308,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::ApplyVertexResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
+    void D3D11Driver::ApplyVertexResources(ConstRef<Submission> Oldest, ConstRef<Submission> Newest)
     {
         Ptr<ID3D11Buffer> Array[k_MaxFetches];
         UINT ArrayOffset[k_MaxFetches];
@@ -1318,8 +1318,8 @@ namespace Graphic
 
         for (UInt Element = 0; Element < k_MaxFetches; ++Element)
         {
-            Ref<const Binding> Old = Oldest.Vertices[Element];
-            Ref<const Binding> New = Newest.Vertices[Element];
+            ConstRef<Binding> Old = Oldest.Vertices[Element];
+            ConstRef<Binding> New = Newest.Vertices[Element];
 
             if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Stride != New.Stride)
             {
@@ -1342,7 +1342,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::ApplySamplerResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
+    void D3D11Driver::ApplySamplerResources(ConstRef<Submission> Oldest, ConstRef<Submission> Newest)
     {
         Ptr<ID3D11SamplerState> Array[k_MaxSlots];
         UInt Min = k_MaxSlots;
@@ -1350,8 +1350,8 @@ namespace Graphic
 
         for (UInt Element = 0; Element < k_MaxSlots; ++Element)
         {
-            Ref<const D3D11Sampler> PrevSampler = GetOrCreateSampler(Oldest.Samplers[Element]);
-            Ref<const D3D11Sampler> NextSampler = GetOrCreateSampler(Newest.Samplers[Element]);
+            ConstRef<D3D11Sampler> PrevSampler = GetOrCreateSampler(Oldest.Samplers[Element]);
+            ConstRef<D3D11Sampler> NextSampler = GetOrCreateSampler(Newest.Samplers[Element]);
 
             if (PrevSampler.Resource != NextSampler.Resource)
             {
@@ -1371,7 +1371,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::ApplyTextureResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
+    void D3D11Driver::ApplyTextureResources(ConstRef<Submission> Oldest, ConstRef<Submission> Newest)
     {
         Ptr<ID3D11ShaderResourceView> Array[k_MaxSlots];
         UInt Min = k_MaxSlots;
@@ -1397,7 +1397,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::ApplyUniformResources(Ref<const Submission> Oldest, Ref<const Submission> Newest)
+    void D3D11Driver::ApplyUniformResources(ConstRef<Submission> Oldest, ConstRef<Submission> Newest)
     {
         Ptr<ID3D11Buffer> Array[k_MaxUniforms];
         UINT ArrayOffset[k_MaxUniforms];
@@ -1407,8 +1407,8 @@ namespace Graphic
 
         for (UInt Element = 0; Element < k_MaxUniforms; ++Element)
         {
-            Ref<const Binding> Old = Oldest.Uniforms[Element];
-            Ref<const Binding> New = Newest.Uniforms[Element];
+            ConstRef<Binding> Old = Oldest.Uniforms[Element];
+            ConstRef<Binding> New = Newest.Uniforms[Element];
 
             if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Length != New.Length)
             {

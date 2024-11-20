@@ -156,7 +156,7 @@ namespace Content
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Data PipelineLoader::Compile(Ref<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage)
+    Data PipelineLoader::Compile(Ref<Service> Service, ConstRef<TOMLSection> Section, Graphic::Stage Stage)
     {
         if (!Section.IsEmpty())
         {
@@ -213,7 +213,7 @@ namespace Content
             { "vs_6_0",           "ps_6_0",           "gs_6_0" }
         };
 
-        Ref<const CStr> Profile = kShaderProfiles[CastEnum(mTarget)][CastEnum(Stage)];
+        ConstRef<CStr> Profile = kShaderProfiles[CastEnum(mTarget)][CastEnum(Stage)];
 
         if (const pD3DCompile D3DCompile = GetD3DCompileFunction())
         {

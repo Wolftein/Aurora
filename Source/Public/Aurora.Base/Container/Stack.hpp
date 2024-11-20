@@ -91,7 +91,7 @@ inline namespace Core
         }
 
     	// -=(Undocumented)=-
-    	Ref<const Type> operator[](UInt Handle) const
+        ConstRef<Type> operator[](UInt Handle) const
     	{
     		return mPool[Handle];
     	}

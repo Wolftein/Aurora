@@ -89,11 +89,11 @@ namespace Graphic
 
             if (Successful)
             {
-                Ref<const Capabilities> Capabilities = mDriver->GetCapabilities();
+                ConstRef<Capabilities> Capabilities = mDriver->GetCapabilities();
                 Log::Info("Graphics: using {}", magic_enum::enum_name(Capabilities.Backend));
                 Log::Info("Graphics: Detected shader model {}", CastEnum(Capabilities.Language) + 1);
 
-                for (Ref<const Adapter> Adapter : Capabilities.Adapters)
+                for (ConstRef<Adapter> Adapter : Capabilities.Adapters)
                 {
                     Log::Info("Graphics: Found GPU '{}'", Adapter.Description);
                     Log::Info("Graphics:     Memory {} (video), {} (system), {} (shared)",
@@ -188,7 +188,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Object Service::CreatePass(CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary)
+    Object Service::CreatePass(CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, ConstRef<Attachment> Auxiliary)
     {
         const Object ID = mPasses.Allocate();
 
@@ -214,7 +214,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Object Service::CreatePipeline(Any<Data> Vertex, Any<Data> Fragment, Any<Data> Geometry, Ref<const Descriptor> Properties)
+    Object Service::CreatePipeline(Any<Data> Vertex, Any<Data> Fragment, Any<Data> Geometry, ConstRef<Descriptor> Properties)
     {
         const Object ID = mPipelines.Allocate();
 
@@ -264,7 +264,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::CopyTexture(Object DstTexture, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, Ref<const Recti> SrcOffset)
+    void Service::CopyTexture(Object DstTexture, UInt8 DstLevel, ConstRef<Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, ConstRef<Recti> SrcOffset)
     {
         mEncoder.WriteEnum(Command::CopyTexture);
         mEncoder.WriteUInt16(DstTexture);
@@ -278,7 +278,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, Any<Data> Data)
+    void Service::UpdateTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset, UInt32 Pitch, Any<Data> Data)
     {
         mEncoder.WriteEnum(Command::UpdateTexture);
         mEncoder.WriteUInt16(ID);
@@ -291,7 +291,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Data Service::ReadTexture(Object ID, UInt8 Level, Ref<const Recti> Offset)
+    Data Service::ReadTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset)
     {
         return Data();  // TODO
     }
@@ -316,7 +316,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
+    void Service::Prepare(Object ID, ConstRef<Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
     {
         mEncoder.WriteEnum(Command::Prepare);
         mEncoder.WriteUInt16(ID);

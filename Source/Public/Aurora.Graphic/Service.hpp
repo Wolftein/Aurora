@@ -36,7 +36,7 @@ namespace Graphic
         Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples);
 
         // -=(Undocumented)=-
-        Ref<const Capabilities> GetCapabilities() const
+        ConstRef<Capabilities> GetCapabilities() const
         {
             return mDriver->GetCapabilities();
         }
@@ -71,13 +71,13 @@ namespace Graphic
         void DeleteMaterial(Object ID);
 
         // -=(Undocumented)=-
-        Object CreatePass(CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary);
+        Object CreatePass(CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, ConstRef<Attachment> Auxiliary);
 
         // -=(Undocumented)=-
         void DeletePass(Object ID);
 
         // -=(Undocumented)=-
-        Object CreatePipeline(Any<Data> Vertex, Any<Data> Fragment, Any<Data> Geometry, Ref<const Descriptor> Properties);
+        Object CreatePipeline(Any<Data> Vertex, Any<Data> Fragment, Any<Data> Geometry, ConstRef<Descriptor> Properties);
 
         // -=(Undocumented)=-
         void DeletePipeline(Object ID);
@@ -86,13 +86,13 @@ namespace Graphic
         Object CreateTexture(TextureFormat Format, TextureLayout Layout, UInt16 Width ,UInt16 Height, UInt8 Level, UInt8 Samples, Any<Data> Data);
 
         // -=(Undocumented)=-
-        void CopyTexture(Object DstTexture, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, Ref<const Recti> SrcOffset);
+        void CopyTexture(Object DstTexture, UInt8 DstLevel, ConstRef<Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, ConstRef<Recti> SrcOffset);
 
         // -=(Undocumented)=-
-        void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, Any<Data> Data);
+        void UpdateTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset, UInt32 Pitch, Any<Data> Data);
 
         // -=(Undocumented)=-
-        Data ReadTexture(Object ID, UInt8 Level, Ref<const Recti> Offset);
+        Data ReadTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset);
 
         // -=(Undocumented)=-
         UInt QueryTexture(Object ID);
@@ -101,7 +101,7 @@ namespace Graphic
         void DeleteTexture(Object ID);
 
         // -=(Undocumented)=-
-        void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
+        void Prepare(Object ID, ConstRef<Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
 
         // -=(Undocumented)=-
         void Submit(Ref<Encoder> Encoder, Bool Temporally);

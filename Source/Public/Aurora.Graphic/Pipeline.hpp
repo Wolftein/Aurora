@@ -47,7 +47,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        Ref<const Descriptor> GetProperties() const
+        ConstRef<Descriptor> GetProperties() const
         {
             return mProperties;
         }

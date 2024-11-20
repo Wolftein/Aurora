@@ -35,7 +35,7 @@ namespace Graphic
         virtual void Reset(UInt16 Width, UInt16 Height, UInt8 Samples) = 0;
 
         // -=(Undocumented)=-
-        virtual Ref<const Capabilities> GetCapabilities() const = 0;
+        virtual ConstRef<Capabilities> GetCapabilities() const = 0;
 
         // -=(Undocumented)=-
         virtual void CreateBuffer(Object ID, Usage Type, UInt32 Capacity, CPtr<const UInt8> Data) = 0;
@@ -50,13 +50,13 @@ namespace Graphic
         virtual void DeleteBuffer(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary) = 0;
+        virtual void CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, ConstRef<Attachment> Auxiliary) = 0;
 
         // -=(Undocumented)=-
         virtual void DeletePass(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreatePipeline(Object ID, CPtr<const UInt8> Vertex, CPtr<const UInt8> Fragment, CPtr<const UInt8> Geometry, Ref<const Descriptor> Properties) = 0;
+        virtual void CreatePipeline(Object ID, CPtr<const UInt8> Vertex, CPtr<const UInt8> Fragment, CPtr<const UInt8> Geometry, ConstRef<Descriptor> Properties) = 0;
 
         // -=(Undocumented)=-
         virtual void DeletePipeline(Object ID) = 0;
@@ -65,13 +65,13 @@ namespace Graphic
         virtual void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) = 0;
 
         // -=(Undocumented)=-
-        virtual void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data) = 0;
+        virtual void UpdateTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data) = 0;
 
         // -=(Undocumented)=-
-        virtual void CopyTexture(Object DstTexture, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, Ref<const Recti> SrcOffset) = 0;
+        virtual void CopyTexture(Object DstTexture, UInt8 DstLevel, ConstRef<Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, ConstRef<Recti> SrcOffset) = 0;
 
         // -=(Undocumented)=-
-        virtual Data ReadTexture(Object ID, UInt8 Level, Ref<const Recti> Offset) = 0;
+        virtual Data ReadTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset) = 0;
 
         // -=(Undocumented)=-
         virtual UInt QueryTexture(Object ID) = 0;
@@ -80,7 +80,7 @@ namespace Graphic
         virtual void DeleteTexture(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) = 0;
+        virtual void Prepare(Object ID, ConstRef<Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) = 0;
 
         // -=(Undocumented)=-
         virtual void Submit(CPtr<const Submission> Submissions) = 0;

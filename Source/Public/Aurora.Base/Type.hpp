@@ -126,7 +126,7 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
-    using ConstSPtr = Ref<const SPtr<Type>>;
+    using ConstSPtr = ConstRef<SPtr<Type>>;
 
     // -=(Undocumented)=-
     template<typename Type, typename Deleter = std::default_delete<Type>>
@@ -176,7 +176,7 @@ inline namespace Core
             return ankerl::unordered_dense::hash<CStr>{ }(Value);
         }
 
-        [[nodiscard]] size_t operator()(Ref<const SStr> Value) const
+        [[nodiscard]] size_t operator()(ConstRef<SStr> Value) const
         {
             return ankerl::unordered_dense::hash<SStr>{ }(Value);
         }

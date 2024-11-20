@@ -66,13 +66,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetSampler(Source Source, Ref<const Sampler> Sampler)
+        void SetSampler(Source Source, ConstRef<Sampler> Sampler)
         {
             mSamplers[CastEnum(Source)] = Sampler;
         }
 
         // -=(Undocumented)=-
-        Ref<const Sampler> GetSampler(Source Source) const
+        ConstRef<Sampler> GetSampler(Source Source) const
         {
             return mSamplers[CastEnum(Source)];
         }

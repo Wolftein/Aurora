@@ -107,7 +107,7 @@ inline namespace Math
     public:
 
         // -=(Undocumented)=-
-        static Color Lerp(Ref<const Color> Start, Ref<const Color> End, Real32 Percentage)
+        static Color Lerp(ConstRef<Color> Start, ConstRef<Color> End, Real32 Percentage)
         {
             const Real32 Red   = Math::Lerp(Start.GetRed(),   End.GetRed(),   Percentage);
             const Real32 Green = Math::Lerp(Start.GetGreen(), End.GetGreen(), Percentage);

@@ -76,7 +76,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Rectf Font::Calculate(CStr16 Text, Real32 Size, Ref<const Vector2f> Position, Alignment Alignment) const
+    Rectf Font::Calculate(CStr16 Text, Real32 Size, ConstRef<Vector2f> Position, Alignment Alignment) const
     {
         const Vector2f Measurement = Measure(Text, Size);
 

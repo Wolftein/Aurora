@@ -30,7 +30,7 @@ namespace Content
 
     Data MemoryLocator::Read(CStr Path)
     {
-        Ref<const cmrc::embedded_filesystem> Filesystem = cmrc::Resources::get_filesystem();
+        ConstRef<cmrc::embedded_filesystem> Filesystem = cmrc::Resources::get_filesystem();
 
         if (const SStr Filename(Path); Filesystem.exists(Filename))
         {

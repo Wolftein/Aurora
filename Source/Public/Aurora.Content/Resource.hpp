@@ -75,7 +75,7 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        Ref<const Uri> GetKey() const
+        ConstRef<Uri> GetKey() const
         {
             return mKey;
         }

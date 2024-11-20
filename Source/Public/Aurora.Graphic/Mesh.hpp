@@ -60,7 +60,7 @@ namespace Graphic
             Array<Attribute, k_MaxAttributes> Attributes;
 
             // -=(Undocumented)=-
-            Ref<const Attribute> GetAttribute(VertexSemantic Semantic) const
+            ConstRef<Attribute> GetAttribute(VertexSemantic Semantic) const
             {
                 return Attributes[CastEnum(Semantic)];
             }
@@ -92,7 +92,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        Ref<const Primitive> GetPrimitive(UInt8 Primitive) const
+        ConstRef<Primitive> GetPrimitive(UInt8 Primitive) const
         {
             return mPrimitives[Primitive];
         }

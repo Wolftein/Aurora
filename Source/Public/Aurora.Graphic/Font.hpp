@@ -130,10 +130,10 @@ namespace Graphic
         Vector2f Measure(CStr16 Text, Real32 Size) const;
 
         // -=(Undocumented)=-
-        Rectf Calculate(CStr16 Text, Real32 Size, Ref<const Vector2f> Position, Alignment Alignment) const;
+        Rectf Calculate(CStr16 Text, Real32 Size, ConstRef<Vector2f> Position, Alignment Alignment) const;
 
         // -=(Undocumented)=-
-        Ref<const Metrics> GetMetrics() const
+        ConstRef<Metrics> GetMetrics() const
         {
             return mMetrics;
         }

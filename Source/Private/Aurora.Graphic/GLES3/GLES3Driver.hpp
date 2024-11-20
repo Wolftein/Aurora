@@ -34,7 +34,7 @@ namespace Graphic
         void Reset(UInt16 Width, UInt16 Height, UInt8 Samples) override;
 
         // \see Driver::GetCapabilities
-        Ref<const Capabilities> GetCapabilities() const override;
+        ConstRef<Capabilities> GetCapabilities() const override;
 
         // \see Driver::CreateBuffer
         void CreateBuffer(Object ID, Usage Type, UInt32 Capacity, CPtr<const UInt8> Data) override;
@@ -49,13 +49,13 @@ namespace Graphic
         void DeleteBuffer(Object ID) override;
 
         // \see Driver::CreatePass
-        void CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, Ref<const Attachment> Auxiliary) override;
+        void CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, ConstRef<Attachment> Auxiliary) override;
 
         // \see Driver::DeletePass
         void DeletePass(Object ID) override;
 
         // \see Driver::CreatePipeline
-        void CreatePipeline(Object ID, CPtr<const UInt8> Vertex, CPtr<const UInt8> Pixel, CPtr<const UInt8> Geometry, Ref<const Descriptor> Properties) override;
+        void CreatePipeline(Object ID, CPtr<const UInt8> Vertex, CPtr<const UInt8> Pixel, CPtr<const UInt8> Geometry, ConstRef<Descriptor> Properties) override;
 
         // \see Driver::DeletePipeline
         void DeletePipeline(Object ID) override;
@@ -64,13 +64,13 @@ namespace Graphic
         void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) override;
 
         // \see Driver::UpdateTexture
-        void UpdateTexture(Object ID, UInt8 Level, Ref<const Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data) override;
+        void UpdateTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data) override;
 
         // \see Driver::CopyTexture
-        void CopyTexture(Object DstTexture, UInt8 DstLevel, Ref<const Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, Ref<const Recti> SrcOffset) override;
+        void CopyTexture(Object DstTexture, UInt8 DstLevel, ConstRef<Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, ConstRef<Recti> SrcOffset) override;
 
         // \see Driver::ReadTexture
-        Data ReadTexture(Object ID, UInt8 Level, Ref<const Recti> Offset) override;
+        Data ReadTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset) override;
 
         // \see Driver::QueryTexture
         UInt QueryTexture(Object ID) override;
@@ -79,7 +79,7 @@ namespace Graphic
         void DeleteTexture(Object ID) override;
 
         // \see Driver::Prepare
-        void Prepare(Object ID, Ref<const Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) override;
+        void Prepare(Object ID, ConstRef<Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil) override;
 
         // \see Driver::Submit
         void Submit(CPtr<const Submission> Submissions) override;

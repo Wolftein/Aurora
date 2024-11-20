@@ -54,7 +54,7 @@ namespace Content
     private:
 
         // -=(Undocumented)=-
-        Data Compile(Ref<Service> Service, Ref<const TOMLSection> Section, Graphic::Stage Stage);
+        Data Compile(Ref<Service> Service, ConstRef<TOMLSection> Section, Graphic::Stage Stage);
 
         // -=(Undocumented)=-
         Data CompileDXBC(CStr Entry, CStr Code, Ref<Vector<Property>> Properties, Graphic::Stage Stage);

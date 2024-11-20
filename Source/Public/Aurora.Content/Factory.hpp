@@ -58,7 +58,7 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        SPtr<Type> GetOrCreate(Ref<const Uri> Key, Bool CreateIfNeeded)
+        SPtr<Type> GetOrCreate(ConstRef<Uri> Key, Bool CreateIfNeeded)
         {
             SPtr<Type> Result;
 
@@ -76,7 +76,7 @@ namespace Content
         }
 
         // -=(Undocumented)=-
-        Bool Remove(Ref<const Uri> Key)
+        Bool Remove(ConstRef<Uri> Key)
         {
             if (const auto Iterator = mRegistry.find(Key.GetPath()); Iterator != mRegistry.end())
             {
