@@ -34,11 +34,6 @@ namespace Network
     TCPDriver::~TCPDriver()
     {
         mLock.reset();
-
-        for (Ref<std::thread> Thread : mWorkers)
-        {
-            Thread.join();
-        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -46,12 +41,9 @@ namespace Network
 
     Bool TCPDriver::Initialize(UInt32 Threads)
     {
-        for (UInt32 Core = 0; Core < Threads; ++Core)
+        for (UInt32 Thread = 0; Thread < Threads; ++Thread)
         {
-            mWorkers.emplace_back([this]()
-            {
-                mReactor.run();
-            });
+            mWorkers.emplace_back(std::bind_front(& asio::io_context::run, AddressOf(mReactor)));
         }
         return true;
     }

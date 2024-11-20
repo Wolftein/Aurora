@@ -54,9 +54,9 @@ namespace Network
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        asio::io_context    mExecutor;
-        asio::io_context    mReactor;
-        Vector<std::thread> mWorkers;
-        Lock                mLock;
+        asio::io_context mExecutor;
+        asio::io_context mReactor;
+        Vector<Thread>   mWorkers;
+        Lock             mLock;
     };
 }
