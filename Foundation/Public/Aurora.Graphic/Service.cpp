@@ -569,7 +569,7 @@ namespace Graphic
             {
                 const auto Bytes = Reader.ReadObject<Data>();
 
-                mDriver->Submit(Bytes.GetData<Encoder>()->GetSubmissions());
+                mDriver->Submit(Bytes.GetData<Encoder>()->GetSubmission());
                 break;
             }
             case Command::Commit:
