@@ -104,9 +104,15 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        void SetPipeline(Object Technique)
+        {
+            mInFlyCommand->Pipeline = Technique;
+        }
+
+        // -=(Undocumented)=-
         void SetPipeline(ConstRef<Pipeline> Technique)
         {
-            mInFlyCommand->Pipeline = Technique.GetID();
+            SetPipeline(Technique.GetID());
         }
 
         // -=(Undocumented)=-
@@ -116,9 +122,15 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        void SetTexture(UInt8 Slot, Object Texture)
+        {
+            mInFlyCommand->Textures[Slot] = Texture;
+        }
+
+        // -=(Undocumented)=-
         void SetTexture(UInt8 Slot, ConstRef<Texture> Texture)
         {
-            mInFlyCommand->Textures[Slot] = Texture.GetID();
+            SetTexture(Slot, Texture.GetID());
         }
 
         // -=(Undocumented)=-
