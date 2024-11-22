@@ -1,11 +1,11 @@
-[Properties.Blend]
+[Properties.Blend]  # Enable Alpha-Blending
 
 	ColorSrcFactor  = "SrcAlpha"
 	ColorDstFactor  = "OneMinusSrcAlpha"
 	AlphaSrcFactor  = "SrcAlpha"
 	AlphaDstFactor  = "OneMinusSrcAlpha"
 
-[Properties.Depth]
+[Properties.Depth]  # Disable Depth Write
 
 	Mask            = 0
 	Condition       = "LessEqual"
@@ -14,22 +14,18 @@
 
 	Attributes      = [
 		["POSITION",  "Float32x3",   0, 0  ],
-		["COLOR",     "UIntNorm8x4", 0, 12 ],
-		["TEXCOORD0", "Float32x2",   0, 16 ]
+		["TEXCOORD0", "Float32x2",   0, 12 ],
+		["COLOR",     "UIntNorm8x4", 0, 20 ],
 	]
 
     Topology        = "Triangle"
 
-[Program.Textures]
-
-    Diffuse         = 0
-
 [Program.Vertex]
 
 	Entry           = "vertex"
-	Filename        = "Engine://Pipeline/Font.shader"
+	Filename        = "Engine://Pipeline/MSDF.shader"
 
 [Program.Fragment]
 
 	Entry           = "fragment"
-	Filename        = "Engine://Pipeline/Font.shader"
+	Filename        = "Engine://Pipeline/MSDF.shader"

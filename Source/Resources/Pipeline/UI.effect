@@ -1,29 +1,28 @@
-[Properties.Blend]
+[Properties.Blend] # Enable Alpha-Blending
 
-	ColorSrcFactor  = "One"
-	AlphaSrcFactor  = "One"
-
+	ColorSrcFactor  = "SrcAlpha"
 	ColorDstFactor  = "OneMinusSrcAlpha"
+	AlphaSrcFactor  = "SrcAlpha"
 	AlphaDstFactor  = "OneMinusSrcAlpha"
 
-[Properties.Depth]
+[Properties.Depth] # Disable Depth Write
 
 	Mask            = 0
-	Condition       = "LessEqual"
+	Condition       = "Always"
 
 [Properties.Layout]
 
 	Attributes      = [
-		["POSITION",  "Float32x3",   0, 0  ],
-		["COLOR",     "UIntNorm8x4", 0, 12 ],
-		["TEXCOORD0", "Float32x2",   0, 16 ]
+		["POSITION",  "Float32x2",   0, 0  ],
+		["TEXCOORD0", "Float32x2",   0, 8  ],
+		["COLOR",     "UIntNorm8x4", 0, 16 ],
 	]
 
     Topology        = "Triangle"
 
-[Program.Textures]
+[Properties.Rasterizer] # Disable Cull
 
-    Diffuse         = 0
+    Cull            = "None"
 
 [Program.Vertex]
 

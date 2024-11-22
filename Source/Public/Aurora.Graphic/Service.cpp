@@ -332,20 +332,23 @@ namespace Graphic
 
     void Service::Submit(Ref<Encoder> Encoder, Bool Temporally)
     {
-        Data EncoderDataPtr;
-
-        if (Temporally)
+        if (Encoder.HasSubmission())
         {
-            EncoderDataPtr = Data(sizeof(Encoder));
-            EncoderDataPtr.Copy(AddressOf(Encoder), sizeof(Encoder));
-        }
-        else
-        {
-            EncoderDataPtr = Data(AddressOf(Encoder), sizeof(Encoder), Data::EMPTY_DELETER);
-        }
+            Data EncoderDataPtr;
 
-        mEncoder.WriteEnum(Command::Submit);
-        mEncoder.WriteObject(EncoderDataPtr);
+            if (Temporally)
+            {
+                EncoderDataPtr = Data(sizeof(Encoder));
+                EncoderDataPtr.Copy(AddressOf(Encoder), sizeof(Encoder));
+            }
+            else
+            {
+                EncoderDataPtr = Data(AddressOf(Encoder), sizeof(Encoder), Data::EMPTY_DELETER);
+            }
+
+            mEncoder.WriteEnum(Command::Submit);
+            mEncoder.WriteObject(EncoderDataPtr);
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

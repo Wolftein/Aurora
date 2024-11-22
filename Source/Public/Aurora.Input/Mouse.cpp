@@ -40,7 +40,7 @@ namespace Input
                 mThisMousePosition.Set(Event.MouseAxis.X, Event.MouseAxis.Y);
                 break;
             case Event::Type::MouseScroll:
-                mThisMouseScroll.Set(Event.MouseAxis.X, Event.MouseAxis.Y);
+                mThisMouseScroll.Set(Event.MouseAxis.XDelta, Event.MouseAxis.YDelta);
                 break;
             default:
                 break;

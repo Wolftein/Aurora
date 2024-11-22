@@ -135,7 +135,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        CPtr<const Submission> GetSubmissions() const
+        Bool HasSubmission() const
+        {
+            return !mInFlySubmissions.IsEmpty();
+        }
+
+        // -=(Undocumented)=-
+        CPtr<const Submission> GetSubmission() const
         {
             return mInFlySubmissions.GetData();
         }
