@@ -1,9 +1,9 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021-2024 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2024 Aeldur contributors (see AUTHORS.md)
 //
-// This work is licensed under the terms of the MIT license.
+// This work is licensed under the terms of the AGPL-V3 license.
 //
-// For a copy, see <https://opensource.org/licenses/MIT>.
+// For a copy, see <https://opensource.org/license/agpl-v3>
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #pragma once
@@ -12,41 +12,42 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
-#include "Frontend/ImGuiBackend.hpp"
+#include <Aurora.Engine/Device.hpp>
+#include "ImGuiInput.hpp"
+#include "ImGuiRenderer.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 namespace Editor
 {
     // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    class ImGuiBackend final
     {
-    private:
-
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
-
-        // \see Kernel::OnTick
-        void OnTick(Real64 Time, Real64 Delta) override;
-
-        // \see Kernel::OnDestroy
-        void OnDestroy() override;
-
-    private:
-
-        // \see Input::Listener::OnEvent(ConstRef<Input::Event>)
-        Bool OnEvent(ConstRef<Input::Event> Event) override;
+    public:
 
         // -=(Undocumented)=-
-        void OnRender(ConstSPtr<Graphic::Service> Graphics, Real64 Delta);
+        void Initialize(Ref<Subsystem::Context> Context, Ref<Engine::Device> Device);
+
+        // -=(Undocumented)=-
+        Bool Forward(ConstRef<Input::Event> Event)
+        {
+            return mInput.OnEvent(Event);
+        }
+
+        // -=(Undocumented)=-
+        void Begin();
+
+        // -=(Undocumented)=-
+        void End(Ref<Graphic::Encoder> Encoder);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        ImGuiBackend mImGuiBackend;
+        ImGuiRenderer mRenderer;
+        ImGuiInput    mInput;
     };
 }

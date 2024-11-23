@@ -1068,7 +1068,7 @@ namespace Graphic
 
                 ConstRef<D3D11Attachment> Source = Pass.Color[Slot];
                 mDeviceImmediate->ResolveSubresource(
-                        Resolve.Object.Get(), Resolve.Level, Source.Object.Get(), Source.Level, Description.Format);
+                    Resolve.Object.Get(), Resolve.Level, Source.Object.Get(), Source.Level, Description.Format);
             }
         }
 

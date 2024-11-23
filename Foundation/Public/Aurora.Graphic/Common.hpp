@@ -567,7 +567,7 @@ namespace Graphic
         Binding                       Indices;
 
         // -=(Undocumented)=-
-        Rect<UInt16>                  Scissor   = { 0, 0, UINT16_MAX, UINT16_MAX };
+        Rect<UInt16>                  Scissor   = Rect<UInt16>(0, 0, UINT16_MAX, UINT16_MAX);
 
         // -=(Undocumented)=-
         UInt8                         Stencil   = 0;
@@ -576,13 +576,13 @@ namespace Graphic
         Object                        Pipeline  = 0;
 
         // -=(Undocumented)=-
-        Array<Binding, k_MaxUniforms> Uniforms;
+        Array<Binding, k_MaxUniforms> Uniforms { };
 
         // -=(Undocumented)=-
-        Array<Sampler, k_MaxSlots>    Samplers;
+        Array<Sampler, k_MaxSlots>    Samplers { };
 
         // -=(Undocumented)=-
-        Array<Object, k_MaxSlots>     Textures;
+        Array<Object, k_MaxSlots>     Textures { 0 };
 
         // -=(Undocumented)=-
         Instance                      Primitive;

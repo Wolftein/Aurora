@@ -12,41 +12,42 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
-#include "Frontend/ImGuiBackend.hpp"
+#include <Aurora.Input/Service.hpp>
+#include <imgui.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 namespace Editor
 {
     // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    class ImGuiInput final : public Input::Listener
     {
     private:
 
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
-
-        // \see Kernel::OnTick
-        void OnTick(Real64 Time, Real64 Delta) override;
-
-        // \see Kernel::OnDestroy
-        void OnDestroy() override;
-
-    private:
-
-        // \see Input::Listener::OnEvent(ConstRef<Input::Event>)
-        Bool OnEvent(ConstRef<Input::Event> Event) override;
+        // -=(Undocumented)=-
+        Bool OnKeyType(UInt Codepoint) override;
 
         // -=(Undocumented)=-
-        void OnRender(ConstSPtr<Graphic::Service> Graphics, Real64 Delta);
+        Bool OnKeyUp(Input::Key Key) override;
 
-    private:
+        // -=(Undocumented)=-
+        Bool OnKeyDown(Input::Key Key) override;
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=(Undocumented)=-
+        Bool OnMouseMove(Real32 X, Real32 Y, Real32 DeltaX, Real32 DeltaY) override;
 
-        ImGuiBackend mImGuiBackend;
+        // -=(Undocumented)=-
+        Bool OnMouseScroll(Real32 DeltaX, Real32 DeltaY) override;
+
+        // -=(Undocumented)=-
+        Bool OnMouseUp(Input::Button Button) override;
+
+        // -=(Undocumented)=-
+        Bool OnMouseDown(Input::Button Button)  override;
+
+        // -=(Undocumented)=-
+        Bool OnWindowResize(UInt32 Width, UInt32 Height) override;
     };
 }

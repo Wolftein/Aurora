@@ -12,41 +12,40 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
-#include "Frontend/ImGuiBackend.hpp"
+#include <Aurora.Content/Service.hpp>
+#include <Aurora.Graphic/Service.hpp>
+#include <imgui.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 namespace Editor
 {
     // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    class ImGuiRenderer final
     {
-    private:
-
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
-
-        // \see Kernel::OnTick
-        void OnTick(Real64 Time, Real64 Delta) override;
-
-        // \see Kernel::OnDestroy
-        void OnDestroy() override;
-
-    private:
-
-        // \see Input::Listener::OnEvent(ConstRef<Input::Event>)
-        Bool OnEvent(ConstRef<Input::Event> Event) override;
+    public:
 
         // -=(Undocumented)=-
-        void OnRender(ConstSPtr<Graphic::Service> Graphics, Real64 Delta);
+        void Initialize(Ref<Subsystem::Context> Context);
+
+        // -=(Undocumented)=-
+        void Submit(Ref<Graphic::Encoder> Encoder, ConstRef<ImDrawData> Commands);
+
+    private:
+
+        // -=(Undocumented)=-
+        void CreateTextureFontAtlas(Ref<Subsystem::Context> Context);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        ImGuiBackend mImGuiBackend;
+        SPtr<Graphic::Service>    mGraphics;
+        SPtr<Graphic::Pipeline>   mPipeline;
+        Array<Graphic::Object, 3> mBuffers; // @TODO: replace with transient buffers
+
     };
 }
