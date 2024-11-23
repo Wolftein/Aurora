@@ -523,6 +523,25 @@ namespace Graphic
 
         // -=(Undocumented)=-
         TextureFilter Filter = TextureFilter::Nearest;
+
+        // -=(Undocumented)=-
+        Sampler() = default;
+
+        // -=(Undocumented)=-
+        Sampler(TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter)
+            : EdgeU  { EdgeU  },
+              EdgeV  { EdgeV  },
+              Filter { Filter }
+        {
+        }
+
+        // -=(Undocumented)=-
+        Sampler(TextureEdge Edge, TextureFilter Filter)
+            : EdgeU  { Edge   },
+              EdgeV  { Edge   },
+              Filter { Filter }
+        {
+        }
     };
 
     // -=(Undocumented)=-

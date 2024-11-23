@@ -49,7 +49,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetIndices(Graphic::Object Buffer, UInt32 Offset, UInt32 Length, UInt32 Stride)
+        void SetIndices(ConstRef<Binding> Binding)
+        {
+            mInFlyCommand->Indices = Binding;
+        }
+
+        // -=(Undocumented)=-
+        void SetIndices(Object Buffer, UInt32 Offset, UInt32 Length, UInt32 Stride)
         {
             Ref<Binding> Binding = mInFlyCommand->Indices;
             Binding.Buffer = Buffer;
@@ -60,13 +66,19 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename Type>
-        void SetIndices(Graphic::Object Buffer, UInt32 Offset, UInt32 Length)
+        void SetIndices(Object Buffer, UInt32 Offset, UInt32 Length)
         {
             SetIndices(Buffer, Offset, Length * sizeof(Type), sizeof(Type));
         }
 
         // -=(Undocumented)=-
-        void SetVertices(UInt8 Slot, Graphic::Object Buffer, UInt32 Offset, UInt32 Length, UInt32 Stride)
+        void SetVertices(UInt8 Slot, ConstRef<Binding> Binding)
+        {
+            mInFlyCommand->Vertices[Slot] = Binding;
+        }
+
+        // -=(Undocumented)=-
+        void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length, UInt32 Stride)
         {
             Ref<Binding> Binding = mInFlyCommand->Vertices[Slot];
             Binding.Buffer = Buffer;
@@ -77,13 +89,19 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename Type>
-        void SetVertices(UInt8 Slot, Graphic::Object Buffer, UInt32 Offset, UInt32 Length)
+        void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length)
         {
             SetVertices(Slot, Buffer, Offset, Length * sizeof(Type), sizeof(Type));
         }
 
         // -=(Undocumented)=-
-        void SetUniforms(UInt8 Slot, Graphic::Object Buffer, UInt32 Offset, UInt32 Length)
+        void SetUniforms(UInt8 Slot, ConstRef<Binding> Binding)
+        {
+            mInFlyCommand->Uniforms[Slot] = Binding;
+        }
+
+        // -=(Undocumented)=-
+        void SetUniforms(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length)
         {
             Ref<Binding> Binding = mInFlyCommand->Uniforms[Slot];
             Binding.Buffer = Buffer;
