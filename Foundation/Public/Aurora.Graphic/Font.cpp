@@ -54,19 +54,19 @@ namespace Graphic
 
             switch (Codepoint)
             {
-                case '\r':
-                    CurrentX = 0.0f;
-                    break;
-                case '\n':
-                    MaximumY += mMetrics.UnderlineHeight * Scale;
-                    break;
-                default:
-                {
-                    const Ptr<const Glyph> Glyph = GetGlyph(Codepoint);
-                    CurrentX += GetKerning(Previous, Codepoint) * Scale + Glyph->Advance * Scale;
-                    MaximumX = Max(MaximumX, CurrentX);
-                    break;
-                }
+            case '\r':
+                CurrentX = 0.0f;
+                break;
+            case '\n':
+                MaximumY += mMetrics.UnderlineHeight * Scale;
+                break;
+            default:
+            {
+                const Ptr<const Glyph> Glyph = GetGlyph(Codepoint);
+                CurrentX += GetKerning(Previous, Codepoint) * Scale + Glyph->Advance * Scale;
+                MaximumX = Max(MaximumX, CurrentX);
+                break;
+            }
             }
             Previous = Codepoint;
         }

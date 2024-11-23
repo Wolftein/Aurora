@@ -44,8 +44,6 @@ namespace Graphic
         // -=(Undocumented)=-
         void Reset(UInt16 Width, UInt16 Height, UInt8 Samples);
 
-        // @TODO: AllocateTransientBuffer
-
         // -=(Undocumented)=-
         Object CreateBuffer(Usage Type, UInt32 Capacity)
         {
@@ -152,7 +150,6 @@ namespace Graphic
         Writer                 mEncoder;
         Writer                 mDecoder;
         Atomic_Flag            mBusy;
-        Atomic<Bool>           mInitialized;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

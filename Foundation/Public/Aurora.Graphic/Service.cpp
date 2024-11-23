@@ -85,7 +85,7 @@ namespace Graphic
                 Flush();
             }
 
-            Successful = mDriver != nullptr && mInitialized.load(std::memory_order_acquire);
+            Successful = mDriver != nullptr;
 
             if (Successful)
             {
@@ -425,161 +425,164 @@ namespace Graphic
     {
         switch (Type)
         {
-            case Command::Initialize:
-            {
-                const auto Swapchain = reinterpret_cast<Ptr<SDL_Window>>(Reader.ReadInt<UInt>());
-                const auto Width     = Reader.ReadUInt16();
-                const auto Height    = Reader.ReadUInt16();
-                const auto Samples   = Reader.ReadUInt8();
+        case Command::Initialize:
+        {
+            const auto Swapchain = reinterpret_cast<Ptr<SDL_Window>>(Reader.ReadInt<UInt>());
+            const auto Width     = Reader.ReadUInt16();
+            const auto Height    = Reader.ReadUInt16();
+            const auto Samples   = Reader.ReadUInt8();
 
-                mInitialized = mDriver->Initialize(Swapchain, Width, Height, Samples);
-                break;
-            }
-            case Command::Reset:
+            if (const Bool Succeed = mDriver->Initialize(Swapchain, Width, Height, Samples); !Succeed)
             {
-                const auto Width   = Reader.ReadUInt16();
-                const auto Height  = Reader.ReadUInt16();
-                const auto Samples = Reader.ReadUInt8();
+                mDriver = nullptr;
+            }
+            break;
+        }
+        case Command::Reset:
+        {
+            const auto Width   = Reader.ReadUInt16();
+            const auto Height  = Reader.ReadUInt16();
+            const auto Samples = Reader.ReadUInt8();
 
-                mDriver->Reset(Width, Height, Samples);
-                break;
-            }
-            case Command::CreateBuffer:
-            {
-                const auto ID       = Reader.ReadUInt16();
-                const auto Kind     = Reader.ReadEnum<Usage>();
-                const auto Capacity = Reader.ReadUInt32();
-                const auto Bytes    = Reader.ReadObject<Data>();
+            mDriver->Reset(Width, Height, Samples);
+            break;
+        }
+        case Command::CreateBuffer:
+        {
+            const auto ID       = Reader.ReadUInt16();
+            const auto Kind     = Reader.ReadEnum<Usage>();
+            const auto Capacity = Reader.ReadUInt32();
+            const auto Bytes    = Reader.ReadObject<Data>();
 
-                mDriver->CreateBuffer(ID, Kind, Capacity, Bytes);
-                break;
-            }
-            case Command::CopyBuffer:
-            {
-                const auto DstBuffer = Reader.ReadUInt16();
-                const auto DstOffset = Reader.ReadUInt32();
-                const auto SrcBuffer = Reader.ReadUInt16();
-                const auto SrcOffset = Reader.ReadUInt32();
-                const auto Size      = Reader.ReadUInt32();
+            mDriver->CreateBuffer(ID, Kind, Capacity, Bytes);
+            break;
+        }
+        case Command::CopyBuffer:
+        {
+            const auto DstBuffer = Reader.ReadUInt16();
+            const auto DstOffset = Reader.ReadUInt32();
+            const auto SrcBuffer = Reader.ReadUInt16();
+            const auto SrcOffset = Reader.ReadUInt32();
+            const auto Size      = Reader.ReadUInt32();
 
-                mDriver->CopyBuffer(DstBuffer, DstOffset, SrcBuffer, SrcOffset, Size);
-                break;
-            }
-            case Command::UpdateBuffer:
-            {
-                const auto ID      = Reader.ReadUInt16();
-                const auto Discard = Reader.ReadBool();
-                const auto Offset  = Reader.ReadUInt32();
-                const auto Bytes   = Reader.ReadObject<Data>();
+            mDriver->CopyBuffer(DstBuffer, DstOffset, SrcBuffer, SrcOffset, Size);
+            break;
+        }
+        case Command::UpdateBuffer:
+        {
+            const auto ID      = Reader.ReadUInt16();
+            const auto Discard = Reader.ReadBool();
+            const auto Offset  = Reader.ReadUInt32();
+            const auto Bytes   = Reader.ReadObject<Data>();
 
-                mDriver->UpdateBuffer(ID, Discard, Offset, Bytes);
-                break;
-            }
-            case Command::DeleteBuffer:
-            {
-                mDriver->DeleteBuffer(Reader.ReadUInt16());
-                break;
-            }
-            case Command::CreatePass:
-            {
-                const auto ID        = Reader.ReadUInt16();
-                const auto Colors    = Reader.ReadBlock<Attachment>();
-                const auto Resolves  = Reader.ReadBlock<Attachment>();
-                const auto Auxiliary = Reader.Read<Attachment>();
+            mDriver->UpdateBuffer(ID, Discard, Offset, Bytes);
+            break;
+        }
+        case Command::DeleteBuffer:
+        {
+            mDriver->DeleteBuffer(Reader.ReadUInt16());
+            break;
+        }
+        case Command::CreatePass:
+        {
+            const auto ID        = Reader.ReadUInt16();
+            const auto Colors    = Reader.ReadBlock<Attachment>();
+            const auto Resolves  = Reader.ReadBlock<Attachment>();
+            const auto Auxiliary = Reader.Read<Attachment>();
 
-                mDriver->CreatePass(ID, Colors, Resolves, Auxiliary);
-                break;
-            }
-            case Command::DeletePass:
-            {
-                mDriver->DeletePass(Reader.ReadUInt16());
-                break;
-            }
-            case Command::CreatePipeline:
-            {
-                const auto ID         = Reader.ReadUInt16();
-                const auto Vertex     = Reader.ReadObject<Data>();
-                const auto Fragment   = Reader.ReadObject<Data>();
-                const auto Geometry   = Reader.ReadObject<Data>();
-                const auto Properties = Reader.Read<Descriptor>();
-                
-                mDriver->CreatePipeline(ID, Vertex, Fragment, Geometry, Properties);
-                break;
-            }
-            case Command::DeletePipeline:
-            {
-                mDriver->DeletePipeline(Reader.ReadUInt16());
-                break;
-            }
-            case Command::CreateTexture:
-            {
-                const auto ID      = Reader.ReadUInt16();
-                const auto Format  = Reader.ReadEnum<TextureFormat>();
-                const auto Layout  = Reader.ReadEnum<TextureLayout>();
-                const auto Width   = Reader.ReadUInt16();
-                const auto Height  = Reader.ReadUInt16();
-                const auto Level   = Reader.ReadUInt8();
-                const auto Samples = Reader.ReadUInt8();
-                const auto Bytes   = Reader.ReadObject<Data>();
+            mDriver->CreatePass(ID, Colors, Resolves, Auxiliary);
+            break;
+        }
+        case Command::DeletePass:
+        {
+            mDriver->DeletePass(Reader.ReadUInt16());
+            break;
+        }
+        case Command::CreatePipeline:
+        {
+            const auto ID         = Reader.ReadUInt16();
+            const auto Vertex     = Reader.ReadObject<Data>();
+            const auto Fragment   = Reader.ReadObject<Data>();
+            const auto Geometry   = Reader.ReadObject<Data>();
+            const auto Properties = Reader.Read<Descriptor>();
 
-                mDriver->CreateTexture(ID, Format, Layout, Width, Height, Level, Samples, Bytes);
-                break;
-            }
-            case Command::CopyTexture:
-            {
-                const auto DstTexture = Reader.ReadUInt16();
-                const auto DstLevel   = Reader.ReadUInt8();
-                const auto DstOffset  = Reader.ReadObject<Vector2i>();
-                const auto SrcTexture = Reader.ReadUInt16();
-                const auto SrcLevel   = Reader.ReadUInt8();
-                const auto SrcOffset  = Reader.ReadObject<Recti>();
+            mDriver->CreatePipeline(ID, Vertex, Fragment, Geometry, Properties);
+            break;
+        }
+        case Command::DeletePipeline:
+        {
+            mDriver->DeletePipeline(Reader.ReadUInt16());
+            break;
+        }
+        case Command::CreateTexture:
+        {
+            const auto ID      = Reader.ReadUInt16();
+            const auto Format  = Reader.ReadEnum<TextureFormat>();
+            const auto Layout  = Reader.ReadEnum<TextureLayout>();
+            const auto Width   = Reader.ReadUInt16();
+            const auto Height  = Reader.ReadUInt16();
+            const auto Level   = Reader.ReadUInt8();
+            const auto Samples = Reader.ReadUInt8();
+            const auto Bytes   = Reader.ReadObject<Data>();
 
-                mDriver->CopyTexture(DstTexture, DstLevel, DstOffset, SrcTexture, SrcLevel, SrcOffset);
-                break;
-            }
-            case Command::UpdateTexture:
-            {
-                const auto ID     = Reader.ReadUInt16();
-                const auto Level  = Reader.ReadUInt8();
-                const auto Offset = Reader.ReadObject<Recti>();
-                const auto Pitch  = Reader.ReadUInt32();
-                const auto Bytes  = Reader.ReadObject<Data>();
+            mDriver->CreateTexture(ID, Format, Layout, Width, Height, Level, Samples, Bytes);
+            break;
+        }
+        case Command::CopyTexture:
+        {
+            const auto DstTexture = Reader.ReadUInt16();
+            const auto DstLevel   = Reader.ReadUInt8();
+            const auto DstOffset  = Reader.ReadObject<Vector2i>();
+            const auto SrcTexture = Reader.ReadUInt16();
+            const auto SrcLevel   = Reader.ReadUInt8();
+            const auto SrcOffset  = Reader.ReadObject<Recti>();
 
-                mDriver->UpdateTexture(ID, Level, Offset, Pitch, Bytes);
-                break;
-            }
-            case Command::DeleteTexture:
-            {
-                mDriver->DeleteTexture(Reader.ReadUInt16());
-                break;
-            }
-            case Command::Prepare:
-            {
-                const auto ID       = Reader.ReadUInt16();
-                const auto Viewport = Reader.ReadObject<Rectf>();
-                const auto Target   = Reader.ReadEnum<Clear>();
-                const auto Tint     = Reader.ReadObject<Color>();
-                const auto Depth    = Reader.ReadReal32();
-                const auto Stencil  = Reader.ReadUInt8();
+            mDriver->CopyTexture(DstTexture, DstLevel, DstOffset, SrcTexture, SrcLevel, SrcOffset);
+            break;
+        }
+        case Command::UpdateTexture:
+        {
+            const auto ID     = Reader.ReadUInt16();
+            const auto Level  = Reader.ReadUInt8();
+            const auto Offset = Reader.ReadObject<Recti>();
+            const auto Pitch  = Reader.ReadUInt32();
+            const auto Bytes  = Reader.ReadObject<Data>();
 
-                mDriver->Prepare(ID, Viewport, Target, Tint, Depth, Stencil);
-                break;
-            }
-            case Command::Submit:
-            {
-                const auto Bytes = Reader.ReadObject<Data>();
+            mDriver->UpdateTexture(ID, Level, Offset, Pitch, Bytes);
+            break;
+        }
+        case Command::DeleteTexture:
+        {
+            mDriver->DeleteTexture(Reader.ReadUInt16());
+            break;
+        }
+        case Command::Prepare:
+        {
+            const auto ID       = Reader.ReadUInt16();
+            const auto Viewport = Reader.ReadObject<Rectf>();
+            const auto Target   = Reader.ReadEnum<Clear>();
+            const auto Tint     = Reader.ReadObject<Color>();
+            const auto Depth    = Reader.ReadReal32();
+            const auto Stencil  = Reader.ReadUInt8();
 
-                mDriver->Submit(Bytes.GetData<Encoder>()->GetSubmission());
-                break;
-            }
-            case Command::Commit:
-            {
-                const auto ID           = Reader.ReadUInt16();
-                const auto Synchronised = Reader.ReadBool();
+            mDriver->Prepare(ID, Viewport, Target, Tint, Depth, Stencil);
+            break;
+        }
+        case Command::Submit:
+        {
+            const auto Bytes = Reader.ReadObject<Data>();
 
-                mDriver->Commit(ID, Synchronised);
-                break;
-            }
+            mDriver->Submit(Bytes.GetData<Encoder>()->GetSubmission());
+            break;
+        }
+        case Command::Commit:
+        {
+            const auto ID           = Reader.ReadUInt16();
+            const auto Synchronised = Reader.ReadBool();
+
+            mDriver->Commit(ID, Synchronised);
+            break;
+        }
         }
     }
 }
