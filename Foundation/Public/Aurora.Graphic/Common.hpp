@@ -426,13 +426,10 @@ namespace Graphic
         Object Buffer = 0;
 
         // -=(Undocumented)=-
-        UInt32 Length = 0;
+        UInt16 Length = 0;
 
         // -=(Undocumented)=-
         UInt32 Offset = 0;
-
-        // -=(Undocumented)=-
-        UInt32 Stride = 0;
     };
 
     // -=(Undocumented)=-

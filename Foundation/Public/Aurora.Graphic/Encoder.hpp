@@ -55,20 +55,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetIndices(Object Buffer, UInt32 Offset, UInt32 Length, UInt32 Stride)
+        template<typename Type>
+        void SetIndices(Object Buffer, UInt32 Offset, UInt32 Length = sizeof(Type))
         {
             Ref<Binding> Binding = mInFlyCommand->Indices;
             Binding.Buffer = Buffer;
             Binding.Offset = Offset;
             Binding.Length = Length;
-            Binding.Stride = Stride;
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type>
-        void SetIndices(Object Buffer, UInt32 Offset, UInt32 Length)
-        {
-            SetIndices(Buffer, Offset, Length * sizeof(Type), sizeof(Type));
         }
 
         // -=(Undocumented)=-
@@ -78,20 +71,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length, UInt32 Stride)
+        template<typename Type>
+        void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length = sizeof(Type))
         {
             Ref<Binding> Binding = mInFlyCommand->Vertices[Slot];
             Binding.Buffer = Buffer;
             Binding.Offset = Offset;
             Binding.Length = Length;
-            Binding.Stride = Stride;
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type>
-        void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length)
-        {
-            SetVertices(Slot, Buffer, Offset, Length * sizeof(Type), sizeof(Type));
         }
 
         // -=(Undocumented)=-

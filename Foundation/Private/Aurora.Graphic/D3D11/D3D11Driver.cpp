@@ -943,12 +943,12 @@ namespace Graphic
             // Apply indices
             if (OldestSubmission.Indices.Buffer != NewestSubmission.Indices.Buffer ||
                 OldestSubmission.Indices.Offset != NewestSubmission.Indices.Offset ||
-                OldestSubmission.Indices.Stride != NewestSubmission.Indices.Stride)
+                OldestSubmission.Indices.Length != NewestSubmission.Indices.Length)
             {
                 ConstRef<D3D11Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
-                const DXGI_FORMAT      Format =
-                    NewestSubmission.Indices.Stride == sizeof(UInt8)  ? DXGI_FORMAT_R8_UINT  :
-                    NewestSubmission.Indices.Stride == sizeof(UInt16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+                const DXGI_FORMAT     Format =
+                    NewestSubmission.Indices.Length == sizeof(UInt8)  ? DXGI_FORMAT_R8_UINT  :
+                    NewestSubmission.Indices.Length == sizeof(UInt16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
                 mDeviceImmediate->IASetIndexBuffer(Buffer.Object.Get(), Format, NewestSubmission.Indices.Offset);
             }
 
@@ -1321,7 +1321,7 @@ namespace Graphic
             ConstRef<Binding> Old = Oldest.Vertices[Element];
             ConstRef<Binding> New = Newest.Vertices[Element];
 
-            if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Stride != New.Stride)
+            if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Length != New.Length)
             {
                 Min = Core::Min(Element, Min);
                 Max = Core::Max(Element + 1, Max);
@@ -1329,7 +1329,7 @@ namespace Graphic
 
             Array[Element]       = mBuffers[New.Buffer].Object.Get();
             ArrayOffset[Element] = New.Offset;
-            ArrayStride[Element] = New.Stride;
+            ArrayStride[Element] = New.Length;
         }
 
         if (Min != k_MaxFetches && Max > 0)
