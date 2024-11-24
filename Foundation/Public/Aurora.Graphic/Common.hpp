@@ -397,7 +397,7 @@ namespace Graphic
         Object Texture = 0;
 
         // -=(Undocumented)=-
-        UInt8 Level    = 0;
+        UInt8  Level   = 0;
     };
 
     // -=(Undocumented)=-
@@ -561,12 +561,6 @@ namespace Graphic
     struct Submission
     {
         // -=(Undocumented)=-
-        Array<Binding, k_MaxFetches>  Vertices;
-
-        // -=(Undocumented)=-
-        Binding                       Indices;
-
-        // -=(Undocumented)=-
         Rect<UInt16>                  Scissor   = Rect<UInt16>(0, 0, UINT16_MAX, UINT16_MAX);
 
         // -=(Undocumented)=-
@@ -576,13 +570,19 @@ namespace Graphic
         Object                        Pipeline  = 0;
 
         // -=(Undocumented)=-
-        Array<Binding, k_MaxUniforms> Uniforms { };
+        Array<Binding, k_MaxFetches>  Vertices;
 
         // -=(Undocumented)=-
-        Array<Sampler, k_MaxSlots>    Samplers { };
+        Binding                       Indices;
 
         // -=(Undocumented)=-
-        Array<Object, k_MaxSlots>     Textures { 0 };
+        Array<Binding, k_MaxUniforms> Uniforms;
+
+        // -=(Undocumented)=-
+        Array<Sampler, k_MaxSlots>    Samplers;
+
+        // -=(Undocumented)=-
+        Array<Object, k_MaxSlots>     Textures  = { 0 };
 
         // -=(Undocumented)=-
         Instance                      Primitive;

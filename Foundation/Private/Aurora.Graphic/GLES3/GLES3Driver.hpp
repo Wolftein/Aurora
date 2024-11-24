@@ -72,9 +72,6 @@ namespace Graphic
         // \see Driver::ReadTexture
         Data ReadTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset) override;
 
-        // \see Driver::QueryTexture
-        UInt QueryTexture(Object ID) override;
-
         // \see Driver::DeleteTexture
         void DeleteTexture(Object ID) override;
 

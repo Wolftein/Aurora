@@ -503,6 +503,7 @@ namespace Graphic
                 {
                     LoadAdapters();
                     LoadCapabilities();
+                    LoadStates();
 
                     if (Swapchain)
                     {
@@ -537,6 +538,9 @@ namespace Graphic
 
         // Recreate the swap chain's resources
         CreateSwapchainResources(mPasses[k_Default], Width, Height, Samples);
+
+        // Reset the system to its initial states by loading default configurations and settings.
+        LoadStates();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -861,17 +865,6 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    UInt D3D11Driver::QueryTexture(Object ID)
-    {
-        Ptr<IDXGISurface> Surface;
-        CheckIfFail(mTextures[ID].Object->QueryInterface(
-            __uuidof(IDXGISurface), reinterpret_cast<Ptr<LPVOID>>(AddressOf(Surface))));
-        return reinterpret_cast<UInt>(Surface);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
     void D3D11Driver::DeleteTexture(Object ID)
     {
         mTextures[ID].~D3D11Texture();
@@ -927,15 +920,11 @@ namespace Graphic
 
     void D3D11Driver::Submit(CPtr<const Submission> Submissions)
     {
-        static Submission s_PreviousFrameCache {
-            .Scissor = Rectf(0, 0, 0, 0)
-        };
-
         // Apply all job(s).
         for (UInt Batch = 0; Batch < Submissions.size(); ++Batch)
         {
             ConstRef<Submission> NewestSubmission = Submissions[Batch];
-            ConstRef<Submission> OldestSubmission = Batch > 0 ? Submissions[Batch - 1] : s_PreviousFrameCache;
+            ConstRef<Submission> OldestSubmission = Batch > 0 ? Submissions[Batch - 1] : mStates;
 
             // Apply vertices
             ApplyVertexResources(OldestSubmission, NewestSubmission);
@@ -1048,7 +1037,7 @@ namespace Graphic
         }
 
         // Apply cache
-        s_PreviousFrameCache = Submissions.back();
+        mStates = Submissions.back();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -1187,6 +1176,15 @@ namespace Graphic
                 mLimits.Multisample[Level] = mLimits.Multisample[Last];
             }
         }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void D3D11Driver::LoadStates()
+    {
+        mStates = Submission();
+        mStates.Scissor = Rectf(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Type.hpp"
+#include "Aurora.Base/Trait.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -26,14 +26,18 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
-        static constexpr inline UInt32 kDefaultCapacity = 1024;
+        static constexpr inline UInt32 kDefaultCapacity  = 1024;
+
+        // -=(Undocumented)=-
+        static constexpr inline UInt32 kDefaultAlignment = 1;
 
     public:
 
         // -=(Undocumented)=-
-        explicit Writer(UInt32 Capacity = kDefaultCapacity)
-            : mBuffer ( Capacity, 0 ),
-              mOffset { 0 }
+        explicit Writer(UInt32 Capacity = kDefaultCapacity, UInt32 Alignment = kDefaultAlignment)
+            : mBuffer    ( Capacity, 0 ),
+              mOffset    { 0 },
+              mAlignment { Alignment }
         {
         }
 
@@ -59,6 +63,12 @@ inline namespace Core
         UInt32 GetOffset() const
         {
             return mOffset;
+        }
+
+        // -=(Undocumented)=-
+        UInt32 GetAlignment() const
+        {
+            return mAlignment;
         }
 
         // -=(Undocumented)=-
@@ -99,7 +109,8 @@ inline namespace Core
             {
                 reinterpret_cast<Ref<Type>>(mBuffer[mOffset]) = Value;
             }
-            mOffset += Length;
+
+            mOffset = Align(mOffset + Length, mAlignment);
         }
 
         // -=(Undocumented)=-
@@ -270,5 +281,6 @@ inline namespace Core
 
         Vector<UInt8> mBuffer;
         UInt32        mOffset;
+        UInt32        mAlignment;
     };
 }

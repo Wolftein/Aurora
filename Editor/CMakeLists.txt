@@ -37,7 +37,8 @@ LIST(APPEND PROJECT_DEPENDENCIES "Aurora_Engine")
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 FetchContent_Declare(External_ImGUI
-        GIT_REPOSITORY https://github.com/ocornut/imgui)
+        GIT_REPOSITORY https://github.com/ocornut/imgui
+        GIT_TAG docking)
 FetchContent_MakeAvailable(External_ImGUI)
 
 ADD_LIBRARY(ImGUI INTERFACE)
