@@ -154,6 +154,9 @@ namespace Graphic
         void LoadCapabilities();
 
         // -=(Undocumented)=-
+        void LoadStates();
+
+        // -=(Undocumented)=-
         void CreateSwapchain(Ref<D3D11Pass> Pass, UInt Display, UInt16 Width, UInt16 Height, UInt8 Samples);
 
         // -=(Undocumented)=-
@@ -184,6 +187,7 @@ namespace Graphic
         ComPtr<IDXGIFactory1>        mDeviceFactory;
         Capabilities                 mCapabilities;
         D3D11Limits                  mLimits;
+        Submission                   mStates;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
