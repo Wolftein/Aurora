@@ -25,7 +25,7 @@ namespace Editor
     {
         // Initialize basic context setting(s).
         ImGui::CreateContext();
-        ImGui::GetIO().ConfigFlags            |= ImGuiConfigFlags_NavEnableKeyboard;
+        ImGui::GetIO().ConfigFlags            |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;
         ImGui::GetIO().BackendFlags           |= ImGuiBackendFlags_RendererHasVtxOffset;
         ImGui::GetIO().DisplaySize             = ImVec2(Device.GetWidth(), Device.GetHeight());
         ImGui::GetIO().DisplayFramebufferScale = ImVec2(Device.GetScale(), Device.GetScale());
