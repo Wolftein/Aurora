@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Type.hpp"
+#include "Aurora.Base/Trait.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -26,6 +26,11 @@ inline namespace Core
     public:
 
         // -=(Undocumented)=-
+        static constexpr inline UInt32 kDefaultAlignment = 1;
+
+    public:
+
+        // -=(Undocumented)=-
         explicit Reader()
             : mBuffer { nullptr },
               mLength { 0 },
@@ -35,19 +40,21 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Type>
-        explicit Reader(Ptr<Type> Pointer, UInt32 Length)
-            : mBuffer { reinterpret_cast<Ptr<UInt8>>(Pointer) },
-              mLength { Length * sizeof(Type) },
-              mOffset { 0 }
+        explicit Reader(Ptr<Type> Pointer, UInt32 Length, UInt32 Alignment = kDefaultAlignment)
+            : mBuffer    { reinterpret_cast<Ptr<UInt8>>(Pointer) },
+              mLength    { Length * sizeof(Type) },
+              mOffset    { 0 },
+              mAlignment { Alignment }
         {
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        explicit Reader(CPtr<Type> Block)
-            : mBuffer { reinterpret_cast<Ptr<UInt8>>(Block.data()) },
-              mLength { static_cast<UInt32>(Block.size_bytes()) },
-              mOffset { 0 }
+        explicit Reader(CPtr<Type> Block, UInt32 Alignment = kDefaultAlignment)
+            : mBuffer    { reinterpret_cast<Ptr<UInt8>>(Block.data()) },
+              mLength    { static_cast<UInt32>(Block.size_bytes()) },
+              mOffset    { 0 },
+              mAlignment { Alignment }
         {
         }
 
@@ -73,6 +80,12 @@ inline namespace Core
         UInt32 GetOffset() const
         {
             return mOffset;
+        }
+
+        // -=(Undocumented)=-
+        UInt32 GetAlignment() const
+        {
+            return mAlignment;
         }
 
         // -=(Undocumented)=-
@@ -105,7 +118,7 @@ inline namespace Core
         Type Read(UInt32 Length = sizeof(Type))
         {
             const Type Result = Peek<Type>(Length);
-            mOffset += Length;
+            mOffset = Align(mOffset + Length, mAlignment);
             return Result;
         }
 
@@ -268,5 +281,6 @@ inline namespace Core
         Ptr<UInt8> mBuffer;
         UInt32     mLength;
         UInt32     mOffset;
+        UInt32     mAlignment;
     };
 }
