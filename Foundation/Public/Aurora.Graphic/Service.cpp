@@ -324,18 +324,19 @@ namespace Graphic
 
     void Service::Submit(Ref<Encoder> Encoder, Bool Temporally)
     {
-        if (Encoder.HasSubmission())
+        if (CPtr<const Submission> Submissions = Encoder.GetSubmissions(); !Submissions.empty())
         {
             Data EncoderDataPtr;
 
             if (Temporally)
             {
-                EncoderDataPtr = Data(sizeof(Encoder));
-                EncoderDataPtr.Copy(AddressOf(Encoder), sizeof(Encoder));
+                EncoderDataPtr = Data(Submissions.size_bytes());
+                EncoderDataPtr.Copy(Submissions.data(), Submissions.size_bytes());
             }
             else
             {
-                EncoderDataPtr = Data(AddressOf(Encoder), sizeof(Encoder), Data::EMPTY_DELETER);
+                const Ptr<Submission> Memory = const_cast<Ptr<Submission>>(Submissions.data());
+                EncoderDataPtr = Data(Memory, Submissions.size_bytes(), Data::EMPTY_DELETER);
             }
 
             mEncoder.WriteEnum(Command::Submit);
@@ -564,7 +565,7 @@ namespace Graphic
         {
             const auto Bytes = Reader.ReadObject<Data>();
 
-            mDriver->Submit(Bytes.GetData<Encoder>()->GetSubmission());
+            mDriver->Submit(Bytes.GetSpan<Submission>());
             break;
         }
         case Command::Commit:

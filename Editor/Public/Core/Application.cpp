@@ -43,7 +43,7 @@ namespace Editor
         Rectf Viewport(0, 0, GetDevice().GetWidth(), GetDevice().GetHeight());
         Graphics->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, Color(0), 1, 0);
         {
-            OnRender(Graphics, Delta);
+           OnRender(Graphics, Delta);
         }
         Graphics->Commit(Graphic::k_Default, false);
         Graphics->Flush();
@@ -73,17 +73,19 @@ namespace Editor
 
     void Application::OnRender(ConstSPtr<Graphic::Service> Graphics, Real64 Delta)
     {
-        Graphic::Encoder Encoder;   // @TODO: Replace with transient encoders
+        static Graphic::Encoder Encoder_1;   // @TODO: Replace with transient encoders
+        static Graphic::Encoder Encoder_2;   // @TODO: Replace with transient encoders
 
-        Encoder.Attach();
-        mImGuiBackend.Begin();
+        mImGuiBackend.Begin(Delta);
         {
             ImGui::ShowDemoWindow();
         }
-        mImGuiBackend.End(Encoder);
-        Encoder.Detach();
+        mImGuiBackend.End(Encoder_1);
 
-        Graphics->Submit(Encoder, true);
+        Graphics->Submit(Encoder_1, false);
+
+        Swap(Encoder_1, Encoder_2);
+        Encoder_2.Clear();
     }
 }
 

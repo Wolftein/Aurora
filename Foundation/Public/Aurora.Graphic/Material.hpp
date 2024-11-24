@@ -28,11 +28,6 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        static constexpr UInt k_Alignment = 16;
-
-    public:
-
-        // -=(Undocumented)=-
         explicit Material(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
@@ -79,18 +74,18 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename Type>
-        void SetParameter(UInt Offset, Type Parameter)
+        void SetParameter(UInt32 Offset, Type Parameter)
         {
-            if (constexpr UInt Size = sizeof(Type) / sizeof(Vector4f) + 1; Offset + Size > mParameters.size())
+            if (constexpr UInt Size = sizeof(Type); Offset + Size >= mParameters.size())
             {
-                mParameters.resize(mParameters.size() + Align(Size, k_Alignment));
+                mParameters.resize(Offset + Size);
             }
 
-            * reinterpret_cast<Ptr<Type>>(reinterpret_cast<UInt>(mParameters.data() + Offset)) = Parameter;
+            * reinterpret_cast<Ptr<Type>>(mParameters.data() + Offset) = Parameter;
         }
 
         // -=(Undocumented)=-
-        CPtr<const Vector4f> GetParameters() const
+        CPtr<const UInt8> GetParameters() const
         {
             return mParameters;
         }
@@ -112,6 +107,6 @@ namespace Graphic
         Bool                               mOwnership;
         Array<SPtr<Texture>, k_MaxSources> mTextures;   // TODO: Sparse
         Array<Sampler, k_MaxSources>       mSamplers;   // TODO: Sparse
-        Vector<Vector4f>                   mParameters; // TODO: Replace with pre allocated chunked memory
+        Vector<UInt8>                      mParameters; // TODO: Replace with pre allocated chunked memory
     };
 }
