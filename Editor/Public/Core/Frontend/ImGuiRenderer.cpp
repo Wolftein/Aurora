@@ -85,9 +85,9 @@ namespace Editor
                     }
                     Encoder.SetScissor(Scissor);
 
-                    Encoder.SetVertices(0, Graphic::Binding { mBuffers[0], sizeof(ImDrawVert), 0 });
-                    Encoder.SetIndices(Graphic::Binding { mBuffers[1], sizeof(ImDrawIdx), 0 });
-                    Encoder.SetUniforms(0, mBuffers[2], 0, 16);
+                    Encoder.SetVertices<ImDrawVert>(0, mBuffers[0], 0);
+                    Encoder.SetIndices<ImDrawIdx>(mBuffers[1], 0);
+                    Encoder.SetUniforms(0, mBuffers[2], 0, UfmTransientPtr.GetSize());
                     Encoder.SetPipeline(* mPipeline);
                     Encoder.SetTexture(0, Command.TextureId);
                     Encoder.SetSampler(0, Graphic::Sampler(Graphic::TextureEdge::Clamp, Graphic::TextureFilter::Trilinear));

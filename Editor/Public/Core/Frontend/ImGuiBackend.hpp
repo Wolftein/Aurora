@@ -37,7 +37,7 @@ namespace Editor
         }
 
         // -=(Undocumented)=-
-        void Begin();
+        void Begin(Real64 Delta);
 
         // -=(Undocumented)=-
         void End(Ref<Graphic::Encoder> Encoder);

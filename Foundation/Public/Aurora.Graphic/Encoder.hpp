@@ -27,90 +27,79 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        static constexpr UInt32 k_MaxCommands = 256;
+        static constexpr UInt32 k_DefaultCapacity = 64;
 
     public:
 
         // -=(Undocumented)=-
-        void Attach()
+        Encoder(UInt32 Capacity = k_DefaultCapacity)
         {
-            mInFlySubmissions.Clear(false);
-            mInFlyCommand = mInFlySubmissions.Allocate();
+            mInFlightSubmission.reserve(Capacity);
         }
 
         // -=(Undocumented)=-
-        void Detach()
+        void Clear()
         {
-            if (mInFlyCommand)
-            {
-                mInFlyCommand = nullptr;
-                mInFlySubmissions.Free();
-            }
+            mInFlightSubmission.clear();
+            mInFlightCommand = Submission();
         }
 
         // -=(Undocumented)=-
         void SetIndices(ConstRef<Binding> Binding)
         {
-            mInFlyCommand->Indices = Binding;
+            mInFlightCommand.Indices = Binding;
         }
 
         // -=(Undocumented)=-
         template<typename Type>
         void SetIndices(Object Buffer, UInt32 Offset, UInt32 Length = sizeof(Type))
         {
-            Ref<Binding> Binding = mInFlyCommand->Indices;
-            Binding.Buffer = Buffer;
-            Binding.Offset = Offset;
-            Binding.Length = Length;
+            SetIndices(Binding(Buffer, Length, Offset));
         }
 
         // -=(Undocumented)=-
         void SetVertices(UInt8 Slot, ConstRef<Binding> Binding)
         {
-            mInFlyCommand->Vertices[Slot] = Binding;
+            mInFlightCommand.Vertices[Slot] = Binding;
         }
 
         // -=(Undocumented)=-
         template<typename Type>
         void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length = sizeof(Type))
         {
-            Ref<Binding> Binding = mInFlyCommand->Vertices[Slot];
-            Binding.Buffer = Buffer;
-            Binding.Offset = Offset;
-            Binding.Length = Length;
+            SetVertices(Slot, Binding(Buffer, Length, Offset));
         }
 
         // -=(Undocumented)=-
         void SetUniforms(UInt8 Slot, ConstRef<Binding> Binding)
         {
-            mInFlyCommand->Uniforms[Slot] = Binding;
+            mInFlightCommand.Uniforms[Slot] = Binding;
         }
 
         // -=(Undocumented)=-
         void SetUniforms(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length)
         {
-            Ref<Binding> Binding = mInFlyCommand->Uniforms[Slot];
-            Binding.Buffer = Buffer;
-            Binding.Offset = Offset;
-            Binding.Length = Length;
+            Offset = Align(k_Alignment * sizeof(Vector4f), Offset) / sizeof(Vector4f);
+            Length = Align(k_Alignment * sizeof(Vector4f), Length) / sizeof(Vector4f);
+            SetUniforms(0, Binding(Buffer, Length, Offset));
         }
 
         // -=(Undocumented)=-
         void SetScissor(ConstRef<Recti> Scissor)
         {
-            mInFlyCommand->Scissor = Scissor;
+            mInFlightCommand.Scissor = Scissor;
         }
 
         // -=(Undocumented)=-
         void SetStencil(UInt8 Stencil)
         {
-            mInFlyCommand->Stencil = Stencil;
+            mInFlightCommand.Stencil = Stencil;
         }
 
         // -=(Undocumented)=-
         void SetPipeline(Object Technique)
         {
-            mInFlyCommand->Pipeline = Technique;
+            mInFlightCommand.Pipeline = Technique;
         }
 
         // -=(Undocumented)=-
@@ -122,13 +111,13 @@ namespace Graphic
         // -=(Undocumented)=-
         void SetSampler(UInt8 Slot, ConstRef<Sampler> Sampler)
         {
-            mInFlyCommand->Samplers[Slot] = Sampler;
+            mInFlightCommand.Samplers[Slot] = Sampler;
         }
 
         // -=(Undocumented)=-
         void SetTexture(UInt8 Slot, Object Texture)
         {
-            mInFlyCommand->Textures[Slot] = Texture;
+            mInFlightCommand.Textures[Slot] = Texture;
         }
 
         // -=(Undocumented)=-
@@ -140,26 +129,22 @@ namespace Graphic
         // -=(Undocumented)=-
         void Draw(UInt32 Count, UInt32 Base, UInt32 Offset, UInt32 Instances = 0)
         {
-            Ref<Instance> Primitive = mInFlyCommand->Primitive;
+            Ref<Instance> Primitive = mInFlightCommand.Primitive;
             Primitive.Count     = Count;
             Primitive.Base      = Base;
             Primitive.Offset    = Offset;
             Primitive.Instances = Instances;
 
-            // Continue with the next command (if there is one)
-            mInFlyCommand = mInFlySubmissions.IsFull() ? nullptr : mInFlySubmissions.Allocate();
+            // Add the current in-flight command to the list of submissions to be processed.
+            // After queuing, reset mInFlightCommand to prepare for the next command.
+            mInFlightSubmission.push_back(mInFlightCommand);
+            mInFlightCommand = Submission();
         }
 
         // -=(Undocumented)=-
-        Bool HasSubmission() const
+        CPtr<const Submission> GetSubmissions() const
         {
-            return !mInFlySubmissions.IsEmpty();
-        }
-
-        // -=(Undocumented)=-
-        CPtr<const Submission> GetSubmission() const
-        {
-            return mInFlySubmissions.GetData();
+            return mInFlightSubmission;
         }
 
     private:
@@ -167,7 +152,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Stack<Submission, k_MaxCommands> mInFlySubmissions; // @TODO: Replace with linear/page allocator.
-        Ptr<Submission>                  mInFlyCommand;
+        Vector<Submission> mInFlightSubmission; // @TODO: Replace with linear/page allocator.
+        Submission         mInFlightCommand;
     };
 }

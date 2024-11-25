@@ -34,7 +34,7 @@ namespace Graphic
 
     Bool Material::OnCreate(Ref<Subsystem::Context> Context)
     {
-        SetMemory(mParameters.size() * sizeof(Vector4f));
+        SetMemory(mParameters.size());
 
         mID = Context.GetSubsystem<Service>()->CreateMaterial();
 
