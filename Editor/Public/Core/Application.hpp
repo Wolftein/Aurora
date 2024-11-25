@@ -14,6 +14,7 @@
 
 #include <Aurora.Engine/Kernel.hpp>
 #include "Frontend/ImGuiBackend.hpp"
+#include "Frontend/EditorUI.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -48,5 +49,7 @@ namespace Editor
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         ImGuiBackend mImGuiBackend;
+
+        EditorUI    mEditorUI;
     };
 }
