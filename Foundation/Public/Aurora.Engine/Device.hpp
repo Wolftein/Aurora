@@ -102,6 +102,21 @@ namespace Engine
         }
 
         // -=(Undocumented)=-
+        void SetPosition(UInt16 X, UInt16 Y)
+        {
+            SDL_SetWindowPosition(mHandle, X, Y);
+        }
+
+        // -=(Undocumented)=-
+        Vector2i GetPosition() const
+        {
+            int X;
+            int Y;
+            SDL_GetWindowPosition(mHandle, AddressOf(X), AddressOf(Y));
+            return Vector2i(X, Y);
+        }
+
+        // -=(Undocumented)=-
         void SetSize(UInt16 Width, UInt16 Height)
         {
             SDL_SetWindowSize(mHandle, Width, Height);

@@ -15,6 +15,7 @@
 #include <Aurora.Content/Service.hpp>
 #include <Aurora.Graphic/Service.hpp>
 #include <imgui.h>
+#include <imgui_internal.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]

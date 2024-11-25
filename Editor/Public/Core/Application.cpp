@@ -78,8 +78,7 @@ namespace Editor
 
         mImGuiBackend.Begin(Delta);
         {
-            //ImGui::ShowDemoWindow();
-            mEditorUI.ShowMainWindow();
+            mUIMain.ShowMainWindow();
         }
         mImGuiBackend.End(Encoder_1);
 

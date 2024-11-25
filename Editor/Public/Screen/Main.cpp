@@ -10,16 +10,15 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "EditorUI.hpp"
-#include <iostream>
+#include "Main.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Editor
+namespace Editor::UI
 {
-	void EditorUI::ShowMainWindow()
+	void Main::ShowMainWindow()
 	{
 
 		ImGuiWindowFlags WindowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoDecoration;
@@ -39,7 +38,7 @@ namespace Editor
 
 		ImGui::PopStyleVar(3);
 
-		if (ImGui::BeginMenuBar())
+		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
 			{
@@ -98,7 +97,7 @@ namespace Editor
 				ImGui::EndMenu();
 			}
 
-			ImGui::EndMenuBar();
+			ImGui::EndMainMenuBar();
 		}
 
 		ImGuiID DockspaceID = ImGui::GetID("Dockspace");
@@ -166,7 +165,7 @@ namespace Editor
 		ImGui::End();
 	}
 
-	void EditorUI::ResetDocking()
+	void Main::ResetDocking()
 	{
 		mResetDock = true;
 	}

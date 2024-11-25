@@ -1,9 +1,9 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2024 Aeldur contributors (see AUTHORS.md)
+// Copyright (C) 2021-2024 by Agustin Alvarez. All rights reserved.
 //
-// This work is licensed under the terms of the AGPL-V3 license.
+// This work is licensed under the terms of the MIT license.
 //
-// For a copy, see <https://opensource.org/license/agpl-v3>
+// For a copy, see <https://opensource.org/licenses/MIT>.
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
