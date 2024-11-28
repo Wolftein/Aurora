@@ -52,9 +52,9 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename Type>
-        void SetIndices(Object Buffer, UInt32 Offset, UInt32 Length = sizeof(Type))
+        void SetIndices(Object Buffer, UInt32 Offset, UInt32 Stride = sizeof(Type))
         {
-            SetIndices(Binding(Buffer, Length, Offset));
+            SetIndices(Binding(Buffer, Stride, Offset));
         }
 
         // -=(Undocumented)=-
@@ -65,9 +65,9 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename Type>
-        void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length = sizeof(Type))
+        void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Stride = sizeof(Type))
         {
-            SetVertices(Slot, Binding(Buffer, Length, Offset));
+            SetVertices(Slot, Binding(Buffer, Stride, Offset));
         }
 
         // -=(Undocumented)=-
@@ -77,11 +77,11 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetUniforms(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Length)
+        void SetUniforms(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Stride)
         {
             Offset = Align(k_Alignment * sizeof(Vector4f), Offset) / sizeof(Vector4f);
-            Length = Align(k_Alignment * sizeof(Vector4f), Length) / sizeof(Vector4f);
-            SetUniforms(0, Binding(Buffer, Length, Offset));
+            Stride = Align(k_Alignment * sizeof(Vector4f), Stride) / sizeof(Vector4f);
+            SetUniforms(Slot, Binding(Buffer, Stride, Offset));
         }
 
         // -=(Undocumented)=-

@@ -23,9 +23,9 @@ namespace Graphic
 
     void Frame::Initialize(Object Vertices, Object Indices, Object Uniforms)
     {
-        CreateTransientBuffer(mHeap[CastEnum(Usage::Vertex)], Vertices, k_DefaultMaxVertices);
-        CreateTransientBuffer(mHeap[CastEnum(Usage::Index)], Indices, k_DefaultMaxIndices);
-        CreateTransientBuffer(mHeap[CastEnum(Usage::Uniform)], Uniforms, k_DefaultMaxUniforms);
+        CreateTransientBuffer(mHeap[CastEnum(Usage::Vertex)], Vertices, k_DefaultVertices);
+        CreateTransientBuffer(mHeap[CastEnum(Usage::Index)], Indices, k_DefaultIndices);
+        CreateTransientBuffer(mHeap[CastEnum(Usage::Uniform)], Uniforms, k_DefaultUniforms);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

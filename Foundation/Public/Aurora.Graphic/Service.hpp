@@ -58,6 +58,11 @@ namespace Graphic
         template<typename Format>
         Frame::Allocation<Format> Allocate(Usage Type, UInt32 Length, UInt32 Stride = sizeof(Format))
         {
+            if (Type == Usage::Uniform)
+            {
+                Stride = k_Alignment * sizeof(Vector4f);
+                Length = Align(Length, Stride) / Stride;
+            }
             return mFrames[k_CpuFrame].Allocate<Format>(Type, Length * Stride, Stride);
         }
 

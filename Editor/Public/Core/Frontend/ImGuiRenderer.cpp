@@ -82,7 +82,7 @@ namespace Editor
                     Encoder.SetUniforms(0, UfmTransient);
                     Encoder.SetPipeline(* mPipeline);
                     Encoder.SetTexture(0, Command.TextureId);
-                    Encoder.SetSampler(0, Graphic::Sampler(Graphic::TextureEdge::Clamp, Graphic::TextureFilter::Trilinear));
+                    Encoder.SetSampler(0, Graphic::Sampler(Graphic::TextureEdge::Clamp, Graphic::TextureEdge::Clamp, Graphic::TextureFilter::Trilinear));
                     Encoder.Draw(Command.ElemCount, Command.VtxOffset + VtxOffset, Command.IdxOffset + IdxOffset);
                 }
             }

@@ -97,7 +97,7 @@ inline namespace Core
 
         // -=(Undocumented)=
         template<typename Type>
-        Ptr<Type> Write(UInt32 Length = sizeof(Type))
+        Ptr<Type> Reserve(UInt32 Length = sizeof(Type))
         {
             Ensure(Length);
 

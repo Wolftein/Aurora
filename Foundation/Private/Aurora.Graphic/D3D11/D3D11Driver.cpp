@@ -932,12 +932,15 @@ namespace Graphic
             // Apply indices
             if (OldestSubmission.Indices.Buffer != NewestSubmission.Indices.Buffer ||
                 OldestSubmission.Indices.Offset != NewestSubmission.Indices.Offset ||
-                OldestSubmission.Indices.Length != NewestSubmission.Indices.Length)
+                OldestSubmission.Indices.Stride != NewestSubmission.Indices.Stride)
             {
+                constexpr auto AsFormat = [](UInt32 Stride) {
+                    return Stride == sizeof(UInt8)  ? DXGI_FORMAT_R8_UINT
+                         : Stride == sizeof(UInt16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+                };
+
                 ConstRef<D3D11Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
-                const DXGI_FORMAT     Format =
-                    NewestSubmission.Indices.Length == sizeof(UInt8)  ? DXGI_FORMAT_R8_UINT  :
-                    NewestSubmission.Indices.Length == sizeof(UInt16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+                const DXGI_FORMAT     Format = AsFormat(NewestSubmission.Indices.Stride);
                 mDeviceImmediate->IASetIndexBuffer(Buffer.Object.Get(), Format, NewestSubmission.Indices.Offset);
             }
 
@@ -1319,7 +1322,7 @@ namespace Graphic
             ConstRef<Binding> Old = Oldest.Vertices[Element];
             ConstRef<Binding> New = Newest.Vertices[Element];
 
-            if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Length != New.Length)
+            if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Stride != New.Stride)
             {
                 Min = Core::Min(Element, Min);
                 Max = Core::Max(Element + 1, Max);
@@ -1327,7 +1330,7 @@ namespace Graphic
 
             Array[Element]       = mBuffers[New.Buffer].Object.Get();
             ArrayOffset[Element] = New.Offset;
-            ArrayStride[Element] = New.Length;
+            ArrayStride[Element] = New.Stride;
         }
 
         if (Min != k_MaxFetches && Max > 0)
@@ -1408,15 +1411,15 @@ namespace Graphic
             ConstRef<Binding> Old = Oldest.Uniforms[Element];
             ConstRef<Binding> New = Newest.Uniforms[Element];
 
-            if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Length != New.Length)
+            if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Stride != New.Stride)
             {
                 Min = Core::Min(Element, Min);
                 Max = Core::Max(Element + 1, Max);
             }
 
             Array[Element]       = mBuffers[New.Buffer].Object.Get();
-            ArrayOffset[Element] = Align(New.Offset, 16);
-            ArrayLength[Element] = Align(New.Length, 16);
+            ArrayOffset[Element] = Align(New.Offset, k_Alignment);
+            ArrayLength[Element] = Align(New.Stride, k_Alignment);
         }
 
         if (Min != k_MaxUniforms && Max > 0)

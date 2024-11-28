@@ -448,9 +448,9 @@ namespace Graphic
                 for (Ref<Frame> InFlightFrame : mFrames)
                 {
                     InFlightFrame.Initialize(
-                        CreateTransientBuffer(Usage::Vertex, Frame::k_DefaultMaxVertices),
-                        CreateTransientBuffer(Usage::Index, Frame::k_DefaultMaxIndices),
-                        CreateTransientBuffer(Usage::Uniform, Frame::k_DefaultMaxUniforms));
+                        CreateTransientBuffer(Usage::Vertex, Frame::k_DefaultVertices),
+                        CreateTransientBuffer(Usage::Index, Frame::k_DefaultIndices),
+                        CreateTransientBuffer(Usage::Uniform, Frame::k_DefaultUniforms));
                 }
             }
             else

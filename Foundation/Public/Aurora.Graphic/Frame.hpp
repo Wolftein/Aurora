@@ -27,13 +27,13 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        static constexpr UInt32 k_DefaultMaxVertices = 4 * 1024 * 1024;
+        static constexpr UInt32 k_DefaultVertices = 4 * 1024 * 1024;
 
         // -=(Undocumented)=-
-        static constexpr UInt32 k_DefaultMaxIndices  = 2 * 1024 * 1024;
+        static constexpr UInt32 k_DefaultIndices  = 2 * 1024 * 1024;
 
         // -=(Undocumented)=-
-        static constexpr UInt32 k_DefaultMaxUniforms = 1 * 1024 * 1024;
+        static constexpr UInt32 k_DefaultUniforms = 1 * 1024 * 1024;
 
         // -=(Undocumented)=-
         template<typename Format>
@@ -63,9 +63,20 @@ namespace Graphic
         {
             Ref<TransientBuffer> Buffer = mHeap[CastEnum(Type)];
 
-            Ref<Writer> Writer  = Buffer.Writer;
-            const UInt32 Offset = Writer.GetOffset(); // @TODO: Alignment offset
-            return Allocation<Format>(Writer.Write<Format>(Length), Binding(Buffer.ID, Stride, Offset));
+            Ref<Writer> Writer = Buffer.Writer;
+            UInt32 Offset      = Align(Writer.GetOffset(), Stride);
+
+            if (const UInt32 Skip = Offset - Writer.GetOffset(); Skip > 0)
+            {
+                Writer.Reserve<UInt8>(Skip);
+            }
+
+            if (Type == Usage::Uniform)
+            {
+                Offset = Offset / k_Alignment;
+                Stride = Stride / k_Alignment;
+            }
+            return Allocation<Format>(Writer.Reserve<Format>(Length), Binding(Buffer.ID, Stride, Offset));
         }
 
         // -=(Undocumented)=-

@@ -429,7 +429,7 @@ namespace Graphic
         Object Buffer = 0;
 
         // -=(Undocumented)=-
-        UInt16 Length = 0;
+        UInt16 Stride = 0;
 
         // -=(Undocumented)=-
         UInt32 Offset = 0;
@@ -523,25 +523,6 @@ namespace Graphic
 
         // -=(Undocumented)=-
         TextureFilter Filter = TextureFilter::Nearest;
-
-        // -=(Undocumented)=-
-        Sampler() = default;
-
-        // -=(Undocumented)=-
-        Sampler(TextureEdge EdgeU, TextureEdge EdgeV, TextureFilter Filter)
-            : EdgeU  { EdgeU  },
-              EdgeV  { EdgeV  },
-              Filter { Filter }
-        {
-        }
-
-        // -=(Undocumented)=-
-        Sampler(TextureEdge Edge, TextureFilter Filter)
-            : EdgeU  { Edge   },
-              EdgeV  { Edge   },
-              Filter { Filter }
-        {
-        }
     };
 
     // -=(Undocumented)=-
