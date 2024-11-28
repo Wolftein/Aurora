@@ -223,16 +223,28 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void SerializeString(Ref<Type> Value)
+        void SerializeString8(Ref<SStr> Value)
         {
             if constexpr (k_Reader)
             {
-                Value = mArchive.template ReadString<Type>();
+                Value = mArchive.ReadString8();
             }
             else
             {
-                mArchive.template WriteString<Type>(Value);
+                mArchive.WriteString8(Value);
+            }
+        }
+
+        // -=(Undocumented)=-
+        void SerializeString16(Ref<SStr16> Value)
+        {
+            if constexpr (k_Reader)
+            {
+                Value = mArchive.ReadString16();
+            }
+            else
+            {
+                mArchive.WriteString16(Value);
             }
         }
 
