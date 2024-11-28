@@ -61,6 +61,13 @@ namespace Graphic
         template<typename Format>
         Allocation<Format> Allocate(Usage Type, UInt32 Length, UInt32 Stride = sizeof(Format))
         {
+            // This is essential for uniform buffer allocations to maintain alignment requirements.
+            if (Type == Usage::Uniform)
+            {
+                Stride = k_Alignment;
+                Length = Align(Length, k_Alignment) / k_Alignment;
+            }
+
             Ref<TransientBuffer> Buffer = mHeap[CastEnum(Type)];
 
             Ref<Writer> Writer = Buffer.Writer;
@@ -70,13 +77,7 @@ namespace Graphic
             {
                 Writer.Reserve<UInt8>(Skip);
             }
-
-            if (Type == Usage::Uniform)
-            {
-                Offset = Offset / k_Alignment;
-                Stride = Stride / k_Alignment;
-            }
-            return Allocation<Format>(Writer.Reserve<Format>(Length), Binding(Buffer.ID, Stride, Offset));
+            return Allocation<Format>(Writer.Reserve<Format>(Length * Stride), Binding(Buffer.ID, Stride, Offset));
         }
 
         // -=(Undocumented)=-

@@ -79,8 +79,6 @@ namespace Graphic
         // -=(Undocumented)=-
         void SetUniforms(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Stride)
         {
-            Offset = Align(k_Alignment * sizeof(Vector4f), Offset) / sizeof(Vector4f);
-            Stride = Align(k_Alignment * sizeof(Vector4f), Stride) / sizeof(Vector4f);
             SetUniforms(Slot, Binding(Buffer, Stride, Offset));
         }
 

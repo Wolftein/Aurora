@@ -559,7 +559,7 @@ namespace Graphic
         const UINT              Size       = (Capacity == 0 ? Data.size() : Capacity);
         const D3D11_BIND_FLAG   Binding    = As(Type);
         const D3D11_BUFFER_DESC Descriptor = CD3D11_BUFFER_DESC(
-            Binding != D3D11_BIND_CONSTANT_BUFFER ? Size : Align(Size, 256),
+            Binding != D3D11_BIND_CONSTANT_BUFFER ? Size : Align(Size, k_Alignment),
             Binding,
             Data.empty() ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE,
             0);
@@ -1418,8 +1418,8 @@ namespace Graphic
             }
 
             Array[Element]       = mBuffers[New.Buffer].Object.Get();
-            ArrayOffset[Element] = Align(New.Offset, k_Alignment);
-            ArrayLength[Element] = Align(New.Stride, k_Alignment);
+            ArrayOffset[Element] = New.Offset / sizeof(Vector4f);
+            ArrayLength[Element] = New.Stride / sizeof(Vector4f);
         }
 
         if (Min != k_MaxUniforms && Max > 0)

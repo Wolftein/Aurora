@@ -27,7 +27,7 @@ namespace Graphic
         k_Default        = 0,
 
         // -=(Undocumented)=-
-        k_Alignment      = 0x0010,
+        k_Alignment      = 0x0100,
 
         // -=(Undocumented)=-
         k_MaxAttachments = 0x0004,
