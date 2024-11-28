@@ -92,6 +92,20 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
+    constexpr auto CastSpan(Ref<Type> Value)
+    {
+        return CPtr<Type>(AddressOf(Value), 1);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    constexpr auto CastSpan(ConstRef<Type> Value)
+    {
+        return CPtr<const Type>(AddressOf(Value), 1);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
     constexpr auto CastEnum(Type Value)
     {
         return static_cast<std::underlying_type_t<Type>>(Value);
@@ -103,6 +117,13 @@ inline namespace Core
     {
         const auto Result = magic_enum::enum_cast<Type>(Value, magic_enum::case_insensitive);
         return Result.has_value() ? Result.value() : Default;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    constexpr auto CountEnum()
+    {
+        return magic_enum::enum_count<Type>();
     }
 
     // -=(Undocumented)=-

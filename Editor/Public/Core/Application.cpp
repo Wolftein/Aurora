@@ -73,19 +73,15 @@ namespace Editor
 
     void Application::OnRender(ConstSPtr<Graphic::Service> Graphics, Real64 Delta)
     {
-        static Graphic::Encoder Encoder_1;   // @TODO: Replace with transient encoders
-        static Graphic::Encoder Encoder_2;   // @TODO: Replace with transient encoders
+        Ref<Graphic::Encoder> Encoder = Graphics->Encode();
 
         mImGuiBackend.Begin(Delta);
         {
-            mUIMain.ShowMainWindow();
+            ImGui::ShowDemoWindow();
         }
-        mImGuiBackend.End(Encoder_1);
+        mImGuiBackend.End(Encoder);
 
-        Graphics->Submit(Encoder_1, false);
-
-        Swap(Encoder_1, Encoder_2);
-        Encoder_2.Clear();
+        Graphics->Submit(Encoder, false);
     }
 }
 
@@ -107,7 +103,7 @@ int main([[maybe_unused]] int Argc, [[maybe_unused]] Ptr<Char> Argv[])
     Properties.SetWindowTitle("Aurora Editor v0.1");
     Properties.SetWindowWidth(1280);
     Properties.SetWindowHeight(720);
-    Properties.SetWindowSamples(1);
+    Properties.SetWindowSamples(4);
     Properties.SetWindowFullscreen(false);
     Properties.SetWindowBorderless(false);
     Properties.SetVideoDriver("D3D11");

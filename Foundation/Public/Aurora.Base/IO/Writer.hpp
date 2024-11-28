@@ -35,7 +35,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         explicit Writer(UInt32 Capacity = kDefaultCapacity, UInt32 Alignment = kDefaultAlignment)
-            : mBuffer    ( Capacity, 0 ),
+            : mBuffer    (Capacity, 0),
               mOffset    { 0 },
               mAlignment { Alignment }
         {
@@ -93,6 +93,17 @@ inline namespace Core
         void Clear()
         {
             mOffset = 0u;
+        }
+
+        // -=(Undocumented)=
+        template<typename Type>
+        Ptr<Type> Write(UInt32 Length = sizeof(Type))
+        {
+            Ensure(Length);
+
+            Ptr<Type> Pointer = reinterpret_cast<Ptr<Type>>(AddressOf(mBuffer[mOffset]));
+            mOffset = Align(mOffset + Length, mAlignment);
+            return Pointer;
         }
 
         // -=(Undocumented)=-

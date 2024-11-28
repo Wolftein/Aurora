@@ -12,8 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Driver.hpp"
-#include "Encoder.hpp"
+#include "Frame.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -24,6 +23,11 @@ namespace Graphic
     // -=(Undocumented)=-
     class Service final : public AbstractSubsystem<Service>
     {
+    public:
+
+        // -=(Undocumented)=-
+        static constexpr UInt32 k_InFlightFrames = 2;
+
     public:
 
         // -=(Undocumented)=-
@@ -43,6 +47,28 @@ namespace Graphic
 
         // -=(Undocumented)=-
         void Reset(UInt16 Width, UInt16 Height, UInt8 Samples);
+
+        // -=(Undocumented)=-
+        Ref<Encoder> Encode()
+        {
+            return mFrames[k_CpuFrame].GetEncoder();
+        }
+
+        // -=(Undocumented)=-
+        template<typename Format>
+        Frame::Allocation<Format> Allocate(Usage Type, UInt32 Length, UInt32 Stride = sizeof(Format))
+        {
+            return mFrames[k_CpuFrame].Allocate<Format>(Type, Length * Stride, Stride);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Format>
+        Binding Allocate(Usage Type, CPtr<const Format> Data)
+        {
+            const Frame::Allocation<Format> Allocation = Allocate<Format>(Type, Data.size_bytes());
+            std::memcpy(Allocation.Pointer, Data.data(), Data.size_bytes());
+            return Allocation.Binding;
+        }
 
         // -=(Undocumented)=-
         Object CreateBuffer(Usage Type, UInt32 Capacity)
@@ -110,6 +136,12 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
+        static constexpr UInt32 k_CpuFrame = 0;
+
+        // -=(Undocumented)=-
+        static constexpr UInt32 k_GpuFrame = 1;
+
+        // -=(Undocumented)=-
         enum class Command
         {
             Initialize,
@@ -142,19 +174,20 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UPtr<Driver>           mDriver;
-        Thread                 mWorker;
-        Writer                 mEncoder;
-        Writer                 mDecoder;
-        Atomic_Flag            mBusy;
+        UPtr<Driver>                   mDriver;
+        Thread                         mWorker;
+        Writer                         mEncoder;
+        Writer                         mDecoder;
+        Atomic_Flag                    mBusy;
+        Array<Frame, k_InFlightFrames> mFrames;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Handle<k_MaxBuffers>   mBuffers;
-        Handle<k_MaxMaterials> mMaterials;
-        Handle<k_MaxPasses>    mPasses;
-        Handle<k_MaxPipelines> mPipelines;
-        Handle<k_MaxTextures>  mTextures;
+        Handle<k_MaxBuffers>           mBuffers;
+        Handle<k_MaxMaterials>         mMaterials;
+        Handle<k_MaxPasses>            mPasses;
+        Handle<k_MaxPipelines>         mPipelines;
+        Handle<k_MaxTextures>          mTextures;
     };
 }

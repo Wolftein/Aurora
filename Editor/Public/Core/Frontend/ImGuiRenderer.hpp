@@ -44,9 +44,7 @@ namespace Editor
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Graphic::Service>    mGraphics;
-        SPtr<Graphic::Pipeline>   mPipeline;
-        Array<Graphic::Object, 3> mBuffers; // @TODO: replace with transient buffers
-
+        SPtr<Graphic::Service>  mGraphics;
+        SPtr<Graphic::Pipeline> mPipeline;
     };
 }

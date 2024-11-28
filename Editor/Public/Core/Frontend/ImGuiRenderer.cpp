@@ -28,11 +28,7 @@ namespace Editor
         mPipeline = Content->Load<Graphic::Pipeline>("Engine://Pipeline/UI.effect");
         mGraphics = Context.GetSubsystem<Graphic::Service>();
 
-        // Create buffers and textures
-        ConstSPtr<Graphic::Service> Graphics = Context.GetSubsystem<Graphic::Service>();
-        mBuffers[0] = Graphics->CreateBuffer(Graphic::Usage::Vertex,  4 * 1024 * 1024);
-        mBuffers[1] = Graphics->CreateBuffer(Graphic::Usage::Index,   1 * 1024 * 1024);
-        mBuffers[2] = Graphics->CreateBuffer(Graphic::Usage::Uniform, 1024);
+        // Create texture atlas.
         CreateTextureFontAtlas(Context);
     }
 
@@ -41,13 +37,8 @@ namespace Editor
 
     void ImGuiRenderer::Submit(Ref<Graphic::Encoder> Encoder, ConstRef<ImDrawData> Commands)
     {
-        // @TODO: Transient buffer should remove all this stale and temporally data.
-        Data VtxTransientPtr(Commands.TotalVtxCount * sizeof(ImDrawVert));
-        Data IdxTransientPtr(Commands.TotalIdxCount * sizeof(ImDrawIdx));
-        Data UfmTransientPtr(sizeof(Matrix4f));
-
-        auto VtxData = VtxTransientPtr.GetData<ImDrawVert>();
-        auto IdxData = IdxTransientPtr.GetData<ImDrawIdx>();
+        auto VtxTransientPtr = mGraphics->Allocate<ImDrawVert>(Graphic::Usage::Vertex, Commands.TotalVtxCount);
+        auto IdxTransientPtr = mGraphics->Allocate<ImDrawIdx>(Graphic::Usage::Index, Commands.TotalIdxCount);
 
         const Matrix4f Projection = Matrix4f::CreateOrthographic(
                 Commands.DisplayPos.x,
@@ -56,16 +47,17 @@ namespace Editor
                 Commands.DisplayPos.y,
                 -1.0f,
                 +1.0f);
-        UfmTransientPtr.Copy(AddressOf(Projection));
+        const Graphic::Binding UfmTransient = mGraphics->Allocate<Matrix4f>(Graphic::Usage::Uniform, CastSpan(Projection));
 
         UInt32 VtxOffset = 0;
         UInt32 IdxOffset = 0;
+
         for (ConstPtr<ImDrawList> CommandList : Commands.CmdLists)
         {
-            std::memcpy(VtxData, CommandList->VtxBuffer.Data, CommandList->VtxBuffer.Size * sizeof(ImDrawVert));
-            std::memcpy(IdxData, CommandList->IdxBuffer.Data, CommandList->IdxBuffer.Size * sizeof(ImDrawIdx));
-            VtxData += CommandList->VtxBuffer.Size;
-            IdxData += CommandList->IdxBuffer.Size;
+            std::memcpy(VtxTransientPtr.Pointer, CommandList->VtxBuffer.Data, CommandList->VtxBuffer.Size * sizeof(ImDrawVert));
+            std::memcpy(IdxTransientPtr.Pointer, CommandList->IdxBuffer.Data, CommandList->IdxBuffer.Size * sizeof(ImDrawIdx));
+            VtxTransientPtr.Pointer += CommandList->VtxBuffer.Size;
+            IdxTransientPtr.Pointer += CommandList->IdxBuffer.Size;
 
             for (ConstRef<ImDrawCmd> Command : CommandList->CmdBuffer)
             {
@@ -85,9 +77,9 @@ namespace Editor
                     }
                     Encoder.SetScissor(Scissor);
 
-                    Encoder.SetVertices<ImDrawVert>(0, mBuffers[0], 0);
-                    Encoder.SetIndices<ImDrawIdx>(mBuffers[1], 0);
-                    Encoder.SetUniforms(0, mBuffers[2], 0, UfmTransientPtr.GetSize());
+                    Encoder.SetVertices(0, VtxTransientPtr.Binding);
+                    Encoder.SetIndices(IdxTransientPtr.Binding);
+                    Encoder.SetUniforms(0, UfmTransient);
                     Encoder.SetPipeline(* mPipeline);
                     Encoder.SetTexture(0, Command.TextureId);
                     Encoder.SetSampler(0, Graphic::Sampler(Graphic::TextureEdge::Clamp, Graphic::TextureFilter::Trilinear));
@@ -98,10 +90,6 @@ namespace Editor
             VtxOffset += CommandList->VtxBuffer.Size;
             IdxOffset += CommandList->IdxBuffer.Size;
         }
-
-        mGraphics->UpdateBuffer(mBuffers[0], true, 0, Move(VtxTransientPtr));
-        mGraphics->UpdateBuffer(mBuffers[1], true, 0, Move(IdxTransientPtr));
-        mGraphics->UpdateBuffer(mBuffers[2], true, 0, Move(UfmTransientPtr));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
