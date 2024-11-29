@@ -49,7 +49,7 @@ namespace Graphic
         void Reset(UInt16 Width, UInt16 Height, UInt8 Samples);
 
         // -=(Undocumented)=-
-        Ref<Encoder> Encode()
+        Ref<Encoder> GetEncoder()
         {
             return mFrames[k_CpuFrame].GetEncoder();
         }

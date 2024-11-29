@@ -41,7 +41,7 @@ namespace Editor
         Bool OnEvent(ConstRef<Input::Event> Event) override;
 
         // -=(Undocumented)=-
-        void OnRender(ConstSPtr<Graphic::Service> Graphics, Real64 Delta);
+        void OnRender(ConstSPtr<Graphic::Service> Graphics, Ref<Graphic::Encoder> Encoder, Real64 Delta);
 
     private:
 

@@ -79,8 +79,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        void Free()
+        void Free(Bool Dispose = true)
         {
+            if (Dispose)
+            {
+                mPool[mSize].~Type();
+            }
             --mSize;
         }
 

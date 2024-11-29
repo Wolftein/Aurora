@@ -38,7 +38,7 @@ namespace Graphic
         virtual ConstRef<Capabilities> GetCapabilities() const = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateBuffer(Object ID, Usage Type, UInt32 Capacity, CPtr<const UInt8> Data) = 0;
+        virtual void CreateBuffer(Object ID, Usage Usage, Source Source, CPtr<const UInt8> Data) = 0;
 
         // -=(Undocumented)=-
         virtual void CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size) = 0;
@@ -62,7 +62,7 @@ namespace Graphic
         virtual void DeletePipeline(Object ID) = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) = 0;
+        virtual void CreateTexture(Object ID, Usage Usage, TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data) = 0;
 
         // -=(Undocumented)=-
         virtual void UpdateTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data) = 0;

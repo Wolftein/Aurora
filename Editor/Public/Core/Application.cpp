@@ -43,7 +43,11 @@ namespace Editor
         Rectf Viewport(0, 0, GetDevice().GetWidth(), GetDevice().GetHeight());
         Graphics->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, Color(0), 1, 0);
         {
-           OnRender(Graphics, Delta);
+            Ref<Graphic::Encoder> Encoder = Graphics->GetEncoder();
+            {
+                OnRender(Graphics, Encoder, Delta);
+            }
+            Graphics->Submit(Encoder, false);
         }
         Graphics->Commit(Graphic::k_Default, false);
         Graphics->Flush();
@@ -71,17 +75,13 @@ namespace Editor
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Application::OnRender(ConstSPtr<Graphic::Service> Graphics, Real64 Delta)
+    void Application::OnRender(ConstSPtr<Graphic::Service> Graphics, Ref<Graphic::Encoder> Encoder, Real64 Delta)
     {
-        Ref<Graphic::Encoder> Encoder = Graphics->Encode();
-
         mImGuiBackend.Begin(Delta);
         {
             ImGui::ShowDemoWindow();
         }
         mImGuiBackend.End(Encoder);
-
-        Graphics->Submit(Encoder, false);
     }
 }
 

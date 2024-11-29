@@ -95,7 +95,7 @@ namespace Graphic
             Object ID;
 
             // -=(Undocumented)=-
-            UInt32 Length;
+            UInt32 Capacity;
 
             // -=(Undocumented)=-
             Writer Writer;
@@ -105,7 +105,7 @@ namespace Graphic
         using Heap = Array<TransientBuffer, CountEnum<Usage>()>;
 
         // -=(Undocumented)=-
-        void CreateTransientBuffer(Ref<TransientBuffer> Buffer, Object ID, UInt32 Length);
+        void CreateTransientBuffer(Ref<TransientBuffer> Buffer, Object ID, UInt32 Capacity);
 
         // -=(Undocumented)=-
         void UpdateTransientBuffer(Ref<Driver> Driver, Ref<TransientBuffer> Buffer, Usage Type);

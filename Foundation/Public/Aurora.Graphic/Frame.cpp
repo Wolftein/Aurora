@@ -54,11 +54,11 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Frame::CreateTransientBuffer(Ref<TransientBuffer> Buffer, Object ID, UInt32 Length)
+    void Frame::CreateTransientBuffer(Ref<TransientBuffer> Buffer, Object ID, UInt32 Capacity)
     {
-        Buffer.ID     = ID;
-        Buffer.Length = Length;
-        Buffer.Writer.Ensure(Length);
+        Buffer.ID       = ID;
+        Buffer.Capacity = Capacity;
+        Buffer.Writer.Ensure(Capacity);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -66,23 +66,21 @@ namespace Graphic
 
     void Frame::UpdateTransientBuffer(Ref<Driver> Driver, Ref<TransientBuffer> Buffer, Usage Type)
     {
-        Ref<Writer> Writer = Buffer.Writer;
-        if (!Writer.HasData())
+        if (Ref<Writer> Writer = Buffer.Writer; Writer.HasData())
         {
-            return;
-        }
+            // Ensures that the GPU buffer can accommodate all the data from the CPU buffer,
+            // maintaining synchronization.
+            if (Buffer.Capacity < Writer.GetCapacity())
+            {
+                Buffer.Capacity = Writer.GetCapacity();
 
-        // Ensures that the GPU buffer can accommodate all the data from the CPU buffer,
-        // maintaining synchronization.
-        if (Writer.GetCapacity() > Buffer.Length)
-        {
-            Driver.DeleteBuffer(Buffer.ID);
-            Driver.CreateBuffer(Buffer.ID, Type, Writer.GetCapacity(), CPtr<const UInt8>());
-        }
+                Driver.DeleteBuffer(Buffer.ID);
+                Driver.CreateBuffer(Buffer.ID, Type, Buffer.Capacity, CPtr<const UInt8>());
+            }
 
-        // Update the GPU buffer to reflect the new data from the CPU buffer.
-        Buffer.Length = Writer.GetCapacity();
-        Driver.UpdateBuffer(Buffer.ID, false, 0, Writer.GetData());
-        Writer.Clear();
+            // Update the GPU buffer to reflect the new data from the CPU buffer.
+            Driver.UpdateBuffer(Buffer.ID, false, 0, Writer.GetData());
+            Writer.Clear();
+        }
     }
 }
