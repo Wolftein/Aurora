@@ -554,22 +554,21 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreateBuffer(Object ID, Usage Type, UInt32 Capacity, CPtr<const UInt8> Data)
+    void D3D11Driver::CreateBuffer(Object ID, Usage Type, Bool Immutable, Ptr<const UInt8> Data, UInt32 Length)
     {
-        const UINT              Size       = (Capacity == 0 ? Data.size() : Capacity);
         const D3D11_BIND_FLAG   Binding    = As(Type);
         const D3D11_BUFFER_DESC Descriptor = CD3D11_BUFFER_DESC(
-            Binding != D3D11_BIND_CONSTANT_BUFFER ? Size : Align(Size, k_Alignment),
+            Binding != D3D11_BIND_CONSTANT_BUFFER ? Length : Align(Length, k_Alignment),
             Binding,
-            Data.empty() ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE,
+            Immutable ? D3D11_USAGE_IMMUTABLE : D3D11_USAGE_DEFAULT,
             0);
 
-        D3D11_SUBRESOURCE_DATA      Content {
-            Data.data(), static_cast<UINT>(Data.size())
+        D3D11_SUBRESOURCE_DATA  Content {
+            Data, static_cast<UINT>(Length)
         };
-        const Ptr<D3D11_SUBRESOURCE_DATA> Pointer = Data.empty() ? nullptr : AddressOf(Content);
+        const Ptr<D3D11_SUBRESOURCE_DATA> Pointer = Data == nullptr ? nullptr : AddressOf(Content);
 
-        CheckIfFail(mDevice->CreateBuffer(& Descriptor, Pointer, mBuffers[ID].Object.GetAddressOf()));
+        CheckIfFail(mDevice->CreateBuffer(AddressOf(Descriptor), Pointer, mBuffers[ID].Object.GetAddressOf()));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

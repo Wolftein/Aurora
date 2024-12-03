@@ -49,27 +49,27 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetTexture(Source Source, ConstSPtr<Texture> Texture)
+        void SetTexture(TextureSlot Slot, ConstSPtr<Texture> Texture)
         {
-            mTextures[CastEnum(Source)] = Texture;
+            mTextures[CastEnum(Slot)] = Texture;
         }
 
         // -=(Undocumented)=-
-        ConstSPtr<Texture> GetTexture(Source Source) const
+        ConstSPtr<Texture> GetTexture(TextureSlot Slot) const
         {
-            return mTextures[CastEnum(Source)];
+            return mTextures[CastEnum(Slot)];
         }
 
         // -=(Undocumented)=-
-        void SetSampler(Source Source, ConstRef<Sampler> Sampler)
+        void SetSampler(TextureSlot Slot, ConstRef<Sampler> Sampler)
         {
-            mSamplers[CastEnum(Source)] = Sampler;
+            mSamplers[CastEnum(Slot)] = Sampler;
         }
 
         // -=(Undocumented)=-
-        ConstRef<Sampler> GetSampler(Source Source) const
+        ConstRef<Sampler> GetSampler(TextureSlot Slot) const
         {
-            return mSamplers[CastEnum(Source)];
+            return mSamplers[CastEnum(Slot)];
         }
 
         // -=(Undocumented)=-

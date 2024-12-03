@@ -75,11 +75,13 @@ namespace Graphic
                 Buffer.Capacity = Writer.GetCapacity();
 
                 Driver.DeleteBuffer(Buffer.ID);
-                Driver.CreateBuffer(Buffer.ID, Type, Buffer.Capacity, CPtr<const UInt8>());
+                Driver.CreateBuffer(Buffer.ID, Type, false, Writer.GetData().data(), Writer.GetCapacity());
             }
-
-            // Update the GPU buffer to reflect the new data from the CPU buffer.
-            Driver.UpdateBuffer(Buffer.ID, false, 0, Writer.GetData());
+            else
+            {
+                // Update the GPU buffer to reflect the new data from the CPU buffer.
+                Driver.UpdateBuffer(Buffer.ID, false, 0, Writer.GetData());
+            }
             Writer.Clear();
         }
     }

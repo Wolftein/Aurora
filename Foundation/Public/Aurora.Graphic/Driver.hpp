@@ -38,7 +38,7 @@ namespace Graphic
         virtual ConstRef<Capabilities> GetCapabilities() const = 0;
 
         // -=(Undocumented)=-
-        virtual void CreateBuffer(Object ID, Usage Type, UInt32 Capacity, CPtr<const UInt8> Data) = 0;
+        virtual void CreateBuffer(Object ID, Usage Type, Bool Immutable, Ptr<const UInt8> Data, UInt32 Length) = 0;
 
         // -=(Undocumented)=-
         virtual void CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size) = 0;

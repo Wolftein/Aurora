@@ -32,7 +32,7 @@ namespace Graphic
         explicit Pipeline(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
-        void Load(Any<Array<Data, k_MaxStages>> Shaders, Any<Array<Source, k_MaxSlots>> Slots, Any<Descriptor> Properties);
+        void Load(Any<Array<Data, k_MaxStages>> Shaders, Any<Array<TextureSlot, k_MaxSlots>> Slots, Any<Descriptor> Properties);
 
         // -=(Undocumented)=-
         Object GetID() const
@@ -41,7 +41,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        Source GetSlot(UInt32 Slot) const
+        TextureSlot GetSlot(UInt32 Slot) const
         {
             return mSlots[Slot];
         }
@@ -65,9 +65,9 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Object                    mID;
-        Array<Data, k_MaxStages>  mShaders;    // TODO: Sparse
-        Array<Source, k_MaxSlots> mSlots;      // TODO: Sparse
-        Descriptor                mProperties;
+        Object                         mID;
+        Array<Data, k_MaxStages>       mShaders;    // TODO: Sparse
+        Array<TextureSlot, k_MaxSlots> mSlots;      // TODO: Sparse
+        Descriptor                     mProperties;
     };
 }

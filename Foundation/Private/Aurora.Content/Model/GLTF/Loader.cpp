@@ -192,36 +192,36 @@ namespace Content
             {
                 ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
-                Material->SetTexture(Graphic::Source::Diffuse, LoadTexture(GLTFModel, GLTFTexture));
-                Material->SetSampler(Graphic::Source::Diffuse, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
+                Material->SetTexture(Graphic::TextureSlot::Diffuse, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::TextureSlot::Diffuse, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
             if (SInt32 Index = GLTFMaterial.pbrMetallicRoughness.metallicRoughnessTexture.index; Index >= 0)
             {
                 ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
-                Material->SetTexture(Graphic::Source::Roughness, LoadTexture(GLTFModel, GLTFTexture));
-                Material->SetSampler(Graphic::Source::Roughness, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
+                Material->SetTexture(Graphic::TextureSlot::Roughness, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::TextureSlot::Roughness, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
             if (SInt32 Index = GLTFMaterial.normalTexture.index; Index >= 0)
             {
                 ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
-                Material->SetTexture(Graphic::Source::Normal, LoadTexture(GLTFModel, GLTFTexture));
-                Material->SetSampler(Graphic::Source::Normal, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
+                Material->SetTexture(Graphic::TextureSlot::Normal, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::TextureSlot::Normal, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
             if (SInt32 Index = GLTFMaterial.emissiveTexture.index; Index >= 0)
             {
                 ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
-                Material->SetTexture(Graphic::Source::Emissive, LoadTexture(GLTFModel, GLTFTexture));
-                Material->SetSampler(Graphic::Source::Emissive, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
+                Material->SetTexture(Graphic::TextureSlot::Emissive, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::TextureSlot::Emissive, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
             if (SInt32 Index = GLTFMaterial.occlusionTexture.index; Index >= 0)
             {
                 ConstRef<tinygltf::Texture> GLTFTexture = GLTFModel.textures[Index];
 
-                Material->SetTexture(Graphic::Source::Occlusion, LoadTexture(GLTFModel, GLTFTexture));
-                Material->SetSampler(Graphic::Source::Occlusion, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
+                Material->SetTexture(Graphic::TextureSlot::Occlusion, LoadTexture(GLTFModel, GLTFTexture));
+                Material->SetSampler(Graphic::TextureSlot::Occlusion, LoadSampler(GLTFModel.samplers[GLTFTexture.sampler]));
             }
 
             // @TODO: Create uniform buffer for the PBR / Custom properties

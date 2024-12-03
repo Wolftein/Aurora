@@ -151,8 +151,8 @@ namespace Graphic
 
         mMaterial = NewPtr<Material>(Content::Uri::Merge(GetKey(), "Material"));
         mMaterial->SetOwnership(true);
-        mMaterial->SetTexture(Source::Diffuse, Atlas);
-        mMaterial->SetSampler(Source::Diffuse, k_DefaultSampler);
+        mMaterial->SetTexture(TextureSlot::Diffuse, Atlas);
+        mMaterial->SetSampler(TextureSlot::Diffuse, k_DefaultSampler);
         mMaterial->SetParameter(0, Vector3f(Atlas->GetWidth(), Atlas->GetHeight(), mMetrics.Distance));
         return mMaterial->Create(Context);
     }

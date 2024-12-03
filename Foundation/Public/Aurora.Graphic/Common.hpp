@@ -157,24 +157,6 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    enum class Source : UInt8
-    {
-        None,
-        Diffuse,
-        Normal,
-        Roughness,
-        Metallic,
-        Specular,
-        Emissive,
-        Displacement,
-        Occlusion,
-        Height,
-        Ambient,
-        Detail,
-        Translucency,
-    };
-
-    // -=(Undocumented)=-
     enum class Stage : UInt8
     {
         Vertex,
@@ -291,6 +273,24 @@ namespace Graphic
         Source,
         Destination,
         Dual,
+    };
+
+    // -=(Undocumented)=-
+    enum class TextureSlot : UInt8
+    {
+        None,
+        Diffuse,
+        Normal,
+        Roughness,
+        Metallic,
+        Specular,
+        Emissive,
+        Displacement,
+        Occlusion,
+        Height,
+        Ambient,
+        Detail,
+        Translucency,
     };
 
     // -=(Undocumented)=-
