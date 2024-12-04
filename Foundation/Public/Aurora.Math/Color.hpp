@@ -92,7 +92,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr UInt32 AsPacked() const
+        constexpr UInt32 GetValue() const
         {
             return mValue;
         }
@@ -131,9 +131,9 @@ inline namespace Math
             else
             {
                 return (static_cast<UInt32>(Alpha * UINT8_MAX) << 24)
-                    | (static_cast<UInt32>(Blue   * UINT8_MAX) << 16)
-                    | (static_cast<UInt32>(Green  * UINT8_MAX) << 8)
-                    | (static_cast<UInt32>(Red    * UINT8_MAX));
+                     | (static_cast<UInt32>(Blue  * UINT8_MAX) << 16)
+                     | (static_cast<UInt32>(Green * UINT8_MAX) << 8)
+                     | (static_cast<UInt32>(Red   * UINT8_MAX));
             }
         }
 

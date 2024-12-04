@@ -259,7 +259,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Type, typename Decay = std::decay_t<Type>>
-        void WriteObject(Any<Type> Value)
+        void WriteObject(ConstRef<Type> Value)
         {
             if constexpr (std::is_same_v<Decay, Bool>)
             {

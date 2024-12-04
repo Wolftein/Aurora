@@ -27,7 +27,7 @@ namespace Editor
     private:
 
         // -=(Undocumented)=-
-        Bool OnKeyType(UInt Codepoint) override;
+        Bool OnKeyType(UInt32 Codepoint) override;
 
         // -=(Undocumented)=-
         Bool OnKeyUp(Input::Key Key) override;

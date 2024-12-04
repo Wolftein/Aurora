@@ -53,7 +53,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         Transform(ConstRef<Vector3f> Position)
-                : Transform()
+            : Transform()
         {
             SetPosition(Position);
         }

@@ -34,7 +34,7 @@ namespace Input
     private:
 
         // -=(Undocumented)=-
-        virtual Bool OnKeyType(UInt Codepoint);
+        virtual Bool OnKeyType(UInt32 Codepoint);
 
         // -=(Undocumented)=-
         virtual Bool OnKeyUp(Key Key);

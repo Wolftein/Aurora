@@ -240,10 +240,10 @@ inline namespace Math
         // -=(Undocumented)=-
         Ref<Rect<Base>> operator+=(ConstRef<Rect<Base>> Other)
         {
-            mX1 += Other.X1;
-            mY1 += Other.Y1;
-            mX2 += Other.X2;
-            mY2 += Other.Y2;
+            mX1 += Other.mX1;
+            mY1 += Other.mY1;
+            mX2 += Other.mX2;
+            mY2 += Other.mY2;
             return (* this);
         }
 
@@ -272,10 +272,10 @@ inline namespace Math
         // -=(Undocumented)=-
         Ref<Rect<Base>> operator-=(ConstRef<Rect<Base>> Other)
         {
-            mX1 -= Other.X1;
-            mY1 -= Other.Y1;
-            mX2 -= Other.X2;
-            mY2 -= Other.Y2;
+            mX1 -= Other.mX1;
+            mY1 -= Other.mY1;
+            mX2 -= Other.mX2;
+            mY2 -= Other.mY2;
             return (* this);
         }
 

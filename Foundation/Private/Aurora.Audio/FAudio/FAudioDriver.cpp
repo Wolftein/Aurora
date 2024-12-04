@@ -73,15 +73,15 @@ namespace Audio
 
     static auto GetAzimuth(UInt32 Channels)
     {
-        constexpr static Real32 K_Left         = 3 * kMathPI / 2;
-        constexpr static Real32 k_Right        = kMathPI / 2;
-        constexpr static Real32 k_FrontLeft    = 7 * kMathPI / 4;
-        constexpr static Real32 k_FrontRight   = kMathPI / 4;
+        constexpr static Real32 K_Left         = 3 * k_PI / 2;
+        constexpr static Real32 k_Right        = k_PI / 2;
+        constexpr static Real32 k_FrontLeft    = 7 * k_PI / 4;
+        constexpr static Real32 k_FrontRight   = k_PI / 4;
         constexpr static Real32 k_FrontCenter  = 0.0f;
-        constexpr static Real32 k_LowFrequency = kMathPI;
-        constexpr static Real32 k_BackLeft     = 5 * kMathPI / 4;
-        constexpr static Real32 k_BackRight    = 3 * kMathPI / 4;
-        constexpr static Real32 k_BackCenter   = kMathPI;
+        constexpr static Real32 k_LowFrequency = k_PI;
+        constexpr static Real32 k_BackLeft     = 5 * k_PI / 4;
+        constexpr static Real32 k_BackRight    = 3 * k_PI / 4;
+        constexpr static Real32 k_BackCenter   = k_PI;
 
         constexpr static Real32 k_Mapping[9][8] =
             {
@@ -113,9 +113,9 @@ namespace Audio
     static auto GetFormat(Kind Value)
     {
         static constexpr SInt32 k_Mapping[] = {
-            FAUDIO_FORMAT_MSADPCM,                    // Format::ADPCM
-            FAUDIO_FORMAT_PCM,                        // Format::PCM
-            FAUDIO_FORMAT_IEEE_FLOAT,                 // Format::IEEE
+            FAUDIO_FORMAT_MSADPCM,                   // Format::ADPCM
+            FAUDIO_FORMAT_PCM,                       // Format::PCM
+            FAUDIO_FORMAT_IEEE_FLOAT,                // Format::IEEE
         };
         return k_Mapping[CastEnum(Value)];
     }
@@ -137,7 +137,8 @@ namespace Audio
 
     FAudioDriver::FAudioDriver()
         : mDevice { nullptr },
-          mMaster { nullptr }
+          mMaster { nullptr },
+          mDirty  { false }
     {
     }
 
@@ -210,11 +211,9 @@ namespace Audio
 
     void FAudioDriver::Tick()
     {
-        F3DAUDIO_LISTENER Listener;
-        Listener.Position    = GetVector(mListener.GetPosition());
-        Listener.Velocity    = GetVector(mListener.GetVelocity());
-        Listener.OrientFront = GetVector(mListener.GetOrientation().GetForward());
-        Listener.OrientTop   = GetVector(mListener.GetOrientation().GetUp());
+        // Ensures that the listener configuration remains consistent throughout the entire tick,
+        // preserving the audio environment's state for accurate 3D audio processing during this period.
+        F3DAUDIO_LISTENER Listener = mListener;
 
         for (auto Iterator = mMixes.begin(); Iterator != mMixes.end(); )
         {
@@ -233,15 +232,14 @@ namespace Audio
             }
             else
             {
-                if (InstancePtr->Emitter && (InstancePtr->Emitter->GetDirty() || mListener.GetDirty()))
+                if (InstancePtr->Emitter && (InstancePtr->Emitter->GetDirty() || mDirty))
                 {
                     Process(* InstancePtr, Listener);
                 }
                 ++Iterator;
             }
         }
-
-        mListener.SetDirty(false);
+        mDirty = false;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -265,12 +263,11 @@ namespace Audio
 
     void FAudioDriver::SetListener(Ref<Listener> Listener)
     {
-        const Bool WasListenerDirty = mListener.GetDirty();
-        const Bool NewListenerDirty = Listener.GetDirty();
-        Listener.SetDirty(false);
-
-        mListener = Listener;
-        mListener.SetDirty(WasListenerDirty || NewListenerDirty);
+        mListener.Position    = GetVector(Listener.GetPosition());
+        mListener.Velocity    = GetVector(Listener.GetVelocity());
+        mListener.OrientFront = GetVector(Listener.GetOrientation().GetForward());
+        mListener.OrientTop   = GetVector(Listener.GetOrientation().GetUp());
+        mDirty                = mDirty || Listener.GetDirty();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -529,7 +526,7 @@ namespace Audio
         Emitter.DopplerScaler       = 1.0f;
         Emitter.CurveDistanceScaler = 1.0f;
         Emitter.InnerRadius         = Instance.Emitter->GetRadius();
-        Emitter.InnerRadiusAngle    = kMathPI / 4.0;
+        Emitter.InnerRadiusAngle    = k_PI / 4.0;
         Emitter.pChannelAzimuths    = GetAzimuth(Emitter.ChannelCount);
 
         F3DAUDIO_DSP_SETTINGS Settings { };

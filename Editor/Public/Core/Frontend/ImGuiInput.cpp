@@ -258,7 +258,7 @@ namespace Editor
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Bool ImGuiInput::OnKeyType(UInt Codepoint)
+    Bool ImGuiInput::OnKeyType(UInt32 Codepoint)
     {
         ImGui::GetIO().AddInputCharacter(Codepoint);
         return ImGui::GetIO().WantCaptureKeyboard;

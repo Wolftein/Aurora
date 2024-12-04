@@ -174,7 +174,8 @@ namespace Audio
         Submixes                  mSubmixes;
         Voices                    mVoices;
         F3DAUDIO_HANDLE           mProcessor;
-        Listener                  mListener;
+        F3DAUDIO_LISTENER         mListener;
+        Bool                      mDirty;
         Mixes                     mMixes;
         Instances                 mInstances;
     };

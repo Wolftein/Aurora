@@ -21,20 +21,20 @@
 inline namespace Math
 {
     // -=(Undocumented)=-
-    static constexpr Real32 kMathPI = 3.141592653589793238462643383279502884e+00f;
+    static constexpr Real32 k_PI = 3.141592653589793238462643383279502884e+00f;
 
     // -=(Undocumented)=-
     template<typename Type>
     Type DegreesToRadians(Type Degrees)
     {
-        return Degrees * (kMathPI / 180);
+        return Degrees * (k_PI / 180);
     }
 
     // -=(Undocumented)=-
     template<typename Type>
     Type RadiansToDegrees(Type Radians)
     {
-        return Radians * (180 / kMathPI);
+        return Radians * (180 / k_PI);
     }
 
     // -=(Undocumented)=-
