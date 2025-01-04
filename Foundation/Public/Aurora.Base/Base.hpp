@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021-2024 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2025 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -17,8 +17,8 @@
 #include "Container/Stack.hpp"
 
 #include "IO/Reader.hpp"
-#include "IO/Stream.hpp"
 #include "IO/Writer.hpp"
+#include "IO/Stream.hpp"
 #include "IO/TOML/Parser.hpp"
 
 #include "Logger/Log.hpp"
