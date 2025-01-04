@@ -59,7 +59,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Mesh>                                   mMesh;
-        Array<SPtr<Material>, Mesh::k_MaxPrimitives> mMaterials;
+        SPtr<Mesh>                                   mMesh;         // TODO: Allow to share resource
+        Array<SPtr<Material>, Mesh::k_MaxPrimitives> mMaterials;    // TODO: Allow to share resource
     };
 }

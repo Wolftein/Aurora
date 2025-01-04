@@ -104,7 +104,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Object                             mID;
-        Bool                               mOwnership;
+        Bool                               mOwnership;  // TODO: Allow to share resource without flag
         Array<SPtr<Texture>, k_MaxSources> mTextures;   // TODO: Sparse
         Array<Sampler, k_MaxSources>       mSamplers;   // TODO: Sparse
         Vector<UInt8>                      mParameters; // TODO: Replace with pre allocated chunked memory

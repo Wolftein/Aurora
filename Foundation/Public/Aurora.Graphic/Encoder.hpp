@@ -127,7 +127,7 @@ namespace Graphic
         // -=(Undocumented)=-
         void Draw(UInt32 Count, UInt32 Base, UInt32 Offset, UInt32 Instances = 0)
         {
-            Ref<Instance> Primitive = mInFlightCommand.Primitive;
+            Ref<Primitive> Primitive = mInFlightCommand.Primitive;
             Primitive.Count     = Count;
             Primitive.Base      = Base;
             Primitive.Offset    = Offset;

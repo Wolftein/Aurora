@@ -526,7 +526,7 @@ namespace Graphic
     };
 
     // -=(Undocumented)=-
-    struct Instance
+    struct Primitive
     {
         // -=(Undocumented)=-
         UInt32 Count     = 0;
@@ -569,6 +569,6 @@ namespace Graphic
         Array<Object, k_MaxSlots>     Textures  = { 0 };
 
         // -=(Undocumented)=-
-        Instance                      Primitive;
+        Primitive                     Primitive;
     };
 }

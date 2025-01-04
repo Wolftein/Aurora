@@ -321,13 +321,13 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Submit(Ref<Encoder> Encoder, Bool Temporally)
+    void Service::Submit(Ref<Encoder> Encoder, Bool Copy)
     {
         if (CPtr<const Submission> Submissions = Encoder.GetSubmissions(); !Submissions.empty())
         {
             Data EncoderDataPtr;
 
-            if (Temporally)
+            if (Copy)
             {
                 EncoderDataPtr = Data(Submissions.size_bytes());
                 EncoderDataPtr.Copy(Submissions.data(), Submissions.size_bytes());
@@ -365,7 +365,6 @@ namespace Graphic
         // Exchange the buffers so that the CPU can write new commands into the
         // encoder buffer while the GPU processes the commands in the decoder buffer.
         Swap(mEncoder, mDecoder);
-        Swap(mFrames[0], mFrames[1]);
 
         // Clear the encoder buffer to prepare it for new data.
         // This is necessary to avoid processing stale or incorrect data in subsequent operations.
@@ -395,10 +394,6 @@ namespace Graphic
                 break;
             }
 
-            // Prepares the current GPU frame for command submission by performing necessary pre-submission operations.
-            // This step ensures the frame's state is correctly set for the upcoming command execution cycle.
-            mFrames[k_GpuFrame].OnPreSubmission(* mDriver);
-
             // Continuously process the data as long as there is available data in the decoder.
             // This involves reading commands from the decoder and executing them to update the state
             // or perform necessary actions.
@@ -407,11 +402,6 @@ namespace Graphic
             {
                 OnExecute(Decoder.ReadEnum<Command>(), Decoder);
             }
-
-            // Completes the current GPU frame's command submission by performing necessary post-submission operations.
-            // Setting up memory and offsets ensures that the frame is correctly set for the next GPU command
-            // execution cycle, maintaining efficient memory management and seamless data processing.
-            mFrames[k_GpuFrame].OnPostSubmission(* mDriver);
 
             // Clear the busy flag to signal that the GPU has completed its current tasks.
             // This action informs the main thread that the system is no longer busy, ensuring
@@ -435,24 +425,7 @@ namespace Graphic
             const auto Height    = Reader.ReadUInt16();
             const auto Samples   = Reader.ReadUInt8();
 
-            if (const Bool Succeed = mDriver->Initialize(Swapchain, Width, Height, Samples); Succeed)
-            {
-                const auto CreateTransientBuffer = [this](Usage Type, UInt32 Capacity)
-                {
-                    const Object ID = mBuffers.Allocate();
-                    mDriver->CreateBuffer(ID, Type, false, nullptr, Capacity);
-                    return ID;
-                };
-
-                for (Ref<Frame> InFlightFrame : mFrames)
-                {
-                    InFlightFrame.Initialize(
-                        CreateTransientBuffer(Usage::Vertex, Frame::k_DefaultVertices),
-                        CreateTransientBuffer(Usage::Index, Frame::k_DefaultIndices),
-                        CreateTransientBuffer(Usage::Uniform, Frame::k_DefaultUniforms));
-                }
-            }
-            else
+            if (const Bool Succeed = mDriver->Initialize(Swapchain, Width, Height, Samples); !Succeed)
             {
                 mDriver = nullptr;
             }
