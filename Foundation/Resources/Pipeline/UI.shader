@@ -3,14 +3,14 @@
 Texture2D    ColorTexture : register(t0);
 SamplerState ColorSampler : register(s0);
 
-// Uniforms
+// Parameters
 
 cbuffer cb_Scene : register(b0)
 {
     float4x4 uCamera;
 };
 
-// Definition
+// Attributes
 
 struct ps_Input
 {

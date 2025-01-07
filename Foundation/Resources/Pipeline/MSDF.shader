@@ -3,7 +3,7 @@
 Texture2D    ColorTexture : register(t0);
 SamplerState ColorSampler : register(s0);
 
-// Uniforms
+// Parameters
 
 cbuffer cb_Scene    : register(b0)
 {
@@ -22,7 +22,7 @@ cbuffer cb_Instance : register(b3)
     float    uOutlineThickness;
 };
 
-// Definition
+// Attributes
 
 struct ps_Input
 {

@@ -1,11 +1,11 @@
-[Properties.Blend] # Enable Alpha-Blending
+[Properties.Blend]  # Enable Alpha-Blending
 
 	ColorSrcFactor  = "SrcAlpha"
 	ColorDstFactor  = "OneMinusSrcAlpha"
 	AlphaSrcFactor  = "SrcAlpha"
 	AlphaDstFactor  = "OneMinusSrcAlpha"
 
-[Properties.Depth] # Disable Depth Write
+[Properties.Depth]  # Disable Depth Write
 
 	Mask            = 0
 	Condition       = "Always"
