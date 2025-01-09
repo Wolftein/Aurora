@@ -121,7 +121,7 @@ inline namespace Math
         // -=(Undocumented)=-
         static constexpr UInt32 PackFloatColor(Real32 Red, Real32 Green, Real32 Blue, Real32 Alpha)
         {
-            if constexpr (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
             {
                 return (static_cast<UInt32>(Red   * UINT8_MAX) << 24)
                      | (static_cast<UInt32>(Green * UINT8_MAX) << 16)

@@ -101,6 +101,10 @@ namespace Engine
             RemoveSubsystem<Network::Service>();
         }
 
+        // Create the scene service
+        Log::Info("Kernel: Creating scene service");
+        AddSubsystem<Scene::Service>();
+
         // Initialize the Host and then enable the platform's device
         mActive = OnInitialize();
 

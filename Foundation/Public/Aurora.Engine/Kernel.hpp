@@ -22,6 +22,8 @@
 
 #include "Aurora.Network/Service.hpp"
 
+#include "Aurora.Scene/Service.hpp"
+
 #include "Device.hpp"
 
 #include "Properties.hpp"
