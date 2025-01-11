@@ -77,8 +77,8 @@ namespace Engine
 
         }
 
-        // \see Tickable::OnTick(Real64, Real64)
-        virtual void OnTick(Real64 Time, Real64 Delta) override
+        // \see Tickable::OnTick
+        virtual void OnTick(ConstRef<Time> Tick) override
         {
         }
 
@@ -114,7 +114,7 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Bool         mActive;
-        Real64       mTime;
+        Time         mTime;
         UPtr<Device> mDevice;
     };
 }

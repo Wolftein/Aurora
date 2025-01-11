@@ -22,8 +22,7 @@ namespace Engine
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Kernel::Kernel()
-        : mActive { false },
-          mTime   { 0.0 }
+        : mActive { false }
     {
     }
 
@@ -119,15 +118,13 @@ namespace Engine
 
     void Kernel::Poll()
     {
-        const Real64 Time  = static_cast<Real64>(SDL_GetTicksNS()) / static_cast<Real64>(SDL_NS_PER_SECOND);
-        const Real64 Delta = Time - mTime;
-        mTime = Time;
+        mTime.SetAbsolute(static_cast<Real64>(SDL_GetTicksNS()) / static_cast<Real64>(SDL_NS_PER_SECOND));
 
-        // Tick subsystems (order matters)
-        Tick(Time, Delta);
+        // Time subsystems (order matters)
+        Tick(mTime);
 
-        // Tick application
-        OnTick(Time, Delta);
+        // Time application
+        OnTick(mTime);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

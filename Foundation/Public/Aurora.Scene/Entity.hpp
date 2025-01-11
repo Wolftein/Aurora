@@ -186,6 +186,19 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        void SetName(CStr Name)
+        {
+            mHandle.set_name(Name.data());
+        }
+
+        // -=(Undocumented)=-
+        CStr GetName() const
+        {
+            const auto Name = mHandle.name();
+            return CStr(Name.c_str(), Name.size());
+        }
+
+        // -=(Undocumented)=-
         Bool operator==(Ref<const Entity> Other) const
         {
             return GetHandle() == Other.GetHandle();

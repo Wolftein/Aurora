@@ -28,8 +28,8 @@ namespace Network
         // -=(Undocumented)=-
         explicit Service(Ref<Context> System);
 
-        // \see Tickable::OnTick(Real64, Real64)
-        void OnTick(Real64 Time, Real64 Delta) override;
+        // \see Tickable::OnTick
+        void OnTick(ConstRef<Time> Time) override;
 
         // -=(Undocumented)=-
         Bool Initialize(UInt32 Threads);

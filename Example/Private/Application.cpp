@@ -26,13 +26,23 @@ namespace Example
     {
         ConstSPtr<Content::Service> Content = GetSubsystem<Content::Service>();
         Content->AddLocator("Root", NewPtr<Content::SystemLocator>("Resources"));
+
+        auto Entity = GetSubsystem<Scene::Service>()->Create();
+        Entity.Attach<Component::LocalTransform>();
+
+        auto Entity2 = GetSubsystem<Scene::Service>()->Create();
+        Entity2.Attach<Component::LocalTransform>();
+        Entity2.SetParent(Entity);
+
+        auto Entity3 = GetSubsystem<Scene::Service>()->Create();
+        Entity3.Attach<Component::LocalTransform>();
         return true;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Application::OnTick(Real64 Time, Real64 Delta)
+    void Application::OnTick(ConstRef<Time> Time)
     {
         ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>();
 

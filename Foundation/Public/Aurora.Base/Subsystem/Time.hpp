@@ -12,74 +12,51 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Entity.hpp"
+#include "Aurora.Base/Type.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Scene
+inline namespace Core
 {
     // -=(Undocumented)=-
-    class Service final : public AbstractSubsystem<Service>, public Tickable
+    class Time
     {
     public:
 
         // -=(Undocumented)=-
-        explicit Service(Ref<Context> Context);
-
-        // \see Tickable::OnTick
-        void OnTick(ConstRef<Time> Time) override;
-
-        // -=(Undocumented)=-
-        Entity Create();
-
-        // -=(Undocumented)=-
-        Entity Find(UInt64 ID);
-
-        // -=(Undocumented)=-
-        void Load(Ref<Reader> Reader, Entity Actor);
-
-        // -=(Undocumented)=-
-        void Save(Ref<Writer> Writer, Entity Actor);
-
-        // -=(Undocumented)=-
-        template<typename Type, typename Dependency = void>
-        auto Register(Bool Serializable = true)
+        Time()
+            : mAbsolute { 0 },
+              mDelta    { 0 }
         {
-            flecs::entity Component = mWorld.component<Type>();
-
-            if (Serializable)
-            {
-                Component.template set<Component::Factory>(Component::Factory::Create<Type>());
-            }
-
-            if constexpr (! std::is_void_v<Dependency>)
-            {
-                Component.add(flecs::With, mWorld.component<Dependency>());
-            }
-            return Component;
         }
 
         // -=(Undocumented)=-
-        Ref<flecs::world> GetWorld()
+        void SetAbsolute(Real64 Absolute)
         {
-            return mWorld;
+            mDelta    = Absolute - mAbsolute;
+            mAbsolute = Absolute;
         }
 
-    private:
+        // -=(Undocumented)=-
+        Real64 GetAbsolute() const
+        {
+            return mAbsolute;
+        }
 
         // -=(Undocumented)=-
-        void RegisterDefaultComponents();
-
-        // -=(Undocumented)=-
-        void RegisterDefaultSystems();
+        Real64 GetDelta() const
+        {
+            return mDelta;
+        }
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        flecs::world mWorld;
+        Real64 mAbsolute;
+        Real64 mDelta;
     };
 }

@@ -31,8 +31,8 @@ namespace Input
         // -=(Undocumented)=-
         explicit Service(Ref<Context> System);
 
-        // \see Tickable::OnTick(Real64, Real64)
-        void OnTick(Real64 Time, Real64 Delta) override;
+        // \see Tickable::OnTick
+        void OnTick(ConstRef<Time> Time) override;
 
         // -=(Undocumented)=-
         bool IsKeyPressed(Key Key) const

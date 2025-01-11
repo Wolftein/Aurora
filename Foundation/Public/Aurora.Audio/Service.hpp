@@ -28,8 +28,8 @@ namespace Audio
         // -=(Undocumented)=-
         explicit Service(Ref<Context> Context);
 
-        // \see Tickable::OnTick(Real64, Real64)
-        void OnTick(Real64 Time, Real64 Delta) override;
+        // \see Tickable::OnTick
+        void OnTick(ConstRef<Time> Time) override;
 
         // -=(Undocumented)=-
         Bool Initialize(Backend Backend, CStr Device);

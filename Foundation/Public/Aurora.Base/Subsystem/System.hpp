@@ -66,11 +66,11 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        void Tick(Real64 Time, Real64 Delta)
+        void Tick(ConstRef<Time> Time)
         {
             for (const Ptr<Tickable> Tickable : mTickables)
             {
-                Tickable->OnTick(Time, Delta);
+                Tickable->OnTick(Time);
             }
         }
 

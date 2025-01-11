@@ -29,7 +29,7 @@ namespace Input
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::OnTick(Real64 Time, Real64 Delta)
+    void Service::OnTick(ConstRef<Time> Time)
     {
         // Poll all raw-input event(s) and update hardware states
         const CPtr<const Event> Stack = mPoller.Poll();
