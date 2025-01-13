@@ -120,7 +120,7 @@ namespace Scene
 
     void Service::RegisterDefaultComponents()
     {
-        Register<Component::LocalTransform, Component::WorldTransform>();
+        Register<Component::LocalTransform, true, Component::WorldTransform>();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -128,6 +128,49 @@ namespace Scene
 
     void Service::RegisterDefaultSystems()
     {
-        // TODO
+        System<>()
+                .kind(flecs::PreUpdate)
+                .with<const Component::LocalTransform>()
+                .with<const Component::WorldTransform>().optional().parent().cascade()
+                .with<Component::WorldTransform>().out()
+                .run([](Ref<flecs::iter> Iterator)
+                     {
+                         while (Iterator.next())
+                         {
+                             if (Iterator.changed())
+                             {
+                                 OnApplyTransformation(Iterator);
+                             }
+                             else
+                             {
+                                 Iterator.skip();
+                             }
+                         }
+                     });
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Service::OnApplyTransformation(Ref<flecs::iter> Iterator)
+    {
+        const auto LocalTransformTable  = Iterator.field<const Component::LocalTransform>(0);
+        const auto WorldTransformTable  = Iterator.field<Component::WorldTransform>(2);
+        const auto ParentTransform      = Iterator.field<const Component::WorldTransform>(1);
+
+        if (Iterator.is_set(1))
+        {
+            for (const UInt64 Index : Iterator)
+            {
+                WorldTransformTable[Index] = ParentTransform[0] * LocalTransformTable[Index].Compute();
+            }
+        }
+        else
+        {
+            for (const UInt64 Index : Iterator)
+            {
+                WorldTransformTable[Index] = LocalTransformTable[Index].Compute();
+            }
+        }
     }
 }

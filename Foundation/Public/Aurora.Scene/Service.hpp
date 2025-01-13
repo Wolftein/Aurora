@@ -44,12 +44,12 @@ namespace Scene
         void Save(Ref<Writer> Writer, Entity Actor);
 
         // -=(Undocumented)=-
-        template<typename Type, typename Dependency = void>
-        auto Register(Bool Serializable = true)
+        template<typename Type, Bool Serializable = true, typename Dependency = void>
+        auto Register()
         {
             flecs::entity Component = mWorld.component<Type>();
 
-            if (Serializable)
+            if constexpr (Serializable)
             {
                 Component.template set<Component::Factory>(Component::Factory::Create<Type>());
             }
@@ -62,9 +62,17 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        Ref<flecs::world> GetWorld()
+        template<typename ...Components>
+        auto Query()
         {
-            return mWorld;
+            return mWorld.template query_builder<Components...>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename ...Components>
+        auto System()
+        {
+            return mWorld.template system<Components...>();
         }
 
     private:
@@ -74,6 +82,9 @@ namespace Scene
 
         // -=(Undocumented)=-
         void RegisterDefaultSystems();
+
+        // -=(Undocumented)=-
+        static void OnApplyTransformation(Ref<flecs::iter> Iterator);
 
     private:
 

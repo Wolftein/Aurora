@@ -117,15 +117,22 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        void Retain(Entity Component)
+        template<typename Type>
+        Bool Retain(Type Value)
         {
-            mHandle.has(Component.GetID());
+            return mHandle.has(Value);
         }
 
         // -=(Undocumented)=-
-        void Retain(Entity First, Entity Second)
+        Bool Retain(Entity Component)
         {
-            mHandle.has(First.GetID(), Second.GetID());
+            return mHandle.has(Component.GetID());
+        }
+
+        // -=(Undocumented)=-
+        Bool Retain(Entity First, Entity Second)
+        {
+            return mHandle.has(First.GetID(), Second.GetID());
         }
 
         // -=(Undocumented)=-
