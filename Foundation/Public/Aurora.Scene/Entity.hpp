@@ -175,6 +175,58 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
+        void Enable() const
+        {
+            mHandle.enable<Type>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void Enable(Type Value)
+        {
+            mHandle.enable(Value);
+        }
+
+        // -=(Undocumented)=-
+        void Enable(Entity Component)
+        {
+            mHandle.enable(Component.GetID());
+        }
+
+        // -=(Undocumented)=-
+        void Enable(Entity First, Entity Second)
+        {
+            mHandle.enable(First.GetID(), Second.GetID());
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void Disable() const
+        {
+            mHandle.disable<Type>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void Disable(Type Value)
+        {
+            mHandle.disable(Value);
+        }
+
+        // -=(Undocumented)=-
+        void Disable(Entity Component)
+        {
+            mHandle.disable(Component.GetID());
+        }
+
+        // -=(Undocumented)=-
+        void Disable(Entity First, Entity Second)
+        {
+            mHandle.disable(First.GetID(), Second.GetID());
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
         void SetParent()
         {
             mHandle.child_of<Type>();

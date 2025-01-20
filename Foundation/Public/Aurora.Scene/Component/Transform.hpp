@@ -21,8 +21,8 @@
 namespace Component
 {
     // -=(Undocumented)=-
-    using LocalTransform = Transformf;
+    using TEcsTransform = Transformf;
 
     // -=(Undocumented)=-
-    using WorldTransform = Matrix4f;
+    using TEcsMatrix    = Matrix4f;
 }

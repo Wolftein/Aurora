@@ -51,7 +51,7 @@ namespace Scene
 
             if constexpr (Serializable)
             {
-                Component.template set<Component::Factory>(Component::Factory::Create<Type>());
+                Component.template set<Component::TEcsFactory>(Component::TEcsFactory::Create<Type>());
             }
 
             if constexpr (! std::is_void_v<Dependency>)
@@ -70,9 +70,9 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto System()
+        auto System(UInt64 Phase = EcsOnUpdate)
         {
-            return mWorld.template system<Components...>();
+            return mWorld.template system<Components...>().kind(Phase);
         }
 
     private:
@@ -82,9 +82,6 @@ namespace Scene
 
         // -=(Undocumented)=-
         void RegisterDefaultSystems();
-
-        // -=(Undocumented)=-
-        static void OnApplyTransformation(Ref<flecs::iter> Iterator);
 
     private:
 

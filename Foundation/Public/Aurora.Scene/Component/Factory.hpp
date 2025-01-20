@@ -21,7 +21,7 @@
 namespace Component
 {
     // -=(Undocumented)=-
-    class Factory final
+    class TEcsFactory final
     {
     public:
 
@@ -32,10 +32,10 @@ namespace Component
     public:
 
         // -=(Undocumented)=-
-        Factory() = default;
+        TEcsFactory() = default;
 
         // -=(Undocumented)=-
-        Factory(Serializer<Reader> Reader, Serializer<Writer> Writer)
+        TEcsFactory(Serializer<Reader> Reader, Serializer<Writer> Writer)
             : mReader { Move(Reader) },
               mWriter { Move(Writer) }
         {
@@ -57,9 +57,9 @@ namespace Component
 
         // -=(Undocumented)=-
         template<typename Component>
-        static Factory Create()
+        static TEcsFactory Create()
         {
-            return Factory(OnComponentRead<Component>, OnComponentWrite<Component>);
+            return TEcsFactory(OnComponentRead<Component>, OnComponentWrite<Component>);
         }
 
     private:

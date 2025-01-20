@@ -27,15 +27,22 @@ namespace Example
         ConstSPtr<Content::Service> Content = GetSubsystem<Content::Service>();
         Content->AddLocator("Root", NewPtr<Content::SystemLocator>("Resources"));
 
-        auto Entity = GetSubsystem<Scene::Service>()->Create();
-        Entity.Attach<Component::LocalTransform>();
+        ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
 
-        auto Entity2 = GetSubsystem<Scene::Service>()->Create();
-        Entity2.Attach<Component::LocalTransform>();
-        Entity2.SetParent(Entity);
+        mEntities[0] = Scene->Create();
+        mEntities[0].SetName("Grand Master");
+        mEntities[0].Attach(Component::TEcsTransform());
 
-        auto Entity3 = GetSubsystem<Scene::Service>()->Create();
-        Entity3.Attach<Component::LocalTransform>();
+        mEntities[1] = Scene->Create();
+        mEntities[1].SetName("Master");
+        mEntities[1].SetParent(mEntities[0]);
+        mEntities[1].Attach(Component::TEcsTransform(Vector3f(10, 0, 0)));
+
+        mEntities[2] = Scene->Create();
+        mEntities[2].SetName("Child");
+        mEntities[2].SetParent(mEntities[1]);
+        mEntities[2].Attach(Component::TEcsTransform(Vector3f(0, 0, 10)));
+
         return true;
     }
 

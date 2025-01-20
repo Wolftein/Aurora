@@ -72,7 +72,7 @@ namespace Scene
             }
             else
             {
-                if (const Ptr<Component::Factory> Factory = Component.get_mut<Component::Factory>())
+                if (const Ptr<Component::TEcsFactory> Factory = Component.get_mut<Component::TEcsFactory>())
                 {
                     if (const Ptr<void> Data = Entity.ensure(Component))
                     {
@@ -94,7 +94,7 @@ namespace Scene
     void Service::Save(Ref<Writer> Writer, Entity Actor)
     {
         const flecs::query Query = mWorld.query_builder()
-                .with<Component::Factory>().src("$component")
+                .with<Component::TEcsFactory>().src("$component")
                 .with("$component").src(Actor.GetHandle())
                 .build();
 
@@ -109,7 +109,7 @@ namespace Scene
                 Writer.WriteInt<UInt64>(Component.raw_id());
 
                 // Write Component's Data
-                Iterator.field<Component::Factory>(0)->Write(Writer, Entity.get_mut(Component));
+                Iterator.field<Component::TEcsFactory>(0)->Write(Writer, Entity.get_mut(Component));
             }
         };
         Query.run(OnIterate);
@@ -120,57 +120,31 @@ namespace Scene
 
     void Service::RegisterDefaultComponents()
     {
-        Register<Component::LocalTransform, true, Component::WorldTransform>();
+        Register<Component::TEcsTransform, true, Component::TEcsMatrix>().add(flecs::CanToggle);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::RegisterDefaultSystems()
+    void Service::RegisterDefaultSystems()  // TODO: Cleanup
     {
-        System<>()
-                .kind(flecs::PreUpdate)
-                .with<const Component::LocalTransform>()
-                .with<const Component::WorldTransform>().optional().parent().cascade()
-                .with<Component::WorldTransform>().out()
-                .run([](Ref<flecs::iter> Iterator)
-                     {
-                         while (Iterator.next())
-                         {
-                             if (Iterator.changed())
-                             {
-                                 OnApplyTransformation(Iterator);
-                             }
-                             else
-                             {
-                                 Iterator.skip();
-                             }
-                         }
-                     });
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Service::OnApplyTransformation(Ref<flecs::iter> Iterator)
-    {
-        const auto LocalTransformTable  = Iterator.field<const Component::LocalTransform>(0);
-        const auto WorldTransformTable  = Iterator.field<Component::WorldTransform>(2);
-        const auto ParentTransform      = Iterator.field<const Component::WorldTransform>(1);
-
-        if (Iterator.is_set(1))
-        {
-            for (const UInt64 Index : Iterator)
+        constexpr auto OnToggleTransformComponent = [](flecs::entity Entity) {
+            Entity.enable<Component::TEcsTransform>();
+        };
+        mWorld.observer().with<Component::TEcsTransform>().event(flecs::OnSet)
+            .each(OnToggleTransformComponent);
+        mWorld.observer().with<Component::TEcsTransform>().up().event(flecs::OnSet)
+            .each(OnToggleTransformComponent);
+        mWorld.system<const Component::TEcsTransform, Ptr<const Component::TEcsMatrix>, Component::TEcsMatrix>()
+            .term_at(1).parent().cascade()
+            .kind(flecs::PreUpdate)
+            .each([](Entity::Handle Entity,
+                     ConstRef<Component::TEcsTransform> Local,
+                     Ptr<const Component::TEcsMatrix> Parent,
+                     Ref<Component::TEcsMatrix> World)
             {
-                WorldTransformTable[Index] = ParentTransform[0] * LocalTransformTable[Index].Compute();
-            }
-        }
-        else
-        {
-            for (const UInt64 Index : Iterator)
-            {
-                WorldTransformTable[Index] = LocalTransformTable[Index].Compute();
-            }
-        }
+                World = Parent ? Parent->operator*(Local.Compute()) : Local.Compute();
+                Entity.disable<Component::TEcsTransform>();
+            });
     }
 }
