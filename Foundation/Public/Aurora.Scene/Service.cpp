@@ -126,15 +126,14 @@ namespace Scene
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::RegisterDefaultSystems()  // TODO: Cleanup
+    void Service::RegisterDefaultSystems()
     {
-        constexpr auto OnToggleTransformComponent = [](flecs::entity Entity) {
+        static constexpr void (* OnEnableTransform)(flecs::entity Entity) = [](flecs::entity Entity)
+        {
             Entity.enable<Component::TEcsTransform>();
+            Entity.children(OnEnableTransform);
         };
-        mWorld.observer().with<Component::TEcsTransform>().event(flecs::OnSet)
-            .each(OnToggleTransformComponent);
-        mWorld.observer().with<Component::TEcsTransform>().up().event(flecs::OnSet)
-            .each(OnToggleTransformComponent);
+        mWorld.observer().with<Component::TEcsTransform>().self().event(flecs::OnSet).each(OnEnableTransform);
         mWorld.system<const Component::TEcsTransform, Ptr<const Component::TEcsMatrix>, Component::TEcsMatrix>()
             .term_at(1).parent().cascade()
             .kind(flecs::PreUpdate)
@@ -143,7 +142,7 @@ namespace Scene
                      Ptr<const Component::TEcsMatrix> Parent,
                      Ref<Component::TEcsMatrix> World)
             {
-                World = Parent ? Parent->operator*(Local.Compute()) : Local.Compute();
+                World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
                 Entity.disable<Component::TEcsTransform>();
             });
     }
