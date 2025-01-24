@@ -120,7 +120,8 @@ namespace Scene
 
     void Service::RegisterDefaultComponents()
     {
-        Register<Component::TEcsTransform, true, Component::TEcsMatrix>().add(flecs::CanToggle);
+        Register<Component::TEcsTint>();
+        Register<Component::TEcsTransform, Component::TEcsMatrix>().add(flecs::CanToggle);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

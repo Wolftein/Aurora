@@ -44,7 +44,7 @@ namespace Scene
         void Save(Ref<Writer> Writer, Entity Actor);
 
         // -=(Undocumented)=-
-        template<typename Type, Bool Serializable = true, typename Dependency = void>
+        template<typename Type, typename Dependency = void, Bool Serializable = true>
         auto Register()
         {
             flecs::entity Component = mWorld.component<Type>();
