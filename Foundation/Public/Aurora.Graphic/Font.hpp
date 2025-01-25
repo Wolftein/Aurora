@@ -28,46 +28,6 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        enum class Alignment
-        {
-            // -=(Undocumented)=-
-            LeftTop,
-
-            // -=(Undocumented)=-
-            LeftMiddle,
-
-            // -=(Undocumented)=-
-            LeftBottom,
-
-            // -=(Undocumented)=-
-            LeftBaseline,
-
-            // -=(Undocumented)=-
-            CenterTop,
-
-            // -=(Undocumented)=-
-            CenterMiddle,
-
-            // -=(Undocumented)=-
-            CenterBottom,
-
-            // -=(Undocumented)=-
-            CenterBaseline,
-
-            // -=(Undocumented)=-
-            RightTop,
-
-            // -=(Undocumented)=-
-            RightMiddle,
-
-            // -=(Undocumented)=-
-            RightBottom,
-
-            // -=(Undocumented)=-
-            RightBaseline,
-        };
-
-        // -=(Undocumented)=-
         struct Atlas
         {
             // -=(Undocumented)=-
@@ -130,7 +90,7 @@ namespace Graphic
         Vector2f Measure(CStr16 Text, Real32 Size) const;
 
         // -=(Undocumented)=-
-        Rectf Calculate(CStr16 Text, Real32 Size, ConstRef<Vector2f> Position, Alignment Alignment) const;
+        Rectf Calculate(CStr16 Text, Real32 Size, ConstRef<Vector2f> Position, ConstRef<Pivot> Pivot) const;
 
         // -=(Undocumented)=-
         ConstRef<Metrics> GetMetrics() const

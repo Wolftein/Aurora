@@ -13,5 +13,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Component/Factory.hpp"
+#include "Component/Pivot.hpp"
 #include "Component/Tint.hpp"
 #include "Component/Transform.hpp"

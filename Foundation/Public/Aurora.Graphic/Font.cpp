@@ -76,53 +76,53 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Rectf Font::Calculate(CStr16 Text, Real32 Size, ConstRef<Vector2f> Position, Alignment Alignment) const
+    Rectf Font::Calculate(CStr16 Text, Real32 Size, ConstRef<Vector2f> Position, ConstRef<Pivot> Pivot) const
     {
         const Vector2f Measurement = Measure(Text, Size);
 
         Real32 OffsetX = Position.GetX();
         Real32 OffsetY = Position.GetY();
 
-        switch (Alignment)
+        switch (Pivot.GetType())
         {
-        case Alignment::LeftTop:
+        case Pivot::Type::LeftTop:
             break;
-        case Alignment::LeftMiddle:
+        case Pivot::Type::LeftMiddle:
             OffsetY -= mMetrics.Ascender * 0.5f * Size;
             break;
-        case Alignment::LeftBottom:
+        case Pivot::Type::LeftBottom:
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Alignment::LeftBaseline:
+        case Pivot::Type::LeftBaseline:
             OffsetY -= mMetrics.Ascender * Size;
             break;
-        case Alignment::CenterTop:
+        case Pivot::Type::CenterTop:
             OffsetX -= Measurement.GetX() * 0.5f;
             break;
-        case Alignment::CenterMiddle:
+        case Pivot::Type::CenterMiddle:
             OffsetX -= Measurement.GetX() * 0.5f;
             OffsetY -= mMetrics.Ascender * 0.5f * Size;
             break;
-        case Alignment::CenterBottom:
+        case Pivot::Type::CenterBottom:
             OffsetX -= Measurement.GetX() * 0.5f;
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Alignment::CenterBaseline:
+        case Pivot::Type::CenterBaseline:
             OffsetX -= Measurement.GetX() * 0.5f;
             OffsetY -= mMetrics.Ascender * Size;
             break;
-        case Alignment::RightTop:
+        case Pivot::Type::RightTop:
             OffsetX -= Measurement.GetX();
             break;
-        case Alignment::RightMiddle:
+        case Pivot::Type::RightMiddle:
             OffsetX -= Measurement.GetX();
             OffsetY -= mMetrics.Ascender * 0.5f * Size;
             break;
-        case Alignment::RightBottom:
+        case Pivot::Type::RightBottom:
             OffsetX -= Measurement.GetX();
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Alignment::RightBaseline:
+        case Pivot::Type::RightBaseline:
             OffsetX -= Measurement.GetX();
             OffsetY -= mMetrics.Ascender * Size;
             break;
