@@ -120,7 +120,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Object Service::CreateBuffer(Usage Type, Any<Data> Data)
+    Object Service::CreateBuffer(Usage Type, Bool Immutable, Any<Data> Data)
     {
         const Object ID = mBuffers.Allocate();
 
@@ -129,6 +129,7 @@ namespace Graphic
             mEncoder.WriteEnum(Command::CreateBuffer);
             mEncoder.WriteUInt16(ID);
             mEncoder.WriteEnum(Type);
+            mEncoder.WriteBool(Immutable);
             mEncoder.WriteObject(Data);
         }
         return ID;
@@ -442,11 +443,12 @@ namespace Graphic
         }
         case Command::CreateBuffer:
         {
-            const auto ID       = Reader.ReadUInt16();
-            const auto Kind     = Reader.ReadEnum<Usage>();
-            const auto Bytes    = Reader.ReadObject<Data>();
+            const auto ID        = Reader.ReadUInt16();
+            const auto Kind      = Reader.ReadEnum<Usage>();
+            const auto Immutable = Reader.ReadBool();
+            const auto Bytes     = Reader.ReadObject<Data>();
 
-            mDriver->CreateBuffer(ID, Kind, Bytes.GetData() != nullptr, Bytes.GetData<const UInt8>(), Bytes.GetSize());
+            mDriver->CreateBuffer(ID, Kind, Immutable, Bytes.GetData<const UInt8>(), Bytes.GetSize());
             break;
         }
         case Command::CopyBuffer:

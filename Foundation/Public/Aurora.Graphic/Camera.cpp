@@ -35,19 +35,21 @@ namespace Graphic
 
         if (Dirty)
         {
-            // Calculate the inverse scene matrix from the transformation (if applied)
+            // If the transformation matrix has been modified (dirty flag is set),
+            // compute the inverse scene matrix from the updated transformation.
             if (HasBit(mDirty, k_DirtyBitTransformation))
             {
                 mScene = mTransformation.Compute().Inverse();
             }
 
-            // Calculate the world matrix
+            // Calculate the world matrix by multiplying the projection matrix
+            // with the (possibly updated) scene matrix.
             mWorld   = mProjection * mScene;
 
-            // Calculate the inverse of the world matrix
+            // Compute the inverse of the world matrix
             mInverse = mWorld.Inverse();
 
-            // Reset dirty flags
+            // Clear the dirty flag to indicate that the transformation has been processed.
             mDirty   = 0;
         }
         return Dirty;

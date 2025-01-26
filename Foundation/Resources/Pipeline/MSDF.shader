@@ -66,7 +66,7 @@ float GetOpacityFromDistance(float signedDistance, float2 Jdx, float2 Jdy)
     return smoothstep(-scaledDistanceLimit, scaledDistanceLimit, signedDistance);
 }
 
-float4 fragment(PixelShaderInput Input) : SV_Target
+float4 fragment(ps_Input Input) : SV_Target
 {
     float2 pixelCoord = Input.Texture * uDimension;
     float2 Jdx = ddx(pixelCoord);

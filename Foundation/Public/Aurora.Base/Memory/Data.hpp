@@ -89,6 +89,13 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        template<typename Type>
+        Data(CPtr<Type> Span, Deleter Destructor = EMPTY_DELETER)
+            : Data(Span.data(), Span.size_bytes(), Destructor)
+        {
+        }
+
+        // -=(Undocumented)=-
         ~Data()
         {
             Clear();
@@ -110,9 +117,16 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Type>
-        CPtr<Type> GetSpan(UInt Offset = 0) const
+        CPtr<Type> GetSpan(UInt Offset = 0)
         {
             return CPtr<Type>(static_cast<Ptr<Type>>(mData) + Offset, mSize / sizeof(Type));
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        CPtr<const Type> GetSpan(UInt Offset = 0) const
+        {
+            return CPtr<const Type>(static_cast<Ptr<const Type>>(mData) + Offset, mSize / sizeof(Type));
         }
 
         // -=(Undocumented)=-
@@ -170,7 +184,14 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Type>
-        operator CPtr<Type>() const
+        operator CPtr<Type>()
+        {
+            return GetSpan<Type>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        operator CPtr<const Type>() const
         {
             return GetSpan<Type>();
         }

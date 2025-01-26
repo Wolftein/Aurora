@@ -134,7 +134,7 @@ namespace Graphic
             Primitive.Instances = Instances;
 
             // Add the current in-flight command to the list of submissions to be processed.
-            // After queuing, reset mInFlightCommand to prepare for the next command.
+            // After queuing, reset structure to prepare for the next command.
             mInFlightSubmission.push_back(mInFlightCommand);
             mInFlightCommand = Submission();
         }

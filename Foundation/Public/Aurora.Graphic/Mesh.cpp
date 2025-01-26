@@ -50,11 +50,11 @@ namespace Graphic
 
         if (mBytes[0].HasData())
         {
-            mBuffers[0] = Graphics->CreateBuffer(Usage::Vertex, Move(mBytes[0]));
+            mBuffers[0] = Graphics->CreateBuffer(Usage::Vertex, true, Move(mBytes[0]));
         }
         if (mBytes[1].HasData())
         {
-            mBuffers[1] = Graphics->CreateBuffer(Usage::Index, Move(mBytes[1]));
+            mBuffers[1] = Graphics->CreateBuffer(Usage::Index, true, Move(mBytes[1]));
         }
         return true;
     }

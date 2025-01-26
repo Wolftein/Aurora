@@ -47,11 +47,11 @@ namespace Graphic
         // -=(Undocumented)=-
         Object CreateBuffer(Usage Type, UInt32 Capacity)
         {
-            return CreateBuffer(Type, Data(nullptr, Capacity, Data::EMPTY_DELETER));
+            return CreateBuffer(Type, false, Data(nullptr, Capacity, Data::EMPTY_DELETER));
         }
 
         // -=(Undocumented)=-
-        Object CreateBuffer(Usage Type, Any<Data> Data);
+        Object CreateBuffer(Usage Type, Bool Immutable, Any<Data> Data);
 
         // -=(Undocumented)=-
         void CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size);

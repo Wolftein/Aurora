@@ -20,6 +20,7 @@
 
 namespace Scene
 {
+
     // -=(Undocumented)=-
     class Service final : public AbstractSubsystem<Service>, public Tickable
     {
@@ -44,7 +45,7 @@ namespace Scene
         void Save(Ref<Writer> Writer, Entity Actor);
 
         // -=(Undocumented)=-
-        template<typename Type, typename Dependency = void, Bool Serializable = true>
+        template<typename Type, typename Dependency = void, Bool Serializable = true, Bool Sparse = false>
         auto Register()
         {
             flecs::entity Component = mWorld.component<Type>();
@@ -52,6 +53,11 @@ namespace Scene
             if constexpr (Serializable)
             {
                 Component.template set<Component::TEcsFactory>(Component::TEcsFactory::Create<Type>());
+            }
+
+            if constexpr (Sparse)
+            {
+                Component.add(flecs::Sparse);
             }
 
             if constexpr (! std::is_void_v<Dependency>)
