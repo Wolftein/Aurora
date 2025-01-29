@@ -41,7 +41,7 @@ namespace Audio
         }
 
         // -=(Undocumented)=-
-        Bool Seek(UInt Cursor)
+        Bool Seek(UInt32 Cursor)
         {
             return mDecoder->Seek(Cursor);
         }

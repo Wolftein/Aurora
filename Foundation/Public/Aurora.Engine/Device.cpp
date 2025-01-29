@@ -82,24 +82,19 @@ namespace Engine
     {
         if (Fullscreen)
         {
-            mSize.Set(GetWidth(), GetHeight());
-
-            SDL_DisplayMode FullscreenDisplayMode;
+            SDL_DisplayMode ClosestDisplayMode;
             if (!Borderless)
             {
-                SDL_GetClosestFullscreenDisplayMode(0, mSize.GetX(), mSize.GetY(), 0, true, & FullscreenDisplayMode);
+                SDL_GetClosestFullscreenDisplayMode(
+                        SDL_GetPrimaryDisplay(), GetWidth(), GetHeight(), 0, true, AddressOf(ClosestDisplayMode));
+                SDL_SetWindowFullscreenMode(mHandle, AddressOf(ClosestDisplayMode));
             }
-
-            const Ptr<const SDL_DisplayMode> Display = (Borderless ? nullptr : & FullscreenDisplayMode);
-            SDL_SetWindowFullscreenMode(mHandle, Display);
-            SDL_SetWindowFullscreen(mHandle, true);
+            SDL_SetWindowFullscreenMode(mHandle, Borderless ? nullptr : AddressOf(ClosestDisplayMode));
         }
         else
         {
-            SDL_SetWindowSize(mHandle, mSize.GetX(), mSize.GetY());
-            SDL_SetWindowFullscreen(mHandle, false);
-            SDL_SetWindowPosition(mHandle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
             SDL_SetWindowBordered(mHandle, !Borderless);
         }
+        SDL_SetWindowFullscreen(mHandle, Fullscreen);
     }
 }

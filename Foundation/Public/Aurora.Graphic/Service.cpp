@@ -293,6 +293,7 @@ namespace Graphic
 
     Data Service::ReadTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset)
     {
+        Log::Info("ReadTexture is not supported yet.");
         return Data();  // TODO
     }
 

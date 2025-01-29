@@ -90,7 +90,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Base>
-        Rect<Base> Calculate(Vector2<Base> Position, Vector2<Base> Size) const
+        Rect<Base> Calculate(ConstRef<Vector2<Base>> Position, ConstRef<Vector2<Base>> Size) const
         {
             static constexpr Rect<Base> k_Multiplier[] = {
                 Rect<Base>( 0.0,  0.0, 1.0, 1.0),  // TopLeft

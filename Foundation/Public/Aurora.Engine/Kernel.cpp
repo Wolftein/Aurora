@@ -118,6 +118,7 @@ namespace Engine
 
     void Kernel::Poll()
     {
+        // Updates the current time by calculating the absolute time
         mTime.SetAbsolute(static_cast<Real64>(SDL_GetTicksNS()) / static_cast<Real64>(SDL_NS_PER_SECOND));
 
         // Time subsystems (order matters)

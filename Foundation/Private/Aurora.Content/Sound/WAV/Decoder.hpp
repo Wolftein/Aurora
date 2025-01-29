@@ -36,7 +36,7 @@ namespace Audio
         Bool Read(Ref<Frame> Output) override;
 
         // -=(Undocumented)=-
-        Bool Seek(UInt Cursor) override;
+        Bool Seek(UInt32 Cursor) override;
 
     private:
 

@@ -265,10 +265,10 @@ inline namespace Math
 
             const Base SinPitch = Sine(HalfPitch);
             const Base CosPitch = Cosine(HalfPitch);
-            const Base SinYaw = Sine(HalfYaw);
-            const Base CosYaw = Cosine(HalfYaw);
-            const Base SinRoll = Sine(HalfRoll);
-            const Base CosRoll = Cosine(HalfRoll);
+            const Base SinYaw   = Sine(HalfYaw);
+            const Base CosYaw   = Cosine(HalfYaw);
+            const Base SinRoll  = Sine(HalfRoll);
+            const Base CosRoll  = Cosine(HalfRoll);
 
             return Quaternion<Base>(
                     CosRoll * SinPitch * CosYaw + SinRoll * CosPitch * SinYaw,

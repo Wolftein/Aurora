@@ -37,6 +37,6 @@ namespace Audio
         virtual Bool Read(Ref<Frame> Output) = 0;
 
         // -=(Undocumented)=-
-        virtual Bool Seek(UInt Cursor) = 0;
+        virtual Bool Seek(UInt32 Cursor) = 0;
     };
 }
