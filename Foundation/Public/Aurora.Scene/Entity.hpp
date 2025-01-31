@@ -12,8 +12,9 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Common.hpp"
-#include "Component.hpp"
+#include "Aurora.Base/Base.hpp"
+#include "Aurora.Math/Math.hpp"
+#include <flecs.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -38,7 +39,7 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        explicit Entity(Handle Handle)
+        Entity(Handle Handle)
             : mHandle { Handle }
         {
         }

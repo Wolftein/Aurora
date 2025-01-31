@@ -13,6 +13,8 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Entity.hpp"
+#include "Factory.hpp"
+#include "Query.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -20,7 +22,6 @@
 
 namespace Scene
 {
-
     // -=(Undocumented)=-
     class Service final : public AbstractSubsystem<Service>, public Tickable
     {
@@ -52,7 +53,7 @@ namespace Scene
 
             if constexpr (Serializable)
             {
-                Component.template set<Component::TEcsFactory>(Component::TEcsFactory::Create<Type>());
+                Component.template set<Factory>(Factory::Create<Type>());
             }
 
             if constexpr (Sparse)
@@ -69,6 +70,13 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
+        auto Observer()
+        {
+            return mWorld.template observer<Components...>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename ...Components>
         auto Query()
         {
             return mWorld.template query_builder<Components...>();
@@ -80,14 +88,6 @@ namespace Scene
         {
             return mWorld.template system<Components...>().kind(Phase);
         }
-
-    private:
-
-        // -=(Undocumented)=-
-        void RegisterDefaultComponents();
-
-        // -=(Undocumented)=-
-        void RegisterDefaultSystems();
 
     private:
 

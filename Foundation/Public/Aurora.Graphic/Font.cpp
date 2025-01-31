@@ -42,8 +42,6 @@ namespace Graphic
 
     Vector2f Font::Measure(CStr16 Text, Real32 Size) const
     {
-        const Real32 Scale = Size / mMetrics.Size;
-
         Real32 CurrentX = 0.0f;
         Real32 MaximumX = 0.0f;
         Real32 MaximumY = mMetrics.UnderlineHeight;
@@ -58,76 +56,19 @@ namespace Graphic
                 CurrentX = 0.0f;
                 break;
             case '\n':
-                MaximumY += mMetrics.UnderlineHeight * Scale;
+                MaximumY += mMetrics.UnderlineHeight;
                 break;
             default:
             {
                 const Ptr<const Glyph> Glyph = GetGlyph(Codepoint);
-                CurrentX += GetKerning(Previous, Codepoint) * Scale + Glyph->Advance * Scale;
+                CurrentX += (GetKerning(Previous, Codepoint) + Glyph->Advance);
                 MaximumX = Max(MaximumX, CurrentX);
                 break;
             }
             }
             Previous = Codepoint;
         }
-        return Vector2f(MaximumX, MaximumY) * mMetrics.Size;
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    Rectf Font::Calculate(CStr16 Text, Real32 Size, ConstRef<Vector2f> Position, ConstRef<Pivot> Pivot) const
-    {
-        const Vector2f Measurement = Measure(Text, Size);
-
-        Real32 OffsetX = Position.GetX();
-        Real32 OffsetY = Position.GetY();
-
-        switch (Pivot.GetType())
-        {
-        case Pivot::Type::LeftTop:
-            break;
-        case Pivot::Type::LeftMiddle:
-            OffsetY -= mMetrics.Ascender * 0.5f * Size;
-            break;
-        case Pivot::Type::LeftBottom:
-            OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
-            break;
-        case Pivot::Type::LeftBaseline:
-            OffsetY -= mMetrics.Ascender * Size;
-            break;
-        case Pivot::Type::CenterTop:
-            OffsetX -= Measurement.GetX() * 0.5f;
-            break;
-        case Pivot::Type::CenterMiddle:
-            OffsetX -= Measurement.GetX() * 0.5f;
-            OffsetY -= mMetrics.Ascender * 0.5f * Size;
-            break;
-        case Pivot::Type::CenterBottom:
-            OffsetX -= Measurement.GetX() * 0.5f;
-            OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
-            break;
-        case Pivot::Type::CenterBaseline:
-            OffsetX -= Measurement.GetX() * 0.5f;
-            OffsetY -= mMetrics.Ascender * Size;
-            break;
-        case Pivot::Type::RightTop:
-            OffsetX -= Measurement.GetX();
-            break;
-        case Pivot::Type::RightMiddle:
-            OffsetX -= Measurement.GetX();
-            OffsetY -= mMetrics.Ascender * 0.5f * Size;
-            break;
-        case Pivot::Type::RightBottom:
-            OffsetX -= Measurement.GetX();
-            OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
-            break;
-        case Pivot::Type::RightBaseline:
-            OffsetX -= Measurement.GetX();
-            OffsetY -= mMetrics.Ascender * Size;
-            break;
-        }
-        return Rectf(OffsetX, OffsetY, OffsetX + Measurement.GetX(), OffsetY + Measurement.GetY());
+        return Vector2f(MaximumX, MaximumY) * Size;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

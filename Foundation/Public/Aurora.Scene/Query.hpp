@@ -13,83 +13,53 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Aurora.Base/Base.hpp"
+#include <flecs.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Component
+namespace Scene
 {
     // -=(Undocumented)=-
-    class TEcsFactory final
+    template<typename ...Components>
+    class Query
     {
     public:
 
         // -=(Undocumented)=-
-        template<typename Type>
-        using Serializer = FPtr<void(Ref<Type>, Ptr<void>)>;
+        using Handle = flecs::query<Components...>;
 
     public:
 
         // -=(Undocumented)=-
-        TEcsFactory() = default;
+        Query() = default;
 
         // -=(Undocumented)=-
-        TEcsFactory(Serializer<Reader> Reader, Serializer<Writer> Writer)
-            : mReader { Move(Reader) },
-              mWriter { Move(Writer) }
+        Query(Handle Handle)
+            : mHandle { Handle }
         {
         }
 
         // -=(Undocumented)=-
-        void Read(Ref<Reader> Reader, Ptr<void> Component)
+        template<typename Functor>
+        void Each(Functor && Function)
         {
-            mReader(Reader, Component);
+            mHandle.each(Function);
         }
 
         // -=(Undocumented)=-
-        void Write(Ref<Writer> Writer, Ptr<void> Component)
+        template<typename Functor>
+        void Run(Functor && Function)
         {
-            mWriter(Writer, Component);
-        }
-
-    public:
-
-        // -=(Undocumented)=-
-        template<typename Component>
-        static TEcsFactory Create()
-        {
-            return TEcsFactory(OnComponentRead<Component>, OnComponentWrite<Component>);
+            mHandle.run(Function);
         }
 
     private:
 
-        // -=(Undocumented)=-
-        template<typename Type>
-        static void OnComponentRead(Ref<Reader> Reader, Ptr<void> Component)
-        {
-            if constexpr (not std::is_empty_v<Type>)
-            {
-                static_cast<Ptr<Type>>(Component)->OnSerialize(Stream(Reader));
-            }
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type>
-        static void OnComponentWrite(Ref<Writer> Writer, Ptr<void> Component)
-        {
-            if constexpr (not std::is_empty_v<Type>)
-            {
-                static_cast<Ptr<Type>>(Component)->OnSerialize(Stream(Writer));
-            }
-        }
-
-    protected:
-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Serializer<Reader> mReader;
-        Serializer<Writer> mWriter;
+        Handle mHandle;
     };
 }

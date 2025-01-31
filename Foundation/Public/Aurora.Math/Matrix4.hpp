@@ -473,9 +473,9 @@ inline namespace Math
         void OnSerialize(Stream<Type> Archive)
         {
             Archive.SerializeObject(mColumns[0]);
-            Archive.SerializeNumber(mColumns[1]);
-            Archive.SerializeNumber(mColumns[2]);
-            Archive.SerializeNumber(mColumns[3]);
+            Archive.SerializeObject(mColumns[1]);
+            Archive.SerializeObject(mColumns[2]);
+            Archive.SerializeObject(mColumns[3]);
         }
 
     public:

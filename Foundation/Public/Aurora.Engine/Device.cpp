@@ -86,7 +86,7 @@ namespace Engine
             if (!Borderless)
             {
                 SDL_GetClosestFullscreenDisplayMode(
-                        SDL_GetPrimaryDisplay(), GetWidth(), GetHeight(), 0, true, AddressOf(ClosestDisplayMode));
+                        SDL_GetDisplayForWindow(mHandle), GetWidth(), GetHeight(), 0, true, AddressOf(ClosestDisplayMode));
             }
             SDL_SetWindowFullscreenMode(mHandle, Borderless ? nullptr : AddressOf(ClosestDisplayMode));
         }

@@ -90,9 +90,6 @@ namespace Graphic
         Vector2f Measure(CStr16 Text, Real32 Size) const;
 
         // -=(Undocumented)=-
-        Rectf Calculate(CStr16 Text, Real32 Size, ConstRef<Vector2f> Position, ConstRef<Pivot> Pivot) const;
-
-        // -=(Undocumented)=-
         ConstRef<Metrics> GetMetrics() const
         {
             return mMetrics;

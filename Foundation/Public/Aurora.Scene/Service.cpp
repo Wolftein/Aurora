@@ -24,8 +24,6 @@ namespace Scene
     Service::Service(Ref<Context> Context)
         : AbstractSubsystem(Context)
     {
-        RegisterDefaultComponents();
-        RegisterDefaultSystems();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -72,11 +70,11 @@ namespace Scene
             }
             else
             {
-                if (const Ptr<Component::TEcsFactory> Factory = Component.get_mut<Component::TEcsFactory>())
+                if (const Ptr<Factory> Serializer = Component.get_mut<Factory>())
                 {
                     if (const Ptr<void> Data = Entity.ensure(Component))
                     {
-                        Factory->Read(Reader, Data);
+                        Serializer->Read(Reader, Data);
                     }
                     Entity.modified(Component);
                 }
@@ -94,7 +92,7 @@ namespace Scene
     void Service::Save(Ref<Writer> Writer, Entity Actor)
     {
         const flecs::query Query = mWorld.query_builder()
-                .with<Component::TEcsFactory>().src("$component")
+                .with<Factory>().src("$component")
                 .with("$component").src(Actor.GetHandle())
                 .build();
 
@@ -109,43 +107,9 @@ namespace Scene
                 Writer.WriteInt<UInt64>(Component.raw_id());
 
                 // Write Component's Data
-                Iterator.field<Component::TEcsFactory>(0)->Write(Writer, Entity.get_mut(Component));
+                Iterator.field<Factory>(0)->Write(Writer, Entity.get_mut(Component));
             }
         };
         Query.run(OnIterate);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Service::RegisterDefaultComponents()
-    {
-        Register<Component::TEcsPivot>();
-        Register<Component::TEcsTint>();
-        Register<Component::TEcsTransform, Component::TEcsMatrix>().add(flecs::CanToggle);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Service::RegisterDefaultSystems()
-    {
-        static constexpr void (* OnEnableTransform)(flecs::entity Entity) = [](flecs::entity Entity)
-        {
-            Entity.enable<Component::TEcsTransform>();
-            Entity.children(OnEnableTransform);
-        };
-        mWorld.observer().with<Component::TEcsTransform>().self().event(flecs::OnSet).each(OnEnableTransform);
-        mWorld.system<const Component::TEcsTransform, Ptr<const Component::TEcsMatrix>, Component::TEcsMatrix>()
-            .term_at(1).parent().cascade()
-            .kind(flecs::PreUpdate)
-            .each([](Entity::Handle Entity,
-                     ConstRef<Component::TEcsTransform> Local,
-                     Ptr<const Component::TEcsMatrix> Parent,
-                     Ref<Component::TEcsMatrix> World)
-            {
-                World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
-                Entity.disable<Component::TEcsTransform>();
-            });
     }
 }

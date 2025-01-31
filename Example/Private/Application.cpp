@@ -24,24 +24,31 @@ namespace Example
 
     Bool Application::OnInitialize()
     {
+        //
         ConstSPtr<Content::Service> Content = GetSubsystem<Content::Service>();
         Content->AddLocator("Root", NewPtr<Content::SystemLocator>("Resources"));
 
+        // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
+        CreateTransformSystem(Scene);
 
-        mEntities[0] = Scene->Create();
-        mEntities[0].SetName("Grand Master");
-        mEntities[0].Attach(Component::TEcsTransform());
+        Scene::Entity GrandMaster = Scene->Create();
+        GrandMaster.SetName("Grand Master");
+        GrandMaster.Attach(Transformf(Vector3f(0, 0, 0)));
 
-        mEntities[1] = Scene->Create();
-        mEntities[1].SetName("Master");
-        mEntities[1].SetParent(mEntities[0]);
-        mEntities[1].Attach(Component::TEcsTransform(Vector3f(10, 0, 0)));
+        Scene::Entity Master = Scene->Create();
+        Master.SetName("Master");
+        Master.SetParent(GrandMaster);
+        Master.Attach(Transformf(Vector3f(10, 0, 0)));
 
-        mEntities[2] = Scene->Create();
-        mEntities[2].SetName("Child");
-        mEntities[2].SetParent(mEntities[1]);
-        mEntities[2].Attach(Component::TEcsTransform(Vector3f(0, 0, 10)));
+        Scene::Entity Child = Scene->Create();
+        Child.SetName("Child");
+        Child.SetParent(Master);
+        Child.Attach(Transformf(Vector3f(0, 0, 10)));
+
+        // Initialize Camera.
+        mCamera.SetOrthographic(GetDevice().GetWidth(), GetDevice().GetHeight(), -1000, +1000);
+        mCamera.Compute();
 
         return true;
     }
@@ -56,7 +63,7 @@ namespace Example
         Rectf Viewport(0, 0, GetDevice().GetWidth(), GetDevice().GetHeight());
         Graphics->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, Color(0, 0, 0, 1), 1, 0);
         {
-
+          //  mTextSystem.Draw(mCamera);
         }
         Graphics->Commit(Graphic::k_Default, false);
         Graphics->Flush();
@@ -68,6 +75,28 @@ namespace Example
     void Application::OnDestroy()
     {
 
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Application::CreateTransformSystem(ConstSPtr<Scene::Service> Scene)
+    {
+        Scene->Register<Transformf, Matrix4f>().add(flecs::CanToggle);
+        
+        static constexpr void (* OnEnableTransform)(Scene::Entity::Handle Entity) = [](Scene::Entity::Handle Entity)
+        {
+            Entity.enable<Transformf>();
+            Entity.children(OnEnableTransform);
+        };
+        Scene->Observer().with<Transformf>().self().event(flecs::OnSet).each(OnEnableTransform);
+        Scene->System<const Transformf, Ptr<const Matrix4f>, Matrix4f>(EcsPreUpdate)
+                .term_at(1).parent().cascade()
+                .each([](Scene::Entity::Handle Entity, ConstRef<Transformf> Local, Ptr<const Matrix4f> Parent, Ref<Matrix4f> World)
+                {
+                    World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
+                    Entity.disable<Transformf>();
+                });
     }
 }
 
