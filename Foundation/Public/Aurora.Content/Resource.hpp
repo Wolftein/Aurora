@@ -107,7 +107,7 @@ namespace Content
         // -=(Undocumented)=-
         Bool HasFinished() const
         {
-            return HasLoaded() || HasFailed();
+            return mStatus != Status::None;
         }
 
         // -=(Undocumented)=-

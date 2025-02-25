@@ -14,6 +14,7 @@
 
 #include "Driver.hpp"
 #include "Encoder.hpp"
+#include "Heap.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -43,6 +44,13 @@ namespace Graphic
 
         // -=(Undocumented)=-
         void Reset(UInt16 Width, UInt16 Height, UInt8 Samples);
+
+        // -=(Undocumented)=-
+        template<typename Format>
+        auto Allocate(Usage Type, UInt32 Length, UInt32 Stride = sizeof(Format))
+        {
+            return mAllocators.front().Allocate<Format>(Type, Length, Stride);
+        }
 
         // -=(Undocumented)=-
         Object CreateBuffer(Usage Type, UInt32 Capacity)
@@ -110,6 +118,9 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
+        static constexpr UInt32 k_Frames = 2;
+
+        // -=(Undocumented)=-
         enum class Command
         {
             Initialize,
@@ -144,9 +155,10 @@ namespace Graphic
 
         UPtr<Driver>                   mDriver;
         Thread                         mWorker;
-        Writer                         mEncoder;
-        Writer                         mDecoder;
+        Writer                         mEncoder;    // TODO: Frame structure
+        Writer                         mDecoder;    // TODO: Frame structure
         Atomic_Flag                    mBusy;
+        Array<Heap, k_Frames>          mAllocators; // TODO: Frame structure
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -33,7 +33,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         constexpr Color(Real32 Red, Real32 Green, Real32 Blue, Real32 Alpha)
-            : mValue { PackFloatColor(Red, Green, Blue, Alpha) }
+            : mValue { Pack(Red, Green, Blue, Alpha) }
         {
         }
 
@@ -119,7 +119,7 @@ inline namespace Math
     private:
 
         // -=(Undocumented)=-
-        static constexpr UInt32 PackFloatColor(Real32 Red, Real32 Green, Real32 Blue, Real32 Alpha)
+        static constexpr UInt32 Pack(Real32 Red, Real32 Green, Real32 Blue, Real32 Alpha)
         {
             if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
             {
