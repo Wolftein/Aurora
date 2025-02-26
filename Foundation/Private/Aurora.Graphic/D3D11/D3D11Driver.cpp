@@ -220,7 +220,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    static auto Fill(Ptr<const UInt8> Data, UInt Layer, UInt Width, UInt Height, TextureFormat Layout)
+    static auto Fill(Ptr<const UInt8> Data, UInt8 Layer, UInt16 Width, UInt16 Height, TextureFormat Layout)
     {
         constexpr static UInt8 kMapping[] = {
             4,      // TextureFormat::BC1UIntNorm
@@ -296,9 +296,9 @@ namespace Graphic
                 Content[Level].SysMemPitch      = Width * (Depth / 8);
                 Content[Level].SysMemSlicePitch = 0;
 
-                Data    += Width * Depth * Height;
-                Width  <<= 2u;
-                Height <<= 2u;
+                Data  += Width * Depth * Height;
+                Width  = Core::Max(1, Width  >> 1);
+                Height = Core::Max(1, Height >> 1);
             }
             return Content;
         }
@@ -401,6 +401,22 @@ namespace Graphic
         Char Buffer[MAX_PATH];
         WideCharToMultiByte(CP_ACP, 0, Value, -1, Buffer, MAX_PATH, nullptr, nullptr);
         return SStr(Buffer);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    static auto AsIndexFormat(UInt32 Stride)
+    {
+        switch (Stride)
+        {
+        case sizeof(UInt8):
+            return DXGI_FORMAT_R8_UINT;
+        case sizeof(UInt16):
+            return DXGI_FORMAT_R16_UINT;
+        default:
+            return DXGI_FORMAT_R32_UINT;
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -592,7 +608,7 @@ namespace Graphic
         const D3D11_COPY_FLAGS Flags = (Discard ? D3D11_COPY_DISCARD : D3D11_COPY_NO_OVERWRITE);
 
         // TODO: Investigate if creating a staging buffer and do CopySubResource is better
-        mDeviceImmediate->UpdateSubresource1(mBuffers[ID].Object.Get(), 0, & Destination, Data.data(), 0, 0, Flags);
+        mDeviceImmediate->UpdateSubresource1(mBuffers[ID].Object.Get(), 0, AddressOf(Destination), Data.data(), 0, 0, Flags);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -672,7 +688,7 @@ namespace Graphic
             D3D11_BLEND_DESC Description = CD3D11_BLEND_DESC(CD3D11_DEFAULT());
 
             Description.RenderTarget[0].BlendEnable           = !(
-                Properties.BlendColorSrcFactor == BlendFactor::One
+                       Properties.BlendColorSrcFactor == BlendFactor::One
                     && Properties.BlendAlphaSrcFactor == BlendFactor::One
                     && Properties.BlendColorDstFactor == BlendFactor::Zero
                     && Properties.BlendAlphaDstFactor == BlendFactor::Zero
@@ -920,7 +936,7 @@ namespace Graphic
     void D3D11Driver::Submit(CPtr<const Submission> Submissions)
     {
         // Apply all job(s).
-        for (UInt Batch = 0; Batch < Submissions.size(); ++Batch)
+        for (UInt32 Batch = 0; Batch < Submissions.size(); ++Batch)
         {
             ConstRef<Submission> NewestSubmission = Submissions[Batch];
             ConstRef<Submission> OldestSubmission = Batch > 0 ? Submissions[Batch - 1] : mStates;
@@ -933,13 +949,8 @@ namespace Graphic
                 OldestSubmission.Indices.Offset != NewestSubmission.Indices.Offset ||
                 OldestSubmission.Indices.Stride != NewestSubmission.Indices.Stride)
             {
-                constexpr auto AsFormat = [](UInt32 Stride) {
-                    return Stride == sizeof(UInt8)  ? DXGI_FORMAT_R8_UINT
-                         : Stride == sizeof(UInt16) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
-                };
-
                 ConstRef<D3D11Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
-                const DXGI_FORMAT     Format = AsFormat(NewestSubmission.Indices.Stride);
+                const DXGI_FORMAT     Format = AsIndexFormat(NewestSubmission.Indices.Stride);
                 mDeviceImmediate->IASetIndexBuffer(Buffer.Object.Get(), Format, NewestSubmission.Indices.Offset);
             }
 
@@ -1005,13 +1016,13 @@ namespace Graphic
             ApplyUniformResources(OldestSubmission, NewestSubmission);
 
             // Issue draw command
+            const UInt32 Count     = NewestSubmission.Primitive.Count;
+            const UInt32 Offset    = NewestSubmission.Primitive.Offset;
+            const SInt32 Base      = NewestSubmission.Primitive.Base;
+            const UInt32 Instances = NewestSubmission.Primitive.Instances;
+
             if (NewestSubmission.Indices.Buffer)
             {
-                const UInt32 Count     = NewestSubmission.Primitive.Count;
-                const UInt32 Offset    = NewestSubmission.Primitive.Offset;
-                const SInt32 Base      = NewestSubmission.Primitive.Base;
-                const UInt32 Instances = NewestSubmission.Primitive.Instances;
-
                 if (Instances)
                 {
                     mDeviceImmediate->DrawIndexedInstanced(Count, Instances, Offset, Base, 0);
@@ -1023,10 +1034,6 @@ namespace Graphic
             }
             else
             {
-                const UInt32 Count     = NewestSubmission.Primitive.Count;
-                const UInt32 Offset    = NewestSubmission.Primitive.Offset;
-                const UInt32 Instances = NewestSubmission.Primitive.Instances;
-
                 if (Instances)
                 {
                     mDeviceImmediate->DrawInstanced(Count, Instances, Offset, 0);
