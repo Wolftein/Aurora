@@ -193,7 +193,11 @@ inline namespace Core
     template<typename Type>
     constexpr CStr Name()
     {
+#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+        return { __PRETTY_FUNCTION__ };
+#else
         return { __FUNCSIG__ };
+#endif
     }
 
     // -=(Undocumented)=-

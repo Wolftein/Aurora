@@ -21,6 +21,7 @@
 #include <memory>
 #include <span>
 #include <string>
+#include <thread>
 #include <unordered_dense.h>
 #include <vector>
 
