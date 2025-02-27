@@ -76,11 +76,11 @@ namespace Graphic
                 // transferring data to the GPU. The second Flush ensures that all data has been
                 // completely processed and synchronized, eliminating any potential latency or
                 // incomplete transfer issues that could arise from a single flush operation.
-                mEncoder.WriteEnum(Command::Initialize);
-                mEncoder.WriteInt(reinterpret_cast<UInt>(Swapchain));
-                mEncoder.WriteUInt16(Width);
-                mEncoder.WriteUInt16(Height);
-                mEncoder.WriteUInt8(Samples);
+                mFrames[k_Default].Queue.WriteEnum(Command::Initialize);
+                mFrames[k_Default].Queue.WriteInt(reinterpret_cast<UInt>(Swapchain));
+                mFrames[k_Default].Queue.WriteUInt16(Width);
+                mFrames[k_Default].Queue.WriteUInt16(Height);
+                mFrames[k_Default].Queue.WriteUInt8(Samples);
                 Flush();
                 Flush();
             }
@@ -105,9 +105,9 @@ namespace Graphic
                 // For each frame, create and initialize the allocator to handle transient buffer allocations.
                 // This ensures that each allocator is properly set up to manage temporary buffers required
                 // for rendering tasks within a single frame.
-                for (Ref<Heap> Allocator : mAllocators)
+                for (Ref<Frame> Frame : mFrames)
                 {
-                    Allocator.Create(* this);
+                    Frame.Allocator.Create(* this);
                 }
             }
         }
@@ -119,10 +119,10 @@ namespace Graphic
 
     void Service::Reset(UInt16 Width, UInt16 Height, UInt8 Samples)
     {
-        mEncoder.WriteEnum(Command::Reset);
-        mEncoder.WriteUInt16(Width);
-        mEncoder.WriteUInt16(Height);
-        mEncoder.WriteUInt8(Samples);
+        mFrames[k_Default].Queue.WriteEnum(Command::Reset);
+        mFrames[k_Default].Queue.WriteUInt16(Width);
+        mFrames[k_Default].Queue.WriteUInt16(Height);
+        mFrames[k_Default].Queue.WriteUInt8(Samples);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -134,11 +134,11 @@ namespace Graphic
 
         if (ID)
         {
-            mEncoder.WriteEnum(Command::CreateBuffer);
-            mEncoder.WriteUInt16(ID);
-            mEncoder.WriteEnum(Type);
-            mEncoder.WriteBool(Immutable);
-            mEncoder.WriteObject(Data);
+            mFrames[k_Default].Queue.WriteEnum(Command::CreateBuffer);
+            mFrames[k_Default].Queue.WriteUInt16(ID);
+            mFrames[k_Default].Queue.WriteEnum(Type);
+            mFrames[k_Default].Queue.WriteBool(Immutable);
+            mFrames[k_Default].Queue.WriteObject(Data);
         }
         return ID;
     }
@@ -148,12 +148,12 @@ namespace Graphic
 
     void Service::CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size)
     {
-        mEncoder.WriteEnum(Command::CopyBuffer);
-        mEncoder.WriteUInt16(DstBuffer);
-        mEncoder.WriteUInt32(DstOffset);
-        mEncoder.WriteUInt16(SrcBuffer);
-        mEncoder.WriteUInt32(SrcOffset);
-        mEncoder.WriteUInt32(Size);
+        mFrames[k_Default].Queue.WriteEnum(Command::CopyBuffer);
+        mFrames[k_Default].Queue.WriteUInt16(DstBuffer);
+        mFrames[k_Default].Queue.WriteUInt32(DstOffset);
+        mFrames[k_Default].Queue.WriteUInt16(SrcBuffer);
+        mFrames[k_Default].Queue.WriteUInt32(SrcOffset);
+        mFrames[k_Default].Queue.WriteUInt32(Size);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -161,11 +161,11 @@ namespace Graphic
 
     void Service::UpdateBuffer(Object ID, Bool Discard, UInt32 Offset, Any<Data> Data)
     {
-        mEncoder.WriteEnum(Command::UpdateBuffer);
-        mEncoder.WriteUInt16(ID);
-        mEncoder.WriteBool(Discard);
-        mEncoder.WriteUInt32(Offset);
-        mEncoder.WriteObject(Data);
+        mFrames[k_Default].Queue.WriteEnum(Command::UpdateBuffer);
+        mFrames[k_Default].Queue.WriteUInt16(ID);
+        mFrames[k_Default].Queue.WriteBool(Discard);
+        mFrames[k_Default].Queue.WriteUInt32(Offset);
+        mFrames[k_Default].Queue.WriteObject(Data);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -173,8 +173,8 @@ namespace Graphic
 
     void Service::DeleteBuffer(Object ID)
     {
-        mEncoder.WriteEnum(Command::DeleteBuffer);
-        mEncoder.WriteUInt16(mBuffers.Free(ID));
+        mFrames[k_Default].Queue.WriteEnum(Command::DeleteBuffer);
+        mFrames[k_Default].Queue.WriteUInt16(mBuffers.Free(ID));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -202,10 +202,10 @@ namespace Graphic
 
         if (ID)
         {
-            mEncoder.WriteEnum(Command::CreatePass);
-            mEncoder.WriteBlock(Colors);
-            mEncoder.WriteBlock(Resolves);
-            mEncoder.Write(Auxiliary);
+            mFrames[k_Default].Queue.WriteEnum(Command::CreatePass);
+            mFrames[k_Default].Queue.WriteBlock(Colors);
+            mFrames[k_Default].Queue.WriteBlock(Resolves);
+            mFrames[k_Default].Queue.Write(Auxiliary);
         }
         return ID;
     }
@@ -215,8 +215,8 @@ namespace Graphic
 
     void Service::DeletePass(Object ID)
     {
-        mEncoder.WriteEnum(Command::DeletePass);
-        mEncoder.WriteUInt16(mPasses.Free(ID));
+        mFrames[k_Default].Queue.WriteEnum(Command::DeletePass);
+        mFrames[k_Default].Queue.WriteUInt16(mPasses.Free(ID));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -228,12 +228,12 @@ namespace Graphic
 
         if (ID)
         {
-            mEncoder.WriteEnum(Command::CreatePipeline);
-            mEncoder.WriteUInt16(ID);
-            mEncoder.WriteObject(Vertex);
-            mEncoder.WriteObject(Fragment);
-            mEncoder.WriteObject(Geometry);
-            mEncoder.Write(Properties);
+            mFrames[k_Default].Queue.WriteEnum(Command::CreatePipeline);
+            mFrames[k_Default].Queue.WriteUInt16(ID);
+            mFrames[k_Default].Queue.WriteObject(Vertex);
+            mFrames[k_Default].Queue.WriteObject(Fragment);
+            mFrames[k_Default].Queue.WriteObject(Geometry);
+            mFrames[k_Default].Queue.Write(Properties);
         }
         return ID;
     }
@@ -243,8 +243,8 @@ namespace Graphic
 
     void Service::DeletePipeline(Object ID)
     {
-        mEncoder.WriteEnum(Command::DeletePipeline);
-        mEncoder.WriteUInt16(mPipelines.Free(ID));
+        mFrames[k_Default].Queue.WriteEnum(Command::DeletePipeline);
+        mFrames[k_Default].Queue.WriteUInt16(mPipelines.Free(ID));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -256,15 +256,15 @@ namespace Graphic
 
         if (ID)
         {
-            mEncoder.WriteEnum(Command::CreateTexture);
-            mEncoder.WriteUInt16(ID);
-            mEncoder.WriteEnum(Format);
-            mEncoder.WriteEnum(Layout);
-            mEncoder.WriteUInt16(Width);
-            mEncoder.WriteUInt16(Height);
-            mEncoder.WriteUInt8(Level);
-            mEncoder.WriteUInt8(Samples);
-            mEncoder.WriteObject(Data);
+            mFrames[k_Default].Queue.WriteEnum(Command::CreateTexture);
+            mFrames[k_Default].Queue.WriteUInt16(ID);
+            mFrames[k_Default].Queue.WriteEnum(Format);
+            mFrames[k_Default].Queue.WriteEnum(Layout);
+            mFrames[k_Default].Queue.WriteUInt16(Width);
+            mFrames[k_Default].Queue.WriteUInt16(Height);
+            mFrames[k_Default].Queue.WriteUInt8(Level);
+            mFrames[k_Default].Queue.WriteUInt8(Samples);
+            mFrames[k_Default].Queue.WriteObject(Data);
         }
         return ID;
     }
@@ -274,13 +274,13 @@ namespace Graphic
 
     void Service::CopyTexture(Object DstTexture, UInt8 DstLevel, ConstRef<Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, ConstRef<Recti> SrcOffset)
     {
-        mEncoder.WriteEnum(Command::CopyTexture);
-        mEncoder.WriteUInt16(DstTexture);
-        mEncoder.WriteUInt8(DstLevel);
-        mEncoder.WriteObject(DstOffset);
-        mEncoder.WriteUInt16(SrcTexture);
-        mEncoder.WriteUInt8(SrcLevel);
-        mEncoder.WriteObject(SrcOffset);
+        mFrames[k_Default].Queue.WriteEnum(Command::CopyTexture);
+        mFrames[k_Default].Queue.WriteUInt16(DstTexture);
+        mFrames[k_Default].Queue.WriteUInt8(DstLevel);
+        mFrames[k_Default].Queue.WriteObject(DstOffset);
+        mFrames[k_Default].Queue.WriteUInt16(SrcTexture);
+        mFrames[k_Default].Queue.WriteUInt8(SrcLevel);
+        mFrames[k_Default].Queue.WriteObject(SrcOffset);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -288,12 +288,12 @@ namespace Graphic
 
     void Service::UpdateTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset, UInt32 Pitch, Any<Data> Data)
     {
-        mEncoder.WriteEnum(Command::UpdateTexture);
-        mEncoder.WriteUInt16(ID);
-        mEncoder.WriteUInt8(Level);
-        mEncoder.WriteObject(Offset);
-        mEncoder.WriteUInt32(Pitch);
-        mEncoder.WriteObject(Data);
+        mFrames[k_Default].Queue.WriteEnum(Command::UpdateTexture);
+        mFrames[k_Default].Queue.WriteUInt16(ID);
+        mFrames[k_Default].Queue.WriteUInt8(Level);
+        mFrames[k_Default].Queue.WriteObject(Offset);
+        mFrames[k_Default].Queue.WriteUInt32(Pitch);
+        mFrames[k_Default].Queue.WriteObject(Data);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -310,8 +310,8 @@ namespace Graphic
 
     void Service::DeleteTexture(Object ID)
     {
-        mEncoder.WriteEnum(Command::DeleteTexture);
-        mEncoder.WriteUInt16(mTextures.Free(ID));
+        mFrames[k_Default].Queue.WriteEnum(Command::DeleteTexture);
+        mFrames[k_Default].Queue.WriteUInt16(mTextures.Free(ID));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -319,13 +319,13 @@ namespace Graphic
 
     void Service::Prepare(Object ID, ConstRef<Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
     {
-        mEncoder.WriteEnum(Command::Prepare);
-        mEncoder.WriteUInt16(ID);
-        mEncoder.WriteObject(Viewport);
-        mEncoder.WriteEnum(Target);
-        mEncoder.WriteObject(Tint);
-        mEncoder.WriteReal32(Depth);
-        mEncoder.WriteUInt8(Stencil);
+        mFrames[k_Default].Queue.WriteEnum(Command::Prepare);
+        mFrames[k_Default].Queue.WriteUInt16(ID);
+        mFrames[k_Default].Queue.WriteObject(Viewport);
+        mFrames[k_Default].Queue.WriteEnum(Target);
+        mFrames[k_Default].Queue.WriteObject(Tint);
+        mFrames[k_Default].Queue.WriteReal32(Depth);
+        mFrames[k_Default].Queue.WriteUInt8(Stencil);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -348,8 +348,8 @@ namespace Graphic
                 EncoderDataPtr = Data(Memory, Submissions.size_bytes(), Data::EMPTY_DELETER);
             }
 
-            mEncoder.WriteEnum(Command::Submit);
-            mEncoder.WriteObject(EncoderDataPtr);
+            mFrames[k_Default].Queue.WriteEnum(Command::Submit);
+            mFrames[k_Default].Queue.WriteObject(EncoderDataPtr);
         }
     }
 
@@ -358,9 +358,9 @@ namespace Graphic
 
     void Service::Commit(Object ID, Bool Synchronised)
     {
-        mEncoder.WriteEnum(Command::Commit);
-        mEncoder.WriteUInt16(ID);
-        mEncoder.WriteBool(Synchronised);
+        mFrames[k_Default].Queue.WriteEnum(Command::Commit);
+        mFrames[k_Default].Queue.WriteUInt16(ID);
+        mFrames[k_Default].Queue.WriteBool(Synchronised);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -368,22 +368,17 @@ namespace Graphic
 
     void Service::Flush()
     {
-        // Commit the current allocator to prepare it for the next set of operations.
-        // This action ensures that any pending allocations are finalized and ready for use.
-        mAllocators.front().Commit(* this);
-        Swap(mAllocators.front(), mAllocators.back());
-
         // Wait until the GPU has finished processing any current tasks.
         // This ensures that the buffer swap occurs only when the GPU is idle.
         mBusy.wait(true);
 
         // Exchange the buffers so that the CPU can write new commands into the
         // encoder buffer while the GPU processes the commands in the decoder buffer.
-        Swap(mEncoder, mDecoder);
+        std::rotate(mFrames.rbegin(), mFrames.rbegin() + 1, mFrames.rend());
 
         // Clear the encoder buffer to prepare it for new data.
         // This is necessary to avoid processing stale or incorrect data in subsequent operations.
-        mEncoder.Clear();
+        mFrames[k_Default].Queue.Clear();
 
         // Notify the GPU has new work to process by setting the busy flag.
         // This flag ensures synchronization between the CPU and GPU tasks.
@@ -409,10 +404,15 @@ namespace Graphic
                 break;
             }
 
+            // Commit the current allocator to prepare it for the next set of operations.
+            // This action ensures that any pending allocations are finalized and ready for use.
+            Ref<Frame> Frame = mFrames[k_InFlightFrames - 1];
+            Frame.Allocator.Commit(* mDriver);
+
             // Continuously process the data as long as there is available data in the decoder.
             // This involves reading commands from the decoder and executing them to update the state
             // or perform necessary actions.
-            Reader Decoder(mDecoder.GetData());
+            Reader Decoder(Frame.Queue.GetData());
             while (Decoder.GetAvailable() > 0)
             {
                 OnExecute(Decoder.ReadEnum<Command>(), Decoder);

@@ -49,7 +49,7 @@ namespace Graphic
         template<typename Format>
         auto Allocate(Usage Type, UInt32 Length, UInt32 Stride = sizeof(Format))
         {
-            return mAllocators.front().Allocate<Format>(Type, Length, Stride);
+            return mFrames[k_Default].Allocator.Allocate<Format>(Type, Length, Stride);
         }
 
         // -=(Undocumented)=-
@@ -118,7 +118,7 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
-        static constexpr UInt32 k_Frames = 2;
+        static constexpr UInt32 k_InFlightFrames = 2;
 
         // -=(Undocumented)=-
         enum class Command
@@ -148,6 +148,16 @@ namespace Graphic
         // -=(Undocumented)=-
         void OnExecute(Command Type, Ref<Reader> Reader);
 
+        // -=(Undocumented)=-
+        struct Frame
+        {
+            // -=(Undocumented)=-
+            Heap   Allocator;
+
+            // -=(Undocumented)=-
+            Writer Queue;
+        };
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -155,10 +165,8 @@ namespace Graphic
 
         UPtr<Driver>                   mDriver;
         Thread                         mWorker;
-        Writer                         mEncoder;    // TODO: Frame structure
-        Writer                         mDecoder;    // TODO: Frame structure
         Atomic_Flag                    mBusy;
-        Array<Heap, k_Frames>          mAllocators; // TODO: Frame structure
+        Array<Frame, k_InFlightFrames> mFrames;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

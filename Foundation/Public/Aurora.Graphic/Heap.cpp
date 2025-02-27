@@ -32,11 +32,11 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Heap::Commit(Ref<Service> Service)
+    void Heap::Commit(Ref<Driver> Driver)
     {
         for (Ref<InFlightBuffer> Buffer : mBuffers)
         {
-            UpdateInFlightBuffer(Service, Buffer);
+            UpdateInFlightBuffer(Driver, Buffer);
         }
     }
 
@@ -54,7 +54,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Heap::UpdateInFlightBuffer(Ref<Service> Service, Ref<InFlightBuffer> Buffer)
+    void Heap::UpdateInFlightBuffer(Ref<Driver> Driver, Ref<InFlightBuffer> Buffer)
     {
         if (Ref<Writer> Memory = Buffer.Memory; Memory.HasData())
         {
@@ -65,13 +65,13 @@ namespace Graphic
 
                 if (Buffer.Handle)
                 {
-                    Service.DeleteBuffer(Buffer.Handle);
+                    Driver.DeleteBuffer(Buffer.Handle);
                 }
-                Buffer.Handle = Service.CreateBuffer(Buffer.Type, false, Memory.GetData());
+                Driver.CreateBuffer(Buffer.Handle, Buffer.Type, false, Memory.GetData().data(), Memory.GetCapacity());
             }
             else
             {
-                Service.UpdateBuffer(Buffer.Handle, false, 0, Memory.GetData());
+                Driver.UpdateBuffer(Buffer.Handle, false, 0, Memory.GetData());
             }
 
             // Clear the CPU buffer to prepare for new data.

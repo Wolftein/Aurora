@@ -40,7 +40,7 @@ namespace Graphic
         void Create(Ref<class Service> Service);
 
         // -=(Undocumented)=-
-        void Commit(Ref<class Service> Service);
+        void Commit(Ref<class Driver> Driver);
 
         // -=(Undocumented)=-
         template<typename Format>
@@ -76,7 +76,7 @@ namespace Graphic
         void CreateInFlightBuffer(Ref<class Service> Service, Ref<InFlightBuffer> Buffer, Usage Type, UInt32 Length);
 
         // -=(Undocumented)=-
-        void UpdateInFlightBuffer(Ref<class Service> Service, Ref<InFlightBuffer> Buffer);
+        void UpdateInFlightBuffer(Ref<class Driver> Driver, Ref<InFlightBuffer> Buffer);
 
         // -=(Undocumented)=-
         template<typename Format>
