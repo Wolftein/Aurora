@@ -10,6 +10,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#define GLAD_GL_IMPLEMENTATION
 #include "GLES3Driver.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -131,19 +132,6 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    static auto As(TextureFilter Value)
-    {
-        constexpr static UInt k_Mapping[] = {
-            GL_NEAREST,                 // TextureFilter::Nearest
-            GL_LINEAR,                  // TextureFilter::Bilinear
-            GL_LINEAR_MIPMAP_LINEAR,    // TextureFilter::Trilinear
-        };
-        return k_Mapping[CastEnum(Value)];
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
     template<UInt Data>
     static auto As(TextureFormat Value)
     {
@@ -225,29 +213,31 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    template<UInt Data>
     static auto As(VertexFormat Value)
     {
-        constexpr static UInt k_Mapping[] = {
-            GL_HALF_FLOAT,              // VertexFormat::Float16x2
-            GL_HALF_FLOAT,              // VertexFormat::Float16x4
-            GL_FLOAT,                   // VertexFormat::Float32x1
-            GL_FLOAT,                   // VertexFormat::Float32x2
-            GL_FLOAT,                   // VertexFormat::Float32x3
-            GL_FLOAT,                   // VertexFormat::Float32x4
-            GL_BYTE,                    // VertexFormat::SInt8x4
-            GL_BYTE,                    // VertexFormat::SIntNorm8x4
-            GL_UNSIGNED_BYTE,           // VertexFormat::UInt8x4
-            GL_UNSIGNED_BYTE,           // VertexFormat::UIntNorm8x4
-            GL_SHORT,                   // VertexFormat::SInt16x2
-            GL_SHORT,                   // VertexFormat::SIntNorm16x2
-            GL_UNSIGNED_SHORT,          // VertexFormat::UInt16x2
-            GL_UNSIGNED_SHORT,          // VertexFormat::UIntNorm16x2
-            GL_SHORT,                   // VertexFormat::SInt16x4
-            GL_SHORT,                   // VertexFormat::SIntNorm16x4
-            GL_UNSIGNED_SHORT,          // VertexFormat::UInt16x4
-            GL_UNSIGNED_SHORT,          // VertexFormat::UIntNorm16x4
+        constexpr static std::tuple<UInt, UInt, UInt> k_Mapping[] = {
+            //   Format          // Size      // Normalized
+            { GL_HALF_FLOAT,         2,         GL_FALSE },     // VertexFormat::Float16x2
+            { GL_HALF_FLOAT,         4,         GL_FALSE },     // VertexFormat::Float16x4
+            { GL_FLOAT,              1,         GL_FALSE },     // VertexFormat::Float32x1
+            { GL_FLOAT,              2,         GL_FALSE },     // VertexFormat::Float32x2
+            { GL_FLOAT,              3,         GL_FALSE },     // VertexFormat::Float32x3
+            { GL_FLOAT,              4,         GL_FALSE },     // VertexFormat::Float32x4
+            { GL_BYTE,               4,         GL_FALSE },     // VertexFormat::SInt8x4
+            { GL_BYTE,               4,         GL_TRUE  },     // VertexFormat::SIntNorm8x4
+            { GL_UNSIGNED_BYTE,      4,         GL_FALSE },     // VertexFormat::UInt8x4
+            { GL_UNSIGNED_BYTE,      4,         GL_TRUE  },     // VertexFormat::UIntNorm8x4
+            { GL_SHORT,              2,         GL_FALSE },     // VertexFormat::SInt16x2
+            { GL_SHORT,              2,         GL_TRUE  },     // VertexFormat::SIntNorm16x2
+            { GL_UNSIGNED_SHORT,     2,         GL_FALSE },     // VertexFormat::UInt16x2
+            { GL_UNSIGNED_SHORT,     2,         GL_TRUE  },     // VertexFormat::UIntNorm16x2
+            { GL_SHORT,              4,         GL_FALSE },     // VertexFormat::SInt16x4
+            { GL_SHORT,              4,         GL_TRUE  },     // VertexFormat::SIntNorm16x4
+            { GL_UNSIGNED_SHORT,     4,         GL_FALSE },     // VertexFormat::UInt16x4
+            { GL_UNSIGNED_SHORT,     4,         GL_TRUE  },     // VertexFormat::UIntNorm16x4
         };
-        return k_Mapping[CastEnum(Value)];
+        return std::get<Data>(k_Mapping[CastEnum(Value)]);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -263,13 +253,34 @@ namespace Graphic
         return k_Mapping[CastEnum(Value)];
     }
 
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    static auto AsIndexFormat(UInt32 Stride)
+    {
+        switch (Stride)
+        {
+        case sizeof(UInt8):
+            return GL_UNSIGNED_BYTE;
+        case sizeof(UInt16):
+            return GL_UNSIGNED_SHORT;
+        default:
+            return GL_UNSIGNED_INT;
+        }
+    }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Bool GLES3Driver::Initialize(Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples)
     {
+        mDevice  = Swapchain;
+        mContext = SDL_GL_CreateContext(Swapchain);
+
+        gladLoadGL(static_cast<GLADloadfunc>(SDL_GL_GetProcAddress));
+
         LoadCapabilities();
+        LoadDefaults();
 
         return true;
     }
@@ -279,6 +290,8 @@ namespace Graphic
 
     void GLES3Driver::Reset(UInt16 Width, UInt16 Height, UInt8 Samples)
     {
+        glViewport(0, 0, Width, Height);
+        // @TODO Multisample
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -294,6 +307,12 @@ namespace Graphic
 
     void GLES3Driver::CreateBuffer(Object ID, Usage Type, Bool Immutable, Ptr<const UInt8> Data, UInt32 Length)
     {
+        Ref<GLES3Buffer> Buffer = mBuffers[ID];
+        Buffer.Type             = As(Type);
+
+        glGenBuffers(1, AddressOf(Buffer.ID));
+        glBindBuffer(Buffer.Type, Buffer.ID);
+        glBufferData(Buffer.Type, Length, Data, Immutable ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -301,7 +320,9 @@ namespace Graphic
 
     void GLES3Driver::CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size)
     {
-
+        glBindBuffer(GL_COPY_READ_BUFFER,  mBuffers[SrcBuffer].ID);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, mBuffers[DstBuffer].ID);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, SrcOffset, DstOffset, Size);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -309,6 +330,16 @@ namespace Graphic
 
     void GLES3Driver::UpdateBuffer(Object ID, Bool Discard, UInt32 Offset, CPtr<const UInt8> Data)
     {
+        const UInt32 Access = GL_MAP_WRITE_BIT | (Discard ? GL_MAP_INVALIDATE_BUFFER_BIT : GL_MAP_UNSYNCHRONIZED_BIT);
+
+        ConstRef<GLES3Buffer> Buffer = mBuffers[ID];
+        glBindBuffer(Buffer.Type, Buffer.ID);
+
+        if (Ptr<void> Memory = glMapBufferRange(Buffer.Type, Offset, Data.size(), Access))
+        {
+            std::memcpy(Memory, Data.data(), Data.size());
+            glUnmapBuffer(Buffer.Type);
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -316,6 +347,7 @@ namespace Graphic
 
     void GLES3Driver::DeleteBuffer(Object ID)
     {
+        mBuffers[ID].~GLES3Buffer();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -323,6 +355,7 @@ namespace Graphic
 
     void GLES3Driver::CreatePass(Object ID, CPtr<const Attachment> Colors, CPtr<const Attachment> Resolves, ConstRef<Attachment> Auxiliary)
     {
+        // TODO FBO
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -330,6 +363,7 @@ namespace Graphic
 
     void GLES3Driver::DeletePass(Object ID)
     {
+        mPasses[ID].~GLES3Pass();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -337,6 +371,66 @@ namespace Graphic
 
     void GLES3Driver::CreatePipeline(Object ID, CPtr<const UInt8> Vertex, CPtr<const UInt8> Pixel, CPtr<const UInt8> Geometry, ConstRef<Descriptor> Properties)
     {
+        Ref<GLES3Pipeline> Pipeline  = mPipelines[ID];
+
+        // Compile all shader(s) into the Pipeline's program and link them.
+        Pipeline.Program = glCreateProgram();
+
+        Compile(Pipeline.Program, GL_VERTEX_SHADER, Vertex);
+        Compile(Pipeline.Program, GL_FRAGMENT_SHADER, Pixel);
+
+        if (!Geometry.empty())
+        {
+            Compile(Pipeline.Program, GL_GEOMETRY_SHADER, Geometry);
+        }
+
+        glLinkProgram(Pipeline.Program);
+
+        // Check if we linked the program with all shader(s)
+        GLint Success;
+        glGetProgramiv(Pipeline.Program, GL_LINK_STATUS, AddressOf(Success));
+        if (!Success)
+        {
+            GLchar Error[512];
+            glGetProgramInfoLog(Pipeline.Program, sizeof(Error), nullptr, Error);
+            Log::Critical("GLES3Driver: Failed to link program {}", Error);
+        }
+
+        // Pre-compile all state properties.
+        Pipeline.Cull                = As(Properties.Cull);
+        Pipeline.Fill                = Properties.Fill ? GL_FILL : GL_LINE;
+        Pipeline.BlendEnabled        = !(
+                   Properties.BlendColorSrcFactor == BlendFactor::One
+                && Properties.BlendAlphaSrcFactor == BlendFactor::One
+                && Properties.BlendColorDstFactor == BlendFactor::Zero
+                && Properties.BlendAlphaDstFactor == BlendFactor::Zero
+                && Properties.BlendColorEquation  == BlendFunction::Add
+                && Properties.BlendAlphaEquation  == BlendFunction::Add);
+        Pipeline.BlendMask           = static_cast<UInt32>(Properties.BlendMask);
+        Pipeline.BlendColorSrcFactor = As(Properties.BlendColorSrcFactor);
+        Pipeline.BlendColorDstFactor = As(Properties.BlendColorDstFactor);
+        Pipeline.BlendColorEquation  = As(Properties.BlendColorEquation);
+        Pipeline.BlendAlphaSrcFactor = As(Properties.BlendAlphaSrcFactor);
+        Pipeline.BlendAlphaDstFactor = As(Properties.BlendAlphaDstFactor);
+        Pipeline.BlendAlphaEquation  = As(Properties.BlendAlphaEquation);
+        Pipeline.DepthEnabled        = Properties.DepthCondition != TestCondition::Always || Properties.DepthMask;
+        Pipeline.DepthMask           = Properties.DepthMask;
+        Pipeline.DepthCondition      = As(Properties.DepthCondition);
+        Pipeline.StencilEnabled      = Properties.StencilCondition   != TestCondition::Always
+                                    || Properties.StencilOnFail      != TestAction::Keep
+                                    || Properties.StencilOnDepthFail != TestAction::Keep
+                                    || Properties.StencilOnDepthPass != TestAction::Keep;
+        Pipeline.StencilMask         = Properties.StencilMask;
+        Pipeline.StencilCondition    = As(Properties.StencilCondition);
+        Pipeline.StencilOnFail       = As(Properties.StencilOnFail);
+        Pipeline.StencilOnZFail      = As(Properties.StencilOnDepthFail);
+        Pipeline.StencilOnZPass      = As(Properties.StencilOnDepthPass);
+        Pipeline.InputTopology       = As(Properties.InputTopology);
+
+        for (UInt32 Count = 0; Count < k_MaxAttributes && Properties.InputLayout[Count].ID != VertexSemantic::None; ++Count)
+        {
+            Pipeline.InputAttributes[Count] = Properties.InputLayout[Count];
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -344,6 +438,7 @@ namespace Graphic
 
     void GLES3Driver::DeletePipeline(Object ID)
     {
+        mPipelines[ID].~GLES3Pipeline();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -351,6 +446,31 @@ namespace Graphic
 
     void GLES3Driver::CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data)
     {
+        Ref<GLES3Texture> Texture = mTextures[ID];
+        Texture.Format            = As<1>(Format);
+        Texture.Type              = As<2>(Format);
+
+        ConstPtr<UInt8> Bytes = Data.data();
+        const UInt32 Kind     = As<0>(Format);
+        const UInt32 Depth    = As<3>(Format);
+
+        glGenTextures(1, AddressOf(Texture.ID));
+        glBindTexture(GL_TEXTURE_2D, Texture.ID);
+
+        for (UInt8 Index = 0; Index < Level; ++Index)
+        {
+            // @TODO: Compressed format(s)
+            glTexImage2D(GL_TEXTURE_2D, Index, Kind, Width, Height, 0, Texture.Format, Texture.Type, Bytes);
+
+            Bytes += (Width * Depth * Height);
+            Width  = Max(1, Width  >> 1);
+            Height = Max(1, Height >> 1);
+        }
+
+        if (Level == 0)
+        {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -358,6 +478,21 @@ namespace Graphic
 
     void GLES3Driver::UpdateTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset, UInt32 Pitch, CPtr<const UInt8> Data)
     {
+        ConstRef<GLES3Texture> Texture = mTextures[ID];
+
+        glBindTexture(GL_TEXTURE_2D, Texture.ID);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, Pitch);
+        // @TODO: Compressed format(s)
+        glTexSubImage2D(
+                GL_TEXTURE_2D,
+                Level,
+                Offset.GetLeft(),
+                Offset.GetTop(),
+                Offset.GetWidth(),
+                Offset.GetHeight(),
+                Texture.Format,
+                Texture.Type,
+                Data.data());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -365,6 +500,7 @@ namespace Graphic
 
     void GLES3Driver::CopyTexture(Object DstTexture, UInt8 DstLevel, ConstRef<Vector2i> DstOffset, Object SrcTexture, UInt8 SrcLevel, ConstRef<Recti> SrcOffset)
     {
+        // TODO
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -372,7 +508,7 @@ namespace Graphic
 
     Data GLES3Driver::ReadTexture(Object ID, UInt8 Level, ConstRef<Recti> Offset)
     {
-        return Data();
+        return Data();  // TODO
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -380,6 +516,7 @@ namespace Graphic
 
     void GLES3Driver::DeleteTexture(Object ID)
     {
+        mTextures[ID].~GLES3Texture();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -387,6 +524,22 @@ namespace Graphic
 
     void GLES3Driver::Prepare(Object ID, ConstRef<Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil)
     {
+        // @TODO FBO
+        // @TODO Multisample
+        // @TODO Cache
+        glClearColor(Tint.GetRed(), Tint.GetGreen(), Tint.GetBlue(), Tint.GetAlpha());
+        glClearDepth(Depth);
+        glClearStencil(Stencil);
+        glScissor(0, 0, Viewport.GetWidth(), Viewport.GetHeight());
+        glClear(As(Target));
+
+        if (mViewport != Viewport)
+        {
+            mViewport.Set(Viewport.GetLeft(), Viewport.GetTop(), Viewport.GetWidth(), Viewport.GetHeight());
+            glViewport(Viewport.GetLeft(), Viewport.GetTop(), Viewport.GetWidth(), Viewport.GetHeight());
+        }
+
+        mSubmission.Scissor.Set(0, 0, Viewport.GetWidth(), Viewport.GetHeight());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -394,6 +547,91 @@ namespace Graphic
 
     void GLES3Driver::Submit(CPtr<const Submission> Submissions)
     {
+        // Apply all job(s).
+        for (UInt32 Batch = 0; Batch < Submissions.size(); ++Batch)
+        {
+            ConstRef<Submission> NewestSubmission = Submissions[Batch];
+            ConstRef<Submission> OldestSubmission = Batch > 0 ? Submissions[Batch - 1] : mSubmission;
+
+            // Apply the scissor rect
+            if (OldestSubmission.Scissor != NewestSubmission.Scissor)
+            {
+                const Real32 TopLeftY
+                    = mViewport.GetHeight() - NewestSubmission.Scissor.GetY() - NewestSubmission.Scissor.GetHeight();
+
+                glScissor(NewestSubmission.Scissor.GetX(),
+                          TopLeftY,
+                          NewestSubmission.Scissor.GetWidth(),
+                          NewestSubmission.Scissor.GetHeight());
+            }
+
+            // Apply pipeline
+            ApplyPipeline(OldestSubmission, NewestSubmission);
+
+            // Apply stage(s) resources
+            ApplyResources(OldestSubmission, NewestSubmission);
+
+            // Apply vertices
+            ApplyVertex(OldestSubmission, NewestSubmission);
+
+            // Apply indices
+            if (OldestSubmission.Indices.Buffer != NewestSubmission.Indices.Buffer)
+            {
+                Ref<const GLES3Buffer> Buffer = mBuffers[NewestSubmission.Indices.Buffer];
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffer.ID);
+            }
+
+            // Issue draw command
+            const UInt32 Count     = NewestSubmission.Primitive.Count;
+            const UInt32 Offset    = NewestSubmission.Primitive.Offset;
+            const SInt32 Base      = NewestSubmission.Primitive.Base;
+            const UInt32 Instances = NewestSubmission.Primitive.Instances;
+            const UInt32 Topology  = mPipelines[NewestSubmission.Pipeline].InputTopology;
+
+            if (NewestSubmission.Indices.Buffer)
+            {
+                const UInt32 Stride     = AsIndexFormat(NewestSubmission.Indices.Stride);
+                const Ptr<void> Pointer = reinterpret_cast<Ptr<void>>(
+                        OldestSubmission.Indices.Offset + Offset * NewestSubmission.Indices.Stride);
+
+                if (Base)
+                {
+                    if (Instances)
+                    {
+                        glDrawElementsInstancedBaseVertex(Topology, Count, Stride, Pointer, Instances, Base);
+                    }
+                    else
+                    {
+                        glDrawElementsBaseVertex(Topology, Count, Stride, Pointer, Base);
+                    }
+                }
+                else
+                {
+                    if (Instances)
+                    {
+                        glDrawElementsInstanced(Topology, Count, Stride, Pointer, Instances);
+                    }
+                    else
+                    {
+                        glDrawElements(Topology, Count, Stride, Pointer);
+                    }
+                }
+            }
+            else
+            {
+                if (Instances)
+                {
+                    glDrawArraysInstanced(Topology, Offset, Count, Instances);
+                }
+                else
+                {
+                    glDrawArrays(Topology, Offset, Count);
+                }
+            }
+        }
+
+        // Apply cache
+        mSubmission = Submissions.back();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -401,6 +639,16 @@ namespace Graphic
 
     void GLES3Driver::Commit(Object ID, Bool Synchronised)
     {
+        if (ID == k_Default)
+        {
+            SDL_GL_SetSwapInterval(Synchronised ? 1 : 0);
+            SDL_GL_SwapWindow(mDevice);
+        }
+        else
+        {
+            // @TODO FBO
+            // @TODO Multisample
+        }
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -409,6 +657,321 @@ namespace Graphic
     void GLES3Driver::LoadCapabilities()
     {
         mCapabilities.Backend = Backend::GLES3;
+        // @TODO Capabilities
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void GLES3Driver::LoadDefaults()
+    {
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_STENCIL_TEST);
+        glEnable(GL_LINE_SMOOTH);
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_SCISSOR_TEST);
+        glFrontFace(GL_CCW);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glPixelStorei(GL_PACK_ALIGNMENT,   1);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Bool GLES3Driver::Compile(UInt32 Program, UInt32 Type, CPtr<const UInt8> Shader)
+    {
+        if (const UInt32 ID = glCreateShader(Type); ID > 0)
+        {
+            const auto Data = reinterpret_cast<Ptr<const GLchar>>(Shader.data());
+            const auto Size = static_cast<GLint>(Shader.size());
+
+            glShaderSource(ID, 1, AddressOf(Data), AddressOf(Size));
+            glCompileShader(ID);
+
+            GLint Success;
+            glGetShaderiv(ID, GL_COMPILE_STATUS, AddressOf(Success));
+
+            if (Success)
+            {
+                glAttachShader(Program, ID);
+                glDeleteShader(ID);
+                return true;
+            }
+            else
+            {
+                GLchar Error[512];
+                glGetShaderInfoLog(ID, sizeof(Error), nullptr, Error);
+                Log::Critical("GLES3Driver: Failed to compile shader {}", Error);
+            }
+        }
+        return false;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Ref<GLES3Driver::GLES3Sampler> GLES3Driver::GetOrCreateSampler(ConstRef<Sampler> Descriptor)
+    {
+        Ref<GLES3Sampler> Sampler = mSamplers[
+                static_cast<UInt32>(Descriptor.EdgeU)       |
+                static_cast<UInt32>(Descriptor.EdgeV)  << 2 |
+                static_cast<UInt32>(Descriptor.Filter) << 4];
+
+        if (!Sampler.ID)
+        {
+            glGenSamplers(1, AddressOf(Sampler.ID));
+
+            switch (Descriptor.Filter)
+            {
+            case TextureFilter::Nearest:
+                glSamplerParameteri(Sampler.ID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glSamplerParameteri(Sampler.ID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                break;
+            case TextureFilter::Bilinear:
+                glSamplerParameteri(Sampler.ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glSamplerParameteri(Sampler.ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                break;
+            case TextureFilter::Trilinear:
+            case TextureFilter::Anisotropic:
+                glSamplerParameteri(Sampler.ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                glSamplerParameteri(Sampler.ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                break;
+            }
+
+            glSamplerParameteri(Sampler.ID, GL_TEXTURE_WRAP_S, As(Descriptor.EdgeU));
+            glSamplerParameteri(Sampler.ID, GL_TEXTURE_WRAP_T, As(Descriptor.EdgeV));
+
+            if (Descriptor.Filter == TextureFilter::Anisotropic)
+            {
+                glSamplerParameteri(Sampler.ID, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16); // @TODO Maximum possible anisotropic
+            }
+        }
+        return Sampler;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void GLES3Driver::ApplyVertex(ConstRef<Submission> Oldest, ConstRef<Submission> Newest)
+    {
+        ConstRef<GLES3Pipeline> OldestPipeline = mPipelines[Oldest.Pipeline];
+        ConstRef<GLES3Pipeline> NewestPipeline = mPipelines[Newest.Pipeline];
+
+        SInt32 Slot   = -1;
+        UInt32 Stride = 0;
+        UInt32 Offset = 0;
+
+        for (UInt32 Element = 0; Element < k_MaxAttributes; ++Element)
+        {
+            ConstRef<Attribute> Old = OldestPipeline.InputAttributes[Element];
+            ConstRef<Attribute> New = NewestPipeline.InputAttributes[Element];
+
+            if (Slot != New.Slot)
+            {
+                Slot   = New.Slot;
+                Stride = Newest.Vertices[Slot].Stride;
+                Offset = Newest.Vertices[Slot].Offset;
+
+                if (Newest.Vertices[Slot].Buffer != Oldest.Vertices[Slot].Buffer)
+                {
+                    glBindBuffer(GL_ARRAY_BUFFER, Newest.Vertices[Slot].Buffer);
+                }
+            }
+
+            if (New.ID != VertexSemantic::None)
+            {
+                if (Old.ID == VertexSemantic::None)
+                {
+                    glEnableVertexAttribArray(Element);
+                }
+
+                if (   Old.Format  != New.Format
+                    || Old.Divisor != New.Divisor
+                    || Old.Slot    != New.Slot
+                    || Old.Offset  != New.Offset
+                    || Newest.Vertices[Slot].Offset != Oldest.Vertices[Slot].Offset
+                    || Newest.Vertices[Slot].Stride != Oldest.Vertices[Slot].Stride)
+                {
+                    glVertexAttribPointer(Element,
+                                          As<1>(New.Format),
+                                          As<0>(New.Format),
+                                          As<2>(New.Format),
+                                          Stride,
+                                          reinterpret_cast<const void*>(Offset + New.Offset));
+                }
+
+                if (Old.Divisor != New.Divisor)
+                {
+                    glVertexAttribDivisor(Element, New.Divisor);
+                }
+            }
+            else
+            {
+                if (Old.ID != VertexSemantic::None)
+                {
+                    glDisableVertexAttribArray(Element);
+                }
+            }
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void GLES3Driver::ApplyPipeline(ConstRef<Submission> Oldest, ConstRef<Submission> Newest)
+    {
+        if (Oldest.Pipeline != Newest.Pipeline)
+        {
+            ConstRef<GLES3Pipeline> Old = mPipelines[Oldest.Pipeline];
+            ConstRef<GLES3Pipeline> New = mPipelines[Newest.Pipeline];
+
+            if (New.Cull != Old.Cull)
+            {
+                if (New.Cull == GL_NONE)
+                {
+                    glDisable(GL_CULL_FACE);
+                }
+                else
+                {
+                    if (Old.Cull == GL_NONE)
+                    {
+                        glEnable(GL_CULL_FACE);
+                    }
+                    glCullFace(New.Cull);
+                }
+            }
+
+            if (New.Fill != Old.Fill)
+            {
+                glPolygonMode(GL_FRONT_AND_BACK, New.Fill);
+            }
+
+            if (New.BlendEnabled != Old.BlendEnabled)
+            {
+                if (New.BlendEnabled)
+                {
+                    glEnable(GL_BLEND);
+                }
+                else
+                {
+                    glDisable(GL_BLEND);
+                }
+            }
+
+            if (   New.BlendColorSrcFactor != Old.BlendColorSrcFactor
+                || New.BlendColorDstFactor != Old.BlendColorDstFactor
+                || New.BlendAlphaSrcFactor != Old.BlendAlphaSrcFactor
+                || New.BlendAlphaDstFactor != Old.BlendAlphaDstFactor)
+            {
+                glBlendFuncSeparate(New.BlendColorSrcFactor, New.BlendColorDstFactor,
+                                    New.BlendAlphaSrcFactor, New.BlendAlphaDstFactor);
+            }
+
+            if (New.BlendColorEquation != Old.BlendColorEquation || New.BlendAlphaEquation != Old.BlendAlphaEquation)
+            {
+                glBlendEquationSeparate(New.BlendColorEquation, New.BlendAlphaEquation);
+            }
+
+            if (New.DepthEnabled != Old.DepthEnabled)
+            {
+                if (New.DepthEnabled)
+                {
+                    glEnable(GL_DEPTH_TEST);
+                }
+                else
+                {
+                    glDisable(GL_DEPTH_TEST);
+                }
+            }
+
+            if (New.DepthMask != Old.DepthMask)
+            {
+                glDepthMask(New.DepthMask);
+            }
+
+            if (New.DepthCondition != Old.DepthCondition)
+            {
+                glDepthFunc(New.DepthCondition);
+            }
+
+            if (New.StencilEnabled != Old.StencilEnabled)
+            {
+                if (New.StencilEnabled)
+                {
+                    glEnable(GL_STENCIL_TEST);
+                }
+                else
+                {
+                    glDisable(GL_STENCIL_TEST);
+                }
+            }
+
+            if (New.StencilMask != Old.StencilMask)
+            {
+                glStencilMask(New.StencilMask);
+            }
+
+            if (New.StencilCondition != Old.StencilCondition || Newest.Stencil != Oldest.Stencil)
+            {
+                glStencilFunc(New.StencilCondition, Newest.Stencil, 0xFF);
+            }
+
+            if (   New.StencilOnFail  != Old.StencilOnFail
+                || New.StencilOnZFail != Old.StencilOnZFail
+                || New.StencilOnZPass != Old.StencilOnZPass)
+            {
+                glStencilOp(New.StencilOnFail, New.StencilOnZFail, New.StencilOnZPass);
+            }
+
+            if (New.Program != Old.Program)
+            {
+                glUseProgram(New.Program);
+            }
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void GLES3Driver::ApplyResources(ConstRef<Submission> Oldest, ConstRef<Submission> Newest)
+    {
+        // Apply texture(s)
+        for (UInt32 Index = 0; Index < k_MaxSlots && Newest.Textures[Index] != 0; ++Index)
+        {
+            const UInt32 OldTexture = Oldest.Textures[Index];
+            const UInt32 NewTexture = Newest.Textures[Index];
+
+            if (OldTexture != NewTexture)
+            {
+                glActiveTexture(GL_TEXTURE0 + Index);
+                glBindTexture(GL_TEXTURE_2D, mTextures[NewTexture].ID);
+            }
+        }
+
+        // Apply sampler(s)
+        for (UInt32 Index = 0; Index < k_MaxSlots; ++Index)
+        {
+            ConstRef<GLES3Sampler> Old = GetOrCreateSampler(Oldest.Samplers[Index]);
+            ConstRef<GLES3Sampler> New = GetOrCreateSampler(Newest.Samplers[Index]);
+
+            if (Old.ID != New.ID)
+            {
+                glBindSampler(Index, New.ID);
+            }
+        }
+
+        // Apply uniform buffer(s)
+        for (UInt32 Register = 0; Register < k_MaxUniforms; ++Register)
+        {
+            Ref<const Binding> Old = Oldest.Uniforms[Register];
+            Ref<const Binding> New = Newest.Uniforms[Register];
+
+            if (Old.Buffer != New.Buffer || Old.Offset != New.Offset || Old.Stride != New.Stride)
+            {
+                glBindBufferRange(GL_UNIFORM_BUFFER, Register, mBuffers[New.Buffer].ID, New.Offset, New.Stride);
+            }
+        }
     }
 }
 

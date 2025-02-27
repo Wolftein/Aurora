@@ -1287,9 +1287,9 @@ namespace Graphic
     Ref<D3D11Driver::D3D11Sampler> D3D11Driver::GetOrCreateSampler(ConstRef<Sampler> Descriptor)
     {
         Ref<D3D11Sampler> Sampler = mSamplers[
-            static_cast<UInt>(Descriptor.EdgeU)       |
-            static_cast<UInt>(Descriptor.EdgeV)  << 2 |
-            static_cast<UInt>(Descriptor.Filter) << 4];
+            static_cast<UInt32>(Descriptor.EdgeU)       |
+            static_cast<UInt32>(Descriptor.EdgeV)  << 2 |
+            static_cast<UInt32>(Descriptor.Filter) << 4];
 
         if (!Sampler.Resource)
         {

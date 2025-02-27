@@ -13,8 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Aurora.Graphic/Driver.hpp"
-#include <SDL3/SDL_opengl.h>
-#include <SDL3/SDL_opengl_glext.h>
+#include "GLES3.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -87,13 +86,219 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
+        struct GLES3Buffer
+        {
+            // -=(Undocumented)=-
+            UInt32 ID;
+
+            // -=(Undocumented)=-
+            UInt32 Type;
+
+            // -=(Undocumented)=-
+            GLES3Buffer()
+                : ID { 0 }
+            {
+            }
+
+            // -=(Undocumented)=-
+            ~GLES3Buffer()
+            {
+                if (ID)
+                {
+                    glDeleteBuffers(1, AddressOf(ID));
+                }
+                ID = 0;
+            }
+        };
+
+        // -=(Undocumented)=-
+        struct GLES3Pass
+        {
+            // TODO
+        };
+
+        // -=(Undocumented)=-
+        struct GLES3Pipeline
+        {
+            // -=(Undocumented)=-
+            UInt32                            Program;
+
+            // -=(Undocumented)=-
+            GLint                             Cull;
+
+            // -=(Undocumented)=-
+            GLint                             Fill;
+
+            // -=(Undocumented)=-
+            GLboolean                         BlendEnabled;
+
+            // -=(Undocumented)=-
+            GLint                             BlendMask;
+
+            // -=(Undocumented)=-
+            GLint                             BlendColorSrcFactor;
+
+            // -=(Undocumented)=-
+            GLint                             BlendColorDstFactor;
+
+            // -=(Undocumented)=-
+            GLint                             BlendColorEquation;
+
+            // -=(Undocumented)=-
+            GLint                             BlendAlphaSrcFactor;
+
+            // -=(Undocumented)=-
+            GLint                             BlendAlphaDstFactor;
+
+            // -=(Undocumented)=-
+            GLint                             BlendAlphaEquation;
+
+            // -=(Undocumented)=-
+            GLboolean                         DepthEnabled;
+
+            // -=(Undocumented)=-
+            GLint                             DepthMask;
+
+            // -=(Undocumented)=-
+            GLint                             DepthCondition;
+
+            // -=(Undocumented)=-
+            GLboolean                         StencilEnabled;
+
+            // -=(Undocumented)=-
+            GLint                             StencilMask;
+
+            // -=(Undocumented)=-
+            GLint                             StencilCondition;
+
+            // -=(Undocumented)=-
+            GLint                             StencilOnFail;
+
+            // -=(Undocumented)=-
+            GLint                             StencilOnZFail;
+
+            // -=(Undocumented)=-
+            GLint                             StencilOnZPass;
+
+            // -=(Undocumented)=-
+            GLint                             InputTopology;
+
+            // -=(Undocumented)=-
+            GLint                             InputStride;
+
+            // -=(Undocumented)=-
+            Array<Attribute, k_MaxAttributes> InputAttributes;
+
+            // -=(Undocumented)=-
+            GLES3Pipeline()
+                : Program { 0 }
+            {
+            }
+
+            // -=(Undocumented)=-
+            ~GLES3Pipeline()
+            {
+                if (Program)
+                {
+                    glDeleteProgram(Program);
+                }
+                Program = 0;
+            }
+        };
+
+        // -=(Undocumented)=-
+        struct GLES3Sampler
+        {
+            // -=(Undocumented)=-
+            UInt32 ID;
+
+            // -=(Undocumented)=-
+            GLES3Sampler()
+                : ID { 0 }
+            {
+            }
+
+            // -=(Undocumented)=-
+            ~GLES3Sampler()
+            {
+                if (ID)
+                {
+                    glDeleteSamplers(1, AddressOf(ID));
+                }
+                ID = 0;
+            }
+        };
+
+        // -=(Undocumented)=-
+        struct GLES3Texture
+        {
+            // -=(Undocumented)=-
+            UInt32 ID;
+
+            // -=(Undocumented)=-
+            UInt32 Format;
+
+            // -=(Undocumented)=-
+            UInt32 Type;
+
+            // -=(Undocumented)=-
+            GLES3Texture()
+                : ID { 0 }
+            {
+            }
+
+            // -=(Undocumented)=-
+            ~GLES3Texture()
+            {
+                if (ID)
+                {
+                    glDeleteTextures(1, AddressOf(ID));
+                }
+                ID = 0;
+            }
+        };
+
+    private:
+
+        // -=(Undocumented)=-
         void LoadCapabilities();
+
+        // -=(Undocumented)=-
+        void LoadDefaults();
+
+        // -=(Undocumented)=-
+        Bool Compile(UInt32 Program, UInt32 Type, CPtr<const UInt8> Shader);
+
+        // -=(Undocumented)=-
+        Ref<GLES3Sampler> GetOrCreateSampler(ConstRef<Sampler> Descriptor);
+
+        // -=(Undocumented)=-
+        void ApplyVertex(ConstRef<Submission> Oldest, ConstRef<Submission> Newest);
+
+        // -=(Undocumented)=-
+        void ApplyPipeline(ConstRef<Submission> Oldest, ConstRef<Submission> Newest);
+
+        // -=(Undocumented)=-
+        void ApplyResources(ConstRef<Submission> Oldest, ConstRef<Submission> Newest);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Capabilities mCapabilities;
+        Ptr<SDL_Window> mDevice;
+        SDL_GLContext   mContext;
+        Capabilities    mCapabilities;
+        Submission      mSubmission;
+        Rectf           mViewport;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        GLES3Buffer     mBuffers[k_MaxBuffers];
+        GLES3Pass       mPasses[k_MaxPasses];
+        GLES3Pipeline   mPipelines[k_MaxPipelines];
+        GLES3Sampler    mSamplers[k_MaxSamplers];
+        GLES3Texture    mTextures[k_MaxTextures];
     };
 }
