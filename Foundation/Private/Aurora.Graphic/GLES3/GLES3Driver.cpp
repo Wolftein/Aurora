@@ -277,7 +277,11 @@ namespace Graphic
         mDevice  = Swapchain;
         mContext = SDL_GL_CreateContext(Swapchain);
 
+#if defined(SDL_PLATFORM_ANDROID) || defined(SDL_PLATFORM_EMSCRIPTEN)
+        gladLoadGLES2(static_cast<GLADloadfunc>(SDL_GL_GetProcAddress));
+#else
         gladLoadGL(static_cast<GLADloadfunc>(SDL_GL_GetProcAddress));
+#endif
 
         LoadCapabilities();
         LoadDefaults();
@@ -528,7 +532,13 @@ namespace Graphic
         // @TODO Multisample
         // @TODO Cache
         glClearColor(Tint.GetRed(), Tint.GetGreen(), Tint.GetBlue(), Tint.GetAlpha());
+
+#if defined(SDL_PLATFORM_ANDROID) || defined(SDL_PLATFORM_EMSCRIPTEN)
+        glClearDepthf(Depth);
+#else
         glClearDepth(Depth);
+#endif
+
         glClearStencil(Stencil);
         glScissor(0, 0, Viewport.GetWidth(), Viewport.GetHeight());
         glClear(As(Target));
@@ -556,11 +566,8 @@ namespace Graphic
             // Apply the scissor rect
             if (OldestSubmission.Scissor != NewestSubmission.Scissor)
             {
-                const Real32 TopLeftY
-                    = mViewport.GetHeight() - NewestSubmission.Scissor.GetY() - NewestSubmission.Scissor.GetHeight();
-
-                glScissor(NewestSubmission.Scissor.GetX(),
-                          TopLeftY,
+                glScissor(NewestSubmission.Scissor.GetLeft(),
+                          mViewport.GetHeight() - NewestSubmission.Scissor.GetBottom(),
                           NewestSubmission.Scissor.GetWidth(),
                           NewestSubmission.Scissor.GetHeight());
             }
@@ -667,11 +674,8 @@ namespace Graphic
     {
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_STENCIL_TEST);
-        glEnable(GL_LINE_SMOOTH);
-        glEnable(GL_MULTISAMPLE);
         glEnable(GL_SCISSOR_TEST);
         glFrontFace(GL_CCW);
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glPixelStorei(GL_PACK_ALIGNMENT,   1);
     }

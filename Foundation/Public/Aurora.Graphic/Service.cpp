@@ -109,6 +109,7 @@ namespace Graphic
                 {
                     Frame.Allocator.Create(* this);
                 }
+                Flush();
             }
         }
         return Successful;
