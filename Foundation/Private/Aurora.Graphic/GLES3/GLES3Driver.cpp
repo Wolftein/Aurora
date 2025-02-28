@@ -545,7 +545,7 @@ namespace Graphic
 
         if (mViewport != Viewport)
         {
-            mViewport.Set(Viewport.GetLeft(), Viewport.GetTop(), Viewport.GetWidth(), Viewport.GetHeight());
+            mViewport = Viewport;
             glViewport(Viewport.GetLeft(), Viewport.GetTop(), Viewport.GetWidth(), Viewport.GetHeight());
         }
 
@@ -846,10 +846,12 @@ namespace Graphic
                 }
             }
 
+#if !defined(SDL_PLATFORM_ANDROID) && !defined(SDL_PLATFORM_EMSCRIPTEN)
             if (New.Fill != Old.Fill)
             {
                 glPolygonMode(GL_FRONT_AND_BACK, New.Fill);
             }
+#endif
 
             if (New.BlendEnabled != Old.BlendEnabled)
             {
