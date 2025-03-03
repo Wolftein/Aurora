@@ -84,9 +84,9 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto System(UInt64 Phase = EcsOnUpdate)
+        auto System()
         {
-            return mWorld.template system<Components...>().kind(Phase);
+            return mWorld.template system<Components...>();
         }
 
     private:

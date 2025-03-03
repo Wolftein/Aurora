@@ -7,7 +7,7 @@
 
 [Properties.Depth]  # Disable Depth Write
 
-	Mask            = 0
+	Mask            = 1
 	Condition       = "LessEqual"
 
 [Properties.Layout]

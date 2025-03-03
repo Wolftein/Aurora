@@ -82,9 +82,10 @@ float4 fragment(ps_Input Input) : SV_Target
     float medianSample = Median(sample);
     float signedDistance = medianSample - 0.5f;
 
-    float strokeDistance = -(abs(medianSample - 0.25f - uOutlineThickness) - uOutlineThickness);
-
     float opacity = GetOpacityFromDistance(signedDistance, Jdx, Jdy);
+    clip(opacity <= 0.01 ? -1 : +1);
+
+    float strokeDistance = -(abs(medianSample - 0.25f - uOutlineThickness) - uOutlineThickness);
     float strokeOpacity = GetOpacityFromDistance(strokeDistance, Jdx, Jdy);
 
     return lerp(uOutlineColor, Input.Color, opacity) * max(opacity, strokeOpacity);

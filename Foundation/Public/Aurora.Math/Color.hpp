@@ -46,49 +46,105 @@ inline namespace Math
         // -=(Undocumented)=-
         void SetRed(UInt32 Value)
         {
-            mValue = (mValue & ~(0xFF << 24)) | ((Value & 0xFF) << 24);
+            if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+            {
+                mValue = (mValue & ~0xFFu) | (Value & 0xFFu);
+            }
+            else
+            {
+                mValue = (mValue & ~(0xFFu << 24)) | ((Value & 0xFFu) << 24);
+            }
         }
 
         // -=(Undocumented)=-
         constexpr UInt32 GetRed() const
         {
-            return mValue >> 24 & 0xFF;
+            if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+            {
+                return mValue & 0xFFu;
+            }
+            else
+            {
+                return (mValue >> 24) & 0xFFu;
+            }
         }
 
         // -=(Undocumented)=-
         void SetGreen(UInt32 Value)
         {
-            mValue = mValue & ~(0xFF << 16) | (Value & 0xFF) << 16;
+            if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+            {
+                mValue = (mValue & ~(0xFFu << 8)) | ((Value & 0xFFu) << 8);
+            }
+            else
+            {
+                mValue = (mValue & ~(0xFFu << 16)) | ((Value & 0xFFu) << 16);
+            }
         }
 
         // -=(Undocumented)=-
         constexpr UInt32 GetGreen() const
         {
-            return mValue >> 16 & 0xFF;
+            if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+            {
+                return (mValue >> 8) & 0xFFu;
+            }
+            else
+            {
+                return (mValue >> 16) & 0xFFu;
+            }
         }
 
         // -=(Undocumented)=-
         void SetBlue(UInt32 Value)
         {
-            mValue = mValue & ~(0xFF << 8) | (Value & 0xFF) << 8;
+            if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+            {
+                mValue = (mValue & ~(0xFFu << 16)) | ((Value & 0xFFu) << 16);
+            }
+            else
+            {
+                mValue = (mValue & ~(0xFFu << 8)) | ((Value & 0xFFu) << 8);
+            }
         }
 
         // -=(Undocumented)=-
         constexpr UInt32 GetBlue() const
         {
-            return ((mValue >> 8) & 0xFF);
+            if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+            {
+                return (mValue >> 16) & 0xFFu;
+            }
+            else
+            {
+                return (mValue >> 8) & 0xFFu;
+            }
         }
 
         // -=(Undocumented)=-
         void SetAlpha(UInt32 Value)
         {
-            mValue = mValue & ~0xFF | Value & 0xFF;
+            if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+            {
+                mValue = (mValue & ~(0xFFu << 24)) | ((Value & 0xFFu) << 24);
+            }
+            else
+            {
+                mValue = (mValue & ~0xFFu) | (Value & 0xFFu);
+            }
         }
 
         // -=(Undocumented)=-
         constexpr UInt32 GetAlpha() const
         {
-            return mValue & 0xFF;
+            if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+            {
+                return (mValue >> 24) & 0xFFu;
+            }
+            else
+            {
+                return mValue & 0xFFu;
+            }
         }
 
         // -=(Undocumented)=-
@@ -123,17 +179,17 @@ inline namespace Math
         {
             if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
             {
-                return (static_cast<UInt32>(Red   * UINT8_MAX) << 24)
-                     | (static_cast<UInt32>(Green * UINT8_MAX) << 16)
-                     | (static_cast<UInt32>(Blue  * UINT8_MAX) << 8)
-                     | (static_cast<UInt32>(Alpha * UINT8_MAX));
+                return   (static_cast<UInt32>(Alpha * UINT8_MAX) << 24)
+                       | (static_cast<UInt32>(Blue  * UINT8_MAX) << 16)
+                       | (static_cast<UInt32>(Green * UINT8_MAX) << 8)
+                       | (static_cast<UInt32>(Red   * UINT8_MAX));
             }
             else
             {
-                return (static_cast<UInt32>(Alpha * UINT8_MAX) << 24)
-                     | (static_cast<UInt32>(Blue  * UINT8_MAX) << 16)
-                     | (static_cast<UInt32>(Green * UINT8_MAX) << 8)
-                     | (static_cast<UInt32>(Red   * UINT8_MAX));
+                return   (static_cast<UInt32>(Red   * UINT8_MAX) << 24)
+                       | (static_cast<UInt32>(Green * UINT8_MAX) << 16)
+                       | (static_cast<UInt32>(Blue  * UINT8_MAX) << 8)
+                       | (static_cast<UInt32>(Alpha * UINT8_MAX));
             }
         }
 

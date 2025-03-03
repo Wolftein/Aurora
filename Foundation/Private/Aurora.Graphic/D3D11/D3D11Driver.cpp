@@ -1435,7 +1435,11 @@ namespace Graphic
             // TODO: Do we also need other stages?
             mDeviceImmediate->VSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
             mDeviceImmediate->PSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
-            mDeviceImmediate->GSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
+
+            if (mPipelines[Newest.Pipeline].GS)
+            {
+                mDeviceImmediate->GSSetConstantBuffers1(Min, Count, Array + Min, ArrayOffset + Min, ArrayLength + Min);
+            }
         }
     }
 }
