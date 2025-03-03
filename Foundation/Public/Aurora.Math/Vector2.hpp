@@ -34,6 +34,13 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        constexpr Vector2(Base Scalar)
+            : mX { Scalar },
+              mY { Scalar }
+        {
+        }
+
+        // -=(Undocumented)=-
         constexpr Vector2(Base X, Base Y)
             : mX { X },
               mY { Y }

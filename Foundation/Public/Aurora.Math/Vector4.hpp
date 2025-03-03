@@ -36,6 +36,15 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        constexpr Vector4(Base Scalar)
+            : mX { Scalar },
+              mY { Scalar },
+              mZ { Scalar },
+              mW { Scalar }
+        {
+        }
+
+        // -=(Undocumented)=-
         constexpr Vector4(Base X, Base Y, Base Z, Base W)
             : mX { X },
               mY { Y },
