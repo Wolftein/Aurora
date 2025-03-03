@@ -16,12 +16,6 @@ cbuffer cb_Material : register(b2)
     float    uDistance;
 };
 
-cbuffer cb_Instance : register(b3)
-{
-    float4   uOutlineColor;
-    float    uOutlineThickness;
-};
-
 // Attributes
 
 struct vs_Input
@@ -56,37 +50,12 @@ float Median(float3 Color)
     return max(min(Color.r, Color.g), min(max(Color.r, Color.g), Color.b));
 }
 
-float2 SafeNormalize(float2 Vector)
-{
-    float vLength = length(Vector);
-    vLength = (vLength > 0.0) ? 1.0 / vLength : 0.0;
-    return Vector * vLength;
-}
-
-float GetOpacityFromDistance(float signedDistance, float2 Jdx, float2 Jdy)
-{
-    const float distanceLimit = sqrt(2.0f) / 2.0f;
-    const float thickness = 1.0f / uDistance;
-    float2 gradientDistance = SafeNormalize(float2(ddx(signedDistance), ddy(signedDistance)));
-    float2 gradient = float2(gradientDistance.x * Jdx.x + gradientDistance.y * Jdy.x, gradientDistance.x * Jdx.y + gradientDistance.y * Jdy.y);
-    float scaledDistanceLimit = min(thickness * distanceLimit * length(gradient), 0.5f);
-    return smoothstep(-scaledDistanceLimit, scaledDistanceLimit, signedDistance);
-}
-
 float4 fragment(ps_Input Input) : SV_Target
 {
-    float2 pixelCoord = Input.Texture * uDimension;
-    float2 Jdx = ddx(pixelCoord);
-    float2 Jdy = ddy(pixelCoord);
-    float3 sample = ColorTexture.Sample(ColorSampler, Input.Texture).rgb;
-    float medianSample = Median(sample);
-    float signedDistance = medianSample - 0.5f;
-
-    float opacity = GetOpacityFromDistance(signedDistance, Jdx, Jdy);
-    clip(opacity <= 0.01 ? -1 : +1);
-
-    float strokeDistance = -(abs(medianSample - 0.25f - uOutlineThickness) - uOutlineThickness);
-    float strokeOpacity = GetOpacityFromDistance(strokeDistance, Jdx, Jdy);
-
-    return lerp(uOutlineColor, Input.Color, opacity) * max(opacity, strokeOpacity);
+    const float3 Sample = ColorTexture.Sample(ColorSampler, Input.Texture).rgb;
+    const float  Distance = Median(Sample) - 0.5;
+    const float  DistanceAlpha = abs(ddx(Distance)) + abs(ddy(Distance));
+    const float  Alpha = clamp(Distance / DistanceAlpha + 0.5, 0.0, 1.0);
+    clip(Alpha <= 0.01 ? -1 : +1);
+    return float4(Input.Color.rgb, Input.Color.a * Alpha);
 }
