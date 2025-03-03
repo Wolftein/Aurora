@@ -70,7 +70,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto Observer()
+        auto Observe()
         {
             return mWorld.template observer<Components...>();
         }
@@ -88,6 +88,14 @@ namespace Scene
         {
             return mWorld.template system<Components...>();
         }
+
+    private:
+
+        // -=(Undocumented)=-
+        void RegisterDefaultComponents();
+
+        // -=(Undocumented)=-
+        void RegisterDefaultSystems();
 
     private:
 

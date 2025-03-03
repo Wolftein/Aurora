@@ -24,6 +24,8 @@ namespace Scene
     Service::Service(Ref<Context> Context)
         : AbstractSubsystem(Context)
     {
+        RegisterDefaultComponents();
+        RegisterDefaultSystems();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -111,5 +113,35 @@ namespace Scene
             }
         };
         Query.run(OnIterate);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Service::RegisterDefaultComponents()
+    {
+        Register<TEcsTransform, TEcsMatrix>().add(flecs::CanToggle);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Service::RegisterDefaultSystems()
+    {
+        static constexpr void (* OnEnableTransform)(Scene::Entity::Handle Entity) = [](Scene::Entity::Handle Entity)
+        {
+            Entity.enable<Scene::TEcsTransform>();
+            Entity.children(OnEnableTransform);
+        };
+        Observe().with<TEcsTransform>().self().event(flecs::OnSet).each(OnEnableTransform);
+
+        System<const TEcsTransform, Ptr<const TEcsMatrix>, TEcsMatrix>()
+            .kind(EcsPreUpdate)
+            .term_at(1).parent().cascade()
+            .each([](Entity::Handle Entity, ConstRef<TEcsTransform> Local, Ptr<const TEcsMatrix> Parent, Ref<TEcsMatrix> World)
+            {
+                World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
+                Entity.disable<TEcsTransform>();
+            });
     }
 }
