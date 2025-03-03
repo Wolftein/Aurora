@@ -21,11 +21,5 @@
 namespace Scene
 {
     // -=(Undocumented)=-
-    using TEcsMatrix    = Math::Matrix4f;
-
-    // -=(Undocumented)=-
-    using TEcsPivot     = Math::Pivot;
-
-    // -=(Undocumented)=-
-    using TEcsTransform = Math::Transformf;
+    using TEcsTint = Math::Color;
 }
