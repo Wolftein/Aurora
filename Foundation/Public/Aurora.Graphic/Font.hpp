@@ -87,6 +87,9 @@ namespace Graphic
         void Load(Any<Metrics> Metrics, Any<Atlas> Atlas, Any<Table<UInt32, Glyph>> Glyphs, Any<Table<UInt64, Real32>> Kerning);
 
         // -=(Undocumented)=-
+        Rectf Calculate(CStr16 Text, Real32 Size, ConstRef<Pivot> Pivot) const;
+
+        // -=(Undocumented)=-
         Vector2f Measure(CStr16 Text, Real32 Size) const;
 
         // -=(Undocumented)=-
