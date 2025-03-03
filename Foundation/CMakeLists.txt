@@ -22,7 +22,11 @@ FILE(GLOB_RECURSE PROJECT_SOURCE "Public/*.cpp" "Private/*.cpp")
 FILE(GLOB_RECURSE PROJECT_RESOURCE "Resources/*")
 
 IF    (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    LIST(FILTER PROJECT_SOURCE EXCLUDE REGEX ".*Direct3D11.*")
+    LIST(FILTER PROJECT_SOURCE EXCLUDE REGEX ".*D3D11.*")
+ENDIF ()
+
+IF    (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+    LIST(FILTER PROJECT_SOURCE EXCLUDE REGEX ".*Asio.*") ## ASIO is not currently supported yet in Emscripten
 ENDIF ()
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -101,6 +105,9 @@ LIST(APPEND PROJECT_DEPENDENCIES "ASIO")
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Dependency (ECS)
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+SET(FLECS_STATIC  ON  CACHE BOOL "" FORCE)
+SET(FLECS_SHARED  OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(External_Flecs
         GIT_REPOSITORY https://github.com/SanderMertens/flecs)

@@ -12,6 +12,10 @@
 
 #include "Kernel.hpp"
 
+#ifdef    __EMSCRIPTEN__
+    #include <emscripten.h>
+#endif // __EMSCRIPTEN__
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -135,12 +139,12 @@ namespace Engine
     {
 #ifdef    __EMSCRIPTEN__
 
-        const auto OnPoll = [this]()
+        const auto OnPoll = [](Ptr<void> Instance)
         {
-            Poll();
+            static_cast<Ptr<Kernel>>(Instance)->Poll();
         };
 
-        emscripten_set_main_loop(OnPoll, 0, true);
+        emscripten_set_main_loop_arg(OnPoll, this, 0, true);
 
 #else
 

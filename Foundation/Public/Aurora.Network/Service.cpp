@@ -11,7 +11,10 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Service.hpp"
-#include "Aurora.Network/Asio/Driver.hpp"
+
+#ifndef   __EMSCRIPTEN__
+    #include "Aurora.Network/Asio/Driver.hpp"
+#endif // __EMSCRIPTEN__
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -44,7 +47,9 @@ namespace Network
 
         if (!mDriver)
         {
+#ifndef   __EMSCRIPTEN__
             mDriver = NewUniquePtr<TCPDriver>();
+#endif // __EMSCRIPTEN__
 
             Successful = mDriver && mDriver->Initialize(Threads);
 
