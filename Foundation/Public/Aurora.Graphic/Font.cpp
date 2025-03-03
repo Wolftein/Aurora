@@ -145,7 +145,7 @@ namespace Graphic
             TextureLayout::Source, mAtlas.Width, mAtlas.Height, k_DefaultMipmaps, k_DefaultSamples, Move(mAtlas.Bytes));
 
         // Allocates material for the font
-        constexpr Sampler k_DefaultSampler = Sampler(TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Trilinear);
+        constexpr Sampler k_DefaultSampler = Sampler(TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear);
 
         mMaterial = NewPtr<Material>(Content::Uri::Merge(GetKey(), "Material"));
         mMaterial->SetOwnership(true);

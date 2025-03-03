@@ -99,7 +99,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        Ptr<const Glyph> GetGlyph(UInt32 Unicode, UInt32 Fallback = '?') const
+        ConstPtr<Glyph> GetGlyph(UInt32 Unicode, UInt32 Fallback = '?') const
         {
             if (const auto Iterator = mGlyphs.find(Unicode); Iterator != mGlyphs.end())
             {
