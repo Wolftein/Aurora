@@ -57,7 +57,7 @@ namespace Graphic
         void Clear()
         {
             mInFlightSubmission.clear();
-            Reset();
+            mInFlightCommand = Submission();
         }
 
         // -=(Undocumented)=-
@@ -147,7 +147,6 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        template<Bool Restart = true>
         void Draw(UInt32 Count, UInt32 Base, UInt32 Offset, UInt32 Instances = 0)
         {
             Ref<Primitive> Primitive = mInFlightCommand.Primitive;
@@ -157,13 +156,7 @@ namespace Graphic
             Primitive.Instances = Instances;
 
             // Add the current in-flight command to the list of submissions to be processed.
-            // After queuing, reset structure to prepare for the next command (if specified)
             mInFlightSubmission.push_back(mInFlightCommand);
-
-            if constexpr (Restart)
-            {
-                Reset();
-            }
         }
 
         // -=(Undocumented)=-

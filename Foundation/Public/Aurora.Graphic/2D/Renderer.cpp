@@ -21,6 +21,14 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    Renderer::Renderer()
+        : mInFlightBatch { 0 }
+    {
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void Renderer::Initialize(ConstSPtr<Graphic::Service> Graphics)
     {
         mGraphics = Graphics;
@@ -44,7 +52,7 @@ namespace Graphic
     {
         if (mInFlightPipeline && mInFlightPipeline != Pipeline)
         {
-            Flush();
+            Flush(false);
         }
 
         mInFlightPipeline = Pipeline;
@@ -57,7 +65,7 @@ namespace Graphic
     {
         if (mInFlightMaterial && mInFlightMaterial != Material)
         {
-            Flush();
+            Flush(false);
         }
 
         mInFlightMaterial = Material;
@@ -112,8 +120,7 @@ namespace Graphic
 
     void Renderer::End()
     {
-        Flush();
-        mInFlightEncoder->Reset();
+        Flush(true);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -122,7 +129,7 @@ namespace Graphic
     void Renderer::Push(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Rectangle, ConstRef<Rectf> Source, UInt32 Color)
     {
         const auto [VertexBufferPointer, VertexBufferBinding]
-            = mGraphics->Allocate<PosTexColorLayout>(Graphic::Usage::Vertex, 4);
+            = mGraphics->Allocate<PosTexColorLayout>(Graphic::Usage::Vertex, k_VerticesPerQuad);
 
         VertexBufferPointer[0].Position = Transformation * Vector3f(Rectangle.GetLeft(),  Rectangle.GetBottom(), 0.0f);
         VertexBufferPointer[0].Texture.Set(Source.GetLeft(), Source.GetBottom());
@@ -140,8 +147,8 @@ namespace Graphic
         VertexBufferPointer[3].Texture.Set(Source.GetLeft(),  Source.GetTop());
         VertexBufferPointer[3].Color = Color;
 
-        const auto [IndexBufferPointer, IndexBufferBinding] = mGraphics->Allocate<UInt16>(Graphic::Usage::Index, 6);
-        auto IndexBaseValue = mInFlightBatch * 4;
+        const auto [IndexBufferPointer, IndexBufferBinding] = mGraphics->Allocate<UInt16>(Graphic::Usage::Index, k_IndicesPerQuad);
+        const UInt32 IndexBaseValue = mInFlightBatch * 4;
         IndexBufferPointer[0] = IndexBaseValue;
         IndexBufferPointer[1] = IndexBaseValue + 1;
         IndexBufferPointer[2] = IndexBaseValue + 2;
@@ -160,7 +167,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Flush()
+    void Renderer::Flush(Bool Restart)
     {
         if (mInFlightBatch > 0)
         {
@@ -173,7 +180,12 @@ namespace Graphic
             mInFlightEncoder->SetTexture(0, * mInFlightMaterial->GetTexture(Graphic::TextureSlot::Diffuse));
             mInFlightEncoder->SetSampler(0,   mInFlightMaterial->GetSampler(Graphic::TextureSlot::Diffuse));
             mInFlightEncoder->SetPipeline(* mInFlightPipeline);
-            mInFlightEncoder->Draw(mInFlightBatch * 6, 0, 0);
+            mInFlightEncoder->Draw(mInFlightBatch * k_IndicesPerQuad, 0, 0);
+
+            if (Restart)
+            {
+                mInFlightEncoder->Reset();
+            }
             mInFlightBatch = 0;
         }
     }

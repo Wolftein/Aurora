@@ -28,6 +28,9 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
+        Renderer();
+
+        // -=(Undocumented)=-
         void Initialize(ConstSPtr<Graphic::Service> Graphics);
 
         // -=(Undocumented)=-
@@ -67,9 +70,15 @@ namespace Graphic
         void Push(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Rectangle, ConstRef<Rectf> Source, UInt32 Color);
 
         // -=(Undocumented)=-
-        void Flush();
+        void Flush(Bool Restart);
 
     private:
+
+        // -=(Undocumented)=-
+        static constexpr UInt32 k_IndicesPerQuad  = 6;
+
+        // -=(Undocumented)=-
+        static constexpr UInt32 k_VerticesPerQuad = 4;
 
         // -=(Undocumented)=-
         static Rectf Calculate(ConstRef<Pivot> Pivot, ConstRef<Rectf> Rectangle)
