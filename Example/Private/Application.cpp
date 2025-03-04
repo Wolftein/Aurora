@@ -30,7 +30,6 @@ namespace Example
 
         // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
-        CreateTransformSystem(Scene);
 
         Scene::Entity GrandMaster = Scene->Create();
         GrandMaster.SetName("Grand Master");
@@ -63,7 +62,6 @@ namespace Example
         Rectf Viewport(0, 0, GetDevice().GetWidth(), GetDevice().GetHeight());
         Graphics->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, Color(0, 0, 0, 1), 1, 0);
         {
-          //  mTextSystem.Draw(mCamera);
         }
         Graphics->Commit(Graphic::k_Default, false);
         Graphics->Flush();
@@ -75,28 +73,6 @@ namespace Example
     void Application::OnDestroy()
     {
 
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Application::CreateTransformSystem(ConstSPtr<Scene::Service> Scene)
-    {
-        Scene->Register<Transformf, Matrix4f>().add(flecs::CanToggle);
-        
-        static constexpr void (* OnEnableTransform)(Scene::Entity::Handle Entity) = [](Scene::Entity::Handle Entity)
-        {
-            Entity.enable<Transformf>();
-            Entity.children(OnEnableTransform);
-        };
-        Scene->Observer().with<Transformf>().self().event(flecs::OnSet).each(OnEnableTransform);
-        Scene->System<const Transformf, Ptr<const Matrix4f>, Matrix4f>(EcsPreUpdate)
-                .term_at(1).parent().cascade()
-                .each([](Scene::Entity::Handle Entity, ConstRef<Transformf> Local, Ptr<const Matrix4f> Parent, Ref<Matrix4f> World)
-                {
-                    World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
-                    Entity.disable<Transformf>();
-                });
     }
 }
 
