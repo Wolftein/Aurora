@@ -53,6 +53,15 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        template<typename Format>
+        auto Allocate(Usage Type, CPtr<const Format> Data)
+        {
+            const auto [AllocationPointer, AllocationDescription] = Allocate<Format>(Type, Data.size());
+            std::memcpy(AllocationPointer, Data.data(), Data.size_bytes());
+            return AllocationDescription;
+        }
+
+        // -=(Undocumented)=-
         Object CreateBuffer(Usage Type, UInt32 Capacity)
         {
             return CreateBuffer(Type, false, Data(nullptr, Capacity, Data::EMPTY_DELETER));

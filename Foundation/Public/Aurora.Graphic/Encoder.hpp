@@ -29,6 +29,22 @@ namespace Graphic
         // -=(Undocumented)=-
         static constexpr UInt32 k_DefaultCapacity = 64;
 
+        // -=(Undocumented)=-
+        enum class Uniforms
+        {
+            // -=(Undocumented)=-
+            Scene    = 0,
+
+            // -=(Undocumented)=-
+            Pipeline = 1,
+
+            // -=(Undocumented)=-
+            Material = 2,
+
+            // -=(Undocumented)=-
+            Instance = 3,
+        };
+
     public:
 
         // -=(Undocumented)=-
@@ -41,7 +57,13 @@ namespace Graphic
         void Clear()
         {
             mInFlightSubmission.clear();
-            mInFlightCommand = Submission();
+            Reset();
+        }
+
+        // -=(Undocumented)=-
+        void Reset()
+        {
+            mInFlightCommand = Submission();    // @TODO Allow to reset partially
         }
 
         // -=(Undocumented)=-
@@ -71,13 +93,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetUniforms(UInt8 Slot, ConstRef<Binding> Binding)
+        void SetUniforms(Uniforms Slot, ConstRef<Binding> Binding)
         {
-            mInFlightCommand.Uniforms[Slot] = Binding;
+            mInFlightCommand.Uniforms[CastEnum(Slot)] = Binding;
         }
 
         // -=(Undocumented)=-
-        void SetUniforms(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Stride)
+        void SetUniforms(Uniforms Slot, Object Buffer, UInt32 Offset, UInt32 Stride)
         {
             SetUniforms(Slot, Binding(Buffer, Stride, Offset));
         }
@@ -125,6 +147,7 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        template<Bool Restart = true>
         void Draw(UInt32 Count, UInt32 Base, UInt32 Offset, UInt32 Instances = 0)
         {
             Ref<Primitive> Primitive = mInFlightCommand.Primitive;
@@ -134,9 +157,13 @@ namespace Graphic
             Primitive.Instances = Instances;
 
             // Add the current in-flight command to the list of submissions to be processed.
-            // After queuing, reset structure to prepare for the next command.
+            // After queuing, reset structure to prepare for the next command (if specified)
             mInFlightSubmission.push_back(mInFlightCommand);
-            mInFlightCommand = Submission();
+
+            if constexpr (Restart)
+            {
+                Reset();
+            }
         }
 
         // -=(Undocumented)=-

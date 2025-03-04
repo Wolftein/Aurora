@@ -57,9 +57,6 @@ namespace Graphic
         case Pivot::Type::LeftBottom:
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Pivot::Type::LeftBaseline:
-            OffsetY -= mMetrics.Ascender * Size;
-            break;
         case Pivot::Type::CenterTop:
             OffsetX -= Measurement.GetX() * 0.5f;
             break;
@@ -71,10 +68,6 @@ namespace Graphic
             OffsetX -= Measurement.GetX() * 0.5f;
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Pivot::Type::CenterBaseline:
-            OffsetX -= Measurement.GetX() * 0.5f;
-            OffsetY -= mMetrics.Ascender * Size;
-            break;
         case Pivot::Type::RightTop:
             OffsetX -= Measurement.GetX();
             break;
@@ -85,10 +78,6 @@ namespace Graphic
         case Pivot::Type::RightBottom:
             OffsetX -= Measurement.GetX();
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
-            break;
-        case Pivot::Type::RightBaseline:
-            OffsetX -= Measurement.GetX();
-            OffsetY -= mMetrics.Ascender * Size;
             break;
         }
         return Rectf(OffsetX, OffsetY, OffsetX + Measurement.GetX(), OffsetY + Measurement.GetY());

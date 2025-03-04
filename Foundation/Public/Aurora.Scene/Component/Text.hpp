@@ -12,69 +12,46 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Trigonometry.hpp"
+#include "Aurora.Graphic/Font.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Math
+namespace Scene
 {
     // -=(Undocumented)=-
-    class Pivot final
+    class TEcsText final
     {
     public:
 
         // -=(Undocumented)=-
-        enum class Type : UInt8
-        {
-            // -=(Undocumented)=-
-            LeftTop,
-
-            // -=(Undocumented)=-
-            LeftMiddle,
-
-            // -=(Undocumented)=-
-            LeftBottom,
-
-            // -=(Undocumented)=-
-            CenterTop,
-
-            // -=(Undocumented)=-
-            CenterMiddle,
-
-            // -=(Undocumented)=-
-            CenterBottom,
-
-            // -=(Undocumented)=-
-            RightTop,
-
-            // -=(Undocumented)=-
-            RightMiddle,
-
-            // -=(Undocumented)=-
-            RightBottom,
-        };
-
-    public:
+        TEcsText() = default;
 
         // -=(Undocumented)=-
-        Pivot(Type Type = Type::LeftTop)
-            : mType { Type }
+        TEcsText(ConstSPtr<Graphic::Font> Font, UInt16 Size, CStr16 Word)
+            : mFont { Font },
+              mSize { Size },
+              mWord { Word }
         {
         }
 
         // -=(Undocumented)=-
-        Type GetType() const
+        ConstSPtr<Graphic::Font> GetFont() const
         {
-            return mType;
+            return mFont;
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void OnSerialize(Stream<Type> Archive)
+        UInt16 GetSize() const
         {
-            Archive.SerializeEnum(mType);
+            return mSize;
+        }
+
+        // -=(Undocumented)=-
+        CStr16 GetWord() const
+        {
+            return mWord;
         }
 
     private:
@@ -82,6 +59,8 @@ inline namespace Math
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Type mType;
+        SPtr<Graphic::Font> mFont;
+        UInt16              mSize;
+        SStr16              mWord;
     };
 }

@@ -145,6 +145,18 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        Vector2<Base> GetPosition() const
+        {
+            return Vector2<Base>(GetX(), GetY());
+        }
+
+        // -=(Undocumented)=-
+        Vector2<Base> GetSize() const
+        {
+            return Vector2<Base>(GetWidth(), GetHeight());
+        }
+
+        // -=(Undocumented)=-
         Vector2<Base> GetCenter() const
         {
             return Vector2<Base>(mX1 + GetWidth() * 0.5f, mY1 + GetHeight() * 0.5f);
