@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Common.hpp"
+#include "Aurora.Graphic/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -37,10 +37,13 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        void Create(Ref<class Service> Service);
+        void Initialize(ConstSPtr<Service> Service);
 
         // -=(Undocumented)=-
-        void Commit(Ref<class Driver> Driver);
+        void Dispose();
+
+        // -=(Undocumented)=-
+        void Commit(Bool Copy);
 
         // -=(Undocumented)=-
         template<typename Format>
@@ -54,42 +57,86 @@ namespace Graphic
             return AllocateInFlightBuffer<Format>(mBuffers[CastEnum(Type)], Length, Stride);
         }
 
+        // -=(Undocumented)=-
+        template<typename Format>
+        auto Allocate(Usage Type, CPtr<const Format> Data)
+        {
+            const auto [Pointer, Description] = Allocate<Format>(Type, Data.size());
+            std::memcpy(Pointer, Data.data(), Data.size_bytes());
+            return Description;
+        }
+
+        // -=(Undocumented)=-
+        template<typename Format>
+        Bool Reserve(Usage Type, UInt32 Length, UInt32 Stride = sizeof(Format)) const
+        {
+            if (Type == Usage::Uniform)
+            {
+                Stride = k_Alignment;
+                Length = Align(Length, k_Alignment) / k_Alignment;
+            }
+
+            ConstRef<InFlightBuffer> Buffer = mBuffers[CastEnum(Type)];
+            return (Align(Buffer.Writer, Stride) + Length * Stride) <= Buffer.Length;
+        }
+
+        // -=(Undocumented)=-
+        void Reallocate(Ref<Binding> Description);
+
     private:
 
         // -=(Undocumented)=-
         struct InFlightBuffer
         {
             // -=(Undocumented)=-
-            Object Handle;
+            Object        Handle;
 
             // -=(Undocumented)=-
-            Usage  Type;
+            UPtr<UInt8[]> Memory;
 
             // -=(Undocumented)=-
-            UInt32 Length;
+            UInt32        Length;
 
             // -=(Undocumented)=-
-            Writer Memory;
+            UInt32        Reader;
+
+            // -=(Undocumented)=-
+            UInt32        Writer;
+
+            // -=(Undocumented)=-
+            UInt32        Marker;
         };
 
         // -=(Undocumented)=-
-        void CreateInFlightBuffer(Ref<class Service> Service, Ref<InFlightBuffer> Buffer, Usage Type, UInt32 Length);
+        void CreateInFlightBuffer(Ref<InFlightBuffer> Buffer, Usage Type, UInt32 Length);
 
         // -=(Undocumented)=-
-        void UpdateInFlightBuffer(Ref<class Driver> Driver, Ref<InFlightBuffer> Buffer);
+        void UpdateInFlightBuffer(Ref<InFlightBuffer> Buffer, Bool Copy);
+
+        // -=(Undocumented)=-
+        void DeleteInFlightBuffer(Ref<InFlightBuffer> Buffer);
 
         // -=(Undocumented)=-
         template<typename Format>
         auto AllocateInFlightBuffer(Ref<InFlightBuffer> Buffer, UInt32 Length, UInt32 Stride)
         {
-            Ref<Writer> Memory = Buffer.Memory;
-            UInt32 Offset      = Align(Memory.GetOffset(), Stride);
+            UInt32 Size   = Length * Stride;
+            UInt32 Offset = Align(Buffer.Writer, Stride);
 
-            if (const UInt32 Skip = Offset - Memory.GetOffset(); Skip > 0)
+            if (const UInt32 Address = (Offset + Size); Address > Buffer.Length)
             {
-                Memory.Reserve<UInt8>(Skip);
+                Buffer.Marker = Buffer.Writer;
+
+                Offset = 0;
             }
-            return std::make_tuple(Memory.Reserve<Format>(Length * Stride), Binding(Buffer.Handle, Stride, Offset));
+            else
+            {
+                Offset = Buffer.Writer;
+            }
+
+            Buffer.Writer = Offset + Size;
+            return std::make_tuple(
+                    reinterpret_cast<Ptr<Format>>(AddressOf(Buffer.Memory[Offset])), Binding(Buffer.Handle, Stride, Offset));
         }
 
     private:
@@ -97,6 +144,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        SPtr<Service>                             mService;
         Array<InFlightBuffer, CountEnum<Usage>()> mBuffers;
     };
 }

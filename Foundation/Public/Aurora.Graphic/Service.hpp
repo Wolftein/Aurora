@@ -14,7 +14,6 @@
 
 #include "Driver.hpp"
 #include "Encoder.hpp"
-#include "Heap.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -44,22 +43,6 @@ namespace Graphic
 
         // -=(Undocumented)=-
         void Reset(UInt16 Width, UInt16 Height, UInt8 Samples);
-
-        // -=(Undocumented)=-
-        template<typename Format>
-        auto Allocate(Usage Type, UInt32 Length, UInt32 Stride = sizeof(Format))
-        {
-            return mFrames[k_Default].Allocator.Allocate<Format>(Type, Length, Stride);
-        }
-
-        // -=(Undocumented)=-
-        template<typename Format>
-        auto Allocate(Usage Type, CPtr<const Format> Data)
-        {
-            const auto [AllocationPointer, AllocationDescription] = Allocate<Format>(Type, Data.size());
-            std::memcpy(AllocationPointer, Data.data(), Data.size_bytes());
-            return AllocationDescription;
-        }
 
         // -=(Undocumented)=-
         Object CreateBuffer(Usage Type, UInt32 Capacity)
@@ -160,9 +143,6 @@ namespace Graphic
         // -=(Undocumented)=-
         struct Frame
         {
-            // -=(Undocumented)=-
-            Heap   Allocator;
-
             // -=(Undocumented)=-
             Writer Queue;
         };

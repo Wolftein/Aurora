@@ -29,22 +29,6 @@ namespace Graphic
         // -=(Undocumented)=-
         static constexpr UInt32 k_DefaultCapacity = 64;
 
-        // -=(Undocumented)=-
-        enum class Uniforms
-        {
-            // -=(Undocumented)=-
-            Scene    = 0,
-
-            // -=(Undocumented)=-
-            Pipeline = 1,
-
-            // -=(Undocumented)=-
-            Material = 2,
-
-            // -=(Undocumented)=-
-            Instance = 3,
-        };
-
     public:
 
         // -=(Undocumented)=-
@@ -61,20 +45,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void Reset()
-        {
-            mInFlightCommand = Submission();    // @TODO Allow to reset partially
-        }
-
-        // -=(Undocumented)=-
         void SetIndices(ConstRef<Binding> Binding)
         {
             mInFlightCommand.Indices = Binding;
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void SetIndices(Object Buffer, UInt32 Offset, UInt32 Stride = sizeof(Type))
+        void SetIndices(Object Buffer, UInt32 Offset, UInt32 Stride)
         {
             SetIndices(Binding(Buffer, Stride, Offset));
         }
@@ -86,20 +63,19 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Stride = sizeof(Type))
+        void SetVertices(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Stride)
         {
             SetVertices(Slot, Binding(Buffer, Stride, Offset));
         }
 
         // -=(Undocumented)=-
-        void SetUniforms(Uniforms Slot, ConstRef<Binding> Binding)
+        void SetUniforms(UInt8 Slot, ConstRef<Binding> Binding)
         {
-            mInFlightCommand.Uniforms[CastEnum(Slot)] = Binding;
+            mInFlightCommand.Uniforms[Slot] = Binding;
         }
 
         // -=(Undocumented)=-
-        void SetUniforms(Uniforms Slot, Object Buffer, UInt32 Offset, UInt32 Stride)
+        void SetUniforms(UInt8 Slot, Object Buffer, UInt32 Offset, UInt32 Stride)
         {
             SetUniforms(Slot, Binding(Buffer, Stride, Offset));
         }
@@ -117,15 +93,15 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetPipeline(Object Technique)
+        void SetPipeline(Object Pipeline)
         {
-            mInFlightCommand.Pipeline = Technique;
+            mInFlightCommand.Pipeline = Pipeline;
         }
 
         // -=(Undocumented)=-
-        void SetPipeline(ConstRef<Pipeline> Technique)
+        void SetPipeline(ConstRef<Pipeline> Pipeline)
         {
-            SetPipeline(Technique.GetID());
+            SetPipeline(Pipeline.GetID());
         }
 
         // -=(Undocumented)=-
@@ -147,6 +123,29 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
+        void Bind(ConstRef<Pipeline> Pipeline, ConstRef<Material> Material)
+        {
+            for (UInt32 Slot = 0; Slot < Graphic::k_MaxSlots; ++Slot)
+            {
+                const TextureSlot Source = Pipeline.GetSlot(Slot);
+                if (Source == TextureSlot::None)
+                {
+                    continue;
+                }
+
+                if (ConstSPtr<Texture> Texture = Material.GetTexture(Source))
+                {
+                    SetTexture(Slot, Texture->GetID());
+                }
+                else
+                {
+                    SetTexture(Slot, 0);
+                }
+                SetSampler(Slot, Material.GetSampler(Source));
+            }
+        }
+
+        // -=(Undocumented)=-
         void Draw(UInt32 Count, UInt32 Base, UInt32 Offset, UInt32 Instances = 0)
         {
             Ref<Primitive> Primitive = mInFlightCommand.Primitive;
@@ -156,7 +155,9 @@ namespace Graphic
             Primitive.Instances = Instances;
 
             // Add the current in-flight command to the list of submissions to be processed.
+            // After queuing, reset structure to prepare for the next command.
             mInFlightSubmission.push_back(mInFlightCommand);
+            mInFlightCommand = Submission();
         }
 
         // -=(Undocumented)=-

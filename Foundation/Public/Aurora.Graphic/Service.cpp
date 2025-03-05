@@ -101,15 +101,6 @@ namespace Graphic
                         Adapter.SystemMemoryInMBs,
                         Adapter.SharedMemoryInMBs);
                 }
-
-                // For each frame, create and initialize the allocator to handle transient buffer allocations.
-                // This ensures that each allocator is properly set up to manage temporary buffers required
-                // for rendering tasks within a single frame.
-                for (Ref<Frame> Frame : mFrames)
-                {
-                    Frame.Allocator.Create(* this);
-                }
-                Flush();
             }
         }
         return Successful;
@@ -405,15 +396,10 @@ namespace Graphic
                 break;
             }
 
-            // Commit the current allocator to prepare it for the next set of operations.
-            // This action ensures that any pending allocations are finalized and ready for use.
-            Ref<Frame> Frame = mFrames[k_InFlightFrames - 1];
-            Frame.Allocator.Commit(* mDriver);
-
             // Continuously process the data as long as there is available data in the decoder.
             // This involves reading commands from the decoder and executing them to update the state
             // or perform necessary actions.
-            Reader Decoder(Frame.Queue.GetData());
+            Reader Decoder(mFrames[k_InFlightFrames - 1].Queue.GetData());
             while (Decoder.GetAvailable() > 0)
             {
                 OnExecute(Decoder.ReadEnum<Command>(), Decoder);

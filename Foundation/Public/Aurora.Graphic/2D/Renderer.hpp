@@ -1,5 +1,5 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Copyright (C) 2021-2025 by Agustin Alvarez. All rights reserved.
+// Copyright (C) 2021-2024 by Agustin Alvarez. All rights reserved.
 //
 // This work is licensed under the terms of the MIT license.
 //
@@ -12,9 +12,9 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Heap.hpp"
 #include "Aurora.Graphic/Camera.hpp"
 #include "Aurora.Graphic/Font.hpp"
-#include "Aurora.Graphic/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,39 +22,112 @@
 
 namespace Graphic
 {
-    // -=(Undocumented)=-
     class Renderer
     {
     public:
 
         // -=(Undocumented)=-
-        Renderer();
+        static constexpr UInt32 k_MaxDrawables = 10240;
 
         // -=(Undocumented)=-
-        void Initialize(ConstSPtr<Graphic::Service> Graphics);
+        enum class Block
+        {
+            // -=(Undocumented)=-
+            Scene,
+
+            // -=(Undocumented)=-
+            Technique,
+
+            // -=(Undocumented)=-
+            Material,
+
+            // -=(Undocumented)=-
+            Instance,
+        };
 
         // -=(Undocumented)=-
-        void Begin(Ref<Encoder> Encoder, ConstRef<Camera> Camera);
+        enum class Order
+        {
+            // -=(Undocumented)=-
+            Subtractive,
+
+            // -=(Undocumented)=-
+            Additive,
+
+            // -=(Undocumented)=-
+            Normal,
+
+            // -=(Undocumented)=-
+            Opaque,
+        };
+
+    public:
 
         // -=(Undocumented)=-
-        void SetPipeline(ConstSPtr<Pipeline> Pipeline);
+        Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        void SetMaterial(ConstSPtr<Material> Material);
+        ~Renderer();
 
         // -=(Undocumented)=-
-        void Draw(ConstSPtr<Font> Font, CStr16 Text, UInt16 Size, ConstRef<Matrix4f> Transformation, ConstRef<Pivot> Pivot, Color Tint);
+        template<typename Format>
+        void SetScene(CPtr<const Format> Scene)
+        {
+            mBlocks[CastEnum(Block::Scene)] = mAllocator.Allocate(Usage::Uniform, Scene);
+        }
 
         // -=(Undocumented)=-
-        void Draw(ConstRef<Rectf> Rectangle, ConstRef<Rectf> Source, ConstRef<Matrix4f> Transformation, ConstRef<Pivot> Pivot, Color Tint);
+        template<typename Format>
+        void SetTechnique(CPtr<const Format> Technique)
+        {
+            mBlocks[CastEnum(Block::Technique)] = mAllocator.Allocate(Usage::Uniform, Technique);
+        }
 
         // -=(Undocumented)=-
-        void End();
+        void Draw(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, Pivot Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+
+        // -=(Undocumented)=-
+        void Draw(ConstRef<Matrix4f> Transformation, CStr16 Text, UInt16 Size, Color Tint, Pivot Pivot, Order Order, ConstSPtr<Font> Font);
+
+        // -=(Undocumented)=-
+        void Flush(Bool Copy = false);
 
     private:
 
         // -=(Undocumented)=-
-        struct PosTexColorLayout
+        struct Buffer
+        {
+            Object        ID;
+            UPtr<UInt8[]> Memory;
+            UInt          Length;
+            UInt          Reader;
+            UInt          Writer;
+        };
+
+        // -=(Undocumented)=-
+        struct Drawable
+        {
+            // -=(Undocumented)=-
+            UInt64                  ID;
+
+            // -=(Undocumented)=-
+            Array<Vector3f, 4>      Coordinates;
+
+            // -=(Undocumented)=-
+            Rectf                   Source;
+
+            // -=(Undocumented)=-
+            Color                   Tint;
+
+            // -=(Undocumented)=-
+            Ptr<Graphic::Pipeline>  Pipeline;
+
+            // -=(Undocumented)=-
+            Ptr<Graphic::Material>  Material;
+        };
+
+        // -=(Undocumented)=-
+        struct Layout
         {
             // -=(Undocumented)=-
             Vector3f Position;
@@ -67,21 +140,23 @@ namespace Graphic
         };
 
         // -=(Undocumented)=-
-        void Push(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Rectangle, ConstRef<Rectf> Source, UInt32 Color);
+        void CreateDefaultResources(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        void Flush(Bool Restart);
-
-    private:
+        void PushBatch(UInt32 Offset, UInt32 Count, ConstRef<Drawable> Drawable);
 
         // -=(Undocumented)=-
-        static constexpr UInt32 k_IndicesPerQuad  = 6;
+        void PushDrawable(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Destination, ConstRef<Rectf> Source,
+            Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
 
         // -=(Undocumented)=-
-        static constexpr UInt32 k_VerticesPerQuad = 4;
+        void PushGeometry(ConstPtr<Drawable> Drawable, Ptr<Layout> Buffer);
 
         // -=(Undocumented)=-
-        static Rectf Calculate(ConstRef<Pivot> Pivot, ConstRef<Rectf> Rectangle)
+        UInt64 GenerateUniqueId(Order Order, Object Pipeline, Object Material, Real32 Depth) const;
+
+        // -=(Undocumented)=-
+        Rectf Calculate(ConstRef<Pivot> Pivot, ConstRef<Rectf> Rectangle) const
         {
             static constexpr Rectf k_Multiplier[] = {
                 Rectf( 0.0f,  0.0f, 1.0f, 1.0f),  // LeftTop
@@ -102,14 +177,20 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Graphic::Service> mGraphics;
+        SPtr<Service>                      mService;
+        Heap                               mAllocator;
+        Array<Binding, CountEnum<Block>()> mBlocks;
+        Encoder                            mEncoder;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UInt32                 mInFlightBatch;
-        Ptr<Encoder>           mInFlightEncoder;
-        SPtr<Pipeline>         mInFlightPipeline;
-        SPtr<Material>         mInFlightMaterial;
+        Array<SPtr<Pipeline>, 1>           mPipelines;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Array<Drawable, k_MaxDrawables>    mDrawables;
+        Vector<Ptr<Drawable>>              mDrawablesPtr;
     };
 }

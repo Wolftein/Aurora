@@ -20,6 +20,10 @@
 
     Topology        = "Triangle"
 
+[Program.Textures]
+
+    Diffuse         = 0
+
 [Program.Vertex]
 
 	Entry           = "vertex"
