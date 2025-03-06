@@ -142,6 +142,7 @@ namespace Scene
             .each([](Entity::Handle Entity, ConstRef<TEcsTransform> Local, Ptr<const TEcsMatrix> Parent, Ref<TEcsMatrix> World)
             {
                 World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
+                Entity.modified<TEcsMatrix>();
                 Entity.disable<TEcsTransform>();
             });
     }
