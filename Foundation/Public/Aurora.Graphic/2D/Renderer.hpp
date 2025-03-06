@@ -84,10 +84,10 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void Draw(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, Pivot Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+        void Draw(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
 
         // -=(Undocumented)=-
-        void Draw(ConstRef<Matrix4f> Transformation, CStr16 Text, UInt16 Size, Color Tint, Pivot Pivot, Order Order, ConstSPtr<Font> Font);
+        void Draw(ConstRef<Matrix4f> Transformation, CStr16 Text, UInt16 Size, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Font> Font);
 
         // -=(Undocumented)=-
         void Flush(Bool Copy = false);
@@ -154,23 +154,6 @@ namespace Graphic
 
         // -=(Undocumented)=-
         UInt64 GenerateUniqueId(Order Order, Object Pipeline, Object Material, Real32 Depth) const;
-
-        // -=(Undocumented)=-
-        Rectf Calculate(ConstRef<Pivot> Pivot, ConstRef<Rectf> Rectangle) const
-        {
-            static constexpr Rectf k_Multiplier[] = {
-                Rectf( 0.0f,  0.0f, 1.0f, 1.0f),  // LeftTop
-                Rectf( 0.0f, -0.5f, 1.0f, 0.5f),  // LeftMiddle
-                Rectf( 0.0f, -1.0f, 1.0f, 0.0f),  // LeftBottom
-                Rectf(-0.5f,  0.0f, 0.5f, 1.0f),  // CenterTop
-                Rectf(-0.5f, -0.5f, 0.5f, 0.5f),  // CenterMiddle
-                Rectf(-0.5f, -1.0f, 0.5f, 0.0f),  // CenterBottom
-                Rectf(-1.0f,  0.0f, 0.0f, 1.0f),  // RightTop
-                Rectf(-1.0f, -0.5f, 0.0f, 0.5f),  // RightMiddle
-                Rectf(-1.0f, -1.0f, 0.0f, 0.0f),  // RightBottom
-            };
-            return k_Multiplier[CastEnum(Pivot.GetType())] *  Rectangle.GetSize() + Rectangle.GetPosition();
-        }
 
     private:
 

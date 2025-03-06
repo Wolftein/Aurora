@@ -481,6 +481,25 @@ inline namespace Math
     public:
 
         // -=(Undocumented)=-
+        static constexpr  Bool IsIdentity(ConstRef<Matrix4<Base>> Matrix)
+        {
+            constexpr Vector4<Base> Sub1(1.0, 0.0, 0.0, 0.0);
+            constexpr Vector4<Base> Sub2(0.0, 1.0, 0.0, 0.0);
+            constexpr Vector4<Base> Sub3(0.0, 0.0, 1.0, 0.0);
+            constexpr Vector4<Base> Sub4(0.0, 0.0, 0.0, 1.0);
+            return Matrix.GetColumn(0) == Sub1
+                && Matrix.GetColumn(1) == Sub2
+                && Matrix.GetColumn(2) == Sub3
+                && Matrix.GetColumn(3) == Sub4;
+        }
+
+        // -=(Undocumented)=-
+        static constexpr  Bool IsOrthogonal(ConstRef<Matrix4<Base>> Matrix)
+        {
+            return IsIdentity(Matrix * Transpose(Matrix));
+        }
+
+        // -=(Undocumented)=-
         static constexpr Matrix4<Base> Transpose(ConstRef<Matrix4<Base>> Matrix)
         {
             return Matrix4<Base>(Matrix.GetComponent(0),  Matrix.GetComponent(4),

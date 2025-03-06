@@ -29,17 +29,31 @@ inline namespace Core
     }
 
     // -=(Undocumented)=-
-    template<typename Type>
-    constexpr Type Min(Type First, Type Second)
+    template <typename Type, typename... Tail>
+    constexpr auto Min(Type First, Type Second, Tail... Third)
     {
-        return First < Second ? First : Second;
+        if constexpr (sizeof...(Tail) == 0)
+        {
+            return First < Second ? First : Second;
+        }
+        else
+        {
+            return Min(Min(First, Second), Third...);
+        }
     }
 
     // -=(Undocumented)=-
-    template<typename Type>
-    constexpr Type Max(Type First, Type Second)
+    template <typename Type, typename... Tail>
+    constexpr auto Max(Type First, Type Second, Tail... Third)
     {
-        return First > Second ? First : Second;
+        if constexpr (sizeof...(Tail) == 0)
+        {
+            return First > Second ? First : Second;
+        }
+        else
+        {
+            return Max(Max(First, Second), Third...);
+        }
     }
 
     // -=(Undocumented)=-

@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Pivot.hpp"
 #include "Vector2.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -383,6 +384,23 @@ inline namespace Math
         static Rect<Base> Lerp(ConstRef<Rect<Base>> Start, ConstRef<Rect<Base>> End, Real32 Percentage)
         {
             return Start + (End - Start) * Percentage;
+        }
+
+        // -=(Undocumented)=-
+        static Rect<Base> Transform(ConstRef<Rect<Base>> Rectangle, ConstRef<Pivot> Pivot)
+        {
+            static constexpr Rect<Real32> k_Multiplier[] = {
+                Rect<Real32>( 0.0,  0.0, 1.0, 1.0),  // LeftTop
+                Rect<Real32>( 0.0, -0.5, 1.0, 0.5),  // LeftMiddle
+                Rect<Real32>( 0.0, -1.0, 1.0, 0.0),  // LeftBottom
+                Rect<Real32>(-0.5,  0.0, 0.5, 1.0),  // CenterTop
+                Rect<Real32>(-0.5, -0.5, 0.5, 0.5),  // CenterMiddle
+                Rect<Real32>(-0.5, -1.0, 0.5, 0.0),  // CenterBottom
+                Rect<Real32>(-1.0,  0.0, 0.0, 1.0),  // RightTop
+                Rect<Real32>(-1.0, -0.5, 0.0, 0.5),  // RightMiddle
+                Rect<Real32>(-1.0, -1.0, 0.0, 0.0),  // RightBottom
+            };
+            return k_Multiplier[CastEnum(Pivot.GetType())] *  Rectangle.GetSize() + Rectangle.GetPosition();
         }
 
     private:
