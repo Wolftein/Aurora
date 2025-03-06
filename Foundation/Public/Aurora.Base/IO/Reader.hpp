@@ -95,6 +95,14 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        Reader Split(UInt32 Length)
+        {
+            const UInt32 Offset   = mOffset;
+            const UInt32 Capacity = mOffset + Length <= mLength ? Length : 0;
+            return Reader(CPtr<UInt8>(mBuffer + Offset, Capacity));
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         Type Peek(UInt32 Length = sizeof(Type))
         {
