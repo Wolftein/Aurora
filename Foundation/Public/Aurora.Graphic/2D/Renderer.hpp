@@ -84,10 +84,13 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void Draw(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+        void Draw(ConstRef<Vector3f> Position, ConstRef<Vector2f> Size, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
 
         // -=(Undocumented)=-
-        void Draw(ConstRef<Matrix4f> Transformation, CStr16 Text, UInt16 Size, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Font> Font);
+        void Draw(ConstRef<Matrix4f> Transform, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+
+        // -=(Undocumented)=-
+        void Draw(ConstRef<Matrix4f> Transform, CStr16 Text, UInt16 Size, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Font> Font);
 
         // -=(Undocumented)=-
         void Flush(Bool Copy = false);
@@ -147,6 +150,10 @@ namespace Graphic
 
         // -=(Undocumented)=-
         void PushDrawable(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Destination, ConstRef<Rectf> Source,
+            Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+
+        // -=(Undocumented)=-
+        void PushDrawable(ConstRef<Rectf> Destination, Real32 Depth, ConstRef<Rectf> Source,
             Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
 
         // -=(Undocumented)=-

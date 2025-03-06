@@ -41,6 +41,18 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    void Renderer::Draw(ConstRef<Vector3f> Position, ConstRef<Vector2f> Size, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    {
+        const Rectf Boundaries(Position.GetX(),
+                               Position.GetY(),
+                               Position.GetX() + Size.GetX(),
+                               Position.GetY() + Size.GetY());
+        PushDrawable(Rectf::Transform(Boundaries, Pivot), Position.GetZ(), Source, Tint, Order, Pipeline, Material);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
     void Renderer::Draw(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
         PushDrawable(Transformation, Rectf::Transform(Origin, Pivot), Source, Tint, Order, Pipeline, Material);
@@ -215,6 +227,30 @@ namespace Graphic
         Drawable.Pipeline       = Pipeline.get();
         Drawable.Material       = Material.get();
         Drawable.ID             = GenerateUniqueId(Order, Pipeline->GetID(), Material->GetID(), Drawable.Coordinates[0].GetZ());
+        mDrawablesPtr.push_back(AddressOf(Drawable));
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::PushDrawable(ConstRef<Rectf> Destination, Real32 Depth, ConstRef<Rectf> Source,
+        Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    {
+        if (mDrawablesPtr.size() == k_MaxDrawables)
+        {
+            Flush(true);
+        }
+
+        Ref<Drawable> Drawable  = mDrawables[mDrawablesPtr.size()];
+        Drawable.Coordinates[0].Set(Destination.GetLeft(),  Destination.GetBottom(), Depth);
+        Drawable.Coordinates[1].Set(Destination.GetRight(), Destination.GetBottom(), Depth);
+        Drawable.Coordinates[2].Set(Destination.GetRight(), Destination.GetTop(),    Depth);
+        Drawable.Coordinates[3].Set(Destination.GetLeft(),  Destination.GetTop(),    Depth);
+        Drawable.Source         = Source;
+        Drawable.Tint           = Tint;
+        Drawable.Pipeline       = Pipeline.get();
+        Drawable.Material       = Material.get();
+        Drawable.ID             = GenerateUniqueId(Order, Pipeline->GetID(), Material->GetID(), Depth);
         mDrawablesPtr.push_back(AddressOf(Drawable));
     }
 

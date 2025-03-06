@@ -72,7 +72,7 @@ namespace Scene
             }
             else
             {
-                if (const Ptr<Factory> Serializer = Component.get_mut<Factory>())
+                if (const ConstPtr<Factory> Serializer = Component.get_mut<Factory>())
                 {
                     if (const Ptr<void> Data = Entity.ensure(Component))
                     {
@@ -109,7 +109,7 @@ namespace Scene
                 Writer.WriteInt<UInt64>(Component.raw_id());
 
                 // Write Component's Data
-                Iterator.field<Factory>(0)->Write(Writer, Entity.get_mut(Component));
+                Iterator.field<const Factory>(0)->Write(Writer, Entity.get_mut(Component));
             }
         };
         Query.run(OnIterate);

@@ -42,13 +42,13 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        void Read(Ref<Reader> Reader, Ptr<void> Component)
+        void Read(Ref<Reader> Reader, Ptr<void> Component) const
         {
             mReader(Reader, Component);
         }
 
         // -=(Undocumented)=-
-        void Write(Ref<Writer> Writer, Ptr<void> Component)
+        void Write(Ref<Writer> Writer, Ptr<void> Component) const
         {
             mWriter(Writer, Component);
         }
