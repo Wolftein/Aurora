@@ -29,8 +29,8 @@ namespace Graphic
         // -=(Undocumented)=-
         explicit Service(Ref<Context> Context);
 
-        // -=(Undocumented)=-
-        ~Service();
+        // \see Subsystem::OnDispose
+        void OnDispose() override;
 
         // -=(Undocumented)=-
         Bool Initialize(Backend Backend, Ptr<SDL_Window> Swapchain, UInt16 Width, UInt16 Height, UInt8 Samples);

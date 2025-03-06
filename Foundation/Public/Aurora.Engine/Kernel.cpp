@@ -155,7 +155,11 @@ namespace Engine
 
 #endif // __EMSCRIPTEN__
 
+        // Allows the user to manually dispose of data and resources.
         OnDestroy();
+
+        // Destroys each subsystem and releases associated resources.
+        Dispose();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

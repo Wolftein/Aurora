@@ -124,6 +124,20 @@ inline namespace Core
             }
         }
 
+    protected:
+
+        // -=(Undocumented)=-
+        void Dispose()
+        {
+            for (SInt32 Index = mRegistry.size() - 1; Index >= 0; --Index)
+            {
+                // Disposing from back to front to ensure proper handling of dependencies.
+                // This approach helps avoid issues where objects might depend on others that are already disposed.
+                mRegistry[Index]->OnDispose();
+            }
+            mRegistry.clear();
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

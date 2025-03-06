@@ -47,6 +47,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        virtual void OnDispose()
+        {
+
+        }
+
+        // -=(Undocumented)=-
         virtual void OnTick(Real64 Time)
         {
         }
