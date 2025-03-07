@@ -10,7 +10,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Renderer.hpp"
+#include "Renderer2D.hpp"
 #include "Aurora.Content/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -22,7 +22,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Renderer::Renderer(Ref<Core::Subsystem::Context> Context)
+    Renderer2D::Renderer2D(Ref<Core::Subsystem::Context> Context)
     {
         CreateDefaultResources(Context);
 
@@ -33,7 +33,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Renderer::~Renderer()
+    Renderer2D::~Renderer2D()
     {
         mAllocator.Dispose();
     }
@@ -41,7 +41,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Draw(ConstRef<Vector3f> Position, ConstRef<Vector2f> Size, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    void Renderer2D::Draw(ConstRef<Vector3f> Position, ConstRef<Vector2f> Size, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
         const Rectf Boundaries(Position.GetX(),
                                Position.GetY(),
@@ -53,7 +53,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Draw(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    void Renderer2D::Draw(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
         PushDrawable(Transformation, Rectf::Transform(Origin, Pivot), Source, Tint, Order, Pipeline, Material);
     }
@@ -61,7 +61,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Draw(ConstRef<Matrix4f> Transformation, CStr16 Text, UInt16 Size, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Font> Font)
+    void Renderer2D::Draw(ConstRef<Matrix4f> Transformation, CStr16 Text, UInt16 Size, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Font> Font)
     {
         const Rectf Boundaries = Font->Calculate(Text, Size, Pivot);
         Real32 CurrentX = Boundaries.GetX();
@@ -97,7 +97,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Flush(Bool Copy)
+    void Renderer2D::Flush(Bool Copy)
     {
         if (mDrawablesPtr.empty())
         {
@@ -143,7 +143,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::CreateDefaultResources(Ref<Core::Subsystem::Context> Context)
+    void Renderer2D::CreateDefaultResources(Ref<Core::Subsystem::Context> Context)
     {
         ConstSPtr<Content::Service> Content = Context.GetSubsystem<Content::Service>();
         mPipelines[0] = Content->Load<Graphic::Pipeline>("Engine://Pipeline/MSDF.effect");
@@ -152,7 +152,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::PushBatch(UInt32 Offset, UInt32 Count, ConstRef<Drawable> Drawable)
+    void Renderer2D::PushBatch(UInt32 Offset, UInt32 Count, ConstRef<Drawable> Drawable)
     {
         const Bool FitsVertices = mAllocator.Reserve<Layout>(Usage::Vertex, Count * 4);
         const Bool FitsIndices  = mAllocator.Reserve<UInt16>(Usage::Index,  Count * 6);
@@ -209,8 +209,8 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::PushDrawable(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Destination, ConstRef<Rectf> Source,
-        Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    void Renderer2D::PushDrawable(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Destination, ConstRef<Rectf> Source,
+                                  Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
         if (mDrawablesPtr.size() == k_MaxDrawables)
         {
@@ -233,8 +233,8 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::PushDrawable(ConstRef<Rectf> Destination, Real32 Depth, ConstRef<Rectf> Source,
-        Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    void Renderer2D::PushDrawable(ConstRef<Rectf> Destination, Real32 Depth, ConstRef<Rectf> Source,
+                                  Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
         if (mDrawablesPtr.size() == k_MaxDrawables)
         {
@@ -257,7 +257,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::PushGeometry(ConstPtr<Drawable> Drawable, Ptr<Layout> Buffer)
+    void Renderer2D::PushGeometry(ConstPtr<Drawable> Drawable, Ptr<Layout> Buffer)
     {
         Buffer[0].Position = Drawable->Coordinates[0];
         Buffer[0].Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetBottom());
@@ -279,7 +279,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    UInt64 Renderer::GenerateUniqueId(Order Order, Object Pipeline, Object Material, Real32 Depth) const
+    UInt64 Renderer2D::GenerateUniqueId(Order Order, Object Pipeline, Object Material, Real32 Depth) const
     {
         if (Order == Order::Opaque)
         {
