@@ -384,7 +384,7 @@ namespace Graphic
 
     void Service::OnConsume(std::stop_token Token)
     {
-        while (not Token.stop_requested())
+        while (! Token.stop_requested())
         {
             // Put the thread to sleep until the flag indicates there is more work to process.
             // This ensures that the CPU remains idle, conserving resources, until new tasks
@@ -392,18 +392,16 @@ namespace Graphic
             mBusy.wait(false);
 
             // Exit the loop if a stop request has been issued.
-            if (Token.stop_requested())
+            if (! Token.stop_requested())
             {
-                break;
-            }
-
-            // Continuously process the data as long as there is available data in the decoder.
-            // This involves reading commands from the decoder and executing them to update the state
-            // or perform necessary actions.
-            Reader Decoder(mFrames[k_InFlightFrames - 1].Queue.GetData());
-            while (Decoder.GetAvailable() > 0)
-            {
-                OnExecute(Decoder.ReadEnum<Command>(), Decoder);
+                // Continuously process the data as long as there is available data in the decoder.
+                // This involves reading commands from the decoder and executing them to update the state
+                // or perform necessary actions.
+                Reader Decoder(mFrames[k_InFlightFrames - 1].Queue.GetData());
+                while (Decoder.GetAvailable() > 0)
+                {
+                    OnExecute(Decoder.ReadEnum<Command>(), Decoder);
+                }
             }
 
             // Clear the busy flag to signal that the GPU has completed its current tasks.
