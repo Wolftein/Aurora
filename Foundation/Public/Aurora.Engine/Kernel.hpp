@@ -35,7 +35,7 @@
 namespace Engine
 {
     // -=(Undocumented)=-
-    class Kernel : public Subsystem::Context, public Input::Listener, public Tickable
+    class Kernel : public Subsystem::Context, public Input::Listener
     {
     public:
 
@@ -77,8 +77,8 @@ namespace Engine
 
         }
 
-        // \see Tickable::OnTick
-        virtual void OnTick(ConstRef<Time> Tick) override
+        // -=(Undocumented)=-
+        virtual void OnTick(ConstRef<Time> Tick)
         {
         }
 

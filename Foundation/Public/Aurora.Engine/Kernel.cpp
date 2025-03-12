@@ -111,9 +111,9 @@ namespace Engine
         // Initialize the Host and then enable the platform's device
         mActive = OnInitialize();
 
-        if (mDevice && mActive)
+        if (mDevice != nullptr)
         {
-            mDevice->SetVisible(true);
+            mDevice->SetVisible(mActive);
         }
     }
 
