@@ -244,6 +244,18 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        template<typename Type>
+        void WriteVector(CPtr<const Type> Value)
+        {
+            WriteInt<UInt>(Value.size());
+
+            for (ConstRef<Type> Element : Value)
+            {
+                WriteObject<Type>(Element);
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Type, typename = std::enable_if_t<std::is_arithmetic<Type>::value>>
         void WriteNumber(Type Value)
         {

@@ -245,6 +245,20 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        template<typename Type>
+        void ReadVector(Ref<Vector<Type>> Vector)
+        {
+            const UInt32 Capacity = ReadInt<UInt32>();
+            Vector.clear();
+            Vector.reserve(Capacity);
+
+            for (UInt32 Element = 0; Element < Capacity; ++Element)
+            {
+                Vector.push_back(ReadObject<Type>());
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Type, typename = std::enable_if_t<std::is_arithmetic<Type>::value>>
         Type ReadNumber()
         {

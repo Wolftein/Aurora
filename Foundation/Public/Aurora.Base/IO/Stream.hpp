@@ -276,6 +276,20 @@ inline namespace Core
             }
         }
 
+        // -=(Undocumented)=-
+        template<typename Type>
+        void SerializeVector(Ref<Vector<Type>> Value)
+        {
+            if constexpr (k_Reader)
+            {
+                mArchive.template ReadVector<Type>(Value);
+            }
+            else
+            {
+                mArchive.template WriteVector<Type>(Value);
+            }
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

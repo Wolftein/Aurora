@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Type.hpp"
+#include "Aurora.Base/IO/Stream.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,7 +21,7 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    template<UInt32 T>
+    template<UInt32 Capacity>
     class Handle final
     {
     public:
@@ -40,7 +40,7 @@ inline namespace Core
         // -=(Undocumented)=-
         Bool IsFull() const
         {
-            return mPool.empty() && mHead >= T;
+            return mPool.empty() && mHead >= Capacity;
         }
 
         // -=(Undocumented)=-
@@ -55,7 +55,7 @@ inline namespace Core
         {
             if (mPool.empty())
             {
-                return mHead >= T ? k_Invalid : ++mHead;
+                return mHead >= Capacity ? k_Invalid : ++mHead;
             }
 
             const UInt32 Handle = mPool.empty() ? k_Invalid : mPool.back();
@@ -74,12 +74,20 @@ inline namespace Core
             return Handle;
         }
 
+        // -=(Undocumented)=-
+        template<typename Type>
+        void OnSerialize(Stream<Type> Archive)
+        {
+            Archive.SerializeVector(mPool);
+            Archive.SerializeNumber(mHead);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Vector<UInt> mPool;
-        UInt32       mHead;
+        Vector<UInt32> mPool;
+        UInt32         mHead;
     };
 }
