@@ -190,7 +190,7 @@ namespace Example
 
     void Application::OnDestroy()
     {
-
+        mTexts = nullptr;
     }
 
     Bool Application::OnKeyDown(Input::Key Key)
