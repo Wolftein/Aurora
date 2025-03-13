@@ -12,40 +12,47 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
-#include <Aurora.Graphic/Camera.hpp>
-#include "Experimental/TextSystem.hpp"
+#include "Aurora.Graphic/Material.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-namespace Example
+
+namespace Scene
 {
     // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    class TEcsSprite final
     {
     public:
 
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
+        // -=(Undocumented)=-
+        TEcsSprite() = default;
 
-        // \see Kernel::OnTick
-        void OnTick(ConstRef<Time> Time) override;
+        // -=(Undocumented)=-
+        TEcsSprite(ConstSPtr<Graphic::Material> Material, ConstRef<Rectf> Rectangle)
+            : mMaterial  { Material  },
+              mRectangle { Rectangle }
+        {
+        }
 
-        // \see Kernel::OnDestroy
-        void OnDestroy() override;
+        // -=(Undocumented)=-
+        ConstSPtr<Graphic::Material> GetMaterial() const
+        {
+            return mMaterial;
+        }
 
-        Bool OnKeyDown(Input::Key Key) override;
-        Bool OnMouseMove(Real32 X, Real32 Y, Real32 DeltaX, Real32 DeltaY) override;
-
-        Bool OnWindowResize(UInt32 Width, UInt32 Height) override;
+        // -=(Undocumented)=-
+        ConstRef<Rectf> GetRectangle() const
+        {
+            return mRectangle;
+        }
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Graphic::Camera mCamera;
-        UPtr<Scene::TEcsTextSystem> mTexts;
+        SPtr<Graphic::Material> mMaterial;
+        Rectf                   mRectangle;
     };
 }
