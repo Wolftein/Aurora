@@ -12,9 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-
-#include "Pivot.hpp"
 #include "Matrix4.hpp"
+#include "Pivot.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -412,10 +411,10 @@ inline namespace Math
             const Vector2<Base> V2 = Transform * Vector2f(Rectangle.GetRight(), Rectangle.GetTop());
             const Vector2<Base> V3 = Transform * Vector2f(Rectangle.GetLeft(),  Rectangle.GetTop());
 
-            const Base MinX = Min(V0.GetX(), V1.GetX(), V2.GetX(), V3.GetX());
-            const Base MinY = Min(V0.GetY(), V1.GetY(), V2.GetY(), V3.GetY());
-            const Base MaxX = Max(V0.GetX(), V1.GetX(), V2.GetX(), V3.GetX());
-            const Base MaxY = Max(V0.GetY(), V1.GetY(), V2.GetY(), V3.GetY());
+            const Base MinX = Core::Min(V0.GetX(), V1.GetX(), V2.GetX(), V3.GetX());
+            const Base MinY = Core::Min(V0.GetY(), V1.GetY(), V2.GetY(), V3.GetY());
+            const Base MaxX = Core::Max(V0.GetX(), V1.GetX(), V2.GetX(), V3.GetX());
+            const Base MaxY = Core::Max(V0.GetY(), V1.GetY(), V2.GetY(), V3.GetY());
 
             return Rect<Base>(MinX, MinY, MaxX, MaxY);
         }
