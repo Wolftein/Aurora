@@ -403,6 +403,22 @@ inline namespace Math
             return k_Multiplier[CastEnum(Pivot.GetType())] *  Rectangle.GetSize() + Rectangle.GetPosition();
         }
 
+        // -=(Undocumented)=-
+        static Rect<Base> Transform(ConstRef<Rect<Base>> Rectangle, ConstRef<Matrix4<Base>> Transform)
+        {
+            const Vector2<Base> V0 = Transform * Vector2f(Rectangle.GetLeft(),  Rectangle.GetBottom());
+            const Vector2<Base> V1 = Transform * Vector2f(Rectangle.GetRight(), Rectangle.GetBottom());
+            const Vector2<Base> V2 = Transform * Vector2f(Rectangle.GetRight(), Rectangle.GetTop());
+            const Vector2<Base> V3 = Transform * Vector2f(Rectangle.GetLeft(),  Rectangle.GetTop());
+
+            const Base MinX = Min(V0.GetX(), V1.GetX(), V2.GetX(), V3.GetX());
+            const Base MinY = Min(V0.GetY(), V1.GetY(), V2.GetY(), V3.GetY());
+            const Base MaxX = Max(V0.GetX(), V1.GetX(), V2.GetX(), V3.GetX());
+            const Base MaxY = Max(V0.GetY(), V1.GetY(), V2.GetY(), V3.GetY());
+
+            return Rect<Base>(MinX, MinY, MaxX, MaxY);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
