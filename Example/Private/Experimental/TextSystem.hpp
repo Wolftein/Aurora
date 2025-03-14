@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Render/Renderer2D.hpp>
+#include <Aurora.Render/Renderer.hpp>
 #include <Aurora.Content/Service.hpp>
 #include <Aurora.Scene/Service.hpp>
 #include <Aurora.Graphic/Service.hpp>
@@ -45,7 +45,7 @@ namespace Scene
         // -=(Undocumented)=-
         TEcsTextSystem(Ref<Core::Subsystem::Context> Context)
         {
-            mRenderer = NewUniquePtr<Graphic::Renderer2D>(Context);
+            mRenderer = NewUniquePtr<Graphic::Renderer>(Context);
 
             ConstSPtr<Content::Service> Resources = Context.GetSubsystem<Content::Service>();
             mPipeline2 = Resources->Load<Graphic::Pipeline>("Resources://Pipeline/Sprite.effect");
@@ -73,7 +73,7 @@ namespace Scene
 
                             Math::Pivot OptPivot = (Pivot ? * Pivot : Math::Pivot());
                             Math::Color OptTint  = (Tint  ? * Tint  : Math::Color(1, 1, 1, 1));
-                            mRenderer->Draw(Matrix, Destination, Source, OptTint, OptPivot, Graphic::Renderer2D::Order::Opaque, mPipeline2, Sprite.GetMaterial() );
+                            mRenderer->Draw(Matrix, Destination, Source, OptTint, OptPivot, Graphic::Renderer::Order::Opaque, mPipeline2, Sprite.GetMaterial() );
                         });
 
 
@@ -81,7 +81,7 @@ namespace Scene
             {
                 Math::Pivot OptPivot = (Pivot ? * Pivot : Math::Pivot());
                 Math::Color OptTint  = (Tint  ? * Tint  : Math::Color());
-                mRenderer->Draw(Matrix, Text.GetWord(), Text.GetSize(), OptTint, OptPivot, Graphic::Renderer2D::Order::Opaque, Text.GetFont());
+                mRenderer->Draw(Matrix, Text.GetWord(), Text.GetSize(), OptTint, OptPivot, Graphic::Renderer::Order::Opaque, Text.GetFont());
             });
 
             mRenderer->Flush();
@@ -92,7 +92,7 @@ namespace Scene
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UPtr<Graphic::Renderer2D>       mRenderer;
+        UPtr<Graphic::Renderer>       mRenderer;
         Query mQuery;
         Query2 mQuery2;
         SPtr<Graphic::Pipeline> mPipeline;

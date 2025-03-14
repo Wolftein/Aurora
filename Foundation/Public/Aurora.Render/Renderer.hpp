@@ -23,7 +23,7 @@
 namespace Graphic
 {
     // -=(Undocumented)=-
-    class Renderer2D final
+    class Renderer final
     {
     public:
 
@@ -65,10 +65,10 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        Renderer2D(Ref<Core::Subsystem::Context> Context);
+        Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        ~Renderer2D();
+        ~Renderer();
 
         // -=(Undocumented)=-
         template<typename Format>

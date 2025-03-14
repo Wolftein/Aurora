@@ -83,7 +83,7 @@ namespace Network
 
             const auto OnCompletion = [Self = shared_from_this()](ConstRef<std::error_code> Error)
             {
-                CastPtr<TCPServer>(Self)->WhenAccept(Error);
+                Self->WhenAccept(Error);
             };
             mAcceptor.async_accept(mConnector = asio::ip::tcp::socket(mAcceptor.get_executor()), OnCompletion);
         }
