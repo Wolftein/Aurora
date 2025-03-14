@@ -83,9 +83,9 @@ namespace Graphic
         // -=(Undocumented)=-
         Bool AddPrimitive(Any<Primitive> Data)
         {
-            if (const Ptr<Primitive> Allocation = mPrimitives.Allocate())
+            if (const UInt32 Handle = mPrimitives.Allocate(); Handle > 0)
             {
-                * Allocation = Move(Data);
+                mPrimitives[Handle] = Move(Data);
                 return true;
             }
             return false;
@@ -100,7 +100,7 @@ namespace Graphic
         // -=(Undocumented)=-
         CPtr<const Primitive> GetPrimitives() const
         {
-            return mPrimitives.GetData();
+            return mPrimitives.Content();
         }
 
     private:
@@ -116,8 +116,8 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Array<Data, k_MaxBuffers>         mBytes;
-        Array<Object, k_MaxBuffers>       mBuffers;
-        Stack<Primitive, k_MaxPrimitives> mPrimitives;
+        Array<Data, k_MaxBuffers>        mBytes;
+        Array<Object, k_MaxBuffers>      mBuffers;
+        Pool<Primitive, k_MaxPrimitives> mPrimitives;
     };
 }

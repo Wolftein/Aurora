@@ -12,9 +12,10 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Container/Data.hpp"
 #include "Container/Handle.hpp"
 #include "Container/Pool.hpp"
-#include "Container/Stack.hpp"
+#include "Container/Sparse.hpp"
 
 #include "IO/Reader.hpp"
 #include "IO/Writer.hpp"
@@ -22,7 +23,5 @@
 #include "IO/TOML/Parser.hpp"
 
 #include "Logger/Log.hpp"
-
-#include "Memory/Data.hpp"
 
 #include "Subsystem/Subsystem.hpp"

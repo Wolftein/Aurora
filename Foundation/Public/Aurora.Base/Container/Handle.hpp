@@ -40,7 +40,7 @@ inline namespace Core
         // -=(Undocumented)=-
         Bool IsFull() const
         {
-            return mPool.empty() && mHead >= Capacity;
+            return mPool.empty() && mHead == Capacity;
         }
 
         // -=(Undocumented)=-
@@ -70,12 +70,19 @@ inline namespace Core
         // -=(Undocumented)=-
         UInt32 Free(UInt32 Handle)
         {
-            mPool.emplace_back(Handle);
+            if (Handle < mHead)
+            {
+                mPool.emplace_back(Handle);
+            }
+            else
+            {
+                mHead = Handle;
+            }
             return Handle;
         }
 
         // -=(Undocumented)=-
-        UInt32 Head() const
+        UInt32 Back() const
         {
             return mHead;
         }

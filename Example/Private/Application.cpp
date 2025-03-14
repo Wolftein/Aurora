@@ -39,29 +39,6 @@ namespace Example
         // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
 
-        // Transform ->
-        // Matrix    ->
-        // Pivot
-        // Animation
-
-
-
-        // Matrix
-        // Pivot
-        // ???????????
-        // XxX_Wolftein_XxX
-        //
-
-
-        Scene->Observe<Scene::TEcsMatrix>()
-                .event(flecs::OnSet)
-                .self()
-                .each([](flecs::entity Entity, Ref<Scene::TEcsMatrix> _1)
-                {
-                    Log::Info("Entity  with TEcsMatrix Changed");
-                });
-
-
         GrandMaster = Scene->Create();
         GrandMaster.SetName("Grand Master");
         GrandMaster.Attach(Scene::TEcsTransform(Vector3f(256, 256, 0)));
@@ -115,29 +92,6 @@ namespace Example
         MySprite.Attach(Scene::TEcsSprite(Material, Rectf(0, 0, 500, 400)));
         MySprite.Attach(Scene::TEcsPivot(Pivot::Type::CenterMiddle));
         MySprite.Attach(Scene::TEcsTint(0xFF0000FF));
-
-
-        /*
-        auto Night1 = Scene->Create();
-        Night1.Attach(Scene::TEcsTransform(Vector3f(300, 100, 0)));
-        Night1.Attach(Scene::TEcsText(Font, 32, L"Nightw"));
-        Night1.Attach(Scene::TEcsTint(1, 0, 1, 1));
-        Night1.Attach(Scene::TEcsPivot(Pivot::Type::CenterMiddle));
-
-        Scene::Entity LastEntity = Night1;
-
-        for (UInt32 I = 31; I >= 10; --I)
-        {
-            SStr16 TEXT = Format(L"PT - {}px", I);
-
-            auto Night2 = Scene->Create();
-            Night2.SetParent(LastEntity);
-            Night2.Attach(Scene::TEcsTransform(Vector3f(0, I, 0)));
-            Night2.Attach(Scene::TEcsText(Font, I, TEXT));
-            Night2.Attach(Scene::TEcsTint(1, 1, 0, 1));
-            Night2.Attach(Scene::TEcsPivot(Pivot::Type::CenterMiddle));
-            LastEntity = Night2;
-        }*/
 
         // Initialize Camera.
         mCamera.SetOrthographic(GetDevice().GetWidth(), GetDevice().GetHeight(), 0, 1);

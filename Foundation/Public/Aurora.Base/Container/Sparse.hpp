@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Trait.hpp"
+#include "Handle.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,94 +21,75 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    template<typename Type, UInt32 Count>
-    class Stack final
+    template<typename Type, UInt32 Size>
+    class Sparse final
     {
     public:
 
         // -=(Undocumented)=-
-      	Stack()
-          	: mSize { 0 }
-     	{
-        }
+        Sparse() = default;
 
         // -=(Undocumented)=-
-        Bool IsEmpty() const
+        Sparse(UInt32 Capacity)
         {
-            return mSize == 0;
+            mPool.resize(Capacity);
         }
 
         // -=(Undocumented)=-
         Bool IsFull() const
         {
-            return mSize == Count;
+            return mAllocator.IsFull();
         }
 
         // -=(Undocumented)=-
-        auto GetData()
-      	{
-      	    return CPtr<Type>(mPool.data(), mSize);   
-      	}
-        
-        // -=(Undocumented)=-
-        auto GetData() const
-      	{
-      	    return CPtr<const Type>(mPool.data(), mSize);   
-      	}
-
-    	// -=(Undocumented)=-
-    	auto GetSize() const
-      	{
-      		return mSize;
-      	}
-
-        // -=(Undocumented)=-
-        void Clear(Bool Dispose)
+        void Clear()
         {
-      		if (Dispose)
-      		{
-      			Destroy();
-      		}
-            mSize = 0;
+            mAllocator.Clear();
         }
 
         // -=(Undocumented)=-
-        Ptr<Type> Allocate()
+        auto Content() const
         {
-      	    return IsFull() ? nullptr : AddressOf(mPool[mSize++]);
+            return CPtr<const Type>(mPool.data(), mAllocator.Back());
         }
 
         // -=(Undocumented)=-
-        void Free(Bool Dispose = true)
+        UInt32 Allocate()
         {
-            if (Dispose)
+            const UInt32 Handle = mAllocator.Allocate();
+
+            if (Handle >= mPool.size())
             {
-                mPool[mSize].~Type();
+                const UInt32 Limit = mPool.size() + mPool.size() / 2 + 1;
+                mPool.resize(Core::Min(Limit, Size));
             }
-            --mSize;
+            return Handle;
         }
 
         // -=(Undocumented)=-
-        Ref<Type> operator[](UInt Handle)
+        UInt32 Free(UInt32 Handle)
+        {
+            return mAllocator.Free(Handle);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Type> operator[](UInt32 Handle)
         {
             return mPool[Handle];
         }
 
-    	// -=(Undocumented)=-
-        ConstRef<Type> operator[](UInt Handle) const
-    	{
-    		return mPool[Handle];
-    	}
-
-    private:
-
-    	// -=(Undocumented)=-
-        void Destroy()
+        // -=(Undocumented)=-
+        ConstRef<Type> operator[](UInt32 Handle) const
         {
-            for (Ref<Type> Object : GetData())
-            {
-                Object.~Type();
-            }
+            return mPool[Handle];
+        }
+
+        // -=(Undocumented)=-
+        template<typename Kind>
+        void OnSerialize(Stream<Kind> Archive)
+        {
+            Archive.SerializeObject(mAllocator);
+            Archive.SerializeVector(mPool);
         }
 
     private:
@@ -116,7 +97,7 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Array<Type, Count> mPool;
-        UInt32			   mSize;
+        Handle<Size> mAllocator;
+        Vector<Type> mPool;
     };
 }

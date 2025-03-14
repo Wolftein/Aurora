@@ -21,7 +21,7 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    template<typename Type, UInt32 Count>
+    template<typename Type, UInt32 Size>
     class Pool final
     {
     public:
@@ -39,9 +39,9 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        auto GetData() const
+        auto Content() const
         {
-            return CPtr<const Type>(mPool.data(), mAllocator.Head());
+            return CPtr<const Type>(mPool.data(), mAllocator.Back());
         }
 
         // -=(Undocumented)=-
@@ -63,10 +63,9 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void OnSerialize(Stream<Type> Archive)
+        ConstRef<Type> operator[](UInt32 Handle) const
         {
-            Archive.SerializeObject(mAllocator);
+            return mPool[Handle];
         }
 
     private:
@@ -74,7 +73,7 @@ inline namespace Core
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Handle<Count>      mAllocator;
-        Array<Type, Count> mPool;
+        Handle<Size>      mAllocator;
+        Array<Type, Size> mPool;
     };
 }
