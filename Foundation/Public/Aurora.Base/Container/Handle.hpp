@@ -75,6 +75,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        UInt32 Head() const
+        {
+            return mHead;
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         void OnSerialize(Stream<Type> Archive)
         {

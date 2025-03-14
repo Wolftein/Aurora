@@ -39,6 +39,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        auto GetData() const
+        {
+            return CPtr<const Type>(mPool.data(), mAllocator.Head());
+        }
+
+        // -=(Undocumented)=-
         UInt32 Allocate()
         {
             return mAllocator.Allocate();
