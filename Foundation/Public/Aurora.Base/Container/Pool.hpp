@@ -62,6 +62,13 @@ inline namespace Core
             return mPool[Handle];
         }
 
+        // -=(Undocumented)=-
+        template<typename Type>
+        void OnSerialize(Stream<Type> Archive)
+        {
+            Archive.SerializeObject(mAllocator);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
