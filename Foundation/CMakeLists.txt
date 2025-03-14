@@ -110,7 +110,8 @@ SET(FLECS_STATIC  ON  CACHE BOOL "" FORCE)
 SET(FLECS_SHARED  OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(External_Flecs
-        GIT_REPOSITORY https://github.com/SanderMertens/flecs)
+        GIT_REPOSITORY https://github.com/SanderMertens/flecs
+        GIT_TAG de96203869d45cb14f1ce95692f0fcf779e79b35)
 FetchContent_MakeAvailable(External_Flecs)
 
 LIST(APPEND PROJECT_DEPENDENCIES "flecs_static")
