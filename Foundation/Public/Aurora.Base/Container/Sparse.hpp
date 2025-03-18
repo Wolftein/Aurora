@@ -75,13 +75,13 @@ inline namespace Core
         // -=(Undocumented)=-
         Ref<Type> operator[](UInt32 Handle)
         {
-            return mPool[Handle];
+            return mPool[Handle - 1];
         }
 
         // -=(Undocumented)=-
         ConstRef<Type> operator[](UInt32 Handle) const
         {
-            return mPool[Handle];
+            return mPool[Handle - 1];
         }
 
         // -=(Undocumented)=-

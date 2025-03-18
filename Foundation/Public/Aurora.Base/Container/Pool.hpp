@@ -59,13 +59,25 @@ inline namespace Core
         // -=(Undocumented)=-
         Ref<Type> operator[](UInt32 Handle)
         {
-            return mPool[Handle];
+            return mPool[Handle - 1];
         }
 
         // -=(Undocumented)=-
         ConstRef<Type> operator[](UInt32 Handle) const
         {
-            return mPool[Handle];
+            return mPool[Handle - 1];
+        }
+
+        // -=(Undocumented)=-
+        template<typename Kind>
+        void OnSerialize(Stream<Kind> Archive)
+        {
+            Archive.SerializeObject(mAllocator);
+
+            for (UInt32 Element = 0, Limit = mAllocator.Back(); Element < Limit; ++Element)
+            {
+                Archive.SerializeObject(mPool[Element]);
+            }
         }
 
     private:
