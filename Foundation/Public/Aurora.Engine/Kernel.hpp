@@ -82,7 +82,7 @@ namespace Engine
         {
         }
 
-    private:
+    protected:
 
         // -=(Undocumented)=-
         struct ProxyInputListener final : Listener
