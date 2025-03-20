@@ -76,7 +76,7 @@ inline namespace Core
             }
             else
             {
-                mHead = Handle;
+                mHead = Handle - 1;
             }
             return Handle;
         }
