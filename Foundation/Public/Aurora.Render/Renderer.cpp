@@ -250,7 +250,7 @@ namespace Graphic
         Drawable.Tint           = Tint;
         Drawable.Pipeline       = Pipeline.get();
         Drawable.Material       = Material.get();
-        Drawable.ID             = GenerateUniqueId(Order, Pipeline->GetID(), Material->GetID(), Depth);
+        Drawable.ID             = GenerateUniqueId(Order, Pipeline->GetID(), Material ? Material->GetID() : 0, Depth);
         mDrawablesPtr.push_back(AddressOf(Drawable));
     }
 
