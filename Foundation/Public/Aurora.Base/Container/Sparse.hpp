@@ -54,6 +54,12 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        UInt Capacity() const
+        {
+            return mPool.size();
+        }
+
+        // -=(Undocumented)=-
         UInt32 Allocate()
         {
             const UInt32 Handle = mAllocator.Allocate();
