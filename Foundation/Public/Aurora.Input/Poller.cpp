@@ -310,7 +310,7 @@ namespace Input
                 Result.Type                = Event::Type::WindowExit;
                 break;
             case SDL_EVENT_KEY_DOWN:
-                Result.Type                = Event::Type::KeyDown;
+                Result.Type                = Event.key.repeat ? Event::Type::Unknown : Event::Type::KeyDown;
                 Result.KeyAction.Key       = GetKey(Event.key.key);
                 break;
             case SDL_EVENT_KEY_UP:
