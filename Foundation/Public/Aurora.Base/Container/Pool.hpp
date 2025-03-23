@@ -98,7 +98,7 @@ inline namespace Core
         {
             Archive.SerializeObject(mAllocator);
 
-            for (UInt32 Element = 0, Limit = mAllocator.Back(); Element < Limit; ++Element)
+            for (UInt32 Element = 0, Limit = mAllocator.GetBack(); Element < Limit; ++Element)
             {
                 Archive.SerializeObject(mPool[Element]);
             }
