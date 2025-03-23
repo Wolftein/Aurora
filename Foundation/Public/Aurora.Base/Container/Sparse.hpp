@@ -36,30 +36,6 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Bool IsFull() const
-        {
-            return mAllocator.IsFull();
-        }
-
-        // -=(Undocumented)=-
-        void Clear()
-        {
-            mAllocator.Clear();
-        }
-
-        // -=(Undocumented)=-
-        auto Content()
-        {
-            return CPtr<Type>(mPool.data(), mAllocator.Back());
-        }
-
-        // -=(Undocumented)=-
-        UInt Capacity() const
-        {
-            return mPool.size();
-        }
-
-        // -=(Undocumented)=-
         UInt32 Allocate()
         {
             const UInt32 Handle = mAllocator.Allocate();
@@ -76,6 +52,54 @@ inline namespace Core
         UInt32 Free(UInt32 Handle)
         {
             return mAllocator.Free(Handle);
+        }
+
+        // -=(Undocumented)=-
+        void Clear()
+        {
+            mAllocator.Clear();
+        }
+
+        // -=(Undocumented)=-
+        Bool IsFull() const
+        {
+            return mAllocator.IsFull();
+        }
+
+        // -=(Undocumented)=-
+        Bool IsEmpty() const
+        {
+            return mAllocator.IsEmpty();
+        }
+
+        // -=(Undocumented)=-
+        UInt32 GetBack() const
+        {
+            return mAllocator.GetBack();
+        }
+
+        // -=(Undocumented)=-
+        UInt32 GetSize() const
+        {
+            return mAllocator.GetSize();
+        }
+
+        // -=(Undocumented)=-
+        UInt32 GetCapacity() const
+        {
+            return mPool.size();
+        }
+
+        // -=(Undocumented)=-
+        CPtr<Type> GetContent()
+        {
+            return CPtr<Type>(mPool.data(), mAllocator.GetBack());
+        }
+
+        // -=(Undocumented)=-
+        CPtr<const Type> GetContent() const
+        {
+            return CPtr<const Type>(mPool.data(), mAllocator.GetBack());
         }
 
         // -=(Undocumented)=-

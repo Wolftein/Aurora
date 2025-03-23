@@ -38,19 +38,6 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        Bool IsFull() const
-        {
-            return mPool.empty() && mHead == Capacity;
-        }
-
-        // -=(Undocumented)=-
-        void Clear()
-        {
-            mHead = 0;
-            mPool.clear();
-        }
-
-        // -=(Undocumented)=-
         UInt32 Allocate()
         {
             if (mPool.empty())
@@ -82,9 +69,34 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        UInt32 Back() const
+        void Clear()
+        {
+            mHead = 0;
+            mPool.clear();
+        }
+
+        // -=(Undocumented)=-
+        Bool IsFull() const
+        {
+            return mPool.empty() && mHead == Capacity;
+        }
+
+        // -=(Undocumented)=-
+        Bool IsEmpty() const
+        {
+            return mPool.empty() && mHead == 0;
+        }
+
+        // -=(Undocumented)=-
+        UInt32 GetBack() const
         {
             return mHead;
+        }
+
+        // -=(Undocumented)=-
+        UInt32 GetSize() const
+        {
+            return mHead - mPool.size();
         }
 
         // -=(Undocumented)=-

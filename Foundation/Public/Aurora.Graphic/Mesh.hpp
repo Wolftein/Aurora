@@ -100,7 +100,7 @@ namespace Graphic
         // -=(Undocumented)=-
         CPtr<const Primitive> GetPrimitives() const
         {
-            return mPrimitives.Content();
+            return mPrimitives.GetContent();
         }
 
     private:
