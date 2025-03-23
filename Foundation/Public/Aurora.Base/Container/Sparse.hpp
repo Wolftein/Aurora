@@ -48,9 +48,9 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
-        auto Content() const
+        auto Content()
         {
-            return CPtr<const Type>(mPool.data(), mAllocator.Back());
+            return CPtr<Type>(mPool.data(), mAllocator.Back());
         }
 
         // -=(Undocumented)=-
