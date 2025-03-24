@@ -193,10 +193,6 @@ namespace Content
                 {
                     return true;
                 }
-                else
-                {
-                    Asset->SetStatus(Resource::Status::Failed);
-                }
                 Log::Warn("Resources: Failed to parse '{}'", Key.GetUrl());
             }
             else

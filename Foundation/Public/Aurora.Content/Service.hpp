@@ -98,8 +98,14 @@ namespace Content
             if (Asset && !Asset->HasFinished())
             {
                 // TODO: Asynchronous
-
-                Process(Asset, Parse(Asset));
+                if (const Bool Found = Parse(Asset))
+                {
+                    Process(Asset, true);
+                }
+                else
+                {
+                    Asset->SetStatus(Resource::Status::Failed);
+                }
             }
 
             return Asset;
@@ -112,8 +118,14 @@ namespace Content
             if (Asset && Asset->HasFinished())
             {
                 // TODO: Asynchronous
-
-                Process(Asset, Parse(Asset));
+                if (const Bool Found = Parse(Asset))
+                {
+                    Process(Asset, true);
+                }
+                else
+                {
+                    Asset->SetStatus(Resource::Status::Failed);
+                }
             }
         }
 
