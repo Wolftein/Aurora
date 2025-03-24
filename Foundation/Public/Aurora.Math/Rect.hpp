@@ -65,6 +65,12 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        Bool IsZero() const
+        {
+            return mX1 == 0 && mY1 == 0 && mX2 == 0 && mY2 == 0;
+        }
+
+        // -=(Undocumented)=-
         void Set(Base Left, Base Top, Base Right, Base Bottom)
         {
             mX1 = Left;
