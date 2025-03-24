@@ -62,6 +62,9 @@ namespace Graphic
             Opaque,
         };
 
+        // -=(Undocumented)=-
+        static constexpr CStr k_DefaultMaterialUri = "Memory://Material/Default";
+
     public:
 
         // -=(Undocumented)=-

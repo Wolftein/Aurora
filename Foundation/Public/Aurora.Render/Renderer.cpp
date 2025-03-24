@@ -146,7 +146,15 @@ namespace Graphic
     void Renderer::CreateDefaultResources(Ref<Core::Subsystem::Context> Context)
     {
         ConstSPtr<Content::Service> Content = Context.GetSubsystem<Content::Service>();
-        mPipelines[0] = Content->Load<Graphic::Pipeline>("Engine://Pipeline/MSDF.effect");
+        mPipelines[0] = Content->Load<Pipeline>("Engine://Pipeline/MSDF.effect");
+
+        // Initialize the default material
+        SPtr<Material> Material = Material::GetFactory().GetOrCreate(k_DefaultMaterialUri, true);
+        Material->SetSampler(
+                TextureSlot::Diffuse, Sampler(TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear));
+        Material->SetTexture(
+                TextureSlot::Diffuse, Content->Load<Texture>("Engine://Texture/Unknown.png"));
+        Content->Process(Material, true);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -210,7 +218,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     void Renderer::PushDrawable(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Destination, ConstRef<Rectf> Source,
-                                  Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+        Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
         if (mDrawablesPtr.size() == k_MaxDrawables)
         {
@@ -233,8 +241,8 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::PushDrawable(ConstRef<Rectf> Destination, Real32 Depth, ConstRef<Rectf> Source,
-                                  Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    void Renderer::PushDrawable(ConstRef<Rectf> Destination, Real32 Depth, ConstRef<Rectf> Source, Color Tint,
+        Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
     {
         if (mDrawablesPtr.size() == k_MaxDrawables)
         {
