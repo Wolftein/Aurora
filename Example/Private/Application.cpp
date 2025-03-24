@@ -169,16 +169,8 @@ namespace Example
 // [   MAIN   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#ifdef    SDL_PLATFORM_WINDOWS
-    #include <Windows.h>
-#endif // SDL_PLATFORM_WINDOWS
-
 int main([[maybe_unused]] int Argc, [[maybe_unused]] Ptr<Char> Argv[])
 {
-#ifdef    SDL_PLATFORM_WINDOWS
-    ::CoInitialize(nullptr);
-#endif // SDL_PLATFORM_WINDOWS
-
     Engine::Properties Properties;
     Properties.SetWindowTitle("Aurora Example");
     Properties.SetWindowWidth(1920);

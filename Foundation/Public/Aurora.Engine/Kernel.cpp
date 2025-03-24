@@ -14,6 +14,8 @@
 
 #ifdef    __EMSCRIPTEN__
     #include <emscripten.h>
+#elifdef  SDL_PLATFORM_WINDOWS
+    #include <windows.h>
 #endif // __EMSCRIPTEN__
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -28,6 +30,9 @@ namespace Engine
     Kernel::Kernel()
         : mActive { false }
     {
+#ifdef    SDL_PLATFORM_WINDOWS
+        ::CoInitialize(nullptr);
+#endif // SDL_PLATFORM_WINDOWS
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -35,6 +40,10 @@ namespace Engine
 
     Kernel::~Kernel()
     {
+#ifdef    SDL_PLATFORM_WINDOWS
+        ::CoUninitialize();
+#endif // SDL_PLATFORM_WINDOWS
+
         Log::Shutdown();
     }
 
