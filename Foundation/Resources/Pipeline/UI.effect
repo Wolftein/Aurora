@@ -13,9 +13,9 @@
 [Properties.Layout]
 
     Attributes      = [
-        ["POSITION",  "Float32x3",   0, 0  ],
-        ["TEXCOORD0", "Float32x2",   0, 12 ],
-        ["COLOR",     "UIntNorm8x4", 0, 20 ],
+        ["POSITION",  "Float32x2",   0, 0  ],
+        ["TEXCOORD0", "Float32x2",   0, 8  ],
+        ["COLOR",     "UIntNorm8x4", 0, 16 ],
     ]
 
     Topology        = "Triangle"
@@ -23,6 +23,10 @@
 [Program.Textures]
 
     Diffuse         = 0
+
+[Properties.Rasterizer] # Disable Cull
+
+    Cull            = "None"
 
 [Program.Vertex]
 
