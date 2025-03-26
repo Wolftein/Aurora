@@ -72,10 +72,8 @@ namespace Example
                 Vector3f(-100, -100, 0.5f),
                 Vector3f(0.5),
                 Quaternionf::FromAngles(DegreesToRadians(125), Vector3f(1, 1, 0))));
-        Random.Attach(Scene::TEcsText(Font, 16, L"[Hello SIR]"));
+        Random.Attach(Scene::TEcsText(Font, 16, L"[Hello SIR!!!!!!]"));
         Random.Attach(Scene::TEcsTint(0, 1, 1, 1));
-
-
 
         ConstSPtr<Graphic::Material> Material = Graphic::Material::GetFactory().GetOrCreate(
                 Content::Uri(Format("Memory://Material/{}", 1)), true);
@@ -88,7 +86,7 @@ namespace Example
         Content->Process(Material, true);
 
         MySprite = Scene->Create();
-        MySprite.Attach(Scene::TEcsTransform(Vector3f(333, 333, 0.7f), Vector3f(0.5), Quaternionf()));
+        MySprite.Attach(Scene::TEcsTransform(Vector3f(633, 333, 0.7f), Vector3f(0.5), Quaternionf()));
         MySprite.Attach(Scene::TEcsSprite(Material, Rectf(0, 0, 500, 400)));
         MySprite.Attach(Scene::TEcsPivot(Pivot::Type::CenterMiddle));
         MySprite.Attach(Scene::TEcsTint(0xFF0000FF));
@@ -144,7 +142,7 @@ namespace Example
 
     void Application::OnDestroy()
     {
-        mTexts = nullptr;
+        mTexts->DeleteQueries();
     }
 
     Bool Application::OnKeyDown(Input::Key Key)

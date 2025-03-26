@@ -37,13 +37,10 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        void Initialize(ConstSPtr<Service> Service);
+        Heap(ConstSPtr<Service> Graphics);
 
         // -=(Undocumented)=-
-        void Dispose();
-
-        // -=(Undocumented)=-
-        void Commit(Bool Copy);
+        ~Heap();
 
         // -=(Undocumented)=-
         template<typename Format>
@@ -68,7 +65,7 @@ namespace Graphic
 
         // -=(Undocumented)=-
         template<typename Format>
-        Bool Reserve(Usage Type, UInt32 Length, UInt32 Stride = sizeof(Format)) const
+        Bool Fits(Usage Type, UInt32 Length, UInt32 Stride = sizeof(Format)) const
         {
             if (Type == Usage::Uniform)
             {
@@ -77,11 +74,24 @@ namespace Graphic
             }
 
             ConstRef<InFlightBuffer> Buffer = mBuffers[CastEnum(Type)];
-            return (Align(Buffer.Writer, Stride) + Length * Stride) <= Buffer.Length;
+            const UInt32 Size   = Length * Stride;
+            const UInt32 Offset = Align(Buffer.Writer, Stride);
+
+            if (Buffer.Marker != 0)
+            {
+                return Offset + Size <= Buffer.Reader;
+            }
+            else
+            {
+                return Offset + Size <= Buffer.Length || Size <= Buffer.Reader;
+            }
         }
 
         // -=(Undocumented)=-
-        void Reallocate(Ref<Binding> Description);
+        void Reallocate(Ref<Binding> Description);  // TODO: Hacky, needs to thing another way!
+
+        // -=(Undocumented)=-
+        void Commit(Bool Copy);
 
     private:
 
@@ -120,18 +130,13 @@ namespace Graphic
         template<typename Format>
         auto AllocateInFlightBuffer(Ref<InFlightBuffer> Buffer, UInt32 Length, UInt32 Stride)
         {
-            UInt32 Size   = Length * Stride;
+            const UInt32 Size = Length * Stride;
             UInt32 Offset = Align(Buffer.Writer, Stride);
 
-            if (const UInt32 Address = (Offset + Size); Address > Buffer.Length)
+            if (Offset + Size > Buffer.Length)
             {
                 Buffer.Marker = Buffer.Writer;
-
-                Offset = 0;
-            }
-            else
-            {
-                Offset = Buffer.Writer;
+                Offset        = 0;
             }
 
             Buffer.Writer = Offset + Size;
@@ -144,7 +149,7 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Service>                             mService;
+        SPtr<Service>                             mGraphics;
         Array<InFlightBuffer, CountEnum<Usage>()> mBuffers;
     };
 }

@@ -11,7 +11,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Renderer.hpp"
-#include "Aurora.Content/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -23,49 +22,112 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Renderer::Renderer(Ref<Core::Subsystem::Context> Context)
+        : mGraphics { Context.GetSubsystem<Graphic::Service>() }
     {
-        CreateDefaultResources(Context);
+        // Initialize heap
+        mHeap = NewUniquePtr<Heap>(mGraphics);
 
-        mService = Context.GetSubsystem<Graphic::Service>();
-        mAllocator.Initialize(mService);
+        // Initialize default resources
+        CreateDefaultResources(Context.GetSubsystem<Content::Service>());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Renderer::~Renderer()
+    void Renderer::DrawLine(ConstRef<Vector2f> Origin, ConstRef<Vector2f> Target, Real32 Depth, Color Tint, float Thickness)
     {
-        mAllocator.Dispose();
+        // Calculate the direction vector of the line
+        const Real32 DirX = Target.GetX() - Origin.GetX();
+        const Real32 DirY = Target.GetY() - Origin.GetY();
+
+        const Real32 InvLength = InvSqrt(DirX * DirX + DirY * DirY);
+        const Real32 UnitX     = DirX * InvLength;
+        const Real32 UnitY     = DirY * InvLength;
+
+        // Calculate the perpendicular vector (normal) to the line and apply thickness
+        const Real32 HalfThickness = Thickness * 0.5f;
+        const Real32 NormalX       = -UnitY * HalfThickness;
+        const Real32 NormalY       =  UnitX * HalfThickness;
+
+        Ref<Command> Command = Create(Type::Primitive, GetUniqueKey(Order::Additive, Type::Primitive, Depth, 0));
+        Command.Material = nullptr;
+        Command.Tint     = Tint;
+        Command.Edges[0] = { Origin.GetX() + NormalX, Origin.GetY() + NormalY, Depth };
+        Command.Edges[1] = { Target.GetX() + NormalX, Target.GetY() + NormalY, Depth };
+        Command.Edges[2] = { Target.GetX() - NormalX, Target.GetY() - NormalY, Depth };
+        Command.Edges[3] = { Origin.GetX() - NormalX, Origin.GetY() - NormalY, Depth };
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Draw(ConstRef<Vector3f> Position, ConstRef<Vector2f> Size, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    void Renderer::DrawRect(ConstRef<Rectf> Origin, Real32 Depth, Color Tint, float Thickness)
     {
-        const Rectf Boundaries(Position.GetX(),
-                               Position.GetY(),
-                               Position.GetX() + Size.GetX(),
-                               Position.GetY() + Size.GetY());
-        PushDrawable(Rectf::Transform(Boundaries, Pivot), Position.GetZ(), Source, Tint, Order, Pipeline, Material);
+        const Vector2f EdgeLeftBottom(Origin.GetLeft(), Origin.GetBottom());
+        const Vector2f EdgeLeftTop(Origin.GetLeft(), Origin.GetTop());
+        const Vector2f EdgeRightTop(Origin.GetRight(), Origin.GetTop());
+        const Vector2f EdgeRightBottom(Origin.GetRight(), Origin.GetBottom());
+
+        DrawLine(EdgeLeftBottom, EdgeLeftTop, Depth, Tint, Thickness);
+        DrawLine(EdgeLeftTop, EdgeRightTop, Depth, Tint, Thickness);
+        DrawLine(EdgeRightTop, EdgeRightBottom, Depth, Tint, Thickness);
+        DrawLine(EdgeRightBottom, EdgeLeftBottom, Depth, Tint, Thickness);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Draw(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    void Renderer::DrawQuad(ConstRef<Rectf> Origin, Real32 Depth, Color Tint)
     {
-        PushDrawable(Transformation, Rectf::Transform(Origin, Pivot), Source, Tint, Order, Pipeline, Material);
+        Ref<Command> Command  = Create(Type::Primitive, GetUniqueKey(Order::Additive, Type::Primitive, Depth, 0));
+        Command.Material = nullptr;
+        Command.Tint     = Tint;
+        Command.Edges[0] = { Origin.GetLeft(),  Origin.GetBottom(), Depth };
+        Command.Edges[1] = { Origin.GetRight(), Origin.GetBottom(), Depth };
+        Command.Edges[2] = { Origin.GetRight(), Origin.GetTop(),    Depth };
+        Command.Edges[3] = { Origin.GetLeft(),  Origin.GetTop(),    Depth };
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::Draw(ConstRef<Matrix4f> Transformation, CStr16 Text, UInt16 Size, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Font> Font)
+    void Renderer::DrawSprite(ConstRef<Rectf> Origin, Real32 Depth, ConstRef<Rectf> UV, Color Tint, ConstSPtr<Material> Material)
     {
-        const Rectf Boundaries = Font->Calculate(Text, Size, Pivot);
-        Real32 CurrentX = Boundaries.GetX();
-        Real32 CurrentY = Boundaries.GetY();
+        Ref<Command> Command = Create(Type::Sprite, GetUniqueKey(Order::Opaque, Type::Sprite, Depth, Material->GetID()));
+        Command.Material = Material.get();
+        Command.Tint     = Tint;
+        Command.Edges[0] = { Origin.GetLeft(),  Origin.GetBottom(), Depth };
+        Command.Edges[1] = { Origin.GetRight(), Origin.GetBottom(), Depth };
+        Command.Edges[2] = { Origin.GetRight(), Origin.GetTop(),    Depth };
+        Command.Edges[3] = { Origin.GetLeft(),  Origin.GetTop(),    Depth };
+        Command.UV       = UV;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::DrawSprite(ConstRef<Matrix4f> Transform, ConstRef<Rectf> Origin, Real32 Depth, ConstRef<Rectf> UV, Color Tint, ConstSPtr<Material> Material)
+    {
+        Ref<Command> Command = Create(Type::Sprite, GetUniqueKey(Order::Opaque, Type::Sprite, Depth, Material->GetID()));
+        Command.Material = Material.get();
+        Command.Tint     = Tint;
+        Command.Edges[0] = Transform * Vector3f(Origin.GetLeft(),  Origin.GetBottom(), 0.0f);
+        Command.Edges[1] = Transform * Vector3f(Origin.GetRight(), Origin.GetBottom(), 0.0f);
+        Command.Edges[2] = Transform * Vector3f(Origin.GetRight(), Origin.GetTop(),    0.0f);
+        Command.Edges[3] = Transform * Vector3f(Origin.GetLeft(),  Origin.GetTop(),    0.0f);
+        Command.UV       = UV;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::DrawFont(ConstRef<Rectf> Origin, Real32 Depth, CStr16 Text, UInt16 Size, Color Tint, ConstSPtr<Font> Font)
+    {
+        const UInt32 ID = Font->GetMaterial()->GetID();
+
+        // TODO: Automatically wrapping
+        Real32 CurrentX = Origin.GetX() + Origin.GetX();
+        Real32 CurrentY = Origin.GetY() + Origin.GetY();
 
         for (Char16 Previous = 0, Symbol = 0; Symbol < Text.size(); ++Symbol)
         {
@@ -74,7 +136,7 @@ namespace Graphic
             switch (Codepoint)
             {
             case '\r':
-                CurrentX = Boundaries.GetX();
+                CurrentX = Origin.GetX();
                 break;
             case '\n':
                 CurrentY += Font->GetMetrics().UnderlineHeight * Size;
@@ -84,8 +146,66 @@ namespace Graphic
 
                 if (Glyph->PlaneBounds.GetWidth() > 0 && Glyph->PlaneBounds.GetHeight() > 0)
                 {
-                    const Rectf Destination = (Glyph->PlaneBounds * Size) + Vector2f(CurrentX, CurrentY);
-                    PushDrawable(Transformation, Destination, Glyph->ImageBounds, Tint, Order, mPipelines[0], Font->GetMaterial());
+                    const Rectf Boundaries = (Glyph->PlaneBounds * Size) + Vector2f(CurrentX, CurrentY);
+
+                    // TODO: Create a command for all font, not each letter
+                    // TODO: Calculate Transformation over the origin, not individual
+                    Ref<Command> Command = Create(Type::Font, GetUniqueKey(Order::Opaque, Type::Font, Depth, ID));
+                    Command.Material = Font->GetMaterial().get();
+                    Command.Tint     = Tint;
+                    Command.Edges[0] = Vector3f(Boundaries.GetLeft(),  Boundaries.GetBottom(), Depth);
+                    Command.Edges[1] = Vector3f(Boundaries.GetRight(), Boundaries.GetBottom(), Depth);
+                    Command.Edges[2] = Vector3f(Boundaries.GetRight(), Boundaries.GetTop(),    Depth);
+                    Command.Edges[3] = Vector3f(Boundaries.GetLeft(),  Boundaries.GetTop(),    Depth);
+                    Command.UV       = Glyph->ImageBounds;
+                }
+                CurrentX += (Font->GetKerning(Previous, Codepoint) + Glyph->Advance) * Size;
+                break;
+            }
+            Previous = Codepoint;
+        }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Renderer::DrawFont(ConstRef<Matrix4f> Transform, ConstRef<Rectf> Origin, Real32 Depth, CStr16 Text, UInt16 Size, Color Tint, ConstSPtr<Font> Font)
+    {
+        const UInt32 ID = Font->GetMaterial()->GetID();
+
+        // TODO: Automatically wrapping
+        Real32 CurrentX = Origin.GetX() + Origin.GetX();
+        Real32 CurrentY = Origin.GetY() + Origin.GetY();
+
+        for (Char16 Previous = 0, Symbol = 0; Symbol < Text.size(); ++Symbol)
+        {
+            const Char16 Codepoint = Text[Symbol];
+
+            switch (Codepoint)
+            {
+            case '\r':
+                CurrentX = Origin.GetX();
+                break;
+            case '\n':
+                CurrentY += Font->GetMetrics().UnderlineHeight * Size;
+                break;
+            default:
+                const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Codepoint);
+
+                if (Glyph->PlaneBounds.GetWidth() > 0 && Glyph->PlaneBounds.GetHeight() > 0)
+                {
+                    const Rectf Boundaries = (Glyph->PlaneBounds * Size) + Vector2f(CurrentX, CurrentY);
+
+                    // TODO: Create a command for all font, not each letter
+                    // TODO: Calculate Transformation over the origin, not individual
+                    Ref<Command> Command = Create(Type::Font, GetUniqueKey(Order::Opaque, Type::Font, Depth, ID));
+                    Command.Material = Font->GetMaterial().get();
+                    Command.Tint     = Tint;
+                    Command.Edges[0] = Transform * Vector3f(Boundaries.GetLeft(),  Boundaries.GetBottom(), Depth);
+                    Command.Edges[1] = Transform * Vector3f(Boundaries.GetRight(), Boundaries.GetBottom(), Depth);
+                    Command.Edges[2] = Transform * Vector3f(Boundaries.GetRight(), Boundaries.GetTop(),    Depth);
+                    Command.Edges[3] = Transform * Vector3f(Boundaries.GetLeft(),  Boundaries.GetTop(),    Depth);
+                    Command.UV       = Glyph->ImageBounds;
                 }
                 CurrentX += (Font->GetKerning(Previous, Codepoint) + Glyph->Advance) * Size;
                 break;
@@ -99,30 +219,39 @@ namespace Graphic
 
     void Renderer::Flush(Bool Copy)
     {
-        if (mDrawablesPtr.empty())
+        if (mCommandsPtr.empty())
         {
             return;
         }
 
-        // Sort all drawables back to front and by material/pipeline
-        Sort(mDrawablesPtr, [](ConstPtr<Drawable> Left, ConstPtr<Drawable> Right)
+        // Sort all command(s) back to front and by material/pipeline
+        Sort(mCommandsPtr, [](ConstPtr<Command> Left, ConstPtr<Command> Right)
         {
-            return Left->ID > Right->ID;
+            return Left->Key > Right->Key;
         });
 
-        // Render all drawables in batches
-        for (UInt32 Element = 0, Start = 0, Max = mDrawablesPtr.size() - 1; Element <= Max; ++Element)
+        // Render all command(s) in group of batches
+        for (UInt32 Element = 0, Start = 0, Max = mCommandsPtr.size() - 1; Element <= Max; ++Element)
         {
-            const ConstPtr<Drawable> Current = mDrawablesPtr[Element];
-            const ConstPtr<Drawable> Other   = (Element == Max ? Current : mDrawablesPtr[Element + 1]);
+            const ConstPtr<Command> Current = mCommandsPtr[Element];
+            const ConstPtr<Command> Other   = (Element == Max ? Current : mCommandsPtr[Element + 1]);
 
             // Break batch if material and pipeline differ or we are handling the last element
-            if (Current->Material != Other->Material || Current->Pipeline != Other->Pipeline || Current == Other)
+            if (Current->Pipeline != Other->Pipeline || Current->Material != Other->Material || Current == Other)
             {
                 const UInt32 Count = Element - Start + 1;
 
                 // Ensure we have enough space for the batch otherwise flush previous batches
-                PushBatch(Start, Count, * Current);
+                switch (Current->Kind)
+                {
+                case Type::Primitive:
+                    WritePrimitives(Start, Count, * Current->Pipeline);
+                    break;
+                case Type::Font:        // TODO Efficient hot path
+                case Type::Sprite:
+                    WriteSprites(Start, Count, * Current->Pipeline, * Current->Material);
+                    break;
+                }
 
                 // Continue with the next batch
                 Start = Element + 1;
@@ -130,64 +259,51 @@ namespace Graphic
         }
 
         // Flush all data to the GPU
-        mAllocator.Commit(Copy);
+        mHeap->Commit(Copy);
 
         // Flush all batches to the GPU
-        mService->Submit(mEncoder, true);
-        mEncoder.Clear();
+        mGraphics->Submit(mEncoder);
 
         // Reset all stack(s) back to original states
-        mDrawablesPtr.clear();
+        mCommandsPtr.clear();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::CreateDefaultResources(Ref<Core::Subsystem::Context> Context)
+    void Renderer::WritePrimitives(UInt32 Offset, UInt32 Count, Ref<Pipeline> Pipeline)
     {
-        ConstSPtr<Content::Service> Content = Context.GetSubsystem<Content::Service>();
-        mPipelines[0] = Content->Load<Pipeline>("Engine://Pipeline/MSDF.effect");
+        const Bool FitsVertices = mHeap->Fits<Layout>(Usage::Vertex, Count * 4);
+        const Bool FitsIndices  = mHeap->Fits<UInt16>(Usage::Index,  Count * 6);
 
-        // Initialize the default material
-        SPtr<Material> Material = Material::GetFactory().GetOrCreate(k_DefaultMaterialUri, true);
-        Material->SetSampler(
-                TextureSlot::Diffuse, Sampler(TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear));
-        Material->SetTexture(
-                TextureSlot::Diffuse, Content->Load<Texture>("Engine://Texture/Unknown.png"));
-        Content->Process(Material, true);
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Renderer::PushBatch(UInt32 Offset, UInt32 Count, ConstRef<Drawable> Drawable)
-    {
-        const Bool FitsVertices = mAllocator.Reserve<Layout>(Usage::Vertex, Count * 4);
-        const Bool FitsIndices  = mAllocator.Reserve<UInt16>(Usage::Index,  Count * 6);
-        const Bool FitsUniforms = mAllocator.Reserve<UInt8>(Usage::Uniform, Drawable.Material->GetParameters().size_bytes());
-
-        if (!FitsVertices || !FitsIndices || !FitsUniforms)
+        if (!FitsVertices || !FitsIndices)
         {
             // Flush all data to the GPU
-            mAllocator.Commit(true);
+            mHeap->Commit(true);
 
             // Flush all batches to the GPU
-            mService->Submit(mEncoder, true);
-            mEncoder.Clear();
+            mGraphics->Submit(mEncoder);
 
-            if (!FitsUniforms)
-            {
-                mAllocator.Reallocate(mBlocks[CastEnum(Block::Scene)]);
-                mAllocator.Reallocate(mBlocks[CastEnum(Block::Technique)]);
-            }
+            // Reallocate scopes
+            mHeap->Reallocate(mParameters[CastEnum(Scope::Global)]);
+            mHeap->Reallocate(mParameters[CastEnum(Scope::Effect)]);
         }
 
-        auto [VtxPointer, VtxDescription] = mAllocator.Allocate<Layout>(Usage::Vertex, 4 * Count);
-        auto [IdxPointer, IdxDescription]   = mAllocator.Allocate<UInt16>(Usage::Index, 6 * Count);
+        auto [VtxPointer, VtxDescription] = mHeap->Allocate<Layout>(Usage::Vertex, 4 * Count);
+        auto [IdxPointer, IdxDescription] = mHeap->Allocate<UInt16>(Usage::Index, 6 * Count);
 
         for (UInt32 Index = 0, Element = Offset; Element < Offset + Count; ++Element, Index += 4, VtxPointer += 4, IdxPointer += 6)
         {
-            PushGeometry(mDrawablesPtr[Element], VtxPointer);
+            Ptr<Command> CommandPtr = mCommandsPtr[Element];
+            VtxPointer[0].Position = CommandPtr->Edges[0];
+            VtxPointer[0].Color    = CommandPtr->Tint.GetValue();
+            VtxPointer[1].Position = CommandPtr->Edges[1];
+            VtxPointer[1].Color    = CommandPtr->Tint.GetValue();
+            VtxPointer[2].Position = CommandPtr->Edges[2];
+            VtxPointer[2].Color    = CommandPtr->Tint.GetValue();
+            VtxPointer[3].Position = CommandPtr->Edges[3];
+            VtxPointer[3].Color    = CommandPtr->Tint.GetValue();
+
             IdxPointer[0] = Index;
             IdxPointer[1] = Index + 1;
             IdxPointer[2] = Index + 2;
@@ -196,116 +312,92 @@ namespace Graphic
             IdxPointer[5] = Index + 3;
         }
 
-        mEncoder.SetUniforms(CastEnum(Block::Scene), mBlocks[CastEnum(Block::Scene)]);
-        mEncoder.SetUniforms(CastEnum(Block::Technique), mBlocks[CastEnum(Block::Technique)]);
-
-        if (CPtr<const UInt8> Parameters = Drawable.Material->GetParameters(); !Parameters.empty())
-        {
-            const auto Binding = mAllocator.Allocate(Usage::Uniform, Parameters);
-            mEncoder.SetUniforms(CastEnum(Block::Material), Binding);
-        }
-
-        // @TODO Instance Uniform
-
+        mEncoder.SetUniforms(CastEnum(Scope::Global), mParameters[CastEnum(Scope::Global)]);
+        mEncoder.SetUniforms(CastEnum(Scope::Effect), mParameters[CastEnum(Scope::Effect)]);
         mEncoder.SetVertices(0, Binding(VtxDescription.Buffer, VtxDescription.Stride, 0));
         mEncoder.SetIndices(Binding(IdxDescription.Buffer, IdxDescription.Stride, 0));
-        mEncoder.SetPipeline(* Drawable.Pipeline);
-        mEncoder.Bind(* Drawable.Pipeline, * Drawable.Material);
+        mEncoder.SetPipeline(Pipeline);
         mEncoder.Draw(6 * Count, VtxDescription.Offset / sizeof(Layout), IdxDescription.Offset / sizeof(UInt16));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::PushDrawable(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Destination, ConstRef<Rectf> Source,
-        Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    void Renderer::WriteSprites(UInt32 Offset, UInt32 Count, Ref<Pipeline> Pipeline, Ref<Material> Material)
     {
-        if (mDrawablesPtr.size() == k_MaxDrawables)
+        const Bool FitsVertices = mHeap->Fits<Layout>(Usage::Vertex, Count * 4);
+        const Bool FitsIndices  = mHeap->Fits<UInt16>(Usage::Index,  Count * 6);
+        const Bool FitsUniforms = mHeap->Fits<UInt8>(Usage::Uniform, Material.GetParameters().size_bytes());
+
+        if (!FitsVertices || !FitsIndices || !FitsUniforms)
         {
-            Flush(true);
+            // Flush all data to the GPU
+            mHeap->Commit(true);
+
+            // Flush all batches to the GPU
+            mGraphics->Submit(mEncoder);
+
+            // Reallocate scopes
+            mHeap->Reallocate(mParameters[CastEnum(Scope::Global)]);
+            mHeap->Reallocate(mParameters[CastEnum(Scope::Effect)]);
         }
 
-        Ref<Drawable> Drawable  = mDrawables[mDrawablesPtr.size()];
-        Drawable.Coordinates[0] = Transformation * Vector3f(Destination.GetLeft(),  Destination.GetBottom(), 0.0f);
-        Drawable.Coordinates[1] = Transformation * Vector3f(Destination.GetRight(), Destination.GetBottom(), 0.0f);
-        Drawable.Coordinates[2] = Transformation * Vector3f(Destination.GetRight(), Destination.GetTop(),    0.0f);
-        Drawable.Coordinates[3] = Transformation * Vector3f(Destination.GetLeft(),  Destination.GetTop(),    0.0f);
-        Drawable.Source         = Source;
-        Drawable.Tint           = Tint;
-        Drawable.Pipeline       = Pipeline.get();
-        Drawable.Material       = Material.get();
-        Drawable.ID             = GenerateUniqueId(Order, Pipeline->GetID(), Material->GetID(), Drawable.Coordinates[0].GetZ());
-        mDrawablesPtr.push_back(AddressOf(Drawable));
+        auto [VtxPointer, VtxDescription] = mHeap->Allocate<Layout>(Usage::Vertex, 4 * Count);
+        auto [IdxPointer, IdxDescription] = mHeap->Allocate<UInt16>(Usage::Index, 6 * Count);
+
+        for (UInt32 Index = 0, Element = Offset; Element < Offset + Count; ++Element, Index += 4, VtxPointer += 4, IdxPointer += 6)
+        {
+            Ptr<Command> CommandPtr = mCommandsPtr[Element];
+            VtxPointer[0].Position = CommandPtr->Edges[0];
+            VtxPointer[0].Texture.Set(CommandPtr->UV.GetLeft(), CommandPtr->UV.GetBottom());
+            VtxPointer[0].Color    = CommandPtr->Tint.GetValue();
+            VtxPointer[1].Position = CommandPtr->Edges[1];
+            VtxPointer[1].Texture.Set(CommandPtr->UV.GetRight(), CommandPtr->UV.GetBottom());
+            VtxPointer[1].Color    = CommandPtr->Tint.GetValue();
+            VtxPointer[2].Position = CommandPtr->Edges[2];
+            VtxPointer[2].Texture.Set(CommandPtr->UV.GetRight(), CommandPtr->UV.GetTop());
+            VtxPointer[2].Color    = CommandPtr->Tint.GetValue();
+            VtxPointer[3].Position = CommandPtr->Edges[3];
+            VtxPointer[3].Texture.Set(CommandPtr->UV.GetLeft(),  CommandPtr->UV.GetTop());
+            VtxPointer[3].Color    = CommandPtr->Tint.GetValue();
+
+            IdxPointer[0] = Index;
+            IdxPointer[1] = Index + 1;
+            IdxPointer[2] = Index + 2;
+            IdxPointer[3] = Index;
+            IdxPointer[4] = Index + 2;
+            IdxPointer[5] = Index + 3;
+        }
+
+        mEncoder.SetUniforms(CastEnum(Scope::Global), mParameters[CastEnum(Scope::Global)]);
+        mEncoder.SetUniforms(CastEnum(Scope::Effect), mParameters[CastEnum(Scope::Effect)]);
+
+        if (CPtr<const UInt8> Parameters = Material.GetParameters(); !Parameters.empty())
+        {
+            const auto Binding = mHeap->Allocate(Usage::Uniform, Parameters);
+            mEncoder.SetUniforms(CastEnum(Scope::Style), Binding);
+        }
+
+        mEncoder.SetVertices(0, Binding(VtxDescription.Buffer, VtxDescription.Stride, 0));
+        mEncoder.SetIndices(Binding(IdxDescription.Buffer, IdxDescription.Stride, 0));
+        mEncoder.SetPipeline(Pipeline);
+        mEncoder.Bind(Pipeline, Material);
+        mEncoder.Draw(6 * Count, VtxDescription.Offset / sizeof(Layout), IdxDescription.Offset / sizeof(UInt16));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Renderer::PushDrawable(ConstRef<Rectf> Destination, Real32 Depth, ConstRef<Rectf> Source, Color Tint,
-        Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material)
+    void Renderer::CreateDefaultResources(ConstSPtr<Content::Service> Content)
     {
-        if (mDrawablesPtr.size() == k_MaxDrawables)
-        {
-            Flush(true);
-        }
+        // Initialize the default pipelines
+        mPipelines[CastEnum(Type::Primitive)] = Content->Load<Pipeline>("Engine://Pipeline/Primitive.effect");
+        mPipelines[CastEnum(Type::Font)]      = Content->Load<Pipeline>("Engine://Pipeline/MSDF.effect");
 
-        Ref<Drawable> Drawable  = mDrawables[mDrawablesPtr.size()];
-        Drawable.Coordinates[0].Set(Destination.GetLeft(),  Destination.GetBottom(), Depth);
-        Drawable.Coordinates[1].Set(Destination.GetRight(), Destination.GetBottom(), Depth);
-        Drawable.Coordinates[2].Set(Destination.GetRight(), Destination.GetTop(),    Depth);
-        Drawable.Coordinates[3].Set(Destination.GetLeft(),  Destination.GetTop(),    Depth);
-        Drawable.Source         = Source;
-        Drawable.Tint           = Tint;
-        Drawable.Pipeline       = Pipeline.get();
-        Drawable.Material       = Material.get();
-        Drawable.ID             = GenerateUniqueId(Order, Pipeline->GetID(), Material ? Material->GetID() : 0, Depth);
-        mDrawablesPtr.push_back(AddressOf(Drawable));
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Renderer::PushGeometry(ConstPtr<Drawable> Drawable, Ptr<Layout> Buffer)
-    {
-        Buffer[0].Position = Drawable->Coordinates[0];
-        Buffer[0].Texture.Set(Drawable->Source.GetLeft(), Drawable->Source.GetBottom());
-        Buffer[0].Color = Drawable->Tint.GetValue();
-
-        Buffer[1].Position = Drawable->Coordinates[1];
-        Buffer[1].Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetBottom());
-        Buffer[1].Color = Drawable->Tint.GetValue();
-
-        Buffer[2].Position = Drawable->Coordinates[2];
-        Buffer[2].Texture.Set(Drawable->Source.GetRight(), Drawable->Source.GetTop());
-        Buffer[2].Color = Drawable->Tint.GetValue();
-
-        Buffer[3].Position = Drawable->Coordinates[3];
-        Buffer[3].Texture.Set(Drawable->Source.GetLeft(),  Drawable->Source.GetTop());
-        Buffer[3].Color = Drawable->Tint.GetValue();
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    UInt64 Renderer::GenerateUniqueId(Order Order, Object Pipeline, Object Material, Real32 Depth) const
-    {
-        if (Order == Order::Opaque)
-        {
-            const UInt32 DepthBits = std::bit_cast<UInt32>(1.0f + Depth);
-
-            return  (static_cast<UInt64>(DepthBits)                << 32)
-                |   (static_cast<UInt64>(Material        & 0xFFFF) << 16)
-                |   (static_cast<UInt64>(Pipeline        & 0xFF)   << 8)
-                |   (static_cast<UInt64>(CastEnum(Order) & 0xFF));
-        }
-        else
-        {
-            const UInt32 DepthBits = std::bit_cast<UInt32>(Depth);
-
-            return  (static_cast<UInt64>(Material        & 0xFFFF) << 48)
-                |   (static_cast<UInt64>(Pipeline        & 0xFF)   << 40)
-                |   (static_cast<UInt64>(DepthBits)                << 8)
-                |   (static_cast<UInt64>(CastEnum(Order) & 0xFF));
-        }
+        // Initialize the default material
+        SPtr<Material> Material = Material::GetFactory().GetOrCreate(k_DefaultMaterialUri, true);
+        Material->SetSampler(TextureSlot::Diffuse, Sampler(TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear));
+        Material->SetTexture(TextureSlot::Diffuse, Content->Load<Texture>("Engine://Texture/Unknown.png"));
+        Content->Process(Material, true);
     }
 }

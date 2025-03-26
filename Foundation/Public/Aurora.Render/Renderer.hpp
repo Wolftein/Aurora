@@ -15,6 +15,7 @@
 #include "Heap.hpp"
 #include "Aurora.Graphic/Camera.hpp"
 #include "Aurora.Graphic/Font.hpp"
+#include "Aurora.Content/Service.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -28,22 +29,22 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
-        static constexpr UInt32 k_MaxDrawables = 10240;
+        static constexpr UInt32 k_MaxDrawCalls     = 10'240;
 
         // -=(Undocumented)=-
-        enum class Block
+        static constexpr CStr k_DefaultMaterialUri = "Memory://Material/Default";
+
+        // -=(Undocumented)=-
+        enum class Type
         {
             // -=(Undocumented)=-
-            Scene,
+            Primitive,
 
             // -=(Undocumented)=-
-            Technique,
+            Font,
 
             // -=(Undocumented)=-
-            Material,
-
-            // -=(Undocumented)=-
-            Instance,
+            Sprite,
         };
 
         // -=(Undocumented)=-
@@ -63,7 +64,20 @@ namespace Graphic
         };
 
         // -=(Undocumented)=-
-        static constexpr CStr k_DefaultMaterialUri = "Memory://Material/Default";
+        enum class Scope
+        {
+            // -=(Undocumented)=-
+            Global = 0,
+
+            // -=(Undocumented)=-
+            Effect = 1,
+
+            // -=(Undocumented)=-
+            Style  = 2,
+
+            // -=(Undocumented)=-
+            Object = 3,
+        };
 
     public:
 
@@ -71,30 +85,47 @@ namespace Graphic
         Renderer(Ref<Core::Subsystem::Context> Context);
 
         // -=(Undocumented)=-
-        ~Renderer();
-
-        // -=(Undocumented)=-
         template<typename Format>
-        void SetScene(CPtr<const Format> Scene)
+        void SetGlobalParameters(CPtr<const Format> Parameters)
         {
-            mBlocks[CastEnum(Block::Scene)] = mAllocator.Allocate(Usage::Uniform, Scene);
+            // TODO: Check if Fits
+            mParameters[CastEnum(Scope::Global)] = mHeap->Allocate(Usage::Uniform, Parameters);
         }
 
         // -=(Undocumented)=-
         template<typename Format>
-        void SetTechnique(CPtr<const Format> Technique)
+        void SetEffectParameters(CPtr<const Format> Parameters)
         {
-            mBlocks[CastEnum(Block::Technique)] = mAllocator.Allocate(Usage::Uniform, Technique);
+            // TODO: Check if Fits
+            mParameters[CastEnum(Scope::Effect)] = mHeap->Allocate(Usage::Uniform, Parameters);
         }
 
         // -=(Undocumented)=-
-        void Draw(ConstRef<Vector3f> Position, ConstRef<Vector2f> Size, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+        void SetPipeline(Type Type, ConstSPtr<Pipeline> Pipeline)
+        {
+            mPipelines[CastEnum(Type)] = Pipeline;
+        }
 
         // -=(Undocumented)=-
-        void Draw(ConstRef<Matrix4f> Transform, ConstRef<Rectf> Origin, ConstRef<Rectf> Source, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
+        void DrawLine(ConstRef<Vector2f> Origin, ConstRef<Vector2f> Target, Real32 Depth, Color Tint, float Thickness = 1.0f);
 
         // -=(Undocumented)=-
-        void Draw(ConstRef<Matrix4f> Transform, CStr16 Text, UInt16 Size, Color Tint, ConstRef<Pivot> Pivot, Order Order, ConstSPtr<Font> Font);
+        void DrawRect(ConstRef<Rectf> Origin, Real32 Depth, Color Tint, float Thickness = 1.0f);
+
+        // -=(Undocumented)=-
+        void DrawQuad(ConstRef<Rectf> Origin, Real32 Depth, Color Tint);
+
+        // -=(Undocumented)=-
+        void DrawSprite(ConstRef<Rectf> Origin, Real32 Depth, ConstRef<Rectf> UV, Color Tint, ConstSPtr<Material> Material);
+
+        // -=(Undocumented)=-
+        void DrawSprite(ConstRef<Matrix4f> Transform, ConstRef<Rectf> Origin, Real32 Depth, ConstRef<Rectf> UV, Color Tint, ConstSPtr<Material> Material);
+
+        // -=(Undocumented)=-
+        void DrawFont(ConstRef<Rectf> Origin, Real32 Depth, CStr16 Text, UInt16 Size, Color Tint, ConstSPtr<Font> Font);
+
+        // -=(Undocumented)=-
+        void DrawFont(ConstRef<Matrix4f> Transform, ConstRef<Rectf> Origin, Real32 Depth, CStr16 Text, UInt16 Size, Color Tint, ConstSPtr<Font> Font);
 
         // -=(Undocumented)=-
         void Flush(Bool Copy = false);
@@ -102,36 +133,75 @@ namespace Graphic
     private:
 
         // -=(Undocumented)=-
-        struct Buffer
+        void CreateDefaultResources(ConstSPtr<Content::Service> Content);
+
+        // -=(Undocumented)=-
+        struct Command
         {
-            Object        ID;
-            UPtr<UInt8[]> Memory;
-            UInt          Length;
-            UInt          Reader;
-            UInt          Writer;
+            // -=(Undocumented)=-
+            UInt64             Key;
+
+            // -=(Undocumented)=-
+            Type               Kind;
+
+            // -=(Undocumented)=-
+            Color              Tint;
+
+            // -=(Undocumented)=-
+            Ptr<Pipeline>      Pipeline;
+
+            // -=(Undocumented)=-
+            Ptr<Material>      Material;
+
+            // -=(Undocumented)=-
+            Array<Vector3f, 4> Edges;
+
+            // -=(Undocumented)=-
+            Rectf              UV;
         };
 
         // -=(Undocumented)=-
-        struct Drawable
+        Ref<Command> Create(Type Kind, UInt64 Key)
         {
-            // -=(Undocumented)=-
-            UInt64                  ID;
+            if (mCommandsPtr.size() == k_MaxDrawCalls)
+            {
+                Flush(true);
+            }
 
-            // -=(Undocumented)=-
-            Array<Vector3f, 4>      Coordinates;
+            Ref<Command> Command = mCommands[mCommandsPtr.size()];
+            Command.Key      = Key;
+            Command.Kind     = Kind;
+            Command.Pipeline = mPipelines[CastEnum(Kind)].get();
+            mCommandsPtr.push_back(AddressOf(Command));
+            return Command;
+        }
 
-            // -=(Undocumented)=-
-            Rectf                   Source;
+        // -=(Undocumented)=-
+        UInt64 GetUniqueKey(Order Order, Type Type, Real32 Depth, Object Material)
+        {
+            Object Pipeline = mPipelines[CastEnum(Type)]->GetID();
 
-            // -=(Undocumented)=-
-            Color                   Tint;
+            if (Order == Order::Opaque)
+            {
+                const UInt32 DepthBits = std::bit_cast<UInt32>(1.0f + Depth);
 
-            // -=(Undocumented)=-
-            Ptr<Graphic::Pipeline>  Pipeline;
+                // TODO: Consider Byte Endianness
+                return (static_cast<UInt64>(DepthBits)                << 32)
+                     | (static_cast<UInt64>(Material        & 0xFFFF) << 16)
+                     | (static_cast<UInt64>(Pipeline        & 0xFF)   << 8)
+                     | (static_cast<UInt64>(CastEnum(Order) & 0xFF));
+            }
+            else
+            {
+                const UInt32 DepthBits = std::bit_cast<UInt32>(Depth);
 
-            // -=(Undocumented)=-
-            Ptr<Graphic::Material>  Material;
-        };
+                // TODO: Consider Byte Endianness
+                return (static_cast<UInt64>(Material        & 0xFFFF) << 48)
+                     | (static_cast<UInt64>(Pipeline        & 0xFF)   << 40)
+                     | (static_cast<UInt64>(DepthBits)                << 8)
+                     | (static_cast<UInt64>(CastEnum(Order) & 0xFF));
+            }
+        }
 
         // -=(Undocumented)=-
         struct Layout
@@ -147,44 +217,30 @@ namespace Graphic
         };
 
         // -=(Undocumented)=-
-        void CreateDefaultResources(Ref<Core::Subsystem::Context> Context);
+        void WritePrimitives(UInt32 Offset, UInt32 Count, Ref<Pipeline> Pipeline);
 
         // -=(Undocumented)=-
-        void PushBatch(UInt32 Offset, UInt32 Count, ConstRef<Drawable> Drawable);
-
-        // -=(Undocumented)=-
-        void PushDrawable(ConstRef<Matrix4f> Transformation, ConstRef<Rectf> Destination, ConstRef<Rectf> Source,
-            Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
-
-        // -=(Undocumented)=-
-        void PushDrawable(ConstRef<Rectf> Destination, Real32 Depth, ConstRef<Rectf> Source,
-            Color Tint, Order Order, ConstSPtr<Pipeline> Pipeline, ConstSPtr<Material> Material);
-
-        // -=(Undocumented)=-
-        void PushGeometry(ConstPtr<Drawable> Drawable, Ptr<Layout> Buffer);
-
-        // -=(Undocumented)=-
-        UInt64 GenerateUniqueId(Order Order, Object Pipeline, Object Material, Real32 Depth) const;
+        void WriteSprites(UInt32 Offset, UInt32 Count, Ref<Pipeline> Pipeline, Ref<Material> Material);
 
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        SPtr<Service>                      mService;
-        Heap                               mAllocator;
-        Array<Binding, CountEnum<Block>()> mBlocks;
-        Encoder                            mEncoder;
+        SPtr<Service>                            mGraphics;
+        UPtr<Heap>                               mHeap;
+        Encoder                                  mEncoder;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Array<SPtr<Pipeline>, 1>           mPipelines;
+        Array<Binding, CountEnum<Scope>()>       mParameters;
+        Array<SPtr<Pipeline>, CountEnum<Type>()> mPipelines;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Array<Drawable, k_MaxDrawables>    mDrawables;
-        Vector<Ptr<Drawable>>              mDrawablesPtr;
+        Array<Command, k_MaxDrawCalls>           mCommands;
+        Vector<Ptr<Command>>                     mCommandsPtr;
     };
 }

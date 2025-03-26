@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include <Aurora.Math/Pivot.hpp>
 #include <Aurora.Render/Renderer.hpp>
 #include <Aurora.Content/Service.hpp>
 #include <Aurora.Scene/Service.hpp>
@@ -61,7 +62,16 @@ namespace Scene
         // -=(Undocumented)=-
         void Draw(Ref<Graphic::Encoder> Encoder, Ref<Graphic::Camera> Camera)
         {
-            mRenderer->SetScene(CastSpan(Camera.GetWorld()));
+            mRenderer->SetGlobalParameters(CastSpan(Camera.GetWorld()));
+            mRenderer->SetPipeline(Graphic::Renderer::Type::Sprite, mPipeline2);
+
+            mRenderer->DrawLine({0, 0}, {100, 100}, 0, Color::k_Violet, 1.0f);
+            mRenderer->DrawLine({100, 100}, {200, 200}, 0, Color::k_Chocolate, 5.0f);
+            mRenderer->DrawLine({100, 200}, {200, 200}, 0, Color::k_Red, 2.0f);
+            mRenderer->DrawLine({500, 500}, {400, 400}, 0, Color::k_Red, 2.0f);
+            mRenderer->DrawRect({256, 256, 318, 318}, 0, Color::k_Pink, 1);
+            mRenderer->DrawRect({400, 256, 500, 312}, 0, Color::k_Ivory, 8);
+
 
             mQuery2.Each([&](ConstRef<TEcsSprite> Sprite, ConstRef<TEcsMatrix> Matrix, Ptr<const TEcsTint> Tint, Ptr<const TEcsPivot> Pivot)
                         {
@@ -69,22 +79,34 @@ namespace Scene
                             const Rectf Source(
                                     Vector2f(Sprite.GetRectangle().GetLeft(), Sprite.GetRectangle().GetTop()) / Vector2f(Texture->GetWidth(), Texture->GetHeight()),
                                     Vector2f(Sprite.GetRectangle().GetRight(), Sprite.GetRectangle().GetBottom()) / Vector2f(Texture->GetWidth(), Texture->GetHeight()));
-                            const Rectf Destination(0, 0, Sprite.GetRectangle().GetWidth(), Sprite.GetRectangle().GetHeight());
+
 
                             Math::Pivot OptPivot = (Pivot ? * Pivot : Math::Pivot());
                             Math::Color OptTint  = (Tint  ? * Tint  : Math::Color(1, 1, 1, 1));
-                            mRenderer->Draw(Matrix, Destination, Source, OptTint, OptPivot, Graphic::Renderer::Order::Opaque, mPipeline2, Sprite.GetMaterial() );
-                        });
 
+                            auto Origin = Rectf::Transform(Rectf(0, 0, Sprite.GetRectangle().GetWidth(), Sprite.GetRectangle().GetHeight()), OptPivot);
+
+                            mRenderer->DrawSprite(Matrix, Origin, 0.0f, Source, OptTint, Sprite.GetMaterial());
+                        });
 
             mQuery.Each([&](ConstRef<TEcsText> Text, ConstRef<TEcsMatrix> Matrix, Ptr<const TEcsTint> Tint, Ptr<const TEcsPivot> Pivot)
             {
+
                 Math::Pivot OptPivot = (Pivot ? * Pivot : Math::Pivot());
                 Math::Color OptTint  = (Tint  ? * Tint  : Math::Color());
-                mRenderer->Draw(Matrix, Text.GetWord(), Text.GetSize(), OptTint, OptPivot, Graphic::Renderer::Order::Opaque, Text.GetFont());
+                auto Origin = Text.GetFont()->Calculate(Text.GetWord(), Text.GetSize(), OptPivot);
+
+                mRenderer->DrawFont(Matrix, Origin, 0.0f, Text.GetWord(), Text.GetSize(), OptTint, Text.GetFont());
             });
 
             mRenderer->Flush();
+        }
+
+        void DeleteQueries()
+        {
+            mQuery.~Query();
+            mQuery2.~Query();
+
         }
 
     private:

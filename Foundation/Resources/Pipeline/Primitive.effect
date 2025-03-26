@@ -14,7 +14,7 @@
 
     Attributes      = [
         ["POSITION",  "Float32x3",   0, 0  ],
-        ["COLOR",     "UIntNorm8x4", 0, 12 ],
+        ["COLOR",     "UIntNorm8x4", 0, 20 ],
     ]
 
     Topology        = "Triangle"
