@@ -99,7 +99,7 @@ namespace Graphic
         void Prepare(Object ID, ConstRef<Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
 
         // -=(Undocumented)=-
-        void Submit(Ref<Encoder> Encoder, Bool Copy);
+        void Submit(Ref<Encoder> Encoder, Bool Copy = true, Bool Clear = true);
 
         // -=(Undocumented)=-
         void Commit(Object ID, Bool Synchronised);

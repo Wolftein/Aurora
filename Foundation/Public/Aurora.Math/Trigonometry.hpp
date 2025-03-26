@@ -25,21 +25,21 @@ inline namespace Math
 
     // -=(Undocumented)=-
     template<typename Type>
-    Type DegreesToRadians(Type Degrees)
+    static constexpr Type DegreesToRadians(Type Degrees)
     {
         return Degrees * (k_PI / 180);
     }
 
     // -=(Undocumented)=-
     template<typename Type>
-    Type RadiansToDegrees(Type Radians)
+    static constexpr Type RadiansToDegrees(Type Radians)
     {
         return Radians * (180 / k_PI);
     }
 
     // -=(Undocumented)=-
     template<typename Type>
-    Type Cosine(Type Angle)
+    static constexpr Type Cosine(Type Angle)
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
@@ -57,7 +57,7 @@ inline namespace Math
 
     // -=(Undocumented)=-
     template<typename Type>
-    Type InvCosine(Type Angle)
+    static constexpr Type InvCosine(Type Angle)
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
@@ -75,7 +75,7 @@ inline namespace Math
 
     // -=(Undocumented)=-
     template<typename Type>
-    Type Sine(Type Angle)
+    static constexpr Type Sine(Type Angle)
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
@@ -93,7 +93,7 @@ inline namespace Math
 
     // -=(Undocumented)=-
     template<typename Type>
-    Type InvSine(Type Angle)
+    static constexpr Type InvSine(Type Angle)
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
@@ -111,7 +111,7 @@ inline namespace Math
 
     // -=(Undocumented)=-
     template<typename Type>
-    Type Tangent(Type Angle)
+    static constexpr Type Tangent(Type Angle)
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
@@ -129,7 +129,7 @@ inline namespace Math
 
     // -=(Undocumented)=-
     template<typename Type>
-    Type InvTangent(Type Angle)
+    static constexpr Type InvTangent(Type Angle)
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
@@ -147,7 +147,7 @@ inline namespace Math
 
     // -=(Undocumented)=-
     template<typename Type>
-    Type Sqrt(Type Number)
+    static constexpr Type Sqrt(Type Number)
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
@@ -164,8 +164,18 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
+    static constexpr Real32 InvSqrt(Real32 Number)
+    {
+        UInt32 Magic = std::bit_cast<UInt32>(Number);
+        Magic = 0x5F375A86 - (Magic >> 1);
+
+        const Real32 Y = std::bit_cast<Real32>(Magic);
+        return Y * (1.5f - (Number * 0.5f * Y * Y));
+    }
+
+    // -=(Undocumented)=-
     template<typename Type>
-    Type Lerp(Type Start, Type End, Real32 Percentage)
+    static constexpr Type Lerp(Type Start, Type End, Real32 Percentage)
     {
         return Start + Percentage * (End - Start);
     }

@@ -66,7 +66,7 @@ inline namespace Core
     // -=(Undocumented)=-
     constexpr UInt Align(UInt Value, UInt Alignment)
     {
-        return Value + (Alignment - 1) & ~(Alignment - 1);
+        return ((Value + Alignment - 1) / Alignment) * Alignment;
     }
 
     // -=(Undocumented)=-

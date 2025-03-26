@@ -324,7 +324,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::Submit(Ref<Encoder> Encoder, Bool Copy)
+    void Service::Submit(Ref<Encoder> Encoder, Bool Copy, Bool Clear)
     {
         if (CPtr<const Submission> Submissions = Encoder.GetSubmissions(); !Submissions.empty())
         {
@@ -334,6 +334,11 @@ namespace Graphic
             {
                 EncoderDataPtr = Data(Submissions.size_bytes());
                 EncoderDataPtr.Copy(Submissions.data(), Submissions.size_bytes());
+
+                if (Clear)
+                {
+                    Encoder.Clear();
+                }
             }
             else
             {

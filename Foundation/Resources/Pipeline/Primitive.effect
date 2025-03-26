@@ -14,22 +14,17 @@
 
     Attributes      = [
         ["POSITION",  "Float32x3",   0, 0  ],
-        ["TEXCOORD0", "Float32x2",   0, 12 ],
-        ["COLOR",     "UIntNorm8x4", 0, 20 ],
+        ["COLOR",     "UIntNorm8x4", 0, 12 ],
     ]
 
     Topology        = "Triangle"
 
-[Program.Textures]
-
-    Diffuse         = 0
-
 [Program.Vertex]
 
     Entry           = "vertex"
-    Filename        = "Engine://Pipeline/UI.shader"
+    Filename        = "Engine://Pipeline/Primitive.shader"
 
 [Program.Fragment]
 
     Entry           = "fragment"
-    Filename        = "Engine://Pipeline/UI.shader"
+    Filename        = "Engine://Pipeline/Primitive.shader"

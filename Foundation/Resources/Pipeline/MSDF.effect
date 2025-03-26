@@ -1,22 +1,22 @@
 [Properties.Blend]  # Enable Alpha-Blending
 
-	ColorSrcFactor  = "SrcAlpha"
-	ColorDstFactor  = "OneMinusSrcAlpha"
-	AlphaSrcFactor  = "SrcAlpha"
-	AlphaDstFactor  = "OneMinusSrcAlpha"
+    ColorSrcFactor  = "SrcAlpha"
+    ColorDstFactor  = "OneMinusSrcAlpha"
+    AlphaSrcFactor  = "SrcAlpha"
+    AlphaDstFactor  = "OneMinusSrcAlpha"
 
 [Properties.Depth]  # Enable Depth Write / Depth Testing
 
-	Mask            = 1
-	Condition       = "LessEqual"
+    Mask            = 1
+    Condition       = "LessEqual"
 
 [Properties.Layout]
 
-	Attributes      = [
-		["POSITION",  "Float32x3",   0, 0  ],
-		["TEXCOORD0", "Float32x2",   0, 12 ],
-		["COLOR",     "UIntNorm8x4", 0, 20 ],
-	]
+    Attributes      = [
+        ["POSITION",  "Float32x3",   0, 0  ],
+        ["TEXCOORD0", "Float32x2",   0, 12 ],
+        ["COLOR",     "UIntNorm8x4", 0, 20 ],
+    ]
 
     Topology        = "Triangle"
 
@@ -26,10 +26,10 @@
 
 [Program.Vertex]
 
-	Entry           = "vertex"
-	Filename        = "Engine://Pipeline/MSDF.shader"
+    Entry           = "vertex"
+    Filename        = "Engine://Pipeline/MSDF.shader"
 
 [Program.Fragment]
 
-	Entry           = "fragment"
-	Filename        = "Engine://Pipeline/MSDF.shader"
+    Entry           = "fragment"
+    Filename        = "Engine://Pipeline/MSDF.shader"
