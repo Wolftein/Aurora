@@ -226,6 +226,13 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename Type>
+        void Inherit()
+        {
+            mHandle.is_a<Type>();
+        }
+
+        // -=(Undocumented)=-
         void Inherit(Entity Prefab)
         {
             mHandle.is_a(Prefab.GetHandle());
