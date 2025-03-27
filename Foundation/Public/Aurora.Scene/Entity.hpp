@@ -90,7 +90,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        auto Obtain()
+        auto Obtain() const
         {
             if constexpr (std::is_const_v<Type>)
             {
@@ -104,7 +104,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        auto Obtain(Entity Component)
+        auto Obtain(Entity Component) const
         {
             if constexpr (std::is_const_v<Type>)
             {
@@ -118,7 +118,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        auto Obtain(Entity First, Entity Second)
+        auto Obtain(Entity First, Entity Second) const
         {
             if constexpr (std::is_const_v<Type>)
             {
@@ -139,19 +139,19 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        Bool Retain(Type Value)
+        Bool Retain(Type Value) const
         {
             return mHandle.has(Value);
         }
 
         // -=(Undocumented)=-
-        Bool Retain(Entity Component)
+        Bool Retain(Entity Component) const
         {
             return mHandle.has(Component.GetID());
         }
 
         // -=(Undocumented)=-
-        Bool Retain(Entity First, Entity Second)
+        Bool Retain(Entity First, Entity Second) const
         {
             return mHandle.has(First.GetID(), Second.GetID());
         }
@@ -196,7 +196,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        void Enable() const
+        void Enable()
         {
             mHandle.enable<Type>();
         }
@@ -222,7 +222,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        void Disable() const
+        void Disable()
         {
             mHandle.disable<Type>();
         }
@@ -280,7 +280,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Function>
-        void Children(Any<Function> Callback)
+        void Children(Any<Function> Callback) const
         {
             mHandle.children(Callback);
         }
