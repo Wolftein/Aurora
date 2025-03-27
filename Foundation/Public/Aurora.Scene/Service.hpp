@@ -77,14 +77,14 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto Query()
+        auto Select()
         {
             return mWorld.template query_builder<Components...>();
         }
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto System()
+        auto Execute()
         {
             return mWorld.template system<Components...>();
         }

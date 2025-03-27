@@ -12,7 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Math/Math.hpp"
+#include "Aurora.Scene/Tag.hpp"
+#include "Aurora.Math/Transform.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,11 +22,11 @@
 namespace Scene
 {
     // -=(Undocumented)=-
-    using TEcsMatrix    = Math::Matrix4f;
+    using EcsDirty          = Tag<Hash("EcsDirty")>;
 
     // -=(Undocumented)=-
-    using TEcsPivot     = Math::Pivot;
+    using EcsWorldTransform = Math::Matrix4f;
 
     // -=(Undocumented)=-
-    using TEcsTransform = Math::Transformf;
+    using EcsLocalTransform = Math::Transformf;
 }

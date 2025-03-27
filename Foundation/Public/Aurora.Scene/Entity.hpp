@@ -22,7 +22,7 @@
 namespace Scene
 {
     // -=(Undocumented)=-
-    class Entity
+    class Entity final
     {
     public:
 
@@ -245,6 +245,13 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename Function>
+        void Children(Any<Function> Callback)
+        {
+            mHandle.children(Callback);
+        }
+
+        // -=(Undocumented)=-
         void SetName(CStr Name)
         {
             mHandle.set_name(Name.data());
@@ -261,6 +268,23 @@ namespace Scene
         Bool operator==(Ref<const Entity> Other) const
         {
             return GetHandle() == Other.GetHandle();
+        }
+
+    public:
+
+        // -=(Undocumented)=-
+        template<typename Component, Bool Enable>
+        static void ToggleComponentInHierarchy(Scene::Entity Entity)
+        {
+            if constexpr (Enable)
+            {
+                Entity.template Enable<Component>();
+            }
+            else
+            {
+                Entity.template Disable<Component>();
+            }
+            Entity.Children(& ToggleComponentInHierarchy<Component, Enable>);
         }
 
     private:

@@ -23,7 +23,7 @@ namespace Scene
 {
     // -=(Undocumented)=-
     template<typename ...Components>
-    class Query
+    class Query final
     {
     public:
 
@@ -42,17 +42,17 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<typename Functor>
-        void Each(Functor && Function)
+        template<typename Function>
+        void Each(Any<Function> Callback)
         {
-            mHandle.each(Function);
+            mHandle.each(Callback);
         }
 
         // -=(Undocumented)=-
-        template<typename Functor>
-        void Run(Functor && Function)
+        template<typename Function>
+        void Run(Any<Function> Callback)
         {
-            mHandle.run(Function);
+            mHandle.run(Callback);
         }
 
     private:

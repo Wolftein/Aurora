@@ -120,8 +120,10 @@ namespace Scene
 
     void Service::RegisterDefaultComponents()
     {
-        Register<TEcsTint>();
-        Register<TEcsTransform, TEcsMatrix>().add(flecs::CanToggle);
+        Register<EcsDirty>().add(flecs::CanToggle);
+        Register<EcsTint>();
+        Register<EcsWorldTransform, EcsDirty>();
+        Register<EcsLocalTransform, EcsWorldTransform>();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -129,21 +131,23 @@ namespace Scene
 
     void Service::RegisterDefaultSystems()
     {
-        static constexpr void (* OnEnableTransform)(Scene::Entity::Handle Entity) = [](Scene::Entity::Handle Entity)
-        {
-            Entity.enable<Scene::TEcsTransform>();
-            Entity.children(OnEnableTransform);
-        };
-        Observe().with<TEcsTransform>().self().event(flecs::OnSet).each(OnEnableTransform);
+        // Observes changes to local transforms and marks affected hierarchies as dirty.
+        this->Observe<>()
+            .with<EcsLocalTransform>()
+            .self()
+            .event(flecs::OnSet)
+            .each(Entity::ToggleComponentInHierarchy<EcsDirty, true>);
 
-        System<const TEcsTransform, Ptr<const TEcsMatrix>, TEcsMatrix>()
-            .kind(EcsPreUpdate)
-            .term_at(1).parent().cascade()
-            .each([](Entity::Handle Entity, ConstRef<TEcsTransform> Local, Ptr<const TEcsMatrix> Parent, Ref<TEcsMatrix> World)
+        // Updates world transforms for dirty entities in hierarchy order.
+        this->Execute<const EcsLocalTransform, ConstPtr<EcsWorldTransform>, EcsWorldTransform>()
+            .with<EcsDirty>()
+            .term_at(1)
+                .cascade()
+            .each([](Entity Entity, ConstRef<EcsLocalTransform> Local, ConstPtr<EcsWorldTransform> Parent, Ref<EcsWorldTransform> World)
             {
                 World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
-                Entity.modified<TEcsMatrix>();
-                Entity.disable<TEcsTransform>();
+                Entity.Notify<EcsWorldTransform>();
+                Entity.Disable<EcsDirty>();
             });
     }
 }

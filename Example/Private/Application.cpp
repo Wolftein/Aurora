@@ -41,39 +41,39 @@ namespace Example
 
         GrandMaster = Scene->Create();
         GrandMaster.SetName("Grand Master");
-        GrandMaster.Attach(Scene::TEcsTransform(Vector3f(256, 256, 0)));
+        GrandMaster.Attach(Scene::EcsLocalTransform(Vector3f(256, 256, 0)));
         GrandMaster.Attach(Scene::TEcsText(Font, 32, L"[Fers]"));
-        GrandMaster.Attach(Scene::TEcsTint(0, 1, 0, 1));
+        GrandMaster.Attach(Scene::EcsTint(0, 1, 0, 1));
 
         Master = Scene->Create();
         Master.SetName("Master");
         Master.SetParent(GrandMaster);
-        Master.Attach(Scene::TEcsTransform(
+        Master.Attach(Scene::EcsLocalTransform(
                 Vector3f(0, 32, 0),
                 Vector3f(1),
                 Quaternionf::FromAngles(DegreesToRadians(90), Vector3f(0, 0, 1))));
         Master.Attach(Scene::TEcsPivot(Pivot::Type::CenterMiddle));
         Master.Attach(Scene::TEcsText(Font, 32, L"[Es Puto]"));
-        Master.Attach(Scene::TEcsTint(1, 0, 0, 1));
+        Master.Attach(Scene::EcsTint(1, 0, 0, 1));
 
         Child = Scene->Create();
         Child.SetParent(Master);
         Child.SetName("Child");
-        Child.Attach(Scene::TEcsTransform(
+        Child.Attach(Scene::EcsLocalTransform(
                 Vector3f(12, 24, 0),
                 Vector3f(1),
                 Quaternionf::FromAngles(DegreesToRadians(90), Vector3f(0, 0, 1))));
         Child.Attach(Scene::TEcsText(Font, 12, L"[CHILD_OF_MASTER]"));
-        Child.Attach(Scene::TEcsTint(0, 0, 1, 1));
+        Child.Attach(Scene::EcsTint(0, 0, 1, 1));
 
         Random = Scene->Create();
         Random.SetParent(GrandMaster);
-        Random.Attach(Scene::TEcsTransform(
+        Random.Attach(Scene::EcsLocalTransform(
                 Vector3f(-100, -100, 0.5f),
                 Vector3f(0.5),
                 Quaternionf::FromAngles(DegreesToRadians(125), Vector3f(1, 1, 0))));
         Random.Attach(Scene::TEcsText(Font, 16, L"[Hello SIR!!!!!!]"));
-        Random.Attach(Scene::TEcsTint(0, 1, 1, 1));
+        Random.Attach(Scene::EcsTint(0, 1, 1, 1));
 
         ConstSPtr<Graphic::Material> Material = Graphic::Material::GetFactory().GetOrCreate(
                 Content::Uri(Format("Memory://Material/{}", 1)), true);
@@ -86,10 +86,10 @@ namespace Example
         Content->Process(Material, true);
 
         MySprite = Scene->Create();
-        MySprite.Attach(Scene::TEcsTransform(Vector3f(633, 333, 0.7f), Vector3f(0.5), Quaternionf()));
+        MySprite.Attach(Scene::EcsLocalTransform(Vector3f(633, 333, 0.7f), Vector3f(0.5), Quaternionf()));
         MySprite.Attach(Scene::TEcsSprite(Material, Rectf(0, 0, 500, 400)));
         MySprite.Attach(Scene::TEcsPivot(Pivot::Type::CenterMiddle));
-        MySprite.Attach(Scene::TEcsTint(0xFF0000FF));
+        MySprite.Attach(Scene::EcsTint(0xFF0000FF));
 
         // Initialize Camera.
         mCamera.SetOrthographic(GetDevice().GetWidth(), GetDevice().GetHeight(), 0, 1);
@@ -125,16 +125,16 @@ namespace Example
         Angles += 0.01f;
         if (Angles >= 360.0f) { Angles -= 360.0f; }
 
-        Random.Attach(Scene::TEcsTransform(
+        Random.Attach(Scene::EcsLocalTransform(
                 Vector3f(-100, -100, 0.5f),
                 Vector3f(4),
                 Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1))));
 
-        GrandMaster.Obtain<Scene::TEcsTransform>()->SetRotation(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
-        GrandMaster.Notify<Scene::TEcsTransform>();
+        GrandMaster.Obtain<Scene::EcsLocalTransform>()->SetRotation(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
+        GrandMaster.Notify<Scene::EcsLocalTransform>();
 
-        MySprite.Obtain<Scene::TEcsTransform>()->SetRotation(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
-        MySprite.Notify<Scene::TEcsTransform>();
+        MySprite.Obtain<Scene::EcsLocalTransform>()->SetRotation(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
+        MySprite.Notify<Scene::EcsLocalTransform>();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -152,8 +152,8 @@ namespace Example
 
     Bool Application::OnMouseMove(Real32 X, Real32 Y, Real32 DeltaX, Real32 DeltaY)
     {
-        GrandMaster.Obtain<Scene::TEcsTransform>()->SetPosition(Vector2f { X, Y});
-        GrandMaster.Notify<Scene::TEcsTransform>();
+        GrandMaster.Obtain<Scene::EcsLocalTransform>()->SetPosition(Vector2f { X, Y});
+        GrandMaster.Notify<Scene::EcsLocalTransform>();
         return true;
     }
 
