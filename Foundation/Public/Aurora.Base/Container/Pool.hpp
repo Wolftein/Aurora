@@ -21,7 +21,7 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    template<typename Type, UInt32 Size>
+    template<typename Type, UInt32 Size, Bool Serializable = true>
     class Pool final
     {
     public:
@@ -98,9 +98,12 @@ inline namespace Core
         {
             Archive.SerializeObject(mAllocator);
 
-            for (UInt32 Element = 0, Limit = mAllocator.GetBack(); Element < Limit; ++Element)
+            if constexpr (Serializable)
             {
-                Archive.SerializeObject(mPool[Element]);
+                for (UInt32 Element = 0, Limit = mAllocator.GetBack(); Element < Limit; ++Element)
+                {
+                    Archive.SerializeObject(mPool[Element]);
+                }
             }
         }
 
