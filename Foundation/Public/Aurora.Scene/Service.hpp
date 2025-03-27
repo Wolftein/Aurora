@@ -34,15 +34,21 @@ namespace Scene
         void OnTick(ConstRef<Time> Time) override;
 
         // -=(Undocumented)=-
-        template<Bool Prefab = false>
+        template<UInt32 Trait = k_Final>
         Entity Create()
         {
             Entity Actor(mWorld.entity());
 
-            if constexpr (Prefab)
+            if constexpr (Trait & k_Final)
+            {
+                Actor.Attach(flecs::Final);
+            }
+
+            if constexpr (Trait & k_Prefab)
             {
                 Actor.Attach(flecs::Prefab);
             }
+
             return Actor;
         }
 
@@ -56,19 +62,34 @@ namespace Scene
         void Save(Ref<Writer> Writer, Entity Actor);
 
         // -=(Undocumented)=-
-        template<typename Type, typename Dependency = void, Bool Serializable = true, Bool Inheritable = false>
+        template<typename Type, UInt32 Traits = k_Serializable, typename Dependency = void>
         auto Register()
         {
             flecs::entity Component = mWorld.component<Type>();
 
-            if constexpr (Serializable)
+            if constexpr (Traits & k_Sparse)
+            {
+                Component.add(flecs::OnInstantiate, flecs::Sparse);
+            }
+
+            if constexpr (Traits & k_Serializable)
             {
                 Component.template set<Factory>(Factory::Create<Type>());
             }
 
-            if constexpr (Inheritable)
+            if constexpr (Traits & k_Inheritable)
             {
                 Component.add(flecs::OnInstantiate, flecs::Inherit);
+            }
+
+            if constexpr (Traits & k_Toggleable)
+            {
+                Component.add(flecs::CanToggle);
+            }
+
+            if constexpr (Traits & k_Final)
+            {
+                Component.add(flecs::Final);
             }
 
             if constexpr (! std::is_void_v<Dependency>)

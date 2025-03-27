@@ -14,3 +14,35 @@
 
 #include "Component/Tint.hpp"
 #include "Component/Transform.hpp"
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// [   CODE   ]
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+namespace Scene
+{
+    // -=(Undocumented)=-
+    enum
+    {
+        // -=(Undocumented)=-
+        k_Default      = 0b00000000,
+
+        // -=(Undocumented)=-
+        k_Sparse       = 0b00000001,
+
+        // -=(Undocumented)=-
+        k_Serializable = 0b00000010,
+
+        // -=(Undocumented)=-
+        k_Inheritable  = 0b00000100,
+
+        // -=(Undocumented)=-
+        k_Toggleable   = 0b00001000,
+
+        // -=(Undocumented)=-
+        k_Final        = 0b00010000,
+
+        // -=(Undocumented)=-
+        k_Prefab       = 0b00100000,
+    };
+}

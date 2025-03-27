@@ -112,10 +112,10 @@ namespace Scene
 
     void Service::RegisterDefaultComponents()
     {
-        Register<EcsDirty>().add(flecs::CanToggle);
+        Register<EcsDirty, k_Toggleable>();
         Register<EcsTint>();
-        Register<EcsWorldTransform, EcsDirty>();
-        Register<EcsLocalTransform, EcsWorldTransform>();
+        Register<EcsWorldTransform, k_Default, EcsDirty>();
+        Register<EcsLocalTransform, k_Serializable, EcsWorldTransform>();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
