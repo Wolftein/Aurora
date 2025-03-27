@@ -92,21 +92,42 @@ namespace Scene
         template<typename Type>
         auto Obtain()
         {
-            return mHandle.get_mut<Type>();
+            if constexpr (std::is_const_v<Type>)
+            {
+                return mHandle.get<Type>();
+            }
+            else
+            {
+                return mHandle.get_mut<Type>();
+            }
         }
 
         // -=(Undocumented)=-
         template<typename Type>
         auto Obtain(Entity Component)
         {
-            mHandle.get_mut<Type>(Component.GetID());
+            if constexpr (std::is_const_v<Type>)
+            {
+                return mHandle.get<Type>(Component.GetID());
+            }
+            else
+            {
+                return mHandle.get_mut<Type>(Component.GetID());
+            }
         }
 
         // -=(Undocumented)=-
         template<typename Type>
         auto Obtain(Entity First, Entity Second)
         {
-            mHandle.get_mut<Type>(First.GetID(), Second.GetID());
+            if constexpr (std::is_const_v<Type>)
+            {
+                return mHandle.get<Type>(First.GetID(), Second.GetID());
+            }
+            else
+            {
+                return mHandle.get_mut<Type>(First.GetID(), Second.GetID());
+            }
         }
 
         // -=(Undocumented)=-

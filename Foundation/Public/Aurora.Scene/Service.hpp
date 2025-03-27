@@ -34,7 +34,17 @@ namespace Scene
         void OnTick(ConstRef<Time> Time) override;
 
         // -=(Undocumented)=-
-        Entity Create();
+        template<Bool Prefab = false>
+        Entity Create()
+        {
+            Entity Actor(mWorld.entity());
+
+            if constexpr (Prefab)
+            {
+                Actor.Attach(flecs::Prefab);
+            }
+            return Actor;
+        }
 
         // -=(Undocumented)=-
         Entity Find(UInt64 ID);
@@ -46,7 +56,7 @@ namespace Scene
         void Save(Ref<Writer> Writer, Entity Actor);
 
         // -=(Undocumented)=-
-        template<typename Type, typename Dependency = void, Bool Serializable = true, Bool Sparse = false>
+        template<typename Type, typename Dependency = void, Bool Serializable = true, Bool Inheritable = false>
         auto Register()
         {
             flecs::entity Component = mWorld.component<Type>();
@@ -56,9 +66,9 @@ namespace Scene
                 Component.template set<Factory>(Factory::Create<Type>());
             }
 
-            if constexpr (Sparse)
+            if constexpr (Inheritable)
             {
-                Component.add(flecs::Sparse);
+                Component.add(flecs::OnInstantiate, flecs::Inherit);
             }
 
             if constexpr (! std::is_void_v<Dependency>)
