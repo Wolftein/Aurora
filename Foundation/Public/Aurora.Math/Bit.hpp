@@ -21,7 +21,7 @@
 inline namespace Math
 {
     // -=(Undocumented)=-
-    constexpr UInt32 Float4ToUInt32(Real32 X, Real32 Y, Real32 Z, Real32 W)
+    constexpr UInt32 PackFloat32x4(Real32 X, Real32 Y, Real32 Z, Real32 W)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
@@ -40,15 +40,80 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
-    constexpr UInt32 UInt16x2ToUInt32(UInt16 X, UInt16 Y)
+    constexpr UInt32 PackUInt16x2(UInt16 Low, UInt16 High)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
-            return (static_cast<UInt32>(Y) << 16) | static_cast<UInt32>(X);
+            return (static_cast<UInt32>(High) << 16) | static_cast<UInt32>(Low);
         }
         else
         {
-            return (static_cast<UInt32>(X) << 16) | static_cast<UInt32>(Y);
+            return (static_cast<UInt32>(Low) << 16) | static_cast<UInt32>(High);
+        }
+    }
+
+    // -=(Undocumented)=-
+    constexpr UInt16 GetLowUInt16(UInt32 Value)
+    {
+        if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+        {
+            return static_cast<UInt16>(Value & 0xFFFF);
+        }
+        else
+        {
+            return static_cast<UInt16>(Value >> 16);
+        }
+    }
+
+    // -=(Undocumented)=-
+    constexpr UInt16 GetHighUInt16(UInt32 Value)
+    {
+        if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+        {
+            return static_cast<UInt16>(Value >> 16);
+        }
+        else
+        {
+            return static_cast<UInt16>(Value & 0xFFFF);
+        }
+    }
+
+    // -=(Undocumented)=-
+    constexpr UInt64 PackUInt32x2(UInt32 Low, UInt32 High)
+    {
+        if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+        {
+            return (static_cast<UInt64>(High) << 32) | Low;
+        }
+        else
+        {
+            return (static_cast<UInt64>(Low) << 32) | High;
+        }
+    }
+
+    // -=(Undocumented)=-
+    constexpr UInt32 GetLowUInt32(UInt64 Value)
+    {
+        if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+        {
+            return static_cast<UInt32>(Value & 0xFFFFFFFF);
+        }
+        else
+        {
+            return static_cast<UInt32>(Value >> 32);
+        }
+    }
+
+    // -=(Undocumented)=-
+    constexpr UInt32 GetHighUInt32(UInt64 Value)
+    {
+        if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
+        {
+            return static_cast<UInt32>(Value >> 32);
+        }
+        else
+        {
+            return static_cast<UInt32>(Value & 0xFFFFFFFF);
         }
     }
 }
