@@ -32,20 +32,24 @@ namespace Example
     {
         //
         ConstSPtr<Content::Service> Content = GetSubsystem<Content::Service>();
-        Content->AddLocator("Root", NewPtr<Content::SystemLocator>("Resources"));
+        Content->AddLocator("Resources", NewPtr<Content::SystemLocator>("Resources"));
 
         const auto Font = Content->Load<Graphic::Font>("Resources://Font/Primary.arfont");
 
         // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
 
-        GrandMaster = Scene->Create();
+        Scene->Register<Scene::TEcsPivot, Scene::k_Serializable>();
+
+        auto MyArchetype = Scene->Create<Scene::k_Archetype>();
+        MyArchetype.Attach(Scene::EcsTint(0, 1, 0, 1));
+
+        GrandMaster = Scene->Create(MyArchetype);
         GrandMaster.SetName("Grand Master");
         GrandMaster.Attach(Scene::EcsLocalTransform(Vector3f(256, 256, 0)));
         GrandMaster.Attach(Scene::TEcsText(Font, 32, L"[Fers]"));
-        GrandMaster.Attach(Scene::EcsTint(0, 1, 0, 1));
 
-        Master = Scene->Create();
+        Master = Scene->Create(MyArchetype);
         Master.SetName("Master");
         Master.SetParent(GrandMaster);
         Master.Attach(Scene::EcsLocalTransform(

@@ -38,7 +38,8 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        Entity(Handle Handle)
+        template<typename Type>
+        Entity(Type Handle)
             : mHandle { Handle }
         {
         }
@@ -59,6 +60,24 @@ namespace Scene
         void Destruct()
         {
             mHandle.destruct();
+        }
+
+        // -=(Undocumented)=-
+        Bool IsValid() const
+        {
+            return mHandle.is_valid();
+        }
+
+        // -=(Undocumented)=-
+        Bool IsNull() const
+        {
+            return mHandle == 0;
+        }
+
+        // -=(Undocumented)=-
+        Bool IsArchetype() const
+        {
+            return mHandle.has(flecs::Prefab);
         }
 
         // -=(Undocumented)=-
@@ -276,6 +295,19 @@ namespace Scene
         auto GetParent() const
         {
             return Entity(mHandle.parent());
+        }
+
+        // -=(Undocumented)=-
+        void SetArchetype(Entity Archetype)
+        {
+            mHandle.is_a(Archetype.GetHandle());
+        }
+
+        // -=(Undocumented)=-
+        auto GetArchetype() const
+        {
+            ConstPtr<Entity::Handle> Handle = mHandle.get<Entity::Handle>(flecs::IsA);
+            return Entity(Handle ? * Handle : Entity::Handle::null());
         }
 
         // -=(Undocumented)=-

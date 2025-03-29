@@ -21,7 +21,7 @@
 inline namespace Core
 {
     // -=(Undocumented)=-
-    template<typename Type, UInt32 Size, Bool Serializable = true>
+    template<typename Type, UInt32 Size>
     class Sparse final
     {
     public:
@@ -119,11 +119,7 @@ inline namespace Core
         void OnSerialize(Stream<Kind> Archive)
         {
             Archive.SerializeObject(mAllocator);
-
-            if constexpr (Serializable)
-            {
-                Archive.SerializeVector(mPool);
-            }
+            Archive.SerializeVector(mPool);
         }
 
     private:

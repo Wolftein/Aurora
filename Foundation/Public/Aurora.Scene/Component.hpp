@@ -22,7 +22,7 @@
 namespace Scene
 {
     // -=(Undocumented)=-
-    enum
+    enum Trait : UInt32
     {
         // -=(Undocumented)=-
         k_Default      = 0b00000000,
@@ -43,6 +43,6 @@ namespace Scene
         k_Final        = 0b00010000,
 
         // -=(Undocumented)=-
-        k_Prefab       = 0b00100000,
+        k_Archetype    = 0b00100000,
     };
 }
