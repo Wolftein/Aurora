@@ -168,6 +168,15 @@ namespace Scene
     {
         using namespace Component;
 
+        // Observes when an archetype is destroyed.
+        Observer<>().with(flecs::Prefab).self().event(flecs::OnRemove).each([&](Entity Actor)
+        {
+            if (const UInt32 ID = Actor.GetID(); ID >= k_MinRangeArchetypes && ID <= k_MaxRangeArchetypes)
+            {
+                mArchetypes.Free(ID - k_MinRangeArchetypes);
+            }
+        });
+
         // Observes changes to local transforms and marks affected hierarchies as dirty.
         Observer<>().with<Localspace>().self().event(flecs::OnSet).each(Entity::ToggleComponentInHierarchy<Dirty, true>);
 

@@ -162,9 +162,9 @@ namespace Scene
 
             mWorld.make_alive(Handle);
 
-            if constexpr (Trait::k_Archetype)
+            if constexpr (Trait & Trait::k_Archetype)
             {
-                Handle.set(flecs::Prefab);
+                Handle.add(flecs::Prefab);
             }
             return Handle;
         }
