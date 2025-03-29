@@ -69,39 +69,46 @@ namespace Scene
         template<typename Type, UInt32 Traits = k_Default, typename Dependency = void>
         auto Register()
         {
-            flecs::entity Component = mWorld.component<Type>();
+            flecs::entity Handle = Component<Type>();
 
             if constexpr (Traits & Trait::k_Sparse)
             {
-                Component.add(flecs::OnInstantiate, flecs::Sparse);
+                Handle.add(flecs::OnInstantiate, flecs::Sparse);
             }
 
             if constexpr (Traits & Trait::k_Serializable)
             {
-                Component.template set<Factory>(Factory::Create<Type>());
+                Handle.template set<Factory>(Factory::Create<Type>());
             }
 
             if constexpr (Traits & Trait::k_Inheritable)
             {
-                Component.add(flecs::OnInstantiate, flecs::Inherit);
+                Handle.add(flecs::OnInstantiate, flecs::Inherit);
             }
 
             if constexpr (Traits & Trait::k_Toggleable)
             {
-                Component.add(flecs::CanToggle);
+                Handle.add(flecs::CanToggle);
             }
 
             if constexpr (Traits & Trait::k_Final)
             {
-                Component.add(flecs::Final);
+                Handle.add(flecs::Final);
             }
 
             if constexpr (! std::is_void_v<Dependency>)
             {
-                Component.add(flecs::With, mWorld.component<Dependency>());
+                Handle.add(flecs::With, mWorld.component<Dependency>());
             }
 
             return Component;
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        auto Component()
+        {
+            return Entity(mWorld.component<Type>());
         }
 
         // -=(Undocumented)=-
