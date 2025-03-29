@@ -53,6 +53,7 @@ namespace Scene
         for (UInt32 Element = 1, Limit = mArchetypes.GetSize(); Element <= Limit; ++Element)
         {
             Entity Archetype = Allocate<Trait::k_Archetype>(k_MinRangeArchetypes + Reader.ReadInt<UInt64>());
+            Archetype.SetName(Reader.ReadString8());
 
             if (const UInt64 Base = Reader.ReadInt<UInt64>(); Base)
             {
@@ -74,6 +75,7 @@ namespace Scene
             if (Entity Archetype = Fetch(k_MinRangeArchetypes + Element); Archetype.IsValid())
             {
                 Writer.WriteInt<UInt64>(Archetype.GetID() - k_MinRangeArchetypes);
+                Writer.WriteString8(Archetype.GetName());
 
                 const Entity Base = Archetype.GetArchetype();
                 Writer.WriteInt<UInt64>(Base.IsValid() ? Base.GetID() - k_MinRangeArchetypes : 0);
