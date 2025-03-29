@@ -69,7 +69,7 @@ namespace Scene
         template<typename Type, UInt32 Traits = k_Default, typename Dependency = void>
         auto Register()
         {
-            flecs::entity Handle = Component<Type>();
+            flecs::entity Handle = mWorld.component<Type>();
 
             if constexpr (Traits & Trait::k_Sparse)
             {
