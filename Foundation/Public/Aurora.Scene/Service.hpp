@@ -101,7 +101,7 @@ namespace Scene
                 Handle.add(flecs::With, mWorld.component<Dependency>());
             }
 
-            return Component;
+            return Handle;
         }
 
         // -=(Undocumented)=-
