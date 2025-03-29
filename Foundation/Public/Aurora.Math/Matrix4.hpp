@@ -68,7 +68,7 @@ inline namespace Math
         // -=(Undocumented)=-
         Base GetComponent(UInt Component) const
         {
-            return reinterpret_cast<Ptr<const Base>>(mColumns)[Component];
+            return reinterpret_cast<ConstPtr<Base>>(mColumns)[Component];
         }
 
         // -=(Undocumented)=-
@@ -280,7 +280,7 @@ inline namespace Math
         // -=(Undocumented)=-
         ConstRef<Base> operator[](UInt Component) const
         {
-            return reinterpret_cast<Ptr<const Base>>(mColumns)[Component];
+            return reinterpret_cast<ConstPtr<Base>>(mColumns)[Component];
         }
 
         // -=(Undocumented)=-

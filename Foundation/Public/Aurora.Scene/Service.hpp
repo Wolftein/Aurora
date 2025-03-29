@@ -28,26 +28,6 @@ namespace Scene
     public:
 
         // -=(Undocumented)=-
-        static constexpr UInt32 k_MinRangeComponents = 0;
-
-        // -=(Undocumented)=-
-        static constexpr UInt32 k_MaxRangeComponents = 1'023;
-
-        // -=(Undocumented)=-
-        static constexpr UInt32 k_MinRangeArchetypes = 1'024;
-
-        // -=(Undocumented)=-
-        static constexpr UInt32 k_MaxRangeArchetypes = 65'534;
-
-        // -=(Undocumented)=-
-        static constexpr UInt32 k_MinRangeDynamic    = 65'535;
-
-        // -=(Undocumented)=-
-        static constexpr UInt32 k_MaxRangeDynamic    = 4'294'967'295;
-
-    public:
-
-        // -=(Undocumented)=-
         explicit Service(Ref<Context> Context);
 
         // \see Tickable::OnTick
@@ -55,7 +35,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<UInt32 Trait = Trait::k_Final>
-        Entity Create(Entity Archetype = Entity())
+        Entity Spawn(Entity Archetype = Entity())
         {
             Entity Actor = Allocate<Trait>();
 
@@ -72,9 +52,16 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        Entity Find(UInt64 ID)
+        Entity Fetch(UInt64 ID)
         {
             const Entity::Handle Handle = mWorld.entity(ID);
+            return mWorld.is_alive(Handle) ? Entity(Handle) : Entity();
+        }
+
+        // -=(Undocumented)=-
+        Entity Fetch(CStr Name)
+        {
+            const Entity::Handle Handle = mWorld.lookup(Name.data());
             return mWorld.is_alive(Handle) ? Entity(Handle) : Entity();
         }
 
@@ -118,6 +105,27 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename ...Components>
+        auto Observer()
+        {
+            return mWorld.template observer<Components...>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename ...Components>
+        auto Query()
+        {
+            return mWorld.template query_builder<Components...>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename ...Components>
+        auto System()
+        {
+            return mWorld.template system<Components...>();
+        }
+
+        // -=(Undocumented)=-
         void LoadArchetypes(Ref<Reader> Reader);
 
         // -=(Undocumented)=-
@@ -129,31 +137,13 @@ namespace Scene
         // -=(Undocumented)=-
         void SaveComponents(Ref<Writer> Writer, Entity Actor);
 
-        // -=(Undocumented)=-
-        template<typename ...Components>
-        auto Observe()
-        {
-            return mWorld.template observer<Components...>();
-        }
-
-        // -=(Undocumented)=-
-        template<typename ...Components>
-        auto Select()
-        {
-            return mWorld.template query_builder<Components...>();
-        }
-
-        // -=(Undocumented)=-
-        template<typename ...Components>
-        auto Execute()
-        {
-            return mWorld.template system<Components...>();
-        }
-
     private:
 
         // -=(Undocumented)=-
-        using Archetypes = Handle<k_MaxRangeArchetypes - k_MinRangeArchetypes>;
+        void RegisterDefaultComponents();
+
+        // -=(Undocumented)=-
+        void RegisterDefaultSystems();
 
         // -=(Undocumented)=-
         template<UInt32 Trait>
@@ -179,18 +169,16 @@ namespace Scene
             return Handle;
         }
 
-        // -=(Undocumented)=-
-        void RegisterDefaultComponents();
-
-        // -=(Undocumented)=-
-        void RegisterDefaultSystems();
-
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        flecs::world mWorld;
-        Archetypes   mArchetypes;
+        flecs::world            mWorld;
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        Handle<k_MaxArchetypes> mArchetypes;
     };
 }

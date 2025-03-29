@@ -35,7 +35,7 @@ namespace Graphic
         static constexpr CStr k_DefaultMaterialUri = "Memory://Material/Default";
 
         // -=(Undocumented)=-
-        enum class Type
+        enum class Type : UInt8
         {
             // -=(Undocumented)=-
             Primitive,
@@ -48,7 +48,7 @@ namespace Graphic
         };
 
         // -=(Undocumented)=-
-        enum class Order
+        enum class Order : UInt8
         {
             // -=(Undocumented)=-
             Subtractive,
@@ -64,7 +64,7 @@ namespace Graphic
         };
 
         // -=(Undocumented)=-
-        enum class Scope
+        enum class Scope : UInt8
         {
             // -=(Undocumented)=-
             Global = 0,

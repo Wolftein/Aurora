@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Base.hpp"
+#include "Aurora.Base/IO/Stream.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -70,7 +70,7 @@ namespace Scene
         {
             if constexpr (not std::is_empty_v<Type>)
             {
-                static_cast<Ptr<Type>>(Component)->OnSerialize(Stream(Reader));
+                * static_cast<Ptr<Type>>(Component) = Reader.ReadObject<Type>();
             }
         }
 
@@ -80,7 +80,7 @@ namespace Scene
         {
             if constexpr (not std::is_empty_v<Type>)
             {
-                static_cast<Ptr<Type>>(Component)->OnSerialize(Stream(Writer));
+                Writer.WriteObject<Type>(* static_cast<Ptr<Type>>(Component));
             }
         }
 

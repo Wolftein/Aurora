@@ -78,7 +78,7 @@ namespace Content
         // -=(Undocumented)=-
         Bool Save(ConstRef<Uri> Key, CStr Data)
         {
-            CPtr<const UInt8> Bytes(reinterpret_cast<Ptr<const UInt8>>(Data.data()), Data.size());
+            CPtr<const UInt8> Bytes(reinterpret_cast<ConstPtr<UInt8>>(Data.data()), Data.size());
 
             return Save(Key, Bytes);
         }

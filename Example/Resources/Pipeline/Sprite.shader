@@ -41,9 +41,9 @@ ps_Input vertex(vs_Input Input)
 
 float4 fragment(ps_Input Input) : SV_Target
 {
-	float4 Texel = ColorTexture.Sample(ColorSampler, Input.Texture);
+    float4 Texel = ColorTexture.Sample(ColorSampler, Input.Texture);
 
-	clip(Texel.a == 0 ? -1 : +1);
+    clip(Texel.a == 0 ? -1 : +1);
 
-	return Input.Color * Texel;
+    return Input.Color * Texel;
 }

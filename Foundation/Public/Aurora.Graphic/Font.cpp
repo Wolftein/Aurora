@@ -40,42 +40,42 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    Rectf Font::Calculate(CStr16 Text, Real32 Size, ConstRef<Pivot> Pivot) const
+    Rectf Font::Calculate(CStr16 Text, Real32 Size, Pivot Pivot) const
     {
         const Vector2f Measurement = Measure(Text, Size);
 
         Real32 OffsetX = 0.0f;
         Real32 OffsetY = 0.0f;
 
-        switch (Pivot.GetType())
+        switch (Pivot)
         {
-        case Pivot::Type::LeftTop:
+        case Pivot::LeftTop:
             break;
-        case Pivot::Type::LeftMiddle:
+        case Pivot::LeftMiddle:
             OffsetY -= mMetrics.Ascender * 0.5f * Size;
             break;
-        case Pivot::Type::LeftBottom:
+        case Pivot::LeftBottom:
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Pivot::Type::CenterTop:
+        case Pivot::CenterTop:
             OffsetX -= Measurement.GetX() * 0.5f;
             break;
-        case Pivot::Type::CenterMiddle:
+        case Pivot::CenterMiddle:
             OffsetX -= Measurement.GetX() * 0.5f;
             OffsetY -= mMetrics.Ascender * 0.5f * Size;
             break;
-        case Pivot::Type::CenterBottom:
+        case Pivot::CenterBottom:
             OffsetX -= Measurement.GetX() * 0.5f;
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
-        case Pivot::Type::RightTop:
+        case Pivot::RightTop:
             OffsetX -= Measurement.GetX();
             break;
-        case Pivot::Type::RightMiddle:
+        case Pivot::RightMiddle:
             OffsetX -= Measurement.GetX();
             OffsetY -= mMetrics.Ascender * 0.5f * Size;
             break;
-        case Pivot::Type::RightBottom:
+        case Pivot::RightBottom:
             OffsetX -= Measurement.GetX();
             OffsetY -= (mMetrics.Ascender - mMetrics.Descender) * Size;
             break;
@@ -106,7 +106,7 @@ namespace Graphic
                 break;
             default:
             {
-                const Ptr<const Glyph> Glyph = GetGlyph(Codepoint);
+                const ConstPtr<Glyph> Glyph = GetGlyph(Codepoint);
                 CurrentX += (GetKerning(Previous, Codepoint) + Glyph->Advance);
                 MaximumX = Max(MaximumX, CurrentX);
                 break;

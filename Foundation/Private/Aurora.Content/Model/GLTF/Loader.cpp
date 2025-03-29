@@ -54,7 +54,7 @@ namespace Content
 
         switch (GLTFSampler.wrapS)
         {
-		case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+        case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
             EdgeU = Graphic::TextureEdge::Clamp;
             break;
         case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:

@@ -20,8 +20,6 @@
 
 namespace Scene
 {
-    using TEcsPivot = Math::Pivot;
-
     // -=(Undocumented)=-
     class TEcsText final
     {

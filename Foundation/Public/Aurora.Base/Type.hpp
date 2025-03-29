@@ -167,7 +167,7 @@ inline namespace Core
         using is_transparent = void;
         using is_avalanching = void;
 
-        [[nodiscard]] size_t operator()(Ptr<const Char> Value) const
+        [[nodiscard]] size_t operator()(ConstPtr<Char> Value) const
         {
             return ankerl::unordered_dense::hash<CStr>{ }(Value);
         }

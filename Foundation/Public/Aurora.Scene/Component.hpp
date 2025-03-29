@@ -12,37 +12,31 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Component/Tint.hpp"
-#include "Component/Transform.hpp"
+#include "Tag.hpp"
+#include "Aurora.Math/Color.hpp"
+#include "Aurora.Math/Pivot.hpp"
+#include "Aurora.Math/Transform.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-namespace Scene
+namespace Component
 {
-    // -=(Undocumented)=-
-    enum Trait : UInt32
-    {
-        // -=(Undocumented)=-
-        k_Default      = 0b00000000,
+    // Defines the local reference point for an object's position, rotation, and scaling.
+    using Pivot      = Math::Pivot;
 
-        // -=(Undocumented)=-
-        k_Sparse       = 0b00000001,
+    // A multiplicative color applied to rendered objects (RGBA format).
+    using Tint       = Math::Color;
 
-        // -=(Undocumented)=-
-        k_Serializable = 0b00000010,
+    // Flag indicating an object's world transform needs recalculation.
+    using Dirty      = Scene::Tag<Hash("Dirty")>;
 
-        // -=(Undocumented)=-
-        k_Inheritable  = 0b00000100,
+    // The local transformation relative to a parent object.
+    // Combines position, rotation, and scale without world-space effects.
+    using Localspace = Math::Transformf;
 
-        // -=(Undocumented)=-
-        k_Toggleable   = 0b00001000,
-
-        // -=(Undocumented)=-
-        k_Final        = 0b00010000,
-
-        // -=(Undocumented)=-
-        k_Archetype    = 0b00100000,
-    };
+    // The global transformation matrix in world coordinates.
+    // Represents an object's absolute position, rotation, and scale in the scene.
+    using Worldspace = Math::Matrix4f;
 }

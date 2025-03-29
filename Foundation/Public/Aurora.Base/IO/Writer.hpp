@@ -132,7 +132,7 @@ inline namespace Core
 
             if (!Value.empty())
             {
-                Write<Ptr<const Type>>(Value.data(), Value.size_bytes());
+                Write<ConstPtr<Type>>(Value.data(), Value.size_bytes());
             }
         }
 
@@ -276,6 +276,10 @@ inline namespace Core
             if constexpr (std::is_same_v<Decay, Bool>)
             {
                 WriteBool(Value);
+            }
+            else if constexpr (std::is_enum_v<Decay>)
+            {
+                WriteEnum<Decay>(Value);
             }
             else if constexpr (std::is_arithmetic_v<Decay>)
             {

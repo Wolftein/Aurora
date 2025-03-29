@@ -206,7 +206,7 @@ FetchContent_MakeAvailable(External_SPDLOG)
 LIST(APPEND PROJECT_DEPENDENCIES "spdlog::spdlog")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-## Dependency (Enumeration static reflection)
+## Dependency (Enumeration static reflection) -> TODO: REMOVE
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 FetchContent_Declare(External_Neargye

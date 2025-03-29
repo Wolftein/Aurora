@@ -26,7 +26,7 @@ namespace Input
     public:
 
         // -=(Undocumented)=-
-        static constexpr UInt k_MaxKeys = 256;
+        static constexpr UInt32 k_MaxKeys = CountEnum<Key>();
 
     public:
 

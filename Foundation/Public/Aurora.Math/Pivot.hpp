@@ -21,67 +21,33 @@
 inline namespace Math
 {
     // -=(Undocumented)=-
-    class Pivot final
+    enum class Pivot : UInt8
     {
-    public:
+        // -=(Undocumented)=-
+        LeftTop,
 
         // -=(Undocumented)=-
-        enum class Type : UInt8
-        {
-            // -=(Undocumented)=-
-            LeftTop,
-
-            // -=(Undocumented)=-
-            LeftMiddle,
-
-            // -=(Undocumented)=-
-            LeftBottom,
-
-            // -=(Undocumented)=-
-            CenterTop,
-
-            // -=(Undocumented)=-
-            CenterMiddle,
-
-            // -=(Undocumented)=-
-            CenterBottom,
-
-            // -=(Undocumented)=-
-            RightTop,
-
-            // -=(Undocumented)=-
-            RightMiddle,
-
-            // -=(Undocumented)=-
-            RightBottom,
-        };
-
-    public:
+        LeftMiddle,
 
         // -=(Undocumented)=-
-        Pivot(Type Type = Type::LeftTop)
-            : mType { Type }
-        {
-        }
+        LeftBottom,
 
         // -=(Undocumented)=-
-        Type GetType() const
-        {
-            return mType;
-        }
+        CenterTop,
 
         // -=(Undocumented)=-
-        template<typename Type>
-        void OnSerialize(Stream<Type> Archive)
-        {
-            Archive.SerializeEnum(mType);
-        }
+        CenterMiddle,
 
-    private:
+        // -=(Undocumented)=-
+        CenterBottom,
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=(Undocumented)=-
+        RightTop,
 
-        Type mType;
+        // -=(Undocumented)=-
+        RightMiddle,
+
+        // -=(Undocumented)=-
+        RightBottom,
     };
 }

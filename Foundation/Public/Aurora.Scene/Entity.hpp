@@ -12,8 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Common.hpp"
 #include "Component.hpp"
-#include <flecs.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -267,34 +267,28 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        void Inherit()
-        {
-            mHandle.is_a<Type>();
-        }
-
-        // -=(Undocumented)=-
-        void Inherit(Entity Prefab)
-        {
-            mHandle.is_a(Prefab.GetHandle());
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type>
         void SetParent()
         {
             mHandle.child_of<Type>();
         }
 
         // -=(Undocumented)=-
-        void SetParent(Entity Component)
+        void SetParent(Entity Parent)
         {
-            mHandle = mHandle.child_of(Component.GetID());
+            mHandle.child_of(Parent.GetHandle());
         }
 
         // -=(Undocumented)=-
         auto GetParent() const
         {
             return Entity(mHandle.parent());
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void SetArchetype()
+        {
+            mHandle.is_a<Type>();
         }
 
         // -=(Undocumented)=-
@@ -326,7 +320,7 @@ namespace Scene
         // -=(Undocumented)=-
         CStr GetName() const
         {
-            const auto Name = mHandle.name();
+            const flecs::string_view Name = mHandle.name();
             return CStr(Name.c_str(), Name.size());
         }
 

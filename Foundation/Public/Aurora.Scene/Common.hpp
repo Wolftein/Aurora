@@ -12,7 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Common.hpp"
+#include "Aurora.Base/Type.hpp"
+#include <flecs.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -21,44 +22,58 @@
 namespace Scene
 {
     // -=(Undocumented)=-
-    template<typename ...Components>
-    class Query final
+    enum
     {
-    public:
+        // -=(Undocumented)=-
+        k_MinRangeComponents = 0,
 
         // -=(Undocumented)=-
-        using Handle = flecs::query<Components...>;
-
-    public:
+        k_MaxRangeComponents = 1'023,
 
         // -=(Undocumented)=-
-        Query() = default;
+        k_MinRangeArchetypes = 1'024,
 
         // -=(Undocumented)=-
-        Query(Handle Handle)
-            : mHandle { Handle }
-        {
-        }
+        k_MaxRangeArchetypes = 65'534,
 
         // -=(Undocumented)=-
-        template<typename Function>
-        void Each(Any<Function> Callback)
-        {
-            mHandle.each(Callback);
-        }
+        k_MinRangeEntities   = 65'535,
 
         // -=(Undocumented)=-
-        template<typename Function>
-        void Run(Any<Function> Callback)
-        {
-            mHandle.run(Callback);
-        }
+        k_MaxRangeEntities   = 4'294'967'295,
 
-    private:
+        // -=(Undocumented)=-
+        k_MaxComponents      = k_MaxRangeComponents - k_MinRangeComponents,
 
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=(Undocumented)=-
+        k_MaxArchetypes      = k_MaxRangeArchetypes - k_MinRangeArchetypes,
 
-        Handle mHandle;
+        // -=(Undocumented)=-
+        k_MaxEntities        = k_MaxRangeEntities - k_MinRangeEntities,
+    };
+
+    // -=(Undocumented)=-
+    enum Trait : UInt32
+    {
+        // -=(Undocumented)=-
+        k_Default      = 0b00000000,
+
+        // -=(Undocumented)=-
+        k_Sparse       = 0b00000001,
+
+        // -=(Undocumented)=-
+        k_Serializable = 0b00000010,
+
+        // -=(Undocumented)=-
+        k_Inheritable  = 0b00000100,
+
+        // -=(Undocumented)=-
+        k_Toggleable   = 0b00001000,
+
+        // -=(Undocumented)=-
+        k_Final        = 0b00010000,
+
+        // -=(Undocumented)=-
+        k_Archetype    = 0b00100000,
     };
 }

@@ -20,10 +20,10 @@
 
 namespace Content
 {
-	// -=(Undocumented)=-
-	class Locator
-	{
-	public:
+    // -=(Undocumented)=-
+    class Locator
+    {
+    public:
 
         // -=(Undocumented)=-
         virtual ~Locator() = default;

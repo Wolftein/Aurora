@@ -220,7 +220,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    static auto Fill(Ptr<const UInt8> Data, UInt8 Layer, UInt16 Width, UInt16 Height, TextureFormat Layout)
+    static auto Fill(ConstPtr<UInt8> Data, UInt8 Layer, UInt16 Width, UInt16 Height, TextureFormat Layout)
     {
         constexpr static UInt8 kMapping[] = {
             4,      // TextureFormat::BC1UIntNorm
@@ -352,7 +352,7 @@ namespace Graphic
     template<UInt Data>
     static auto As(VertexSemantic Value)
     {
-        constexpr static std::tuple<Ptr<const Char>, UInt> k_Mapping[] =
+        constexpr static std::tuple<ConstPtr<Char>, UInt> k_Mapping[] =
         {
             // NAME       // ID
             { "NONE",     0 },     // VertexSemantic::None
@@ -570,7 +570,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void D3D11Driver::CreateBuffer(Object ID, Usage Type, Bool Immutable, Ptr<const UInt8> Data, UInt32 Length)
+    void D3D11Driver::CreateBuffer(Object ID, Usage Type, Bool Immutable, ConstPtr<UInt8> Data, UInt32 Length)
     {
         const D3D11_BIND_FLAG   Binding    = As(Type);
         const D3D11_BUFFER_DESC Descriptor = CD3D11_BUFFER_DESC(
@@ -802,7 +802,7 @@ namespace Graphic
             }
         }
 
-        const Ptr<const D3D11_SUBRESOURCE_DATA> Memory = Fill(Data.data(), Level, Width, Height, Format);
+        const ConstPtr<D3D11_SUBRESOURCE_DATA> Memory = Fill(Data.data(), Level, Width, Height, Format);
         CheckIfFail(mDevice->CreateTexture2D(& Description, Memory, mTextures[ID].Object.GetAddressOf()));
 
         if (Layout != TextureLayout::Destination)

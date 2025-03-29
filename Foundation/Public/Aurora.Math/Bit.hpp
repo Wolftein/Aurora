@@ -21,7 +21,7 @@
 inline namespace Math
 {
     // -=(Undocumented)=-
-    constexpr UInt32 PackFloat32x4(Real32 X, Real32 Y, Real32 Z, Real32 W)
+    constexpr UInt32 CombineFloat32x4(Real32 X, Real32 Y, Real32 Z, Real32 W)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
@@ -40,7 +40,7 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
-    constexpr UInt32 PackUInt16x2(UInt16 Low, UInt16 High)
+    constexpr UInt32 CombineUInt16x2(UInt16 Low, UInt16 High)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
@@ -53,7 +53,7 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
-    constexpr UInt16 GetLowUInt16(UInt32 Value)
+    constexpr UInt16 GetLowerUInt16(UInt32 Value)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
@@ -66,7 +66,7 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
-    constexpr UInt16 GetHighUInt16(UInt32 Value)
+    constexpr UInt16 GetUpperUInt16(UInt32 Value)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
@@ -79,7 +79,7 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
-    constexpr UInt64 PackUInt32x2(UInt32 Low, UInt32 High)
+    constexpr UInt64 CombineUInt32x2(UInt32 Low, UInt32 High)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
@@ -92,7 +92,7 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
-    constexpr UInt32 GetLowUInt32(UInt64 Value)
+    constexpr UInt32 GetLowerUInt32(UInt64 Value)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
@@ -105,7 +105,7 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
-    constexpr UInt32 GetHighUInt32(UInt64 Value)
+    constexpr UInt32 GetUpperUInt32(UInt64 Value)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {

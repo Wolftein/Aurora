@@ -20,13 +20,13 @@
 
 namespace Content
 {
-	// -=(Undocumented)=-
-	class SystemLocator final : public Locator
-	{
-	public:
+    // -=(Undocumented)=-
+    class SystemLocator final : public Locator
+    {
+    public:
 
-		// -=(Undocumented)=-
-		explicit SystemLocator(CStr Path = "");
+        // -=(Undocumented)=-
+        explicit SystemLocator(CStr Path = "");
 
         // -=(Undocumented)=-
         ~SystemLocator() override = default;
@@ -43,13 +43,13 @@ namespace Content
     private:
 
         // -=(Undocumented)=-
-		static SStr CreatePath(CStr Path);
+        static SStr CreatePath(CStr Path);
 
-	private:
+    private:
 
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-		const SStr mPath;
-	};
+        const SStr mPath;
+    };
 }

@@ -309,7 +309,7 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void GLES3Driver::CreateBuffer(Object ID, Usage Type, Bool Immutable, Ptr<const UInt8> Data, UInt32 Length)
+    void GLES3Driver::CreateBuffer(Object ID, Usage Type, Bool Immutable, ConstPtr<UInt8> Data, UInt32 Length)
     {
         Ref<GLES3Buffer> Buffer = mBuffers[ID];
         Buffer.Type             = As(Type);
@@ -687,7 +687,7 @@ namespace Graphic
     {
         if (const UInt32 ID = glCreateShader(Type); ID > 0)
         {
-            const auto Data = reinterpret_cast<Ptr<const GLchar>>(Shader.data());
+            const auto Data = reinterpret_cast<ConstPtr<GLchar>>(Shader.data());
             const auto Size = static_cast<GLint>(Shader.size());
 
             glShaderSource(ID, 1, AddressOf(Data), AddressOf(Size));

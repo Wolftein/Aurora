@@ -276,7 +276,15 @@ inline namespace Core
         template<typename Type>
         Type ReadObject()
         {
-            if constexpr (std::is_arithmetic_v<Type>)
+            if constexpr (std::is_same_v<Type, Bool>)
+            {
+                return ReadBool();
+            }
+            else if constexpr (std::is_enum_v<Type>)
+            {
+                return ReadEnum<Type>();
+            }
+            else if constexpr (std::is_arithmetic_v<Type>)
             {
                 return ReadNumber<Type>();
             }

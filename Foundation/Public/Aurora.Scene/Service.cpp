@@ -26,7 +26,7 @@ namespace Scene
     {
         // Ensures that handles within this range are exclusively for entities created during runtime,
         // preventing conflicts with internal engine objects like component(s) or archetype(s).
-        mWorld.set_entity_range(k_MinRangeDynamic, k_MaxRangeDynamic);
+        mWorld.set_entity_range(k_MinRangeEntities, k_MaxRangeEntities);
 
         // Initializes and registers all core components.
         RegisterDefaultComponents();
@@ -48,8 +48,7 @@ namespace Scene
 
     void Service::LoadArchetypes(Ref<Reader> Reader)
     {
-        Stream Stream(Reader);
-        mArchetypes.OnSerialize(Stream);
+        mArchetypes = Reader.ReadObject<decltype(mArchetypes)>();
 
         for (UInt32 Element = 1, Limit = mArchetypes.GetSize(); Element <= Limit; ++Element)
         {
@@ -57,9 +56,8 @@ namespace Scene
 
             if (const UInt64 Base = Reader.ReadInt<UInt64>(); Base)
             {
-                Archetype.SetArchetype(Find(k_MinRangeArchetypes + Base));
+                Archetype.SetArchetype(Fetch(k_MinRangeArchetypes + Base));
             }
-
             LoadComponents(Reader, Archetype);
         }
     }
@@ -69,12 +67,11 @@ namespace Scene
 
     void Service::SaveArchetypes(Ref<Writer> Writer)
     {
-        Stream Stream(Writer);
-        mArchetypes.OnSerialize(Stream);
+        Writer.WriteObject(mArchetypes);
 
         for (UInt32 Element = 1, Limit = mArchetypes.GetBack(); Element <= Limit; ++Element)
         {
-            if (Entity Archetype = Find(k_MinRangeArchetypes + Element); Archetype.IsValid())
+            if (Entity Archetype = Fetch(k_MinRangeArchetypes + Element); Archetype.IsValid())
             {
                 Writer.WriteInt<UInt64>(Archetype.GetID() - k_MinRangeArchetypes);
 
@@ -89,7 +86,7 @@ namespace Scene
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::LoadComponents(Ref<Reader> Reader, Scene::Entity Actor)
+    void Service::LoadComponents(Ref<Reader> Reader, Entity Actor)
     {
         const flecs::entity Entity = Actor.GetHandle();
 
@@ -124,12 +121,13 @@ namespace Scene
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::SaveComponents(Ref<Writer> Writer, Scene::Entity Actor)
+    void Service::SaveComponents(Ref<Writer> Writer, Entity Actor)
     {
+        // TODO Cache query somewhere
         const flecs::query Query = mWorld.query_builder()
-            .with<Factory>().src("$component")
-            .with("$component").src(Actor.GetHandle())
-            .build();
+                .with<Factory>().src("$component")
+                .with("$component").src(Actor.GetHandle())
+                .build();
 
         const auto OnIterate = [&](Ref<flecs::iter> Iterator)
         {
@@ -156,17 +154,11 @@ namespace Scene
 
     void Service::RegisterDefaultComponents()
     {
-        // Registers a color tint component that can be inherited by child entities and serialized for saving/loading.
-        Register<EcsTint, k_Inheritable | k_Serializable>();
-
-        // Registers a lightweight dirty-flag component optimized for frequent add/remove operations.
-        Register<EcsDirty, k_Toggleable>();
-
-        // Registers a mandatory world-space transform component that auto-marks entities as dirty when modified.
-        Register<EcsWorldTransform, k_Default, EcsDirty>();
-
-        // Registers a serializable local-space transform component that automatically updates world transforms.
-        Register<EcsLocalTransform, k_Serializable, EcsWorldTransform>();
+        Register<Component::Pivot,      k_Inheritable | k_Serializable>();
+        Register<Component::Tint,       k_Inheritable | k_Serializable>();
+        Register<Component::Dirty,      k_Toggleable>();
+        Register<Component::Worldspace, k_Default,      Component::Dirty>();
+        Register<Component::Localspace, k_Serializable, Component::Worldspace>();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -174,23 +166,21 @@ namespace Scene
 
     void Service::RegisterDefaultSystems()
     {
+        using namespace Component;
+
         // Observes changes to local transforms and marks affected hierarchies as dirty.
-        this->Observe<>()
-            .with<EcsLocalTransform>()
-            .self()
-            .event(flecs::OnSet)
-            .each(Entity::ToggleComponentInHierarchy<EcsDirty, true>);
+        Observer<>().with<Localspace>().self().event(flecs::OnSet).each(Entity::ToggleComponentInHierarchy<Dirty, true>);
 
         // Updates world transforms for dirty entities in hierarchy order.
-        this->Execute<const EcsLocalTransform, ConstPtr<EcsWorldTransform>, EcsWorldTransform>()
-            .with<EcsDirty>()
+        System<const Localspace, ConstPtr<Worldspace>, Worldspace>()
+            .with<Dirty>()
             .term_at(1)
                 .cascade()
-            .each([](Entity Entity, ConstRef<EcsLocalTransform> Local, ConstPtr<EcsWorldTransform> Parent, Ref<EcsWorldTransform> World)
+            .each([](Entity Actor, ConstRef<Localspace> Local, ConstPtr<Worldspace> Parent, Ref<Worldspace> World)
             {
                 World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
-                Entity.Notify<EcsWorldTransform>();
-                Entity.Disable<EcsDirty>();
+                Actor.Notify<Worldspace>();
+                Actor.Disable<Dirty>();
             });
     }
 }

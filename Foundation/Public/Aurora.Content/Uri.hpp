@@ -20,10 +20,10 @@
 
 namespace Content
 {
-	// -=(Undocumented)=-
-	class Uri final
-	{
-	public:
+    // -=(Undocumented)=-
+    class Uri final
+    {
+    public:
 
         // -=(Undocumented)=-
         Uri() = default;
@@ -35,34 +35,40 @@ namespace Content
         }
 
         // -=(Undocumented)=-
+        Uri(ConstRef<SStr> Url)
+            : mUrl { Url }
+        {
+        }
+
+        // -=(Undocumented)=-
         Uri(CStr Url)
             : mUrl { Url }
         {
         }
 
-		// -=(Undocumented)=-
-		Bool HasSchema() const
-		{
-			return !GetSchema().empty();
-		}
+        // -=(Undocumented)=-
+        Bool HasSchema() const
+        {
+            return !GetSchema().empty();
+        }
 
-		// -=(Undocumented)=-
-		Bool HasFolder() const
-		{
-			return !GetFolder().empty();
-		}
+        // -=(Undocumented)=-
+        Bool HasFolder() const
+        {
+            return !GetFolder().empty();
+        }
 
-		// -=(Undocumented)=-
-		Bool HasExtension() const
-		{
-			return !GetExtension().empty();
-		}
+        // -=(Undocumented)=-
+        Bool HasExtension() const
+        {
+            return !GetExtension().empty();
+        }
 
-		// -=(Undocumented)=-
+        // -=(Undocumented)=-
         CStr GetUrl() const
-		{
-			return mUrl;
-		}
+        {
+            return mUrl;
+        }
 
         // -=(Undocumented)=-
         CStr GetUrlWithoutExtension() const
@@ -71,41 +77,41 @@ namespace Content
             return (Offset != CStr::npos ? GetUrl().substr(0, Offset) : GetUrl());
         }
 
-		// -=(Undocumented)=-
+        // -=(Undocumented)=-
         CStr GetSchema() const
-		{
-			const UInt Offset = mUrl.find("://");
-			return (Offset != CStr::npos ? GetUrl().substr(0, Offset) : "");
-		}
+        {
+            const UInt Offset = mUrl.find("://");
+            return (Offset != CStr::npos ? GetUrl().substr(0, Offset) : "");
+        }
 
-		// -=(Undocumented)=-
+        // -=(Undocumented)=-
         CStr GetPath() const
-		{
-			const UInt Offset = mUrl.find("://");
-			return (Offset != CStr::npos ? GetUrl().substr(Offset + 3, mUrl.length()) : mUrl);
-		}
+        {
+            const UInt Offset = mUrl.find("://");
+            return (Offset != CStr::npos ? GetUrl().substr(Offset + 3, mUrl.length()) : mUrl);
+        }
 
-		// -=(Undocumented)=-
+        // -=(Undocumented)=-
         CStr GetFolder() const
-		{
-			const CStr Path   = GetPath();
-			const UInt Offset = mUrl.find('/');
-			return (Offset != CStr::npos ? Path.substr(0, Offset) : "");
-		}
+        {
+            const CStr Path   = GetPath();
+            const UInt Offset = mUrl.find('/');
+            return (Offset != CStr::npos ? Path.substr(0, Offset) : "");
+        }
 
-		// -=(Undocumented)=-
+        // -=(Undocumented)=-
         CStr GetFilename() const
-		{
-			const UInt Offset = mUrl.rfind('/');
-			return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : GetPath());
-		}
+        {
+            const UInt Offset = mUrl.rfind('/');
+            return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : GetPath());
+        }
 
-		// -=(Undocumented)=-
+        // -=(Undocumented)=-
         CStr GetExtension() const
-		{
-			const UInt Offset = mUrl.rfind('.');
-			return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : "");
-		}
+        {
+            const UInt Offset = mUrl.rfind('.');
+            return (Offset != CStr::npos ? GetUrl().substr(Offset + 1, mUrl.length()) : "");
+        }
 
     public:
 
@@ -115,11 +121,11 @@ namespace Content
             return Uri(Format("{}#{}", Parent.GetUrlWithoutExtension(), Subresource));
         }
 
-	private:
+    private:
 
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-		// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-		const SStr mUrl;
-	};
+        const SStr mUrl;
+    };
 }

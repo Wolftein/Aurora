@@ -32,15 +32,15 @@ namespace Scene
 
         using Query = Query<
                 const TEcsText,
-                const EcsWorldTransform,
-                Ptr<const EcsTint>,
-                Ptr<const TEcsPivot>>;
+                const Component::Worldspace,
+                ConstPtr<Component::Tint>,
+                ConstPtr<Component::Pivot>>;
 
         using Query2 = Scene::Query<
                 const TEcsSprite,
-                const EcsWorldTransform,
-                Ptr<const EcsTint>,
-                Ptr<const TEcsPivot>>;
+                const Component::Worldspace,
+                ConstPtr<Component::Tint>,
+                ConstPtr<Component::Pivot>>;
 
     public:
 
@@ -53,10 +53,10 @@ namespace Scene
             mPipeline2 = Resources->Load<Graphic::Pipeline>("Resources://Pipeline/Sprite.effect");
 
             ConstSPtr<Scene::Service> Scene = Context.GetSubsystem<Scene::Service>();
-            mQuery = Scene->Select<const TEcsText, const EcsWorldTransform, Ptr<const EcsTint>, Ptr<const TEcsPivot>>()
+            mQuery = Scene->Query<const TEcsText, const Component::Worldspace, ConstPtr<Component::Tint>, ConstPtr<Component::Pivot>>()
                     .build();
 
-            mQuery2 = Scene->Select<const TEcsSprite, const EcsWorldTransform, Ptr<const EcsTint>, Ptr<const TEcsPivot>>()
+            mQuery2 = Scene->Query<const TEcsSprite, const Component::Worldspace, ConstPtr<Component::Tint>, ConstPtr<Component::Pivot>>()
                     .build();
         }
 
@@ -74,7 +74,7 @@ namespace Scene
             mRenderer->DrawRect({400, 256, 500, 312}, 0, Color::k_Ivory, 8);
 
 
-            mQuery2.Each([&](ConstRef<TEcsSprite> Sprite, ConstRef<EcsWorldTransform> Matrix, Ptr<const EcsTint> Tint, Ptr<const TEcsPivot> Pivot)
+            mQuery2.Each([&](ConstRef<TEcsSprite> Sprite, ConstRef<Component::Worldspace> Matrix, ConstPtr<Component::Tint> Tint, ConstPtr<Component::Pivot> Pivot)
                         {
                             ConstSPtr<Graphic::Texture> Texture = Sprite.GetMaterial()->GetTexture(Graphic::TextureSlot::Diffuse);
                             const Rectf Source(
@@ -90,7 +90,7 @@ namespace Scene
                             mRenderer->DrawSprite(Matrix, Origin, 0.0f, Source, OptTint, Sprite.GetMaterial());
                         });
 
-            mQuery.Each([&](ConstRef<TEcsText> Text, ConstRef<EcsWorldTransform> Matrix, Ptr<const EcsTint> Tint, Ptr<const TEcsPivot> Pivot)
+            mQuery.Each([&](ConstRef<TEcsText> Text, ConstRef<Component::Worldspace> Matrix, ConstPtr<Component::Tint> Tint, ConstPtr<Component::Pivot> Pivot)
             {
 
                 Math::Pivot OptPivot = (Pivot ? * Pivot : Math::Pivot());

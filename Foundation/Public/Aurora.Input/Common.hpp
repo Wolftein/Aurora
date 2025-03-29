@@ -22,7 +22,7 @@
 namespace Input
 {
     // -=(Undocumented)=-
-    enum class Action
+    enum class Action : UInt8
     {
         Pressed,
         Held,
@@ -30,7 +30,7 @@ namespace Input
     };
 
     // -=(Undocumented)=-
-    enum class Button
+    enum class Button : UInt8
     {
         Unknown,
         Left,
@@ -41,7 +41,7 @@ namespace Input
     };
 
     // -=(Undocumented)=-
-    enum class Key
+    enum class Key : UInt8
     {
         Unknown,
         Space,
@@ -153,7 +153,7 @@ namespace Input
     struct Event
     {
         // -=(Undocumented)=-
-        enum class Type
+        enum class Type : UInt8
         {
             Unknown,
             KeyType,

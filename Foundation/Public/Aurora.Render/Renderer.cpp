@@ -142,7 +142,7 @@ namespace Graphic
                 CurrentY += Font->GetMetrics().UnderlineHeight * Size;
                 break;
             default:
-                const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Codepoint);
+                const ConstPtr<Graphic::Font::Glyph> Glyph = Font->GetGlyph(Codepoint);
 
                 if (Glyph->PlaneBounds.GetWidth() > 0 && Glyph->PlaneBounds.GetHeight() > 0)
                 {
@@ -190,7 +190,7 @@ namespace Graphic
                 CurrentY += Font->GetMetrics().UnderlineHeight * Size;
                 break;
             default:
-                const Ptr<const Graphic::Font::Glyph> Glyph = Font->GetGlyph(Codepoint);
+                const ConstPtr<Graphic::Font::Glyph> Glyph = Font->GetGlyph(Codepoint);
 
                 if (Glyph->PlaneBounds.GetWidth() > 0 && Glyph->PlaneBounds.GetHeight() > 0)
                 {

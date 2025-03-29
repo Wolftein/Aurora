@@ -110,9 +110,9 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Type = void>
-        Ptr<const Type> GetData() const
+        ConstPtr<Type> GetData() const
         {
-            return static_cast<Ptr<const Type>>(mData);
+            return static_cast<ConstPtr<Type>>(mData);
         }
 
         // -=(Undocumented)=-
@@ -126,7 +126,7 @@ inline namespace Core
         template<typename Type>
         CPtr<const Type> GetSpan(UInt Offset = 0) const
         {
-            return CPtr<const Type>(static_cast<Ptr<const Type>>(mData) + Offset, mSize / sizeof(Type));
+            return CPtr<const Type>(static_cast<ConstPtr<Type>>(mData) + Offset, mSize / sizeof(Type));
         }
 
         // -=(Undocumented)=-
@@ -156,7 +156,7 @@ inline namespace Core
 
         // -=(Undocumented)=-
         template<typename Type>
-        void Copy(Ptr<const Type> Source, UInt32 Length = sizeof(Type))
+        void Copy(ConstPtr<Type> Source, UInt32 Length = sizeof(Type))
         {
             std::memcpy(mData, Source, Length);
         }

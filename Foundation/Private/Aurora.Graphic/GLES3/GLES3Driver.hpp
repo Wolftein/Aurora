@@ -36,7 +36,7 @@ namespace Graphic
         ConstRef<Capabilities> GetCapabilities() const override;
 
         // \see Driver::CreateBuffer
-        void CreateBuffer(Object ID, Usage Type, Bool Immutable, Ptr<const UInt8> Data, UInt32 Length) override;
+        void CreateBuffer(Object ID, Usage Type, Bool Immutable, ConstPtr<UInt8> Data, UInt32 Length) override;
 
         // \see Driver::CopyBuffer
         void CopyBuffer(Object DstBuffer, UInt32 DstOffset, Object SrcBuffer, UInt32 SrcOffset, UInt32 Size) override;

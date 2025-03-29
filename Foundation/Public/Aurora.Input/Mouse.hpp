@@ -27,7 +27,7 @@ namespace Input
     public:
 
         // -=(Undocumented)=-
-        static constexpr UInt k_MaxButtons = 6;
+        static constexpr UInt32 k_MaxButtons = CountEnum<Button>();
 
     public:
 
