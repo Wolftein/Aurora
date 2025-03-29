@@ -40,15 +40,15 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
-    constexpr UInt32 CombineUInt16x2(UInt16 Low, UInt16 High)
+    constexpr UInt32 CombineUInt16x2(UInt16 Lower, UInt16 Upper)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
-            return (static_cast<UInt32>(High) << 16) | static_cast<UInt32>(Low);
+            return (static_cast<UInt32>(Upper) << 16) | static_cast<UInt32>(Lower);
         }
         else
         {
-            return (static_cast<UInt32>(Low) << 16) | static_cast<UInt32>(High);
+            return (static_cast<UInt32>(Lower) << 16) | static_cast<UInt32>(Upper);
         }
     }
 
@@ -79,15 +79,15 @@ inline namespace Math
     }
 
     // -=(Undocumented)=-
-    constexpr UInt64 CombineUInt32x2(UInt32 Low, UInt32 High)
+    constexpr UInt64 CombineUInt32x2(UInt32 Lower, UInt32 Upper)
     {
         if constexpr (SDL_BYTEORDER == SDL_LIL_ENDIAN)
         {
-            return (static_cast<UInt64>(High) << 32) | Low;
+            return (static_cast<UInt64>(Upper) << 32) | Lower;
         }
         else
         {
-            return (static_cast<UInt64>(Low) << 32) | High;
+            return (static_cast<UInt64>(Lower) << 32) | Upper;
         }
     }
 

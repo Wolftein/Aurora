@@ -245,6 +245,16 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        template<typename Type, UInt Capacity>
+        void ReadArray(Ref<Array<Type, Capacity>> Array)
+        {
+            for (UInt32 Element = 0; Element < Capacity; ++Element)
+            {
+                Array[Element] = ReadObject<Type>();
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         void ReadVector(Ref<Vector<Type>> Vector)
         {

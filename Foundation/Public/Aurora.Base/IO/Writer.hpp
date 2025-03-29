@@ -244,6 +244,16 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        template<typename Type, UInt Capacity>
+        void WriteArray(ConstRef<Array<Type, Capacity>> Value)
+        {
+            for (UInt32 Element = 0; Element < Capacity; ++Element)
+            {
+                WriteObject<Type>(Value[Element]);
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         void WriteVector(CPtr<const Type> Value)
         {

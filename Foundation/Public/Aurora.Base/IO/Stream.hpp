@@ -277,6 +277,20 @@ inline namespace Core
         }
 
         // -=(Undocumented)=-
+        template<typename Type, UInt Capacity>
+        void SerializeArray(Ref<Array<Type, Capacity>> Value)
+        {
+            if constexpr (k_Reader)
+            {
+                mArchive.template ReadArray<Type, Capacity>(Value);
+            }
+            else
+            {
+                mArchive.template WriteArray<Type>(Value);
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         void SerializeVector(Ref<Vector<Type>> Value)
         {
