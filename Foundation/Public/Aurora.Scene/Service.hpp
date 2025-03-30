@@ -66,7 +66,7 @@ namespace Scene
             }
             if constexpr (Traits & Trait::k_Serializable)
             {
-                Actor.set<Factory>(Factory::Create<Type>());
+                Actor.template set<Factory>(Factory::Create<Type>());
             }
             if constexpr (Traits & Trait::k_Inheritable)
             {
@@ -158,12 +158,12 @@ namespace Scene
 
             if constexpr (Trait & Trait::k_Archetype)
             {
-                Actor.set(flecs::Prefab);
+                Actor.add(flecs::Prefab);
             }
 
             if constexpr (Trait & Trait::k_Final)
             {
-                Actor.set(flecs::Final);
+                Actor.add(flecs::Final);
             }
             return Actor;
         }
