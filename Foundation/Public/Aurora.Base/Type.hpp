@@ -118,6 +118,10 @@ inline namespace Core
     using Any       = Type &&;
 
     // -=(Undocumented)=-
+    template<typename... Type>
+    using Tuple     = std::tuple<Type...>;
+
+    // -=(Undocumented)=-
     template<typename Type>
     using CPtr      = std::span<Type>;
 
