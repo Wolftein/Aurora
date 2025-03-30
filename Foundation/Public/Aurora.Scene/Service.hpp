@@ -35,20 +35,9 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<UInt32 Trait = Trait::k_Final>
-        Entity Spawn(Entity Archetype = Entity())
+        Entity Spawn()
         {
-            Entity Actor = Allocate<Trait>();
-
-            if constexpr (Trait & Trait::k_Final)
-            {
-                Actor.Attach(flecs::Final);
-            }
-
-            if (Archetype.IsValid())
-            {
-                Actor.SetArchetype(Archetype);
-            }
-            return Actor;
+            return Allocate<Trait>();
         }
 
         // -=(Undocumented)=-
@@ -67,48 +56,35 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type, UInt32 Traits = k_Default, typename Dependency = void>
-        auto Register()
+        Entity Component()
         {
-            flecs::entity Handle = mWorld.component<Type>();
+            flecs::entity Actor = mWorld.component<Type>();
 
             if constexpr (Traits & Trait::k_Sparse)
             {
-                Handle.add(flecs::OnInstantiate, flecs::Sparse);
+                Actor.add(flecs::OnInstantiate, flecs::Sparse);
             }
-
             if constexpr (Traits & Trait::k_Serializable)
             {
-                Handle.template set<Factory>(Factory::Create<Type>());
+                Actor.set<Factory>(Factory::Create<Type>());
             }
-
             if constexpr (Traits & Trait::k_Inheritable)
             {
-                Handle.add(flecs::OnInstantiate, flecs::Inherit);
+                Actor.add(flecs::OnInstantiate, flecs::Inherit);
             }
-
             if constexpr (Traits & Trait::k_Toggleable)
             {
-                Handle.add(flecs::CanToggle);
+                Actor.add(flecs::CanToggle);
             }
-
             if constexpr (Traits & Trait::k_Final)
             {
-                Handle.add(flecs::Final);
+                Actor.add(flecs::Final);
             }
-
             if constexpr (! std::is_void_v<Dependency>)
             {
-                Handle.add(flecs::With, mWorld.component<Dependency>());
+                Actor.add(flecs::With, mWorld.component<Dependency>());
             }
-
-            return Handle;
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type>
-        auto Component()
-        {
-            return Entity(mWorld.component<Type>());
+            return Actor;
         }
 
         // -=(Undocumented)=-
@@ -141,6 +117,18 @@ namespace Scene
         void SaveArchetypes(Ref<Writer> Writer);
 
         // -=(Undocumented)=-
+        Entity LoadEntity(Ref<Reader> Reader);
+
+        // -=(Undocumented)=-
+        void SaveEntity(Ref<Writer> Writer, Entity Actor);
+
+        // -=(Undocumented)=-
+        Entity LoadEntityHierarchy(Ref<Reader> Reader);
+
+        // -=(Undocumented)=-
+        void SaveEntityHierarchy(Ref<Writer> Writer, Entity Actor);
+
+        // -=(Undocumented)=-
         void LoadComponents(Ref<Reader> Reader, Entity Actor);
 
         // -=(Undocumented)=-
@@ -149,33 +137,35 @@ namespace Scene
     private:
 
         // -=(Undocumented)=-
-        void RegisterDefaultComponents();
-
-        // -=(Undocumented)=-
-        void RegisterDefaultSystems();
+        void RegisterDefaultComponentsAndSystems();
 
         // -=(Undocumented)=-
         template<UInt32 Trait>
-        Entity Allocate(UInt64 Identifier = 0)
+        Entity Allocate(UInt64 ID = 0)
         {
-            Entity::Handle Handle;
+            flecs::entity Actor;
 
             if constexpr (Trait & Trait::k_Archetype)
             {
-                Handle = mWorld.entity(Identifier ? Identifier : k_MinRangeArchetypes + mArchetypes.Allocate());
+                Actor = mWorld.entity(ID ? ID : k_MinRangeArchetypes + mArchetypes.Allocate());
             }
             else
             {
-                Handle = (Identifier ? mWorld.entity(Identifier) : mWorld.entity());
+                Actor = (ID ? mWorld.entity(ID) : mWorld.entity());
             }
 
-            mWorld.make_alive(Handle);
+            mWorld.make_alive(Actor);
 
             if constexpr (Trait & Trait::k_Archetype)
             {
-                Handle.add(flecs::Prefab);
+                Actor.set(flecs::Prefab);
             }
-            return Handle;
+
+            if constexpr (Trait & Trait::k_Final)
+            {
+                Actor.set(flecs::Final);
+            }
+            return Actor;
         }
 
     private:

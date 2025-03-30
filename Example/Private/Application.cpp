@@ -51,14 +51,16 @@ namespace Example
         Reader Reader(Writer.GetData());
         Scene->LoadArchetypes(Reader);
 
-        GrandMaster = Scene->Spawn(MyArchetype);
+        GrandMaster = Scene->Spawn();
+        GrandMaster.SetArchetype(MyArchetype);
         GrandMaster.SetName("Grand Master");
         GrandMaster.Attach(Component::Localspace(Vector3f(256, 256, 0)));
         GrandMaster.Attach(Scene::TEcsText(Font, 32, L"[Fers]"));
 
         MyCacheLocalscape = GrandMaster.Access<Component::Localspace>();
 
-        Master = Scene->Spawn(MyArchetype);
+        Master = Scene->Spawn();
+        Master.SetArchetype(MyArchetype);
         Master.SetName("Master");
         Master.SetParent(GrandMaster);
         Master.Attach(Component::Localspace(

@@ -28,11 +28,8 @@ namespace Scene
         // preventing conflicts with internal engine objects like component(s) or archetype(s).
         mWorld.set_entity_range(k_MinRangeEntities, k_MaxRangeEntities);
 
-        // Initializes and registers all core components.
-        RegisterDefaultComponents();
-
-        // Initializes and registers all core systems.
-        RegisterDefaultSystems();
+        // Initializes and registers all core component(s) and system(s).
+        RegisterDefaultComponentsAndSystems();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -83,6 +80,76 @@ namespace Scene
                 SaveComponents(Writer, Archetype);
             }
         }
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Entity Service::LoadEntity(Ref<Reader> Reader)
+    {
+        Entity Actor = Spawn<Trait::k_Final>();
+
+        // Read Entity's name
+        Actor.SetName(Reader.ReadString8());
+
+        // Read Entity's archetype
+        if (const UInt64 Base = Reader.ReadInt<UInt64>(); Base)
+        {
+            Actor.SetArchetype(Fetch(k_MinRangeArchetypes + Base));
+        }
+
+        // Read Entity's component(s)
+        LoadComponents(Reader, Actor);
+
+        return Actor;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Service::SaveEntity(Ref<Writer> Writer, Entity Actor)
+    {
+        // Write Entity's name
+        Writer.WriteString8(Actor.GetName());
+
+        // Write Entity's archetype
+        const Entity Archetype = Actor.GetArchetype();
+        Writer.WriteInt<UInt64>(Archetype.IsValid() ? Archetype.GetID() - k_MinRangeArchetypes : 0);
+
+        // Write Entity's component(s)
+        SaveComponents(Writer, Actor);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Entity Service::LoadEntityHierarchy(Ref<Reader> Reader)
+    {
+        // Read Entity's data
+        Entity Actor = LoadEntity(Reader);
+
+        // Read Entity's hierarchy
+        while (Reader.GetAvailable() > 0)
+        {
+            Entity Children = LoadEntityHierarchy(Reader);
+            Children.SetParent(Actor);
+        }
+        return Actor;
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Service::SaveEntityHierarchy(Ref<Writer> Writer, Entity Actor)
+    {
+        // Write Entity's data
+        SaveEntity(Writer, Actor);
+
+        // Write Entity's hierarchy
+        Actor.Children([&](Entity Children)
+        {
+            SaveEntityHierarchy(Writer, Children);
+        });
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -154,21 +221,15 @@ namespace Scene
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Service::RegisterDefaultComponents()
-    {
-        Register<Component::Pivot,      k_Inheritable | k_Serializable>();
-        Register<Component::Tint,       k_Inheritable | k_Serializable>();
-        Register<Component::Dirty,      k_Toggleable>();
-        Register<Component::Worldspace, k_Default,      Component::Dirty>();
-        Register<Component::Localspace, k_Serializable, Component::Worldspace>();
-    }
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    void Service::RegisterDefaultSystems()
+    void Service::RegisterDefaultComponentsAndSystems()
     {
         using namespace Component;
+
+        Component<Pivot,      k_Inheritable | k_Serializable>();
+        Component<Tint,       k_Inheritable | k_Serializable>();
+        Component<Dirty,      k_Toggleable>();
+        Component<Worldspace, k_Default,      Dirty>();
+        Component<Localspace, k_Serializable, Worldspace>();
 
         // Observes when an archetype is destroyed.
         Observer<>().with(flecs::Prefab).self().event(flecs::OnRemove).each([&](Entity Actor)
