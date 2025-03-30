@@ -21,70 +21,44 @@
 namespace Scene
 {
     // -=(Undocumented)=-
-    template<typename Type>
-    class Link final
+    class Observer final
     {
     public:
 
         // -=(Undocumented)=-
-        using Handle = flecs::ref<Type>;
+        using Handle = flecs::observer;
 
     public:
 
         // -=(Undocumented)=-
-        Link() = default;
+        Observer() = default;
 
         // -=(Undocumented)=-
-        Link(Handle Handle)
+        Observer(Handle Handle)
             : mHandle { Handle }
         {
         }
 
         // -=(Undocumented)=-
-        Bool IsNull() const
+        Observer(ConstRef<Observer> Other)
         {
-            return mHandle == 0;
+            Swap(mHandle, Other.mHandle);
         }
 
         // -=(Undocumented)=-
-        template<auto Function, typename... Arguments>
-        void Modify(Any<Arguments>... Parameters)
+        ~Observer()
         {
-            if (Ptr<Type> Component = mHandle.get())
+            if (mHandle)
             {
-                std::invoke(Function, Component, std::forward<Arguments>(Parameters)...);
-                Notify();
+                mHandle.destruct();
             }
         }
 
         // -=(Undocumented)=-
-        void Notify()
+        Ref<Observer> operator=(ConstRef<Observer> Other)
         {
-            mHandle.entity().template modified<Type>();
-        }
-
-        // -=(Undocumented)=-
-        Ptr<Type> operator->()
-        {
-            return mHandle.get();
-        }
-
-        // -=(Undocumented)=-
-        Ref<Type> operator*()
-        {
-            return * mHandle.get();
-        }
-
-        // -=(Undocumented)=-
-        ConstPtr<Type> operator->() const
-        {
-            return const_cast<Ptr<Link>>(this)->mHandle.get();
-        }
-
-        // -=(Undocumented)=-
-        ConstRef<Type> operator*() const
-        {
-            return * const_cast<Ptr<Link>>(this)->mHandle.get();
+            Swap(mHandle, Other.mHandle);
+            return * this;
         }
 
     private:
@@ -92,6 +66,6 @@ namespace Scene
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Handle mHandle;
+        mutable Handle mHandle;
     };
 }

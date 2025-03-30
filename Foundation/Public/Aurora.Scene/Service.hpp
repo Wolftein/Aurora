@@ -14,6 +14,7 @@
 
 #include "Entity.hpp"
 #include "Factory.hpp"
+#include "Observer.hpp"
 #include "Query.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -89,16 +90,23 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto Observe()
+        auto Observe(CStr Name)
         {
-            return mWorld.template observer<Components...>();
+            return mWorld.template observer<Components...>(Name.data());
         }
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto Query()
+        auto Query(CStr Name)
         {
-            return mWorld.template query_builder<Components...>();
+            return mWorld.template query_builder<Components...>(Name.data());
+        }
+
+        // -=(Undocumented)=-
+        template<typename Function>
+        void QueryArchetypes(Any<Function> Callback)
+        {
+            mArchetypesQueryAll.Each(Callback);
         }
 
         // -=(Undocumented)=-
@@ -179,5 +187,7 @@ namespace Scene
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Handle<k_MaxArchetypes> mArchetypes;
+        Scene::Query<>          mArchetypesQueryAll;
+        Scene::Observer         mArchetypesOnDelete;
     };
 }

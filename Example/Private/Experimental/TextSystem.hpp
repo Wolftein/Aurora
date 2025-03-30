@@ -53,11 +53,8 @@ namespace Scene
             mPipeline2 = Resources->Load<Graphic::Pipeline>("Resources://Pipeline/Sprite.effect");
 
             ConstSPtr<Scene::Service> Scene = Context.GetSubsystem<Scene::Service>();
-            mQuery = Scene->Query<const TEcsText, const Component::Worldspace, ConstPtr<Component::Tint>, ConstPtr<Component::Pivot>>()
-                    .build();
-
-            mQuery2 = Scene->Query<const TEcsSprite, const Component::Worldspace, ConstPtr<Component::Tint>, ConstPtr<Component::Pivot>>()
-                    .build();
+            mQuery = Scene->Query<const TEcsText, const Component::Worldspace, ConstPtr<Component::Tint>, ConstPtr<Component::Pivot>>("QueryText").build();
+            mQuery2 = Scene->Query<const TEcsSprite, const Component::Worldspace, ConstPtr<Component::Tint>, ConstPtr<Component::Pivot>>("QuerySprite").build();
         }
 
         // -=(Undocumented)=-

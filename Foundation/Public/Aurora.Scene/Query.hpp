@@ -41,6 +41,21 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        Query(ConstRef<Query> Other)
+        {
+            Swap(mHandle, Other.mHandle);
+        }
+
+        // -=(Undocumented)=-
+        ~Query()
+        {
+            if (mHandle)
+            {
+                mHandle.destruct();
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Function>
         void Each(Any<Function> Callback)
         {
@@ -54,11 +69,18 @@ namespace Scene
             mHandle.run(Callback);
         }
 
+        // -=(Undocumented)=-
+        Ref<Query> operator=(ConstRef<Query> Other)
+        {
+            Swap(mHandle, Other.mHandle);
+            return * this;
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Handle mHandle;
+        mutable Handle mHandle;
     };
 }

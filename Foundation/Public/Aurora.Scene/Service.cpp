@@ -233,6 +233,18 @@ namespace Scene
 
     void Service::RegisterDefaultComponentsAndSystems()
     {
+        mArchetypesQueryAll = Query<>("_Archetypes::Query").with(EcsPrefab).build();
+        mArchetypesOnDelete = Observe<>("_Archetypes::OnDelete")
+                .with(EcsPrefab).self().event(flecs::OnRemove)
+                .each([this](Entity Actor)
+                {
+                    if (const UInt32 ID = Actor.GetID(); ID >= k_MinRangeArchetypes && ID <= k_MaxRangeArchetypes)
+                    {
+                        mArchetypes.Free(ID - k_MinRangeArchetypes);
+                    }
+                });
+
+        // TODO REFACTOR
         using namespace Component;
 
         Register<Pivot,      k_Inheritable | k_Serializable>();
@@ -241,28 +253,19 @@ namespace Scene
         Register<Worldspace, k_Default,      Dirty>();
         Register<Localspace, k_Serializable, Worldspace>();
 
-        // Observes when an archetype is destroyed.
-        Observe<>().with(flecs::Prefab).self().event(flecs::OnRemove).each([&](Entity Actor)
-        {
-            if (const UInt32 ID = Actor.GetID(); ID >= k_MinRangeArchetypes && ID <= k_MaxRangeArchetypes)
-            {
-                mArchetypes.Free(ID - k_MinRangeArchetypes);
-            }
-        });
-
         // Observes changes to local transforms and marks affected hierarchies as dirty.
-        Observe<>().with<Localspace>().self().event(flecs::OnSet).each(Entity::ToggleComponentInHierarchy<Dirty, true>);
+        Observe<>("Engine::UpdateDirty").with<Localspace>().self().event(flecs::OnSet).each(Entity::ToggleComponentInHierarchy<Dirty, true>);
 
         // Updates world transforms for dirty entities in hierarchy order.
         Execute<const Localspace, ConstPtr<Worldspace>, Worldspace>()
-            .with<Dirty>()
-            .term_at(1)
+                .with<Dirty>()
+                .term_at(1)
                 .cascade()
-            .each([](Entity Actor, ConstRef<Localspace> Local, ConstPtr<Worldspace> Parent, Ref<Worldspace> World)
-            {
-                World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
-                Actor.Notify<Worldspace>();
-                Actor.Disable<Dirty>();
-            });
+                .each([](Entity Actor, ConstRef<Localspace> Local, ConstPtr<Worldspace> Parent, Ref<Worldspace> World)
+                      {
+                          World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
+                          Actor.Notify<Worldspace>();
+                          Actor.Disable<Dirty>();
+                      });
     }
 }
