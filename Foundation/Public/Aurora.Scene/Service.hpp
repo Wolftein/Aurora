@@ -103,13 +103,6 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<typename Function>
-        void QueryArchetypes(Any<Function> Callback)
-        {
-            mArchetypesQueryAll.Each(Callback);
-        }
-
-        // -=(Undocumented)=-
         template<typename ...Components>
         auto Execute()
         {
@@ -181,13 +174,12 @@ namespace Scene
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        flecs::world            mWorld;
+        flecs::world                 mWorld;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Handle<k_MaxArchetypes> mArchetypes;
-        Scene::Query<>          mArchetypesQueryAll;
-        Scene::Observer         mArchetypesOnDelete;
+        Handle<k_MaxCountArchetypes> mArchetypes;
+        Scene::Observer              mArchetypesOnDelete;
     };
 }

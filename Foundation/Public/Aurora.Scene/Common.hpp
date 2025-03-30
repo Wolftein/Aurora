@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Base.hpp"
+#include "Aurora.Math/Math.hpp"
 #include <flecs.h>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -34,25 +34,25 @@ namespace Scene
         k_MaxRangeComponents = 1'023,
 
         // -=(Undocumented)=-
+        k_MaxCountComponents = k_MaxRangeComponents - k_MinRangeComponents,
+
+        // -=(Undocumented)=-
         k_MinRangeArchetypes = 1'024,
 
         // -=(Undocumented)=-
         k_MaxRangeArchetypes = 65'534,
 
         // -=(Undocumented)=-
-        k_MinRangeEntities   = 65'535,
+        k_MaxCountArchetypes = k_MaxRangeArchetypes - k_MinRangeArchetypes,
 
         // -=(Undocumented)=-
-        k_MaxRangeEntities   = 4'294'967'295,
+        k_MinRangeDynamics   = 65'535,
 
         // -=(Undocumented)=-
-        k_MaxComponents      = k_MaxRangeComponents - k_MinRangeComponents,
+        k_MaxRangeDynamics   = 4'294'967'295,
 
         // -=(Undocumented)=-
-        k_MaxArchetypes      = k_MaxRangeArchetypes - k_MinRangeArchetypes,
-
-        // -=(Undocumented)=-
-        k_MaxEntities        = k_MaxRangeEntities - k_MinRangeEntities,
+        k_MaxCountDynamics   = k_MaxRangeDynamics - k_MinRangeDynamics,
     };
 
     // -=(Undocumented)=-

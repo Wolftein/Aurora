@@ -22,7 +22,7 @@ namespace Scene
 {
     // -=(Undocumented)=-
     template<typename Type>
-    class Link final
+    class Proxy final
     {
     public:
 
@@ -32,10 +32,10 @@ namespace Scene
     public:
 
         // -=(Undocumented)=-
-        Link() = default;
+        Proxy() = default;
 
         // -=(Undocumented)=-
-        Link(Handle Handle)
+        Proxy(Handle Handle)
             : mHandle { Handle }
         {
         }
@@ -78,13 +78,13 @@ namespace Scene
         // -=(Undocumented)=-
         ConstPtr<Type> operator->() const
         {
-            return const_cast<Ptr<Link>>(this)->mHandle.get();
+            return const_cast<Ptr<Proxy>>(this)->mHandle.get();
         }
 
         // -=(Undocumented)=-
         ConstRef<Type> operator*() const
         {
-            return * const_cast<Ptr<Link>>(this)->mHandle.get();
+            return * const_cast<Ptr<Proxy>>(this)->mHandle.get();
         }
 
     private:

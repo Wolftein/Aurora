@@ -24,8 +24,8 @@ namespace Example
     Scene::Entity Child;
     Scene::Entity Random;
     Scene::Entity MySprite;
-    Scene::Link<Component::Localspace> MyCacheLocalscape;
-    Scene::Link<Component::Localspace> MyCacheLocalscape2;
+    Scene::Proxy<Transformf> MyCacheLocalscape;
+    Scene::Proxy<Transformf> MyCacheLocalscape2;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -42,7 +42,7 @@ namespace Example
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
 
         auto MyArchetype = Scene->Spawn<Scene::k_Archetype>();
-        MyArchetype.Attach(Component::Tint(0, 1, 0, 1));
+        MyArchetype.Attach(Color(0, 1, 0, 1));
         MyArchetype.Attach(Pivot());
 
         Writer Writer;
@@ -54,43 +54,43 @@ namespace Example
         GrandMaster = Scene->Spawn();
         GrandMaster.SetArchetype(MyArchetype);
         GrandMaster.SetName("Grand Master");
-        GrandMaster.Attach(Component::Localspace(Vector3f(256, 256, 0)));
+        GrandMaster.Attach(Transformf(Vector3f(256, 256, 0)));
         GrandMaster.Attach(Scene::TEcsText(Font, 32, L"[Fers]"));
 
-        MyCacheLocalscape = GrandMaster.Link<Component::Localspace>();
+        MyCacheLocalscape = GrandMaster.Link<Transformf>();
 
         Master = Scene->Spawn();
         Master.SetArchetype(MyArchetype);
         Master.SetName("Master");
         Master.SetParent(GrandMaster);
-        Master.Attach(Component::Localspace(
+        Master.Attach(Transformf(
                 Vector3f(0, 32, 0),
                 Vector3f(1),
                 Quaternionf::FromAngles(DegreesToRadians(90), Vector3f(0, 0, 1))));
-        Master.Attach(Component::Pivot(Pivot::CenterMiddle));
+        Master.Attach(Pivot::CenterMiddle);
         Master.Attach(Scene::TEcsText(Font, 32, L"[Es Puto]"));
-        Master.Attach(Component::Tint(1, 0, 0, 1));
+        Master.Attach(Color(1, 0, 0, 1));
 
         Child = Scene->Spawn();
         Child.SetParent(Master);
         Child.SetName("Child");
-        Child.Attach(Component::Localspace(
+        Child.Attach(Transformf(
                 Vector3f(12, 24, 0),
                 Vector3f(1),
                 Quaternionf::FromAngles(DegreesToRadians(90), Vector3f(0, 0, 1))));
         Child.Attach(Scene::TEcsText(Font, 12, L"[CHILD_OF_MASTER]"));
-        Child.Attach(Component::Tint(0, 0, 1, 1));
+        Child.Attach(Color(0, 0, 1, 1));
 
         Random = Scene->Spawn();
         Random.SetParent(GrandMaster);
-        Random.Attach(Component::Localspace(
+        Random.Attach(Transformf(
                 Vector3f(-100, -100, 0.5f),
                 Vector3f(4),
                 Quaternionf()));
         Random.Attach(Scene::TEcsText(Font, 16, L"[Hello SIR!!!!!!]"));
-        Random.Attach(Component::Tint(0, 1, 1, 1));
+        Random.Attach(Color(0, 1, 1, 1));
 
-        MyCacheLocalscape2 = Random.Link<Component::Localspace>();
+        MyCacheLocalscape2 = Random.Link<Transformf>();
 
         ConstSPtr<Graphic::Material> Material = Graphic::Material::GetFactory().GetOrCreate(
                 Content::Uri(Format("Memory://Material/{}", 1)), true);
@@ -103,10 +103,10 @@ namespace Example
         Content->Process(Material, true);
 
         MySprite = Scene->Spawn();
-        MySprite.Attach(Component::Localspace(Vector3f(633, 333, 0.7f), Vector3f(0.5), Quaternionf()));
+        MySprite.Attach(Transformf(Vector3f(633, 333, 0.7f), Vector3f(0.5), Quaternionf()));
         MySprite.Attach(Scene::TEcsSprite(Material, Rectf(0, 0, 500, 400)));
-        MySprite.Attach(Component::Pivot(Pivot::CenterMiddle));
-        MySprite.Attach(Component::Tint(0xFF0000FF));
+        MySprite.Attach(Pivot(Pivot::CenterMiddle));
+        MySprite.Attach(Color(0xFF0000FF));
 
         // Initialize Camera.
         mCamera.SetOrthographic(GetDevice().GetWidth(), GetDevice().GetHeight(), 0, 1);

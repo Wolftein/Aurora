@@ -12,8 +12,8 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Component.hpp"
-#include "Link.hpp"
+#include "Proxy.hpp"
+#include "Tag.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -118,7 +118,7 @@ namespace Scene
         template<typename Type>
         auto Link() const
         {
-            return Scene::Link<Type>(mHandle.get_ref<Type>());
+            return Scene::Proxy<Type>(mHandle.get_ref<Type>());
         }
 
         // -=(Undocumented)=-

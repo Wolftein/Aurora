@@ -40,12 +40,6 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        Observer(ConstRef<Observer> Other)
-        {
-            Swap(mHandle, Other.mHandle);
-        }
-
-        // -=(Undocumented)=-
         ~Observer()
         {
             if (mHandle)

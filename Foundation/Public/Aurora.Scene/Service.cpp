@@ -26,7 +26,7 @@ namespace Scene
     {
         // Ensures that handles within this range are exclusively for entities created during runtime,
         // preventing conflicts with internal engine objects like component(s) or archetype(s).
-        mWorld.set_entity_range(k_MinRangeEntities, k_MaxRangeEntities);
+        mWorld.set_entity_range(k_MinRangeDynamics, k_MaxRangeDynamics);
 
         // Initializes and registers all core component(s) and system(s).
         RegisterDefaultComponentsAndSystems();
@@ -140,7 +140,6 @@ namespace Scene
 
         // Read Entity's hierarchy separator
         Reader.Skip(sizeof(UInt32));
-
         return Actor;
     }
 
@@ -233,39 +232,35 @@ namespace Scene
 
     void Service::RegisterDefaultComponentsAndSystems()
     {
-        mArchetypesQueryAll = Query<>("_Archetypes::Query").with(EcsPrefab).build();
-        mArchetypesOnDelete = Observe<>("_Archetypes::OnDelete")
-                .with(EcsPrefab).self().event(flecs::OnRemove)
-                .each([this](Entity Actor)
-                {
-                    if (const UInt32 ID = Actor.GetID(); ID >= k_MinRangeArchetypes && ID <= k_MaxRangeArchetypes)
-                    {
-                        mArchetypes.Free(ID - k_MinRangeArchetypes);
-                    }
-                });
+        // Observer to keep archetype(s) storage updated.
+        mArchetypesOnDelete = Observe<>("_Archetypes::OnDelete").with(EcsPrefab).event(EcsOnRemove)
+            .each([this](Entity Actor)
+            {
+                mArchetypes.Free(Actor.GetID() - k_MinRangeArchetypes);
+            });
 
-        // TODO REFACTOR
-        using namespace Component;
+        // TODO: REMOVE_ALL_THIS
+        // Observes changes to local transforms and marks affected hierarchies as dirty.
+        using Dirty = Tag<Hash("Dirty")>;
 
         Register<Pivot,      k_Inheritable | k_Serializable>();
-        Register<Tint,       k_Inheritable | k_Serializable>();
+        Register<Color,      k_Inheritable | k_Serializable>();
         Register<Dirty,      k_Toggleable>();
-        Register<Worldspace, k_Default,      Dirty>();
-        Register<Localspace, k_Serializable, Worldspace>();
+        Register<Matrix4f,   k_Default,      Dirty>();
+        Register<Transformf, k_Serializable, Matrix4f>();
 
-        // Observes changes to local transforms and marks affected hierarchies as dirty.
-        Observe<>("Engine::UpdateDirty").with<Localspace>().self().event(flecs::OnSet).each(Entity::ToggleComponentInHierarchy<Dirty, true>);
+        Observe<>("_Default::UpdateTransformDirty").with<Transformf>().event(EcsOnSet)
+            .each(Entity::ToggleComponentInHierarchy<Dirty, true>);
 
-        // Updates world transforms for dirty entities in hierarchy order.
-        Execute<const Localspace, ConstPtr<Worldspace>, Worldspace>()
-                .with<Dirty>()
-                .term_at(1)
+        Execute<const Transformf, ConstPtr<Matrix4f>, Matrix4f>()
+            .with<Dirty>()
+            .term_at(1)
                 .cascade()
-                .each([](Entity Actor, ConstRef<Localspace> Local, ConstPtr<Worldspace> Parent, Ref<Worldspace> World)
-                      {
-                          World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
-                          Actor.Notify<Worldspace>();
-                          Actor.Disable<Dirty>();
-                      });
+            .each([](Entity Actor, ConstRef<Transformf> Local, ConstPtr<Matrix4f> Parent, Ref<Matrix4f> World)
+            {
+                World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
+                Actor.Notify<Matrix4f   >();
+                Actor.Disable<Dirty>();
+            });
     }
 }

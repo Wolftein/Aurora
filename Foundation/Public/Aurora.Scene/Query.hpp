@@ -41,12 +41,6 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        Query(ConstRef<Query> Other)
-        {
-            Swap(mHandle, Other.mHandle);
-        }
-
-        // -=(Undocumented)=-
         ~Query()
         {
             if (mHandle)
