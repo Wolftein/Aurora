@@ -24,6 +24,8 @@ namespace Example
     Scene::Entity Child;
     Scene::Entity Random;
     Scene::Entity MySprite;
+    Scene::Accessor<Component::Localspace> MyCacheLocalscape;
+    Scene::Accessor<Component::Localspace> MyCacheLocalscape2;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -54,6 +56,8 @@ namespace Example
         GrandMaster.Attach(Component::Localspace(Vector3f(256, 256, 0)));
         GrandMaster.Attach(Scene::TEcsText(Font, 32, L"[Fers]"));
 
+        MyCacheLocalscape = GrandMaster.Access<Component::Localspace>();
+
         Master = Scene->Spawn(MyArchetype);
         Master.SetName("Master");
         Master.SetParent(GrandMaster);
@@ -79,10 +83,12 @@ namespace Example
         Random.SetParent(GrandMaster);
         Random.Attach(Component::Localspace(
                 Vector3f(-100, -100, 0.5f),
-                Vector3f(0.5),
-                Quaternionf::FromAngles(DegreesToRadians(125), Vector3f(1, 1, 0))));
+                Vector3f(4),
+                Quaternionf()));
         Random.Attach(Scene::TEcsText(Font, 16, L"[Hello SIR!!!!!!]"));
         Random.Attach(Component::Tint(0, 1, 1, 1));
+
+        MyCacheLocalscape2 = Random.Access<Component::Localspace>();
 
         ConstSPtr<Graphic::Material> Material = Graphic::Material::GetFactory().GetOrCreate(
                 Content::Uri(Format("Memory://Material/{}", 1)), true);
@@ -134,16 +140,10 @@ namespace Example
         Angles += 0.01f;
         if (Angles >= 360.0f) { Angles -= 360.0f; }
 
-        Random.Attach(Component::Localspace(
-                Vector3f(-100, -100, 0.5f),
-                Vector3f(4),
-                Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1))));
-
-        GrandMaster.Obtain<Component::Localspace>()->SetRotation(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
-        GrandMaster.Notify<Component::Localspace>();
-
-        MySprite.Obtain<Component::Localspace>()->SetRotation(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
-        MySprite.Notify<Component::Localspace>();
+        MyCacheLocalscape
+                .Modify<& Transformf::SetRotation>(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
+        MyCacheLocalscape2
+            .Modify<& Transformf::SetRotation>(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -161,8 +161,8 @@ namespace Example
 
     Bool Application::OnMouseMove(Real32 X, Real32 Y, Real32 DeltaX, Real32 DeltaY)
     {
-        GrandMaster.Obtain<Component::Localspace>()->SetPosition(Vector2f { X, Y});
-        GrandMaster.Notify<Component::Localspace>();
+        MyCacheLocalscape->SetPosition(Vector2f { X, Y});
+        MyCacheLocalscape.Notify();
         return true;
     }
 

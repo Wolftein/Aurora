@@ -132,6 +132,8 @@ namespace Scene
             return mWorld.template system<Components...>();
         }
 
+    public:
+
         // -=(Undocumented)=-
         void LoadArchetypes(Ref<Reader> Reader);
 

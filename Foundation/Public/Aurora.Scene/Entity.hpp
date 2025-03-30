@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Common.hpp"
+#include "Accessor.hpp"
 #include "Component.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -109,7 +109,14 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        auto Obtain() const
+        auto Access() const
+        {
+            return Accessor<Type>(mHandle.get_ref<Type>());
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        auto Find() const
         {
             if constexpr (std::is_const_v<Type>)
             {
@@ -123,7 +130,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        auto Obtain(Entity Component) const
+        auto Find(Entity Component) const
         {
             if constexpr (std::is_const_v<Type>)
             {
@@ -137,7 +144,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        auto Obtain(Entity First, Entity Second) const
+        auto Find(Entity First, Entity Second) const
         {
             if constexpr (std::is_const_v<Type>)
             {
@@ -151,26 +158,26 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        Bool Retain() const
+        Bool Contains() const
         {
             return mHandle.has<Type>();
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        Bool Retain(Type Value) const
+        Bool Contains(Type Value) const
         {
             return mHandle.has(Value);
         }
 
         // -=(Undocumented)=-
-        Bool Retain(Entity Component) const
+        Bool Contains(Entity Component) const
         {
             return mHandle.has(Component.GetID());
         }
 
         // -=(Undocumented)=-
-        Bool Retain(Entity First, Entity Second) const
+        Bool Contains(Entity First, Entity Second) const
         {
             return mHandle.has(First.GetID(), Second.GetID());
         }

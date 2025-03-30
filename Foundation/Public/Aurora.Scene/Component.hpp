@@ -23,20 +23,18 @@
 
 namespace Component
 {
-    // Defines the local reference point for an object's position, rotation, and scaling.
+    // -=(Undocumented)=-
     using Pivot      = Math::Pivot;
 
-    // A multiplicative color applied to rendered objects (RGBA format).
+    // -=(Undocumented)=-
     using Tint       = Math::Color;
 
-    // Flag indicating an object's world transform needs recalculation.
+    // -=(Undocumented)=-
     using Dirty      = Scene::Tag<Hash("Dirty")>;
 
-    // The local transformation relative to a parent object.
-    // Combines position, rotation, and scale without world-space effects.
+    // -=(Undocumented)=-
     using Localspace = Math::Transformf;
 
-    // The global transformation matrix in world coordinates.
-    // Represents an object's absolute position, rotation, and scale in the scene.
+    // -=(Undocumented)=-
     using Worldspace = Math::Matrix4f;
 }
