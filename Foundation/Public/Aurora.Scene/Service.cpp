@@ -90,7 +90,10 @@ namespace Scene
         Entity Actor = Spawn<Trait::k_Final>();
 
         // Read Entity's name
-        Actor.SetName(Reader.ReadString8());
+        if (CStr Name = Reader.ReadString8(); !Name.empty())
+        {
+            Actor.SetName(Name);
+        }
 
         // Read Entity's archetype
         if (const UInt64 Base = Reader.ReadInt<UInt64>(); Base)
