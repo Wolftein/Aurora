@@ -75,13 +75,13 @@ namespace Scene
         // -=(Undocumented)=-
         ConstPtr<Type> operator->() const
         {
-            return mHandle.get();
+            return const_cast<Ptr<Accessor>>(this)->mHandle.get();
         }
 
         // -=(Undocumented)=-
         ConstRef<Type> operator*() const
         {
-            return *mHandle.get();
+            return * const_cast<Ptr<Accessor>>(this)->mHandle.get();
         }
 
         // -=(Undocumented)=-
