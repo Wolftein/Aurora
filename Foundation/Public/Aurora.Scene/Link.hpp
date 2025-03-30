@@ -22,7 +22,7 @@ namespace Scene
 {
     // -=(Undocumented)=-
     template<typename Type>
-    class Accessor final
+    class Link final
     {
     public:
 
@@ -32,10 +32,10 @@ namespace Scene
     public:
 
         // -=(Undocumented)=-
-        Accessor() = default;
+        Link() = default;
 
         // -=(Undocumented)=-
-        Accessor(Handle Handle)
+        Link(Handle Handle)
             : mHandle { Handle }
         {
         }
@@ -75,13 +75,13 @@ namespace Scene
         // -=(Undocumented)=-
         ConstPtr<Type> operator->() const
         {
-            return const_cast<Ptr<Accessor>>(this)->mHandle.get();
+            return const_cast<Ptr<Link>>(this)->mHandle.get();
         }
 
         // -=(Undocumented)=-
         ConstRef<Type> operator*() const
         {
-            return * const_cast<Ptr<Accessor>>(this)->mHandle.get();
+            return * const_cast<Ptr<Link>>(this)->mHandle.get();
         }
 
         // -=(Undocumented)=-

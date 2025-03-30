@@ -24,8 +24,8 @@ namespace Example
     Scene::Entity Child;
     Scene::Entity Random;
     Scene::Entity MySprite;
-    Scene::Accessor<Component::Localspace> MyCacheLocalscape;
-    Scene::Accessor<Component::Localspace> MyCacheLocalscape2;
+    Scene::Link<Component::Localspace> MyCacheLocalscape;
+    Scene::Link<Component::Localspace> MyCacheLocalscape2;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -57,7 +57,7 @@ namespace Example
         GrandMaster.Attach(Component::Localspace(Vector3f(256, 256, 0)));
         GrandMaster.Attach(Scene::TEcsText(Font, 32, L"[Fers]"));
 
-        MyCacheLocalscape = GrandMaster.Access<Component::Localspace>();
+        MyCacheLocalscape = GrandMaster.Link<Component::Localspace>();
 
         Master = Scene->Spawn();
         Master.SetArchetype(MyArchetype);
@@ -90,7 +90,7 @@ namespace Example
         Random.Attach(Scene::TEcsText(Font, 16, L"[Hello SIR!!!!!!]"));
         Random.Attach(Component::Tint(0, 1, 1, 1));
 
-        MyCacheLocalscape2 = Random.Access<Component::Localspace>();
+        MyCacheLocalscape2 = Random.Link<Component::Localspace>();
 
         ConstSPtr<Graphic::Material> Material = Graphic::Material::GetFactory().GetOrCreate(
                 Content::Uri(Format("Memory://Material/{}", 1)), true);

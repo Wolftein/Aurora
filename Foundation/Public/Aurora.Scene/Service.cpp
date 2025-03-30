@@ -132,11 +132,15 @@ namespace Scene
         Entity Actor = LoadEntity(Reader);
 
         // Read Entity's hierarchy
-        while (Reader.GetAvailable() > 0)
+        while (Reader.Peek<UInt32>() != k_Terminator)
         {
             Entity Children = LoadEntityHierarchy(Reader);
             Children.SetParent(Actor);
         }
+
+        // Read Entity's hierarchy separator
+        Reader.Skip(sizeof(UInt32));
+
         return Actor;
     }
 
@@ -153,6 +157,9 @@ namespace Scene
         {
             SaveEntityHierarchy(Writer, Children);
         });
+
+        // Write Entity's hierarchy separator
+        Writer.WriteUInt32(k_Terminator);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -165,7 +172,7 @@ namespace Scene
         for (UInt64 Handle = Reader.ReadInt<UInt64>(); Handle; Handle = Reader.ReadInt<UInt64>())
         {
             // Read Component's ID
-            const flecs::untyped_component Component = mWorld.component(Handle);
+            const flecs::untyped_component Component = mWorld.component(Handle + k_MinRangeComponents);
 
             // Read Component's Data
             if (ecs_id_is_tag(mWorld, Component))
@@ -209,7 +216,7 @@ namespace Scene
                 const flecs::entity Entity    = Iterator.src(1);
 
                 // Write Component's ID
-                Writer.WriteInt<UInt64>(Component.raw_id());
+                Writer.WriteInt<UInt64>(Component.raw_id() - k_MinRangeComponents);
 
                 // Write Component's Data
                 Iterator.field<const Factory>(0)->Write(Writer, Entity.get_mut(Component));
@@ -228,14 +235,14 @@ namespace Scene
     {
         using namespace Component;
 
-        Component<Pivot,      k_Inheritable | k_Serializable>();
-        Component<Tint,       k_Inheritable | k_Serializable>();
-        Component<Dirty,      k_Toggleable>();
-        Component<Worldspace, k_Default,      Dirty>();
-        Component<Localspace, k_Serializable, Worldspace>();
+        Register<Pivot,      k_Inheritable | k_Serializable>();
+        Register<Tint,       k_Inheritable | k_Serializable>();
+        Register<Dirty,      k_Toggleable>();
+        Register<Worldspace, k_Default,      Dirty>();
+        Register<Localspace, k_Serializable, Worldspace>();
 
         // Observes when an archetype is destroyed.
-        Observer<>().with(flecs::Prefab).self().event(flecs::OnRemove).each([&](Entity Actor)
+        Observe<>().with(flecs::Prefab).self().event(flecs::OnRemove).each([&](Entity Actor)
         {
             if (const UInt32 ID = Actor.GetID(); ID >= k_MinRangeArchetypes && ID <= k_MaxRangeArchetypes)
             {
@@ -244,10 +251,10 @@ namespace Scene
         });
 
         // Observes changes to local transforms and marks affected hierarchies as dirty.
-        Observer<>().with<Localspace>().self().event(flecs::OnSet).each(Entity::ToggleComponentInHierarchy<Dirty, true>);
+        Observe<>().with<Localspace>().self().event(flecs::OnSet).each(Entity::ToggleComponentInHierarchy<Dirty, true>);
 
         // Updates world transforms for dirty entities in hierarchy order.
-        System<const Localspace, ConstPtr<Worldspace>, Worldspace>()
+        Execute<const Localspace, ConstPtr<Worldspace>, Worldspace>()
             .with<Dirty>()
             .term_at(1)
                 .cascade()

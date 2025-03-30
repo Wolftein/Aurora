@@ -56,7 +56,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type, UInt32 Traits = k_Default, typename Dependency = void>
-        Entity Component()
+        Entity Register()
         {
             flecs::entity Actor = mWorld.component<Type>();
 
@@ -89,7 +89,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto Observer()
+        auto Observe()
         {
             return mWorld.template observer<Components...>();
         }
@@ -103,7 +103,7 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto System()
+        auto Execute()
         {
             return mWorld.template system<Components...>();
         }

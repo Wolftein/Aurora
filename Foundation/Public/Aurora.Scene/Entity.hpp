@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Accessor.hpp"
+#include "Link.hpp"
 #include "Component.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -104,14 +104,21 @@ namespace Scene
         template<typename Type>
         void Attach(Any<Type> Component)
         {
-            mHandle.set<Type>(Move(Component));
+            if constexpr (std::is_empty_v<Type>)
+            {
+                mHandle.add<Type>();
+            }
+            else
+            {
+                mHandle.set<Type>(Move(Component));
+            }
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        auto Access() const
+        auto Link() const
         {
-            return Accessor<Type>(mHandle.get_ref<Type>());
+            return Scene::Link<Type>(mHandle.get_ref<Type>());
         }
 
         // -=(Undocumented)=-

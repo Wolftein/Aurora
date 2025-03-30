@@ -25,6 +25,9 @@ namespace Scene
     enum
     {
         // -=(Undocumented)=-
+        k_Terminator         = 0xFFFF'FFFF,
+
+        // -=(Undocumented)=-
         k_MinRangeComponents = 0,
 
         // -=(Undocumented)=-
