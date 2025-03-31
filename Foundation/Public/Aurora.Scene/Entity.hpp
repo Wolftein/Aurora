@@ -332,8 +332,7 @@ namespace Scene
         // -=(Undocumented)=-
         auto GetArchetype() const
         {
-            ConstPtr<Entity::Handle> Handle = mHandle.get<Entity::Handle>(flecs::IsA);
-            return Entity(Handle ? * Handle : Entity::Handle::null());
+            return Entity(mHandle.target(flecs::IsA));
         }
 
         // -=(Undocumented)=-

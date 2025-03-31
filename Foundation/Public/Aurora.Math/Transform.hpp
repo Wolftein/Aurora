@@ -36,7 +36,7 @@ inline namespace Math
         Transform(ConstRef<Transform> Other) = default;
 
         // -=(Undocumented)=-
-        Transform(ConstRef<Vector3f> Position, ConstRef<Vector3f> Scale, ConstRef<Quaternionf> Rotation)
+        Transform(ConstRef<Vector3<Base>> Position, ConstRef<Vector3<Base>> Scale, ConstRef<Quaternion<Base>> Rotation)
         {
             SetPosition(Position);
             SetScale(Scale);
@@ -44,7 +44,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Transform(ConstRef<Vector2f> Position, ConstRef<Vector2f> Scale, ConstRef<Quaternionf> Rotation)
+        Transform(ConstRef<Vector2<Base>> Position, ConstRef<Vector2<Base>> Scale, ConstRef<Quaternion<Base>> Rotation)
         {
             SetPosition(Position);
             SetScale(Scale);
@@ -52,7 +52,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Transform(ConstRef<Vector3f> Position, ConstRef<Quaternionf> Rotation)
+        Transform(ConstRef<Vector3<Base>> Position, ConstRef<Quaternion<Base>> Rotation)
             : Transform()
         {
             SetPosition(Position);
@@ -60,7 +60,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Transform(ConstRef<Vector2f> Position, ConstRef<Quaternionf> Rotation)
+        Transform(ConstRef<Vector2<Base>> Position, ConstRef<Quaternion<Base>> Rotation)
             : Transform()
         {
             SetPosition(Position);
@@ -68,14 +68,14 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Transform(ConstRef<Vector3f> Position)
+        Transform(ConstRef<Vector3<Base>> Position)
             : Transform()
         {
             SetPosition(Position);
         }
 
         // -=(Undocumented)=-
-        Transform(ConstRef<Vector2f> Position)
+        Transform(ConstRef<Vector2<Base>> Position)
             : Transform()
         {
             SetPosition(Position);
