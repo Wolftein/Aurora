@@ -44,7 +44,23 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        Transform(ConstRef<Vector2f> Position, ConstRef<Vector2f> Scale, ConstRef<Quaternionf> Rotation)
+        {
+            SetPosition(Position);
+            SetScale(Scale);
+            SetRotation(Rotation);
+        }
+
+        // -=(Undocumented)=-
         Transform(ConstRef<Vector3f> Position, ConstRef<Quaternionf> Rotation)
+            : Transform()
+        {
+            SetPosition(Position);
+            SetRotation(Rotation);
+        }
+
+        // -=(Undocumented)=-
+        Transform(ConstRef<Vector2f> Position, ConstRef<Quaternionf> Rotation)
             : Transform()
         {
             SetPosition(Position);
@@ -59,12 +75,40 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        Transform(ConstRef<Vector2f> Position)
+            : Transform()
+        {
+            SetPosition(Position);
+        }
+
+        // -=(Undocumented)=-
         Matrix4<Base> Compute() const
         {
+            const Matrix4<Base> Origin      = Matrix4<Base>::FromTranslation(-mOrigin);
             const Matrix4<Base> Scale       = Matrix4<Base>::FromScale(mScale);
             const Matrix4<Base> Rotation    = Matrix4<Base>::FromRotation(mRotation);
-            const Matrix4<Base> Translation = Matrix4<Base>::FromTranslation(mPosition);
-            return Translation * Rotation * Scale;
+            const Matrix4<Base> Translation = Matrix4<Base>::FromTranslation(mOrigin + mPosition);
+
+            return Translation * Rotation * Scale * Origin;
+        }
+
+        // -=(Undocumented)=-
+        Ref<Transform> SetOrigin(ConstRef<Vector2<Base>> Origin)
+        {
+            return SetOrigin(Vector3<Base>(Origin.GetX(), Origin.GetY(), 0));
+        }
+
+        // -=(Undocumented)=-
+        Ref<Transform> SetOrigin(ConstRef<Vector3<Base>> Origin)
+        {
+            mOrigin = Origin;
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        ConstRef<Vector3<Base>> GetOrigin() const
+        {
+            return mOrigin;
         }
 
         // -=(Undocumented)=-
@@ -189,6 +233,7 @@ inline namespace Math
         template<typename Type>
         void OnSerialize(Stream<Type> Archive)
         {
+            Archive.SerializeObject(mOrigin);
             Archive.SerializeObject(mPosition);
             Archive.SerializeObject(mScale);
             Archive.SerializeObject(mRotation);
@@ -199,6 +244,7 @@ inline namespace Math
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+        Vector3<Base>    mOrigin;
         Vector3<Base>    mPosition;
         Vector3<Base>    mScale;
         Quaternion<Base> mRotation;
