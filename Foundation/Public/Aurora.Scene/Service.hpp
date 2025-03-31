@@ -24,6 +24,7 @@
 namespace Scene
 {
     // -=(Undocumented)=-
+    // @TODO: 128Bit UUID instead of names.
     class Service final : public AbstractSubsystem<Service>, public Tickable
     {
     public:
@@ -56,10 +57,17 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<typename Type, UInt32 Traits = k_Default, typename Dependency = void>
-        Entity Register()
+        template<typename Component>
+        Entity Fetch()
         {
-            flecs::entity Actor = mWorld.component<Type>();
+            return Entity(mWorld.component<Component>());
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type, UInt32 Traits = k_Default, typename Dependency = void>
+        Entity Register(CStr ID = flecs::_::symbol_name<Type>())
+        {
+            flecs::entity Actor = mWorld.component<Type>(ID.data());
 
             if constexpr (Traits & Trait::k_Sparse)
             {

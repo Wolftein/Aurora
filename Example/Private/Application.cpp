@@ -29,7 +29,18 @@ namespace Example
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    
+
+    struct TestComponent {
+        SStr NAME;
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void OnSerialize(Stream<Type> Archive)
+        {
+            Archive.SerializeString8(NAME);
+        }
+    };
+
     Bool Application::OnInitialize()
     {
         //
@@ -41,15 +52,21 @@ namespace Example
         // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
 
+        Scene->Register<TestComponent, Scene::k_Serializable>("TestComponent");
+
         auto MyArchetype = Scene->Spawn<Scene::k_Archetype>();
+        MyArchetype.Attach(TestComponent { "Whatsup!" });
         MyArchetype.Attach(Color(0, 1, 0, 1));
         MyArchetype.Attach(Pivot());
 
         Writer Writer;
-        Scene->SaveArchetypes(Writer);
+        Scene->SaveEntity(Writer, MyArchetype);
+
+        Scene->Fetch<TestComponent>().Destruct();
 
         Reader Reader(Writer.GetData());
-        Scene->LoadArchetypes(Reader);
+        auto MyArchetype2 = Scene->LoadEntity(Reader);
+        Log::Info("{}", MyArchetype2.Contains<TestComponent>() ? MyArchetype2.Find<TestComponent>()->NAME : "NULL");
 
         GrandMaster = Scene->Spawn();
         GrandMaster.SetArchetype(MyArchetype);

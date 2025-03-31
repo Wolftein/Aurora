@@ -168,23 +168,23 @@ namespace Scene
     {
         const flecs::entity Entity = Actor.GetHandle();
 
-        for (UInt64 Handle = Reader.ReadInt<UInt64>(); Handle; Handle = Reader.ReadInt<UInt64>())
+        while (Reader.Peek<UInt32>() != k_Terminator)
         {
             // Read Component's ID
-            const flecs::untyped_component Component = mWorld.component(Handle + k_MinRangeComponents);
+            const SStr Name(Reader.ReadString8());
+            const flecs::untyped_component Component = mWorld.component(Name.c_str());
+
+            // Read Component's Size
+            const UInt16 Size = Reader.ReadUInt16();
 
             // Read Component's Data
-            if (ecs_id_is_tag(mWorld, Component))
-            {
-                Entity.add(Component);
-            }
-            else
+            if (Core::Reader Data = Reader.Split(Size); Data.GetAvailable() > 0)
             {
                 if (const ConstPtr<Factory> Serializer = Component.get_mut<Factory>())
                 {
-                    if (const Ptr<void> Data = Entity.ensure(Component))
+                    if (const Ptr<void> Memory = Entity.ensure(Component))
                     {
-                        Serializer->Read(Reader, Data);
+                        Serializer->Read(Data, Memory);
                     }
                     Entity.modified(Component);
                 }
@@ -193,7 +193,14 @@ namespace Scene
                     Log::Warn("World: Trying to load an invalid component '{}'", Component.name().c_str());
                 }
             }
+            else
+            {
+                Entity.add(Component);
+            }
         }
+
+        // Read Component's separator
+        Reader.Skip(sizeof(UInt32));
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -211,18 +218,25 @@ namespace Scene
         {
             while (Iterator.next())
             {
-                const flecs::entity Component = Iterator.src(0);
-                const flecs::entity Entity    = Iterator.src(1);
+                const Entity Component = Iterator.src(0);
+                const Entity Actor     = Iterator.src(1);
 
                 // Write Component's ID
-                Writer.WriteInt<UInt64>(Component.raw_id() - k_MinRangeComponents);
+                Writer.WriteString8(Component.GetName());
+
+                // Write Component's Size (deferred)
+                Ptr<UInt16> Size   = Writer.Reserve<UInt16>();
+                UInt32      Offset = Writer.GetOffset();
 
                 // Write Component's Data
-                Iterator.field<const Factory>(0)->Write(Writer, Entity.get_mut(Component));
+                Iterator.field<const Factory>(0)->Write(Writer, Actor.Find(Component));
+
+                // Apply Component's Size
+                (* Size) = Writer.GetOffset() - Offset;
             }
 
             // Write terminator
-            Writer.WriteInt<UInt64>(0);
+            Writer.WriteInt<UInt64>(k_Terminator);
         };
         Query.run(OnIterate);
     }
@@ -243,11 +257,11 @@ namespace Scene
         // Observes changes to local transforms and marks affected hierarchies as dirty.
         using Dirty = Tag<Hash("Dirty")>;
 
-        Register<Pivot,      k_Inheritable | k_Serializable>();
-        Register<Color,      k_Inheritable | k_Serializable>();
+        Register<Pivot,      k_Inheritable | k_Serializable>("Pivot");
+        Register<Color,      k_Inheritable | k_Serializable>("Color");
         Register<Dirty,      k_Toggleable>();
         Register<Matrix4f,   k_Default,      Dirty>();
-        Register<Transformf, k_Serializable, Matrix4f>();
+        Register<Transformf, k_Serializable, Matrix4f>("Transform");
 
         Observe<>("_Default::UpdateTransformDirty").with<Transformf>().event(EcsOnSet)
             .each(Entity::ToggleComponentInHierarchy<Dirty, true>);
@@ -259,7 +273,7 @@ namespace Scene
             .each([](Entity Actor, ConstRef<Transformf> Local, ConstPtr<Matrix4f> Parent, Ref<Matrix4f> World)
             {
                 World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
-                Actor.Notify<Matrix4f   >();
+                Actor.Notify<Matrix4f>();
                 Actor.Disable<Dirty>();
             });
     }
