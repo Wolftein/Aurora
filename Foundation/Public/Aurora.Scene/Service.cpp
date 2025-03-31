@@ -228,6 +228,7 @@ namespace Scene
                 Core::Writer Bundle;
                 Iterator.field<const Factory>(0)->Write(Bundle, Actor.Find(Component));
 
+                // Flush Component's Data
                 Writer.WriteBlock(Bundle.GetData());
             }
 
