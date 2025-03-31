@@ -97,13 +97,27 @@ inline namespace Core
 
         // -=(Undocumented)=
         template<typename Type>
-        Ptr<Type> Reserve(UInt32 Length = sizeof(Type))
+        UInt32 Reserve(UInt32 Length = sizeof(Type))
         {
             Ensure(Length);
 
-            Ptr<Type> Pointer = reinterpret_cast<Ptr<Type>>(AddressOf(mBuffer[mOffset]));
+            UInt32 Offset = GetOffset();
             mOffset = Align(mOffset + Length, mAlignment);
-            return Pointer;
+            return Offset;
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void Patch(Type Value, UInt32 Offset, UInt32 Length = sizeof(Type))
+        {
+            if constexpr (std::is_pointer_v<Type>)
+            {
+                std::memcpy(& mBuffer[Offset], Value, Length);
+            }
+            else
+            {
+                reinterpret_cast<Ref<Type>>(mBuffer[Offset]) = Value;
+            }
         }
 
         // -=(Undocumented)=-

@@ -175,7 +175,7 @@ namespace Scene
             const flecs::untyped_component Component = mWorld.component(Name.c_str());
 
             // Read Component's Size
-            const UInt16 Size = Reader.ReadUInt16();
+            const UInt32 Size = Reader.ReadUInt32();
 
             // Read Component's Data
             if (Core::Reader Data = Reader.Split(Size); Data.GetAvailable() > 0)
@@ -225,14 +225,13 @@ namespace Scene
                 Writer.WriteString8(Component.GetName());
 
                 // Write Component's Size (deferred)
-                Ptr<UInt16> Size   = Writer.Reserve<UInt16>();
-                UInt32      Offset = Writer.GetOffset();
+                UInt32      Offset = Writer.Reserve<UInt32>();
 
                 // Write Component's Data
                 Iterator.field<const Factory>(0)->Write(Writer, Actor.Find(Component));
 
                 // Apply Component's Size
-                (* Size) = Writer.GetOffset() - Offset;
+                Writer.Patch(Writer.GetOffset() - Offset - sizeof(UInt32), Offset);
             }
 
             // Write terminator
