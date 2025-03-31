@@ -174,11 +174,11 @@ namespace Scene
             const SStr Name(Reader.ReadString8());
             const flecs::untyped_component Component = mWorld.component(Name.c_str());
 
-            // Read Component's Size
-            const UInt32 Size = Reader.ReadUInt32();
+            // Read Component's Bundle
+            CPtr<UInt8> Bundle = Reader.ReadBlock<UInt8>();
 
             // Read Component's Data
-            if (Core::Reader Data = Reader.Split(Size); Data.GetAvailable() > 0)
+            if (Core::Reader Data(Bundle); Data.GetAvailable() > 0)
             {
                 if (const ConstPtr<Factory> Serializer = Component.get_mut<Factory>())
                 {
@@ -224,14 +224,11 @@ namespace Scene
                 // Write Component's ID
                 Writer.WriteString8(Component.GetName());
 
-                // Write Component's Size (deferred)
-                UInt32      Offset = Writer.Reserve<UInt32>();
-
                 // Write Component's Data
-                Iterator.field<const Factory>(0)->Write(Writer, Actor.Find(Component));
+                Core::Writer Bundle;
+                Iterator.field<const Factory>(0)->Write(Bundle, Actor.Find(Component));
 
-                // Apply Component's Size
-                Writer.Patch(Writer.GetOffset() - Offset - sizeof(UInt32), Offset);
+                Writer.WriteBlock(Bundle.GetData());
             }
 
             // Write terminator

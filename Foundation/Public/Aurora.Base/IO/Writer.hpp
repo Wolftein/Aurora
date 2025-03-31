@@ -95,31 +95,6 @@ inline namespace Core
             mOffset = 0u;
         }
 
-        // -=(Undocumented)=
-        template<typename Type>
-        UInt32 Reserve(UInt32 Length = sizeof(Type))
-        {
-            Ensure(Length);
-
-            UInt32 Offset = GetOffset();
-            mOffset = Align(mOffset + Length, mAlignment);
-            return Offset;
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type>
-        void Patch(Type Value, UInt32 Offset, UInt32 Length = sizeof(Type))
-        {
-            if constexpr (std::is_pointer_v<Type>)
-            {
-                std::memcpy(& mBuffer[Offset], Value, Length);
-            }
-            else
-            {
-                reinterpret_cast<Ref<Type>>(mBuffer[Offset]) = Value;
-            }
-        }
-
         // -=(Undocumented)=-
         template<typename Type>
         void Write(Type Value, UInt32 Length = sizeof(Type))
@@ -136,6 +111,18 @@ inline namespace Core
             }
 
             mOffset = Align(mOffset + Length, mAlignment);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void WriteBlock(CPtr<Type> Value)
+        {
+            WriteInt<UInt32>(Value.size());
+
+            if (!Value.empty())
+            {
+                Write<ConstPtr<Type>>(Value.data(), Value.size_bytes());
+            }
         }
 
         // -=(Undocumented)=-
