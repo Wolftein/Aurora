@@ -232,7 +232,7 @@ namespace Scene
             }
 
             // Write terminator
-            Writer.WriteInt<UInt64>(k_Terminator);
+            Writer.WriteUInt32(k_Terminator);
         };
         Query.run(OnIterate);
     }
