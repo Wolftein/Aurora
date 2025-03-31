@@ -88,6 +88,12 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        auto Attach(Entity Component)
+        {
+            return mHandle.ensure(Component.GetID());
+        }
+
+        // -=(Undocumented)=-
         template<typename First>
         void Attach(Entity Component)
         {
@@ -150,6 +156,12 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        auto Find(Entity Component) const
+        {
+            return mHandle.get_mut(Component.GetID());
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         auto Find(Entity First, Entity Second) const
         {
@@ -161,6 +173,12 @@ namespace Scene
             {
                 return mHandle.get_mut<Type>(First.GetID(), Second.GetID());
             }
+        }
+
+        // -=(Undocumented)=-
+        auto Find(Entity First, Entity Second) const
+        {
+            return mHandle.get_mut(First.GetID(), Second.GetID());
         }
 
         // -=(Undocumented)=-
