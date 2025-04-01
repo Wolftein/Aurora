@@ -116,4 +116,18 @@ inline namespace Math
             return static_cast<UInt32>(Value & 0xFFFFFFFF);
         }
     }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    constexpr Type Flatten2DTo1D(Type X, Type Y, Type Width)
+    {
+        return Y * Width + X;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    constexpr Type Flatten3DTo1D(Type X, Type Y, Type Z, Type Width, Type Height)
+    {
+        return Z * (Width * Height) + Y * Width + X;
+    }
 }
