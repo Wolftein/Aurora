@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Trigonometry.hpp"
+#include "Easing.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,23 +22,25 @@ inline namespace Math
 {
     // -=(Undocumented)=-
     template<typename Type>
-    class Interpolator final
+    class Tween final
     {
     public:
 
         // -=(Undocumented)=-
-        Interpolator()
+        Tween()
             : mTime        { 0 },
-              mAccumulator { 0 }
+              mAccumulator { 0 },
+              mEasing      { Easing::Linear }
         {
         }
 
         // -=(Undocumented)=-
-        Interpolator(Type Start, Type End, Real64 Time)
+        Tween(Type Start, Type End, Real64 Time, Easing Function = Easing::Linear)
             : mStart       { Start },
               mEnd         { End },
               mTime        { Time },
-              mAccumulator { 0 }
+              mAccumulator { 0 },
+              mEasing      { Function }
         {
         }
 
@@ -49,11 +51,11 @@ inline namespace Math
 
             if constexpr (std::is_arithmetic_v<Type>)
             {
-                return Lerp<Type>(mStart, mEnd, mAccumulator / mTime);
+                return Lerp<Type>(mStart, mEnd, Ease(mEasing, mAccumulator / mTime));
             }
             else
             {
-                return Type::Lerp(mStart, mEnd, mAccumulator / mTime);
+                return Type::Lerp(mStart, mEnd, Ease(mEasing, mAccumulator / mTime));
             }
         }
 
@@ -78,5 +80,6 @@ inline namespace Math
         Type   mEnd;
         Real64 mTime;
         Real64 mAccumulator;
+        Easing mEasing;
     };
 }

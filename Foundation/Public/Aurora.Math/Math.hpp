@@ -14,7 +14,7 @@
 
 #include "Color.hpp"
 #include "Easing.hpp"
-#include "Interpolator.hpp"
+#include "Tween.hpp"
 #include "Matrix4.hpp"
 #include "Pivot.hpp"
 #include "Quaternion.hpp"
