@@ -59,6 +59,8 @@ namespace Example
         MyArchetype.Attach(Color(0, 1, 0, 1));
         MyArchetype.Attach(Pivot());
 
+        Math::Ease(Easing::InCirc, 1.0f);
+        
         Writer Writer;
         Scene->SaveEntity(Writer, MyArchetype);
 
