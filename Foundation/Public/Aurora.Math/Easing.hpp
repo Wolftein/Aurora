@@ -21,7 +21,7 @@
 inline namespace Math
 {
     // -=(Undocumented)=-
-    enum class Easing
+    enum class Easing : UInt8
     {
         Linear,
         InQuad,
