@@ -194,15 +194,18 @@ inline namespace Math
         }
         else if (Time < 2 / D1)
         {
-            return N1 * (Time -= 1.5 / D1) * Time + 0.75;
+            Time -= 1.5 / D1;
+            return N1 * Time * Time + 0.75;
         }
         else if (Time < 2.5 / D1)
         {
-            return N1 * (Time -= 2.25 / D1) * Time + 0.9375;
+            Time -= 2.25 / D1;
+            return N1 * Time * Time + 0.9375;
         }
         else
         {
-            return N1 * (Time -= 2.625 / D1) * Time + 0.984375;
+            Time -= 2.625 / D1;
+            return N1 * Time * Time + 0.984375;
         }
     }
 
