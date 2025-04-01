@@ -73,18 +73,18 @@ namespace Audio
 
     static auto GetAzimuth(UInt32 Channels)
     {
-        constexpr static Real32 K_Left         = 3 * k_PI / 2;
-        constexpr static Real32 k_Right        = k_PI / 2;
-        constexpr static Real32 k_FrontLeft    = 7 * k_PI / 4;
-        constexpr static Real32 k_FrontRight   = k_PI / 4;
+        constexpr static Real32 K_Left         = 3 * k_PI<Real32> / 2;
+        constexpr static Real32 k_Right        = k_PI<Real32> / 2;
+        constexpr static Real32 k_FrontLeft    = 7 * k_PI<Real32> / 4;
+        constexpr static Real32 k_FrontRight   = k_PI<Real32> / 4;
         constexpr static Real32 k_FrontCenter  = 0.0f;
-        constexpr static Real32 k_LowFrequency = k_PI;
-        constexpr static Real32 k_BackLeft     = 5 * k_PI / 4;
-        constexpr static Real32 k_BackRight    = 3 * k_PI / 4;
-        constexpr static Real32 k_BackCenter   = k_PI;
+        constexpr static Real32 k_LowFrequency = k_PI<Real32>;
+        constexpr static Real32 k_BackLeft     = 5 * k_PI<Real32> / 4;
+        constexpr static Real32 k_BackRight    = 3 * k_PI<Real32> / 4;
+        constexpr static Real32 k_BackCenter   = k_PI<Real32>;
 
         constexpr static Real32 k_Mapping[9][8] =
-            {
+        {
                 /* 0 */   { 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f },
                 /* 1 */   { 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f },
                 /* 2 */   { K_Left, k_Right, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f },
@@ -94,7 +94,7 @@ namespace Audio
                 /* 5.1 */ { K_Left, k_Right, k_FrontCenter, k_LowFrequency, k_BackLeft, k_BackRight, 0.f, 0.f },
                 /* 6.1 */ { K_Left, k_Right, k_FrontCenter, k_LowFrequency, k_BackLeft, k_BackRight, k_BackCenter, 0.f },
                 /* 7.1 */ { K_Left, k_Right, k_FrontCenter, k_LowFrequency, k_BackLeft, k_BackRight, K_Left, k_Right }
-            };
+        };
         return const_cast<Ptr<Real32>>(& k_Mapping[Channels][0]);
     }
 
@@ -526,7 +526,7 @@ namespace Audio
         Emitter.DopplerScaler       = 1.0f;
         Emitter.CurveDistanceScaler = 1.0f;
         Emitter.InnerRadius         = Instance.Emitter->GetRadius();
-        Emitter.InnerRadiusAngle    = k_PI / 4.0;
+        Emitter.InnerRadiusAngle    = k_PI<Real32> / 4.0;
         Emitter.pChannelAzimuths    = GetAzimuth(Emitter.ChannelCount);
 
         F3DAUDIO_DSP_SETTINGS Settings { };

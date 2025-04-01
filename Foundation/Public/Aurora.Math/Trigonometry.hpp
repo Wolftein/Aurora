@@ -21,20 +21,21 @@
 inline namespace Math
 {
     // -=(Undocumented)=-
-    static constexpr Real32 k_PI = 3.141592653589793238462643383279502884e+00f;
+    template<typename Type>
+    static constexpr Type k_PI = Type(3.141592653589793238462643383279502884e+00);
 
     // -=(Undocumented)=-
     template<typename Type>
     static constexpr Type DegreesToRadians(Type Degrees)
     {
-        return Degrees * (k_PI / 180);
+        return Degrees * (k_PI<Type> / 180);
     }
 
     // -=(Undocumented)=-
     template<typename Type>
     static constexpr Type RadiansToDegrees(Type Radians)
     {
-        return Radians * (180 / k_PI);
+        return Radians * (180 / k_PI<Type>);
     }
 
     // -=(Undocumented)=-
@@ -171,6 +172,24 @@ inline namespace Math
 
         const Real32 Y = std::bit_cast<Real32>(Magic);
         return Y * (1.5f - (Number * 0.5f * Y * Y));
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    static constexpr Type Pow(Type Base, Type Exponent)
+    {
+        if constexpr (std::is_base_of_v<Real64, Type>)
+        {
+            return pow(Base, Exponent);
+        }
+        else if constexpr (std::is_base_of_v<Real32, Type>)
+        {
+            return powf(Base, Exponent);
+        }
+        else
+        {
+            return powl(Base, Exponent);
+        }
     }
 
     // -=(Undocumented)=-
