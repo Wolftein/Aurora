@@ -127,6 +127,18 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        Vector3<Base> GetScale() const
+        {
+            return Vector3<Base>(GetComponent(0), GetComponent(5), GetComponent(10));
+        }
+
+        // -=(Undocumented)=-
+        Vector3<Base> GetTranslation() const
+        {
+            return Vector3<Base>(GetComponent(12), GetComponent(13), GetComponent(14));
+        }
+
+        // -=(Undocumented)=-
         Matrix4<Base> Inverse() const
         {
             const Base C0 =
