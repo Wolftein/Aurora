@@ -172,19 +172,19 @@ inline namespace Math
         // -=(Undocumented)=-
         Bool Contains(ConstRef<Rect<Base>> Other) const
         {
-            return mX1 <= Other.mX1 && Other.mX2 >= mX2 && mY1 <= Other.mY1 && Other.mY1 >= mY2;
+            return mX1 <= Other.mX1 && mX2 >= Other.mX2 && mY1 <= Other.mY1 && mY2 >= Other.mY2;
         }
 
         // -=(Undocumented)=-
         Bool Contains(Base X, Base Y) const
         {
-            return X >= mX1 && Y >= mY1 && X <= mX2 && Y <= mY2;
+            return X >= mX1 && X < mX2 &&  Y >= mY1 && Y < mY2;
         }
 
         // -=(Undocumented)=-
         Bool Intersects(ConstRef<Rect<Base>> Other) const
         {
-            return mX1 <= Other.mX2 && Other.mX1 <= mX2 && mY1 <= Other.mY2 && Other.mY1 <= mY2;
+            return mX1 < Other.mX2 && mX2 > Other.mX1 && mY1 < Other.mY2 && mY2 > Other.mY1;
         }
 
         // -=(Undocumented)=-
