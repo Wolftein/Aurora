@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Component.hpp"
 #include "Entity.hpp"
 #include "Factory.hpp"
 #include "Observer.hpp"
@@ -57,17 +58,17 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<typename Component>
-        Entity Fetch()
+        template<typename Type>
+        Component<Type> Fetch()
         {
-            return Entity(mWorld.component<Component>());
+            return Component<Type>(mWorld.component<Type>());
         }
 
         // -=(Undocumented)=-
         template<typename Type, UInt32 Traits = k_Default, typename Dependency = void>
-        Entity Register(CStr ID = flecs::_::symbol_name<Type>())
+        Component<Type> Register(CStr ID = flecs::_::symbol_name<Type>())
         {
-            flecs::entity Actor = mWorld.component<Type>(ID.data());
+            flecs::component<Type> Actor = mWorld.component<Type>(ID.data());
 
             if constexpr (Traits & Trait::k_Sparse)
             {
@@ -188,6 +189,6 @@ namespace Scene
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Handle<k_MaxCountArchetypes> mArchetypes;
-        Scene::Observer              mArchetypesOnDelete;
+        Scene::Observer              mArchetypesObserver;
     };
 }

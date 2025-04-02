@@ -281,6 +281,7 @@ inline namespace Math
         case Easing::InBack:        return InBack(Time);
         case Easing::OutBack:       return OutBack(Time);
         case Easing::InOutBack:     return InOutBack(Time);
+        default:                    return Linear(Time);
         }
     }
 }
