@@ -54,21 +54,22 @@ namespace Example
 
         Scene->Register<TestComponent, Scene::k_Serializable>("TestComponent");
 
+        using MyTag = Scene::Tag<Hash("A")>;
+
         auto MyArchetype = Scene->Spawn<Scene::k_Archetype>();
+        MyArchetype.SetName("Wacho");
         MyArchetype.Attach(TestComponent { "Whatsup!" });
         MyArchetype.Attach(Color(0, 1, 0, 1));
         MyArchetype.Attach(Pivot());
 
         Math::Ease(Easing::InCirc, 1.0f);
-        
-        Writer Writer;
-        Scene->SaveEntity(Writer, MyArchetype);
+        Scene->FetchArchetypes([](Scene::Entity Handle) {
+            Log::Info("{}", Handle.GetName());
+        });
+        Scene->FetchTags<MyTag>([](Scene::Entity Handle) {
+            Log::Info("{}", Handle.GetName());
+        });
 
-        Scene->Fetch<TestComponent>().Destruct();
-
-        Reader Reader(Writer.GetData());
-        auto MyArchetype2 = Scene->LoadEntity(Reader);
-        Log::Info("{}", MyArchetype2.Contains<TestComponent>() ? MyArchetype2.Find<TestComponent>()->NAME : "NULL");
 
         GrandMaster = Scene->Spawn();
         GrandMaster.SetArchetype(MyArchetype);

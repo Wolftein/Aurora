@@ -244,7 +244,7 @@ namespace Scene
     void Service::RegisterDefaultComponentsAndSystems()
     {
         // Observer to keep archetype(s) storage updated.
-        mArchetypesObserver = Observe<>("_Archetypes::OnDelete").with(EcsPrefab).event(EcsOnRemove)
+        mArchetypesObserver = React<>("_Archetypes::OnDelete").with(EcsPrefab).event(EcsOnRemove)
             .each([this](Entity Actor)
             {
                 mArchetypes.Free(Actor.GetID() - k_MinRangeArchetypes);
@@ -260,7 +260,7 @@ namespace Scene
         Register<Matrix4f,   k_Default,      Dirty>();
         Register<Transformf, k_Serializable, Matrix4f>("Transform");
 
-        Observe<>("_Default::UpdateTransformDirty").with<Transformf>().event(EcsOnSet)
+        React<>("_Default::UpdateTransformDirty").with<Transformf>().event(EcsOnSet)
             .each(Entity::ToggleComponentInHierarchy<Dirty, true>);
 
         Execute<const Transformf, ConstPtr<Matrix4f>, Matrix4f>()

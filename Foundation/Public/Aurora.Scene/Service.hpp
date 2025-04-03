@@ -65,6 +65,20 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename Function>
+        void FetchArchetypes(Any<Function> Callback)
+        {
+            mWorld.query_builder<>().with(EcsPrefab).each(Callback);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Tag, typename Function>
+        void FetchTags(Any<Function> Callback)
+        {
+            mWorld.query_builder<>().with<Tag>().each(Callback);
+        }
+
+        // -=(Undocumented)=-
         template<typename Type, UInt32 Traits = k_Default, typename Dependency = void>
         Component<Type> Register(CStr ID = flecs::_::symbol_name<Type>())
         {
@@ -99,14 +113,14 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto Observe(CStr Name)
+        auto React(CStr Name = "")
         {
             return mWorld.template observer<Components...>(Name.data());
         }
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto Query(CStr Name)
+        auto Match(CStr Name = "")
         {
             return mWorld.template query_builder<Components...>(Name.data());
         }
