@@ -37,6 +37,41 @@ namespace Scene
         void OnTick(ConstRef<Time> Time) override;
 
         // -=(Undocumented)=-
+        template<typename Type>
+        void Attach(Any<Type> Component)
+        {
+            if constexpr (std::is_empty_v<Type>)
+            {
+                mWorld.add<Type>();
+            }
+            else
+            {
+                mWorld.set<Type>(Move(Component));
+            }
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        auto Find() const
+        {
+            if constexpr (std::is_const_v<Type>)
+            {
+                return mWorld.get<Type>();
+            }
+            else
+            {
+                return mWorld.get_mut<Type>();
+            }
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void Detach()
+        {
+            mWorld.remove<Type>();
+        }
+
+        // -=(Undocumented)=-
         template<UInt32 Trait = Trait::k_Final>
         Entity Spawn()
         {
@@ -59,21 +94,21 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        Component<Type> Fetch()
+        auto GetComponent()
         {
             return Component<Type>(mWorld.component<Type>());
         }
 
         // -=(Undocumented)=-
         template<typename Function>
-        void FetchArchetypes(Any<Function> Callback)
+        void GetArchetypes(Any<Function> Callback)
         {
             mWorld.query_builder<>().with(EcsPrefab).each(Callback);
         }
 
         // -=(Undocumented)=-
         template<typename Tag, typename Function>
-        void FetchTags(Any<Function> Callback)
+        void GetTags(Any<Function> Callback)
         {
             mWorld.query_builder<>().with<Tag>().each(Callback);
         }

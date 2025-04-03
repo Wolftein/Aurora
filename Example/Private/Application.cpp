@@ -63,10 +63,10 @@ namespace Example
         MyArchetype.Attach(Pivot());
 
         Math::Ease(Easing::InCirc, 1.0f);
-        Scene->FetchArchetypes([](Scene::Entity Handle) {
+        Scene->GetArchetypes([](Scene::Entity Handle) {
             Log::Info("{}", Handle.GetName());
         });
-        Scene->FetchTags<MyTag>([](Scene::Entity Handle) {
+        Scene->GetTags<MyTag>([](Scene::Entity Handle) {
             Log::Info("{}", Handle.GetName());
         });
 
