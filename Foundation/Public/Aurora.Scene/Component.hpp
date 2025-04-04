@@ -122,6 +122,19 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
+        void With()
+        {
+            mHandle.add(EcsWith, mHandle.world().template component<Type>());
+        }
+
+        // -=(Undocumented)=-
+        void With(Component Component)
+        {
+            mHandle.add(EcsWith, Component.GetHandle());
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
         auto Find() const
         {
             if constexpr (std::is_const_v<Type>)
