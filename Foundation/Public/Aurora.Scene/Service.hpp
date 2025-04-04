@@ -66,6 +66,13 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
+        auto Contains() const
+        {
+            return mWorld.has<Type>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
         void Detach()
         {
             mWorld.remove<Type>();
