@@ -120,6 +120,13 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
+    constexpr auto ListEnum()
+    {
+        return magic_enum::enum_values<Type>();
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
     constexpr auto CastEnum(Type Value)
     {
         return static_cast<std::underlying_type_t<Type>>(Value);
