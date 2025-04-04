@@ -373,7 +373,12 @@ inline namespace Math
             const Base Y1 = Core::Max(Lhs.mY1, Rhs.mY1);
             const Base X2 = Core::Min(Lhs.mX2, Rhs.mX2);
             const Base Y2 = Core::Min(Lhs.mY2, Rhs.mY2);
-            return Rect<Base>(X1, Y1, X2, Y2);
+
+            if (X1 < X2 && Y1 < Y2)
+            {
+                return Rect<Base>(X1, Y1, X2, Y2);
+            }
+            return Rect<Base>();
         }
 
         // -=(Undocumented)=-
