@@ -257,8 +257,8 @@ namespace Scene
         Register<Pivot,      k_Inheritable | k_Serializable>("Pivot");
         Register<Color,      k_Inheritable | k_Serializable>("Color");
         Register<Dirty,      k_Toggleable>();
-        Register<Matrix4f,   k_Default,      Dirty>();
-        Register<Transformf, k_Serializable, Matrix4f>("Transform");
+        Register<Matrix4f,   k_Default>().With<Dirty>();
+        Register<Transformf, k_Serializable>("Transform").With<Matrix4f>();
 
         React<>("_Default::UpdateTransformDirty").with<Transformf>().event(EcsOnSet)
             .each(Entity::ToggleComponentInHierarchy<Dirty, true>);

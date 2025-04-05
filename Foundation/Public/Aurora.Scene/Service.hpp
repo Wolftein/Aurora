@@ -121,7 +121,7 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<typename Type, UInt32 Traits = k_Default, typename Dependency = void>
+        template<typename Type, UInt32 Traits = k_Default>
         Component<Type> Register(CStr ID = flecs::_::symbol_name<Type>())
         {
             flecs::component<Type> Actor = mWorld.component<Type>(ID.data());
@@ -145,10 +145,6 @@ namespace Scene
             if constexpr (Traits & Trait::k_Final)
             {
                 Actor.add(flecs::Final);
-            }
-            if constexpr (! std::is_void_v<Dependency>)
-            {
-                Actor.add(flecs::With, mWorld.component<Dependency>());
             }
             return Actor;
         }
