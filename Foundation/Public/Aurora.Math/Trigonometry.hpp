@@ -44,15 +44,15 @@ inline namespace Math
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
-            return cos(Angle);
+            return std::cos(Angle);
         }
         else if constexpr (std::is_base_of_v<Real32, Type>)
         {
-            return cosf(Angle);
+            return std::cosf(Angle);
         }
         else
         {
-            return cosl(Angle);
+            return std::cosl(Angle);
         }
     }
 
@@ -62,15 +62,15 @@ inline namespace Math
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
-            return acos(Angle);
+            return std::acos(Angle);
         }
         else if constexpr (std::is_base_of_v<Real32, Type>)
         {
-            return acosf(Angle);
+            return std::acosf(Angle);
         }
         else
         {
-            return acosl(Angle);
+            return std::acosl(Angle);
         }
     }
 
@@ -80,15 +80,15 @@ inline namespace Math
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
-            return sin(Angle);
+            return std::sin(Angle);
         }
         else if constexpr (std::is_base_of_v<Real32, Type>)
         {
-            return sinf(Angle);
+            return std::sinf(Angle);
         }
         else
         {
-            return sinl(Angle);
+            return std::sinl(Angle);
         }
     }
 
@@ -98,15 +98,15 @@ inline namespace Math
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
-            return asin(Angle);
+            return std::asin(Angle);
         }
         else if constexpr (std::is_base_of_v<Real32, Type>)
         {
-            return asinf(Angle);
+            return std::asinf(Angle);
         }
         else
         {
-            return asinl(Angle);
+            return std::asinl(Angle);
         }
     }
 
@@ -116,15 +116,15 @@ inline namespace Math
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
-            return tan(Angle);
+            return std::tan(Angle);
         }
         else if constexpr (std::is_base_of_v<Real32, Type>)
         {
-            return tanf(Angle);
+            return std::tanf(Angle);
         }
         else
         {
-            return tanl(Angle);
+            return std::tanl(Angle);
         }
     }
 
@@ -134,15 +134,15 @@ inline namespace Math
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
-            return atan(Angle);
+            return std::atan(Angle);
         }
         else if constexpr (std::is_base_of_v<Real32, Type>)
         {
-            return atanf(Angle);
+            return std::atanf(Angle);
         }
         else
         {
-            return atanl(Angle);
+            return std::atanl(Angle);
         }
     }
 
@@ -152,15 +152,15 @@ inline namespace Math
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
-            return sqrt(Number);
+            return std::sqrt(Number);
         }
         else if constexpr (std::is_base_of_v<Real32, Type>)
         {
-            return sqrtf(Number);
+            return std::sqrtf(Number);
         }
         else
         {
-            return sqrtl(Number);
+            return std::sqrtl(Number);
         }
     }
 
@@ -180,15 +180,51 @@ inline namespace Math
     {
         if constexpr (std::is_base_of_v<Real64, Type>)
         {
-            return pow(Base, Exponent);
+            return std::pow(Base, Exponent);
         }
         else if constexpr (std::is_base_of_v<Real32, Type>)
         {
-            return powf(Base, Exponent);
+            return std::powf(Base, Exponent);
         }
         else
         {
-            return powl(Base, Exponent);
+            return std::powl(Base, Exponent);
+        }
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    static constexpr Type Floor(Type Value)
+    {
+        if constexpr (std::is_base_of_v<Real64, Type>)
+        {
+            return std::floor(Value);
+        }
+        else if constexpr (std::is_base_of_v<Real32, Type>)
+        {
+            return std::floorf(Value);
+        }
+        else
+        {
+            return std::floorl(Value);
+        }
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    static constexpr Type Ceil(Type Value)
+    {
+        if constexpr (std::is_base_of_v<Real64, Type>)
+        {
+            return std::ceil(Value);
+        }
+        else if constexpr (std::is_base_of_v<Real32, Type>)
+        {
+            return std::ceilf(Value);
+        }
+        else
+        {
+            return std::ceill(Value);
         }
     }
 

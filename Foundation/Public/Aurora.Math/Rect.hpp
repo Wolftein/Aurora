@@ -367,6 +367,16 @@ inline namespace Math
     public:
 
         // -=(Undocumented)=-
+        static Rect<Base> Round(ConstRef<Rect<Base>> Rectangle)
+        {
+            const Base X1 = Floor(Rectangle.mX1);
+            const Base Y1 = Floor(Rectangle.mY1);
+            const Base X2 = Ceil(Rectangle.mX2);
+            const Base Y2 = Ceil(Rectangle.mY2);
+            return Rect<Base>(X1, Y1, X2, Y2);
+        }
+
+        // -=(Undocumented)=-
         static Rect<Base> Overlap(ConstRef<Rect<Base>> Lhs, ConstRef<Rect<Base>> Rhs)
         {
             const Base X1 = Core::Max(Lhs.mX1, Rhs.mX1);
