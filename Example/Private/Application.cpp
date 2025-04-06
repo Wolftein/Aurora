@@ -49,12 +49,13 @@ namespace Example
 
         const auto Font = Content->Load<Graphic::Font>("Resources://Font/Primary.arfont");
 
+        // Initial test
+        mTexts = NewUniquePtr<Scene::TEcsTextSystem>(* this);
+
         // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
 
         Scene->Register<TestComponent, Scene::k_Serializable>("TestComponent");
-
-        using MyTag = Scene::Tag<Hash("A")>;
 
         auto MyArchetype = Scene->Spawn<Scene::k_Archetype>();
         MyArchetype.SetName("Wacho");
@@ -66,10 +67,11 @@ namespace Example
         Scene->GetArchetypes([](Scene::Entity Handle) {
             Log::Info("{}", Handle.GetName());
         });
-        Scene->GetTags<MyTag>([](Scene::Entity Handle) {
-            Log::Info("{}", Handle.GetName());
-        });
 
+        Scene->Match<>("AllComponents").with<EcsComponent>().each([](Scene::Entity Entity)
+        {
+            Log::Info("Component {}", Entity.GetName());
+        });
 
         GrandMaster = Scene->Spawn();
         GrandMaster.SetArchetype(MyArchetype);
@@ -131,9 +133,6 @@ namespace Example
         // Initialize Camera.
         mCamera.SetOrthographic(GetDevice().GetWidth(), GetDevice().GetHeight(), 0, 1);
         mCamera.Compute();
-
-        // Initial test
-        mTexts = NewUniquePtr<Scene::TEcsTextSystem>(* this);
 
         return true;
     }

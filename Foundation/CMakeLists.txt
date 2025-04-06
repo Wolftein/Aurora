@@ -18,16 +18,17 @@ PROJECT(Aurora_Engine)
 ## Code
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-FILE(GLOB_RECURSE PROJECT_SOURCE "Public/*.cpp" "Private/*.cpp")
+FILE(GLOB_RECURSE PROJECT_SOURCE   "Public/*.cpp" "Private/*.cpp")
 FILE(GLOB_RECURSE PROJECT_RESOURCE "Resources/*")
 
 IF    (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     LIST(FILTER PROJECT_SOURCE EXCLUDE REGEX ".*D3D11.*")
-ENDIF ()
+ENDIF (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
+## TODO: Implement ASIO in EMSCRIPTEN
 IF    (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-    LIST(FILTER PROJECT_SOURCE EXCLUDE REGEX ".*Asio.*") ## ASIO is not currently supported yet in Emscripten
-ENDIF ()
+    LIST(FILTER PROJECT_SOURCE EXCLUDE REGEX ".*Asio.*")
+ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Includes
@@ -109,15 +110,17 @@ LIST(APPEND PROJECT_DEPENDENCIES "ASIO")
 SET(FLECS_STATIC  ON  CACHE BOOL "" FORCE)
 SET(FLECS_SHARED  OFF CACHE BOOL "" FORCE)
 
-ADD_DEFINITIONS(-DFLECS_CUSTOM_BUILD)
-ADD_DEFINITIONS(-DFLECS_CPP)
-ADD_DEFINITIONS(-DFLECS_CPP_NO_ENUM_REFLECTION)
-ADD_DEFINITIONS(-DFLECS_DOC)
-ADD_DEFINITIONS(-DFLECS_LOG)
-ADD_DEFINITIONS(-DFLECS_META)
-ADD_DEFINITIONS(-DFLECS_OS_API_IMPL)
-ADD_DEFINITIONS(-DFLECS_PIPELINE)
-ADD_DEFINITIONS(-DFLECS_SYSTEM)
+LIST(APPEND PROJECT_DEFINES
+        FLECS_CUSTOM_BUILD
+        FLECS_CPP
+        FLECS_CPP_NO_AUTO_REGISTRATION
+        FLECS_OS_API_IMPL
+        FLECS_PIPELINE
+        FLECS_SYSTEM)
+
+IF      (CMAKE_BUILD_TYPE MATCHES DEBUG)
+    LIST(APPEND PROJECT_DEFINES FLECS_HTTP FLECS_REST FLECS_LOG)
+ENDIF   (CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 FetchContent_Declare(External_Flecs
         GIT_REPOSITORY https://github.com/SanderMertens/flecs)
@@ -143,13 +146,13 @@ LIST(APPEND PROJECT_DEPENDENCIES "Ankerl")
 ## Dependency (BMP / PNG) -> TODO: Remove
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-ADD_DEFINITIONS(-DSTBI_NO_PSD)
-ADD_DEFINITIONS(-DSTBI_NO_TGA)
-ADD_DEFINITIONS(-DSTBI_NO_GIF)
-ADD_DEFINITIONS(-DSTBI_NO_HDR)
-ADD_DEFINITIONS(-DSTBI_NO_PIC)
-ADD_DEFINITIONS(-DSTBI_NO_PNM)
-ADD_DEFINITIONS(-DSTBI_NO_STDIO)
+ADD_COMPILE_DEFINITIONS(STBI_NO_PSD)
+ADD_COMPILE_DEFINITIONS(STBI_NO_TGA)
+ADD_COMPILE_DEFINITIONS(STBI_NO_GIF)
+ADD_COMPILE_DEFINITIONS(STBI_NO_HDR)
+ADD_COMPILE_DEFINITIONS(STBI_NO_PIC)
+ADD_COMPILE_DEFINITIONS(STBI_NO_PNM)
+ADD_COMPILE_DEFINITIONS(STBI_NO_STDIO)
 
 FetchContent_Declare(External_STB
         GIT_REPOSITORY https://github.com/nothings/stb)
@@ -233,18 +236,24 @@ LIST(APPEND PROJECT_DEPENDENCIES "Neargye")
 ## Configuration
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MP3)        # .mp3
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_WAV)        # .wav
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_STB)        # .png, .bmp, .tga, .jpg
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_EFFECT)     # .effect, .shader
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_ARTERY)     # .arfont
-ADD_DEFINITIONS(-DAE_CONTENT_LOADER_MODEL)      # .gltf
+ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_MP3)        # .mp3
+ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_WAV)        # .wav
+ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_STB)        # .png, .bmp, .tga, .jpg
+ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_EFFECT)     # .effect, .shader
+ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_ARTERY)     # .arfont
+ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_MODEL)      # .gltf
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Library
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${PROJECT_SOURCE})
+
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+## Definitions
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC ${PROJECT_DEFINES})
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Libraries

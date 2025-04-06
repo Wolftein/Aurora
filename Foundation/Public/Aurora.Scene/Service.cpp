@@ -250,28 +250,29 @@ namespace Scene
                 mArchetypes.Free(Actor.GetID() - k_MinRangeArchetypes);
             });
 
-        // TODO: REMOVE_ALL_THIS
-        // Observes changes to local transforms and marks affected hierarchies as dirty.
-        using Dirty = Tag<Hash("Dirty")>;
+        // Register default component(s).
+        using TransformDirty = Tag<Hash("Worldspace_Dirty")>;
+        Register<TransformDirty>("Worldspace_Dirty");
 
+        Register<Factory,    k_Final>("Serializer");
         Register<Pivot,      k_Inheritable | k_Serializable>("Pivot");
         Register<Color,      k_Inheritable | k_Serializable>("Color");
-        Register<Dirty,      k_Toggleable>();
-        Register<Matrix4f,   k_Default>().With<Dirty>();
-        Register<Transformf, k_Serializable>("Transform").With<Matrix4f>();
+        Register<Matrix4f,   k_Default>("Worldspace");
+        Register<Transformf, k_Serializable>("Localspace").With<TransformDirty>();
 
+        // Register default system(s).
         React<>("_Default::UpdateTransformDirty").with<Transformf>().event(EcsOnSet)
-            .each(Entity::ToggleComponentInHierarchy<Dirty, true>);
+                .each(Entity::ToggleComponentInHierarchy<TransformDirty, true>);
 
-        Execute<const Transformf, ConstPtr<Matrix4f>, Matrix4f>()
-            .with<Dirty>()
-            .term_at(1)
-                .cascade()
-            .each([](Entity Actor, ConstRef<Transformf> Local, ConstPtr<Matrix4f> Parent, Ref<Matrix4f> World)
-            {
-                World = Parent ? (* Parent) * Local.Compute() : Local.Compute();
-                Actor.Notify<Matrix4f>();
-                Actor.Disable<Dirty>();
-            });
+        Execute<const Transformf, ConstPtr<Matrix4f>>()
+                .term_at(1)
+                    .cascade()
+                .with<TransformDirty>()
+                .write<Matrix4f>()
+                .each([](Entity Actor, ConstRef<Transformf> Local, ConstPtr<Matrix4f> Parent)
+                      {
+                          Actor.Attach<Matrix4f>(Parent ? (* Parent) * Local.Compute() : Local.Compute());
+                          Actor.Disable<TransformDirty>();
+                      });
     }
 }
