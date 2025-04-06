@@ -252,7 +252,7 @@ namespace Scene
 
         // Register default component(s).
         using TransformDirty = Tag<Hash("Worldspace_Dirty")>;
-        Register<TransformDirty>("Worldspace_Dirty");
+        Register<TransformDirty, k_Toggleable>("Worldspace_Dirty");
 
         Register<Factory,    k_Final>("Serializer");
         Register<Pivot,      k_Inheritable | k_Serializable>("Pivot");
