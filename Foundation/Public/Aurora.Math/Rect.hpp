@@ -213,7 +213,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Type>
-        Rect<Base> operator+(Vector2<Type> Vector) const
+        Rect<Base> operator+(ConstRef<Vector2<Type>> Vector) const
         {
             return Rect<Base>(mX1 + Vector.GetX(), mY1 + Vector.GetY(), mX2 + Vector.GetX(), mY2 + Vector.GetY());
         }
@@ -232,7 +232,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Type>
-        Rect<Base> operator-(Vector2<Type> Vector) const
+        Rect<Base> operator-(ConstRef<Vector2<Type>> Vector) const
         {
             return Rect<Base>(mX1 - Vector.GetX(), mY1 - Vector.GetY(), mX2 - Vector.GetX(), mY2 - Vector.GetY());
         }
@@ -245,7 +245,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Type>
-        Rect<Base> operator*(Vector2<Type> Vector) const
+        Rect<Base> operator*(ConstRef<Vector2<Type>> Vector) const
         {
             return Rect<Base>(mX1 * Vector.GetX(), mY1 * Vector.GetY(), mX2 * Vector.GetX(), mY2 * Vector.GetY());
         }
@@ -254,6 +254,13 @@ inline namespace Math
         Rect<Base> operator/(Base Scalar) const
         {
             return Rect<Base>(mX1 / Scalar, mY1 / Scalar, mX2 / Scalar, mY2 / Scalar);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        Rect<Base> operator/(ConstRef<Vector2<Type>> Vector) const
+        {
+            return Rect<Base>(mX1 / Vector.GetX(), mY1 / Vector.GetY(), mX2 / Vector.GetX(), mY2 / Vector.GetY());
         }
 
         // -=(Undocumented)=-
@@ -310,7 +317,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Type>
-        Ref<Rect<Base>> operator-=(Vector2<Type> Vector)
+        Ref<Rect<Base>> operator-=(ConstRef<Vector2<Type>> Vector)
         {
             mX1 -= Vector.GetX();
             mY1 -= Vector.GetY();
@@ -333,7 +340,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Type>
-        Ref<Rect<Base>> operator*=(Vector2<Type> Vector)
+        Ref<Rect<Base>> operator*=(ConstRef<Vector2<Type>> Vector)
         {
             mX1 *= Vector.GetX();
             mY1 *= Vector.GetY();
@@ -351,6 +358,18 @@ inline namespace Math
             mX2 /= Scalar;
             mY2 /= Scalar;
             
+            return (* this);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        Ref<Rect<Base>> operator/=(ConstRef<Vector2<Type>> Vector)
+        {
+            mX1 /= Vector.GetX();
+            mY1 /= Vector.GetY();
+            mX2 /= Vector.GetX();
+            mY2 /= Vector.GetY();
+
             return (* this);
         }
 
