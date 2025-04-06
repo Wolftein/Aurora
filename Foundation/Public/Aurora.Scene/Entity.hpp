@@ -365,17 +365,31 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Component, Bool Enable>
-        static void ToggleComponentInHierarchy(Scene::Entity Entity)
+        static void ToggleComponent(Scene::Entity Actor)
         {
             if constexpr (Enable)
             {
-                Entity.template Enable<Component>();
+                Actor.template Enable<Component>();
             }
             else
             {
-                Entity.template Disable<Component>();
+                Actor.template Disable<Component>();
             }
-            Entity.Children(& ToggleComponentInHierarchy<Component, Enable>);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Component, Bool Enable>
+        static void ToggleComponentInHierarchy(Scene::Entity Actor)
+        {
+            if constexpr (Enable)
+            {
+                Actor.template Enable<Component>();
+            }
+            else
+            {
+                Actor.template Disable<Component>();
+            }
+            Actor.Children(& ToggleComponentInHierarchy<Component, Enable>);
         }
 
     private:
