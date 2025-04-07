@@ -30,7 +30,7 @@ namespace Scene
     class TEcsTextSystem final
     {
 
-        using Query = Query<
+        using Query = Scene::Query<
                 const TEcsText,
                 const Matrix4f,
                 ConstPtr<Color>,
@@ -55,8 +55,9 @@ namespace Scene
             ConstSPtr<Scene::Service> Scene = Context.GetSubsystem<Scene::Service>();
             Scene->Register<TEcsText>();
             Scene->Register<TEcsSprite>();
-            mQuery = Scene->Match<const TEcsText, const Matrix4f, ConstPtr<Color>, ConstPtr<Pivot>>("QueryText").build();
-            mQuery2 = Scene->Match<const TEcsSprite, const Matrix4f, ConstPtr<Color>, ConstPtr<Pivot>>("QuerySprite").build();
+
+            mQuery = Scene->Match<Query>("QueryText").build();
+            mQuery2 = Scene->Match<Query2>("QuerySprite").build();
         }
 
         // -=(Undocumented)=-

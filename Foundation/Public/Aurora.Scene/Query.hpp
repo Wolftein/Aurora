@@ -27,6 +27,9 @@ namespace Scene
     public:
 
         // -=(Undocumented)=-
+        using Types  = Tuple<Components...>;
+
+        // -=(Undocumented)=-
         using Handle = flecs::query<Components...>;
 
     public:
@@ -35,7 +38,8 @@ namespace Scene
         Query() = default;
 
         // -=(Undocumented)=-
-        Query(Handle Handle)
+        template<typename Type>
+        Query(Type Handle)
             : mHandle { Handle }
         {
         }

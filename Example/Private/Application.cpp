@@ -68,11 +68,6 @@ namespace Example
             Log::Info("{}", Handle.GetName());
         });
 
-        Scene->Match<>("AllComponents").with<EcsComponent>().each([](Scene::Entity Entity)
-        {
-            Log::Info("Component {}", Entity.GetName());
-        });
-
         GrandMaster = Scene->Spawn();
         GrandMaster.SetArchetype(MyArchetype);
         GrandMaster.SetName("Grand Master");
