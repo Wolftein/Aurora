@@ -244,7 +244,7 @@ namespace Scene
     void Service::RegisterDefaultComponentsAndSystems()
     {
         // Observer to keep archetype(s) storage updated.
-        mArchetypesObserver = React<>("_Archetypes::OnDelete").with(EcsPrefab).event(EcsOnRemove)
+        React<>("_Archetypes::OnDelete").with(EcsPrefab).event(EcsOnRemove)
             .each([this](Entity Actor)
             {
                 mArchetypes.Free(Actor.GetID() - k_MinRangeArchetypes);
