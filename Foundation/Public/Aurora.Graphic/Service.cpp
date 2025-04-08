@@ -196,6 +196,7 @@ namespace Graphic
         if (ID)
         {
             mFrames[k_Default].Queue.WriteEnum(Command::CreatePass);
+            mFrames[k_Default].Queue.WriteUInt16(ID);
             mFrames[k_Default].Queue.WriteBlock(Colors);
             mFrames[k_Default].Queue.WriteBlock(Resolves);
             mFrames[k_Default].Queue.Write(Auxiliary);
