@@ -130,9 +130,9 @@ namespace Content
         const TOMLSection Textures = Program.GetSection("Textures");
 
         Array<Graphic::TextureSlot, Graphic::k_MaxSlots> Slots { };
-        for (const Graphic::TextureSlot Slot : magic_enum::enum_values<Graphic::TextureSlot>())
+        for (const Graphic::TextureSlot Slot : ListEnum<Graphic::TextureSlot>())
         {
-            if (const SInt32 ID = Textures.GetNumber(magic_enum::enum_name(Slot), -1); ID != -1)
+            if (const SInt32 ID = Textures.GetNumber(NameEnum(Slot), -1); ID != -1)
             {
                 Slots[ID] = Slot;
             }

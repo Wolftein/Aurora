@@ -1,0 +1,9 @@
+Kind = Additive
+
+[Textures]
+
+Diffuse = { Path = "Resources://Texture/8165.png", Sampler = "Default" }
+
+[Samplers]
+
+Default = { Edge_U = "Repeat", Edge_V = "Repeat", Filter = "Nearest" }

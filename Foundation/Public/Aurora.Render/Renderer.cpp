@@ -49,7 +49,7 @@ namespace Graphic
         const Real32 NormalX       = -UnitY * HalfThickness;
         const Real32 NormalY       =  UnitX * HalfThickness;
 
-        Ref<Command> Command = Create(Type::Primitive, GetUniqueKey(Order::Additive, Type::Primitive, Depth, 0));
+        Ref<Command> Command = Create(Type::Primitive, GetUniqueKey(Material::Kind::Opaque, Type::Primitive, Depth, 0));
         Command.Material = nullptr;
         Command.Tint     = Tint;
         Command.Edges[0] = { Origin.GetX() + NormalX, Origin.GetY() + NormalY, Depth };
@@ -79,7 +79,7 @@ namespace Graphic
 
     void Renderer::DrawQuad(ConstRef<Rectf> Origin, Real32 Depth, Color Tint)
     {
-        Ref<Command> Command  = Create(Type::Primitive, GetUniqueKey(Order::Additive, Type::Primitive, Depth, 0));
+        Ref<Command> Command  = Create(Type::Primitive, GetUniqueKey(Material::Kind::Opaque, Type::Primitive, Depth, 0));
         Command.Material = nullptr;
         Command.Tint     = Tint;
         Command.Edges[0] = { Origin.GetLeft(),  Origin.GetBottom(), Depth };
@@ -93,7 +93,7 @@ namespace Graphic
 
     void Renderer::DrawSprite(ConstRef<Rectf> Origin, Real32 Depth, ConstRef<Rectf> UV, Color Tint, ConstSPtr<Material> Material)
     {
-        Ref<Command> Command = Create(Type::Sprite, GetUniqueKey(Order::Opaque, Type::Sprite, Depth, Material->GetID()));
+        Ref<Command> Command = Create(Type::Sprite, GetUniqueKey(Material->GetKind(), Type::Sprite, Depth, Material->GetID()));
         Command.Material = Material.get();
         Command.Tint     = Tint;
         Command.Edges[0] = { Origin.GetLeft(),  Origin.GetBottom(), Depth };
@@ -108,7 +108,7 @@ namespace Graphic
 
     void Renderer::DrawSprite(ConstRef<Matrix4f> Transform, ConstRef<Rectf> Origin, Real32 Depth, ConstRef<Rectf> UV, Color Tint, ConstSPtr<Material> Material)
     {
-        Ref<Command> Command = Create(Type::Sprite, GetUniqueKey(Order::Opaque, Type::Sprite, Depth, Material->GetID()));
+        Ref<Command> Command = Create(Type::Sprite, GetUniqueKey(Material->GetKind(), Type::Sprite, Depth, Material->GetID()));
         Command.Material = Material.get();
         Command.Tint     = Tint;
         Command.Edges[0] = Transform * Vector3f(Origin.GetLeft(),  Origin.GetBottom(), 0.0f);
@@ -150,7 +150,7 @@ namespace Graphic
 
                     // TODO: Create a command for all font, not each letter
                     // TODO: Calculate Transformation over the origin, not individual
-                    Ref<Command> Command = Create(Type::Font, GetUniqueKey(Order::Opaque, Type::Font, Depth, ID));
+                    Ref<Command> Command = Create(Type::Font, GetUniqueKey(Font->GetMaterial()->GetKind(), Type::Font, Depth, ID));
                     Command.Material = Font->GetMaterial().get();
                     Command.Tint     = Tint;
                     Command.Edges[0] = Vector3f(Boundaries.GetLeft(),  Boundaries.GetBottom(), Depth);
@@ -198,7 +198,7 @@ namespace Graphic
 
                     // TODO: Create a command for all font, not each letter
                     // TODO: Calculate Transformation over the origin, not individual
-                    Ref<Command> Command = Create(Type::Font, GetUniqueKey(Order::Opaque, Type::Font, Depth, ID));
+                    Ref<Command> Command = Create(Type::Font, GetUniqueKey(Font->GetMaterial()->GetKind(), Type::Font, Depth, ID));
                     Command.Material = Font->GetMaterial().get();
                     Command.Tint     = Tint;
                     Command.Edges[0] = Transform * Vector3f(Boundaries.GetLeft(),  Boundaries.GetBottom(), Depth);
@@ -262,7 +262,8 @@ namespace Graphic
         mHeap->Commit(Copy);
 
         // Flush all batches to the GPU
-        mGraphics->Submit(mEncoder);
+        mGraphics->Submit(mEncoder.GetSubmissions());
+        mEncoder.Clear();
 
         // Reset all stack(s) back to original states
         mCommandsPtr.clear();
@@ -282,7 +283,8 @@ namespace Graphic
             mHeap->Commit(true);
 
             // Flush all batches to the GPU
-            mGraphics->Submit(mEncoder);
+            mGraphics->Submit(mEncoder.GetSubmissions());
+            mEncoder.Clear();
 
             // Reallocate scopes
             mHeap->Reallocate(mParameters[CastEnum(Scope::Global)]);
@@ -335,7 +337,8 @@ namespace Graphic
             mHeap->Commit(true);
 
             // Flush all batches to the GPU
-            mGraphics->Submit(mEncoder);
+            mGraphics->Submit(mEncoder.GetSubmissions());
+            mEncoder.Clear();
 
             // Reallocate scopes
             mHeap->Reallocate(mParameters[CastEnum(Scope::Global)]);

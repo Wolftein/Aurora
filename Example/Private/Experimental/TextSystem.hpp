@@ -61,9 +61,9 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        void Draw(Ref<Graphic::Encoder> Encoder, Ref<Graphic::Camera> Camera)
+        void Draw(Ref<Graphic::Camera> Camera)
         {
-            mRenderer->SetGlobalParameters(CastSpan(Camera.GetWorld()));
+            mRenderer->SetGlobalParameters(CastSpan(Camera.GetViewProjection()));
             mRenderer->SetPipeline(Graphic::Renderer::Type::Sprite, mPipeline2);
 
             mRenderer->DrawLine({0, 0}, {100, 100}, 0, Color::k_Violet, 1.0f);

@@ -137,7 +137,8 @@ namespace Graphic
         constexpr Sampler k_DefaultSampler = Sampler(TextureEdge::Repeat, TextureEdge::Repeat, TextureFilter::Bilinear);
 
         mMaterial = NewPtr<Material>(Content::Uri::Merge(GetKey(), "Material"));
-        mMaterial->SetOwnership(true);
+        mMaterial->SetExclusive(true);
+        mMaterial->SetKind(Material::Kind::Normal);
         mMaterial->SetTexture(TextureSlot::Diffuse, Atlas);
         mMaterial->SetSampler(TextureSlot::Diffuse, k_DefaultSampler);
         mMaterial->SetParameter(0, Vector3f(Atlas->GetWidth(), Atlas->GetHeight(), mMetrics.Distance));

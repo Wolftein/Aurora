@@ -109,15 +109,7 @@ namespace Example
 
         MyCacheLocalscape2 = Random.Link<Transformf>();
 
-        ConstSPtr<Graphic::Material> Material = Graphic::Material::GetFactory().GetOrCreate(
-                Content::Uri(Format("Memory://Material/{}", 1)), true);
-        ConstSPtr<Graphic::Texture> Texture = Content->Load<Graphic::Texture>(
-                Content::Uri(Format("Resources://Texture/{}.png", 8165)));
-        const Graphic::Sampler Sampler(
-                Graphic::TextureEdge::Repeat, Graphic::TextureEdge::Repeat, Graphic::TextureFilter::Nearest);
-        Material->SetTexture(Graphic::TextureSlot::Diffuse, Texture);
-        Material->SetSampler(Graphic::TextureSlot::Diffuse, Sampler);
-        Content->Process(Material, true);
+        ConstSPtr<Graphic::Material> Material = Content->Load<Graphic::Material>("Resources://Material/Test.material");
 
         MySprite = Scene->Spawn();
         MySprite.Attach(Transformf(Vector3f(633, 333, 0.7f), Vector3f(0.5), Quaternionf()));
@@ -142,12 +134,7 @@ namespace Example
         Rectf Viewport(0, 0, GetDevice().GetWidth(), GetDevice().GetHeight());
         Graphics->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, Color(0, 0, 0, 0), 1, 0);
         {
-            static Graphic::Encoder Encoder;
-            {
-                Encoder.Clear();
-                mTexts->Draw(Encoder, mCamera);
-            }
-            Graphics->Submit(Encoder, true);
+            mTexts->Draw(mCamera);
         }
         Graphics->Commit(Graphic::k_Default, false);
         Graphics->Flush();
@@ -198,7 +185,7 @@ int main([[maybe_unused]] int Argc, [[maybe_unused]] Ptr<Char> Argv[])
     Properties.SetWindowTitle("Aurora Example");
     Properties.SetWindowWidth(1920);
     Properties.SetWindowHeight(1024);
-    Properties.SetWindowSamples(1);
+    Properties.SetWindowSamples(4);
     Properties.SetWindowFullscreen(false);
     Properties.SetWindowBorderless(false);
     Properties.SetVideoDriver("D3D11");

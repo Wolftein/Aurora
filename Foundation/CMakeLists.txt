@@ -242,6 +242,7 @@ ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_STB)        # .png, .bmp, .tga, .jpg
 ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_EFFECT)     # .effect, .shader
 ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_ARTERY)     # .arfont
 ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_MODEL)      # .gltf
+ADD_COMPILE_DEFINITIONS(AE_CONTENT_LOADER_MATERIAL)   # .material
 
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Library

@@ -14,6 +14,7 @@
 
 #include "Heap.hpp"
 #include "Aurora.Graphic/Camera.hpp"
+#include "Aurora.Graphic/Encoder.hpp"
 #include "Aurora.Graphic/Font.hpp"
 #include "Aurora.Content/Service.hpp"
 
@@ -45,22 +46,6 @@ namespace Graphic
 
             // -=(Undocumented)=-
             Sprite,
-        };
-
-        // -=(Undocumented)=-
-        enum class Order : UInt8
-        {
-            // -=(Undocumented)=-
-            Subtractive,
-
-            // -=(Undocumented)=-
-            Additive,
-
-            // -=(Undocumented)=-
-            Normal,
-
-            // -=(Undocumented)=-
-            Opaque,
         };
 
         // -=(Undocumented)=-
@@ -177,11 +162,11 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        UInt64 GetUniqueKey(Order Order, Type Type, Real32 Depth, Object Material)
+        UInt64 GetUniqueKey(Material::Kind Order, Type Type, Real32 Depth, Object Material)
         {
             Object Pipeline = mPipelines[CastEnum(Type)]->GetID();
 
-            if (Order == Order::Opaque)
+            if (Order == Material::Kind::Opaque)
             {
                 const UInt32 DepthBits = std::bit_cast<UInt32>(1.0f + Depth);
 

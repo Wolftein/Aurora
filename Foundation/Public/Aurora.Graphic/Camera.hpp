@@ -39,51 +39,57 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        ConstRef<Matrix4f> GetScene() const
+        ConstRef<Matrix4f> GetView() const
         {
-            return mScene;
+            return mView;
         }
 
         // -=(Undocumented)=-
-        ConstRef<Matrix4f> GetWorld() const
+        ConstRef<Matrix4f> GetViewProjection() const
         {
-            return mWorld;
+            return mViewProjection;
+        }
+
+        // -=(Undocumented)=-
+        ConstRef<Matrix4f> GetViewProjectionInverse() const
+        {
+            return mViewProjectionInverse;
         }
 
         // -=(Undocumented)=-
         Vector3f GetRight() const
         {
-            return mScene.GetRight();
+            return mView.GetRight();
         }
 
         // -=(Undocumented)=-
         Vector3f GetLeft() const
         {
-            return mScene.GetLeft();
+            return mView.GetLeft();
         }
 
         // -=(Undocumented)=-
         Vector3f GetUp() const
         {
-            return mScene.GetUp();
+            return mView.GetUp();
         }
 
         // -=(Undocumented)=-
         Vector3f GetDown() const
         {
-            return mScene.GetDown();
+            return mView.GetDown();
         }
 
         // -=(Undocumented)=-
         Vector3f GetForward() const
         {
-            return mScene.GetForward();
+            return mView.GetForward();
         }
 
         // -=(Undocumented)=-
         Vector3f GetBackward() const
         {
-            return mScene.GetBackward();
+            return mView.GetBackward();
         }
 
         // -=(Undocumented)=-
@@ -109,207 +115,207 @@ namespace Graphic
         // -=(Undocumented)=-
         void SetLook(ConstRef<Vector3f> Eye, ConstRef<Vector3f> Focus, ConstRef<Vector3f> Up)
         {
-            mScene = Matrix4f::CreateLook(Eye, Focus, Up);
+            mView = Matrix4f::CreateLook(Eye, Focus, Up);
             mDirty = SetBit(0u, k_DirtyBitProjection);
         }
 
         // -=(Undocumented)=-
         void SetPosition(ConstRef<Vector3f> Position)
         {
-            mTransformation.SetPosition(Position);
+            mTransform.SetPosition(Position);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetPosition(ConstRef<Vector2f> Position)
         {
-            mTransformation.SetPosition(Position);
+            mTransform.SetPosition(Position);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetPosition(Real32 X, Real32 Y, Real32 Z)
         {
-            mTransformation.SetPosition(Vector3f(X, Y, Z));
+            mTransform.SetPosition(Vector3f(X, Y, Z));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetPosition(Real32 X, Real32 Y)
         {
-            mTransformation.SetPosition(Vector2f(X, Y));
+            mTransform.SetPosition(Vector2f(X, Y));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         ConstRef<Vector3f> GetPosition() const
         {
-            return mTransformation.GetPosition();
+            return mTransform.GetPosition();
         }
 
         // -=(Undocumented)=-
         void SetScale(ConstRef<Vector3f> Scale)
         {
-            mTransformation.SetScale(Scale);
+            mTransform.SetScale(Scale);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetScale(ConstRef<Vector2f> Scale)
         {
-            mTransformation.SetScale(Scale);
+            mTransform.SetScale(Scale);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetScale(Real32 X, Real32 Y, Real32 Z)
         {
-            mTransformation.SetScale(Vector3f(X, Y, Z));
+            mTransform.SetScale(Vector3f(X, Y, Z));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetScale(Real32 X, Real32 Y)
         {
-            mTransformation.SetScale(Vector2f(X, Y));
+            mTransform.SetScale(Vector2f(X, Y));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         ConstRef<Vector3f> GetScale() const
         {
-            return mTransformation.GetScale();
+            return mTransform.GetScale();
         }
 
         // -=(Undocumented)=-
         void SetRotation(Real32 Angle, ConstRef<Vector3f> Axis)
         {
-            mTransformation.SetRotation(Quaternionf::FromAngles(Angle, Axis));
+            mTransform.SetRotation(Quaternionf::FromAngles(Angle, Axis));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetRotation(Real32 Angle, ConstRef<Vector2f> Axis)
         {
-            mTransformation.SetRotation(Quaternionf::FromAngles(Angle, Vector3f(Axis.GetX(), Axis.GetY(), 0)));
+            mTransform.SetRotation(Quaternionf::FromAngles(Angle, Vector3f(Axis.GetX(), Axis.GetY(), 0)));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetRotation(ConstRef<Vector3f> Angles)
         {
-            mTransformation.SetRotation(Quaternionf::FromEulerAngles(Angles));
+            mTransform.SetRotation(Quaternionf::FromEulerAngles(Angles));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetRotation(Real32 Pitch, Real32 Yaw, Real32 Roll)
         {
-            mTransformation.SetRotation(Quaternionf::FromEulerAngles(Pitch, Yaw, Roll));
+            mTransform.SetRotation(Quaternionf::FromEulerAngles(Pitch, Yaw, Roll));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetRotation(ConstRef<Vector3f> Direction, ConstRef<Vector3f> Up)
         {
-            mTransformation.SetRotation(Quaternionf::FromDirection(Direction, Up));
+            mTransform.SetRotation(Quaternionf::FromDirection(Direction, Up));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void SetRotation(ConstRef<Vector3f> Eye, ConstRef<Vector3f> Focus, ConstRef<Vector3f> Up)
         {
-            mTransformation.SetRotation(Quaternionf::FromDirection(Focus - Eye, Up));
+            mTransform.SetRotation(Quaternionf::FromDirection(Focus - Eye, Up));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         ConstRef<Quaternionf> GetRotation() const
         {
-            return mTransformation.GetRotation();
+            return mTransform.GetRotation();
         }
 
         // -=(Undocumented)=-
         void Translate(ConstRef<Vector3f> Translation)
         {
-            mTransformation.Translate(Translation);
+            mTransform.Translate(Translation);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Translate(ConstRef<Vector2f> Translation)
         {
-            mTransformation.Translate(Translation);
+            mTransform.Translate(Translation);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Translate(Real32 X, Real32 Y, Real32 Z)
         {
-            mTransformation.Translate(Vector3f(X, Y, Z));
+            mTransform.Translate(Vector3f(X, Y, Z));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Translate(Real32 X, Real32 Y)
         {
-            mTransformation.Translate(Vector2f(X, Y));
+            mTransform.Translate(Vector2f(X, Y));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Scale(ConstRef<Vector3f> Scale)
         {
-            mTransformation.Scale(Scale);
+            mTransform.Scale(Scale);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Scale(ConstRef<Vector2f> Scale)
         {
-            mTransformation.Scale(Scale);
+            mTransform.Scale(Scale);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Scale(Real32 X, Real32 Y, Real32 Z)
         {
-            mTransformation.Scale(Vector3f(X, Y, Z));
+            mTransform.Scale(Vector3f(X, Y, Z));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Scale(Real32 X, Real32 Y)
         {
-            mTransformation.Scale(Vector2f(X, Y));
+            mTransform.Scale(Vector2f(X, Y));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Rotate(Real32 Angle, ConstRef<Vector3f> Axis)
         {
-            mTransformation.Rotate(Angle, Axis);
+            mTransform.Rotate(Angle, Axis);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Rotate(Real32 Angle, ConstRef<Vector2f> Axis)
         {
-            mTransformation.Rotate(Angle, Vector3f(Axis.GetX(), Axis.GetY(), 0));
+            mTransform.Rotate(Angle, Vector3f(Axis.GetX(), Axis.GetY(), 0));
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Rotate(ConstRef<Vector3f> Angles)
         {
-            mTransformation.Rotate(Angles);
+            mTransform.Rotate(Angles);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
         // -=(Undocumented)=-
         void Rotate(ConstRef<Vector2f> Angles)
         {
-            mTransformation.Rotate(Angles);
+            mTransform.Rotate(Angles);
             mDirty = SetBit(mDirty, k_DirtyBitTransformation);
         }
 
@@ -337,9 +343,9 @@ namespace Graphic
 
         UInt32     mDirty;
         Matrix4f   mProjection;
-        Matrix4f   mScene;
-        Matrix4f   mWorld;
-        Matrix4f   mInverse;
-        Transformf mTransformation;
+        Matrix4f   mView;
+        Matrix4f   mViewProjection;
+        Matrix4f   mViewProjectionInverse;
+        Transformf mTransform;
     };
 }

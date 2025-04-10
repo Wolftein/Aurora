@@ -25,7 +25,8 @@ namespace Graphic
     Material::Material(Any<Content::Uri> Key)
         : AbstractResource(Move(Key)),
           mID        { 0 },
-          mOwnership { false }
+          mKind      { Kind::Opaque },
+          mExclusive { false }
     {
     }
 
@@ -38,7 +39,7 @@ namespace Graphic
 
         mID = Context.GetSubsystem<Service>()->CreateMaterial();
 
-        if (mOwnership)
+        if (mExclusive)
         {
             for (ConstSPtr<Texture> Texture : mTextures)
             {
@@ -57,7 +58,7 @@ namespace Graphic
 
     void Material::OnDelete(Ref<Subsystem::Context> Context)
     {
-        if (mOwnership)
+        if (mExclusive)
         {
             for (ConstSPtr<Texture> Texture : mTextures)
             {

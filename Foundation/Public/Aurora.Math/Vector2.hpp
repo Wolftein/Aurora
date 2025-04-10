@@ -345,6 +345,18 @@ inline namespace Math
             return (Start * Cosine(Theta)) + (Relative * Sine(Theta));
         }
 
+        // -=(Undocumented)=-
+        static Vector2<Base> Floor(ConstRef<Vector2<Base>> Vector)
+        {
+            return Vector2<Base>(Math::Floor(Vector.mX), Math::Floor(Vector.mY));
+        }
+
+        // -=(Undocumented)=-
+        static Vector2<Base> Ceil(ConstRef<Vector2<Base>> Vector)
+        {
+            return Vector2<Base>(Math::Ceil(Vector.mX), Math::Ceil(Vector.mY));
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

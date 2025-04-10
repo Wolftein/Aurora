@@ -66,8 +66,8 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Object                         mID;
-        Array<Data, k_MaxStages>       mShaders;    // TODO: Sparse
-        Array<TextureSlot, k_MaxSlots> mSlots;      // TODO: Sparse
+        Array<Data, k_MaxStages>       mShaders;
+        Array<TextureSlot, k_MaxSlots> mSlots;
         Descriptor                     mProperties;
     };
 }

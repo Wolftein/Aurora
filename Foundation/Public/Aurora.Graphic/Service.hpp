@@ -13,7 +13,6 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Driver.hpp"
-#include "Encoder.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -99,7 +98,7 @@ namespace Graphic
         void Prepare(Object ID, ConstRef<Rectf> Viewport, Clear Target, Color Tint, Real32 Depth, UInt8 Stencil);
 
         // -=(Undocumented)=-
-        void Submit(Ref<Encoder> Encoder, Bool Copy = true, Bool Clear = true);
+        void Submit(CPtr<const Submission> Submissions, Bool Copy = true);
 
         // -=(Undocumented)=-
         void Commit(Object ID, Bool Synchronised);
@@ -140,30 +139,23 @@ namespace Graphic
         // -=(Undocumented)=-
         void OnExecute(Command Type, Ref<Reader> Reader);
 
-        // -=(Undocumented)=-
-        struct Frame
-        {
-            // -=(Undocumented)=-
-            Writer Queue;
-        };
-
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        UPtr<Driver>                   mDriver;
-        Thread                         mWorker;
-        Atomic_Flag                    mBusy;
-        Array<Frame, k_InFlightFrames> mFrames;
+        UPtr<Driver>                    mDriver;
+        Thread                          mWorker;
+        Atomic_Flag                     mBusy;
+        Array<Writer, k_InFlightFrames> mFrames;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Handle<k_MaxBuffers>           mBuffers;
-        Handle<k_MaxMaterials>         mMaterials;
-        Handle<k_MaxPasses>            mPasses;
-        Handle<k_MaxPipelines>         mPipelines;
-        Handle<k_MaxTextures>          mTextures;
+        Handle<k_MaxBuffers>            mBuffers;
+        Handle<k_MaxMaterials>          mMaterials;
+        Handle<k_MaxPasses>             mPasses;
+        Handle<k_MaxPipelines>          mPipelines;
+        Handle<k_MaxTextures>           mTextures;
     };
 }

@@ -35,6 +35,9 @@
 #ifdef    AE_CONTENT_LOADER_MODEL
     #include "Aurora.Content/Model/GLTF/Loader.hpp"
 #endif // AE_CONTENT_LOADER_MODEL
+#ifdef    AE_CONTENT_LOADER_MATERIAL
+    #include "Aurora.Content/Material/Loader.hpp"
+#endif // AE_CONTENT_LOADER_MATERIAL
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -173,6 +176,10 @@ namespace Content
 #ifdef    AE_CONTENT_LOADER_MODEL
             AddLoader(NewPtr<GLTFLoader>());
 #endif // AE_CONTENT_LOADER_MODEL
+
+#ifdef    AE_CONTENT_LOADER_MATERIAL
+            AddLoader(NewPtr<MaterialLoader>());
+#endif // AE_CONTENT_LOADER_MATERIAL
         }
     }
 

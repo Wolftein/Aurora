@@ -27,7 +27,7 @@ namespace Content
 
     Graphic::VertexSemantic As(CStr Name)
     {
-        static  Table<SStr, Graphic::VertexSemantic> kMapping
+        static Table<SStr, Graphic::VertexSemantic> k_Mapping
         {
             { "NORMAL",     Graphic::VertexSemantic::Normal },
             { "POSITION",   Graphic::VertexSemantic::Position },
@@ -39,8 +39,8 @@ namespace Content
             { "TEXCOORD_3", Graphic::VertexSemantic::TexCoord3 },
         };
 
-        const auto Iterator = kMapping.find(Name.data());
-        return (Iterator == kMapping.end() ? Graphic::VertexSemantic::None : Iterator->second);
+        const auto Iterator = k_Mapping.find(Name.data());
+        return (Iterator == k_Mapping.end() ? Graphic::VertexSemantic::None : Iterator->second);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -100,18 +100,18 @@ namespace Content
 
     SPtr<Graphic::Texture> LoadTexture(Ref<tinygltf::Model> GLTFModel, ConstRef<tinygltf::Texture> GLTFTexture)
     {
-        ConstRef<tinygltf::Image>   GLTFImage   = GLTFModel.images[GLTFTexture.source];
+        ConstRef<tinygltf::Image> GLTFImage = GLTFModel.images[GLTFTexture.source];
 
         Data Chunk(GLTFImage.image.size());
-        memcpy(Chunk.GetData<UInt8>(), GLTFImage.image.data(), GLTFImage.image.size());
+        Chunk.Copy(GLTFImage.image.data(), GLTFImage.image.size());
 
         constexpr UInt8 k_DefaultMipmaps = 1;
         constexpr UInt8 k_DefaultSamples = 1;
 
         const SPtr<Graphic::Texture> Texture = NewPtr<Graphic::Texture>(Uri { GLTFTexture.name });
         Texture->Load(
-                Graphic::TextureFormat::RGBA8UIntNorm,
-                Graphic::TextureLayout::Source, GLTFImage.width, GLTFImage.height, k_DefaultMipmaps, k_DefaultSamples, Move(Chunk));
+            Graphic::TextureFormat::RGBA8UIntNorm,
+            Graphic::TextureLayout::Source, GLTFImage.width, GLTFImage.height, k_DefaultMipmaps, k_DefaultSamples, Move(Chunk));
         return Texture;
     }
 
@@ -186,7 +186,7 @@ namespace Content
         for (UInt32 ID = 0; ConstRef<tinygltf::Material> GLTFMaterial : GLTFModel.materials)
         {
             const SPtr<Graphic::Material> Material = NewPtr<Graphic::Material>(Uri { GLTFMaterial.name });
-            Material->SetOwnership(true);
+            Material->SetExclusive(true);
 
             if (SInt32 Index = GLTFMaterial.pbrMetallicRoughness.baseColorTexture.index; Index >= 0)
             {
@@ -280,7 +280,7 @@ namespace Content
                 Primitive.Indices = { Length, Offset, Stride };
             }
 
-            // Continue with the next submesh
+            // Continue with the next primitive
             Mesh->AddPrimitive(Move(Primitive));
         }
 

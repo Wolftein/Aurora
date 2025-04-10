@@ -28,6 +28,30 @@ namespace Graphic
     public:
 
         // -=(Undocumented)=-
+        enum class Kind : UInt8
+        {
+            // -=(Undocumented)=-
+            Opaque,
+
+            // -=(Undocumented)=-
+            Normal,
+
+            // -=(Undocumented)=-
+            Subtractive,
+
+            // -=(Undocumented)=-
+            Transparent,
+
+            // -=(Undocumented)=-
+            Additive,
+
+            // -=(Undocumented)=-
+            Multiplicative,
+        };
+
+    public:
+
+        // -=(Undocumented)=-
         explicit Material(Any<Content::Uri> Key);
 
         // -=(Undocumented)=-
@@ -37,15 +61,27 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetOwnership(Bool Ownership)
+        void SetExclusive(Bool Exclusive)
         {
-            mOwnership = Ownership;
+            mExclusive = Exclusive;
         }
 
         // -=(Undocumented)=-
-        Bool HasOwnership() const
+        Bool IsExclusive() const
         {
-            return mOwnership;
+            return mExclusive;
+        }
+
+        // -=(Undocumented)=-
+        void SetKind(Kind Kind)
+        {
+            mKind = Kind;
+        }
+
+        // -=(Undocumented)=-
+        Kind GetKind() const
+        {
+            return mKind;
         }
 
         // -=(Undocumented)=-
@@ -104,9 +140,10 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         Object                             mID;
-        Bool                               mOwnership;  // TODO: Allow to share resource without flag
+        Kind                               mKind;
+        Bool                               mExclusive;  // TODO: Allow to share resource without flag
         Array<SPtr<Texture>, k_MaxSources> mTextures;   // TODO: Sparse
         Array<Sampler, k_MaxSources>       mSamplers;   // TODO: Sparse
-        Vector<UInt8>                      mParameters; // TODO: Replace with pre allocated chunked memory
+        Vector<UInt8>                      mParameters; // TODO: Replace with Key=Value
     };
 }

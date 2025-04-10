@@ -26,7 +26,7 @@ namespace Graphic
         : AbstractResource(Move(Key)),
           mID      { 0 },
           mFormat  { TextureFormat::RGBA8UInt },
-          mLayout  { TextureLayout::Dual },
+          mLayout  { TextureLayout::Source },
           mWidth   { 0 },
           mHeight  { 0 },
           mLevel   { 0 },
@@ -53,7 +53,7 @@ namespace Graphic
 
     Bool Texture::OnCreate(Ref<Subsystem::Context> Context)
     {
-        SetMemory(mData.GetSize());
+        SetMemory(mData.GetSize()); // TODO: Compressed texture format(s)
 
         mID = Context.GetSubsystem<Service>()->CreateTexture(mFormat, mLayout, mWidth, mHeight, mLevel, mSamples, Move(mData));
 

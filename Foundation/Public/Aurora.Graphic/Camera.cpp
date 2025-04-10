@@ -39,15 +39,15 @@ namespace Graphic
             // compute the inverse scene matrix from the updated transformation.
             if (HasBit(mDirty, k_DirtyBitTransformation))
             {
-                mScene = mTransformation.Compute().Inverse();
+                mView = mTransform.Compute().Inverse();
             }
 
-            // Calculate the world matrix by multiplying the projection matrix
-            // with the (possibly updated) scene matrix.
-            mWorld   = mProjection * mScene;
+            // Calculate the view-projection matrix by multiplying the projection matrix
+            // with the (possibly updated) view matrix.
+            mViewProjection        = mProjection * mView;
 
-            // Compute the inverse of the world matrix
-            mInverse = mWorld.Inverse();
+            // Compute the inverse of the view-projection matrix
+            mViewProjectionInverse = mViewProjection.Inverse();
 
             // Clear the dirty flag to indicate that the transformation has been processed.
             mDirty   = 0;
@@ -71,7 +71,7 @@ namespace Graphic
         const Real32 Y = (Height - (Position.GetY() - Viewport.GetY())) / Height * 2.0f - 1.0f;
 
         // Transform the normalized device coordinates back to world space
-        const Vector4f WorldPosition = mInverse * Vector4f(X, Y, Z, 1.0f);
+        const Vector4f WorldPosition = mViewProjectionInverse * Vector4f(X, Y, Z, 1.0f);
         return Vector3f(WorldPosition.GetX(), WorldPosition.GetY(), WorldPosition.GetZ());
     }
 
@@ -90,7 +90,7 @@ namespace Graphic
 
     Vector3f Camera::GetScreenCoordinates(ConstRef<Vector3f> Position, ConstRef<Rectf> Viewport) const
     {
-        const Vector3f Point = mWorld * Position;
+        const Vector3f Point = mViewProjection * Position;
 
         const Real32 Width  = Viewport.GetWidth();
         const Real32 Height = Viewport.GetHeight();
