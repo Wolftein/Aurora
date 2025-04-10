@@ -89,14 +89,14 @@ namespace Scene
         Entity Fetch(UInt64 ID)
         {
             const Entity::Handle Handle = mWorld.entity(ID);
-            return mWorld.is_alive(Handle) ? Entity(Handle) : Entity();
+            return Handle.is_valid() && mWorld.is_alive(Handle) ? Entity(Handle) : Entity();
         }
 
         // -=(Undocumented)=-
         Entity Fetch(CStr Name)
         {
             const Entity::Handle Handle = mWorld.lookup(Name.data());
-            return mWorld.is_alive(Handle) ? Entity(Handle) : Entity();
+            return Handle.is_valid() && mWorld.is_alive(Handle) ? Entity(Handle) : Entity();
         }
 
         // -=(Undocumented)=-
