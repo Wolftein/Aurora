@@ -79,7 +79,7 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<UInt32 Trait = Trait::k_Final>
+        template<UInt32 Trait = Trait::k_Default>
         Entity Spawn()
         {
             return Allocate<Trait>();
@@ -126,25 +126,25 @@ namespace Scene
         {
             flecs::component<Type> Actor = mWorld.component<Type>(ID.data());
 
-            if constexpr (Traits & Trait::k_Sparse)
+            if constexpr (HasBit(Traits, CastEnum(Trait::k_Sparse)))
             {
                 Actor.add(flecs::OnInstantiate, flecs::Sparse);
             }
-            if constexpr (Traits & Trait::k_Serializable)
+            if constexpr (HasBit(Traits, CastEnum(Trait::k_Serializable)))
             {
                 Actor.template set<Factory>(Factory::Create<Type>());
             }
-            if constexpr (Traits & Trait::k_Inheritable)
+            if constexpr (HasBit(Traits, CastEnum(Trait::k_Inheritable)))
             {
                 Actor.add(flecs::OnInstantiate, flecs::Inherit);
             }
-            if constexpr (Traits & Trait::k_Toggleable)
-            {
-                Actor.add(flecs::CanToggle);
-            }
-            if constexpr (Traits & Trait::k_Final)
+            else
             {
                 Actor.add(flecs::Final);
+            }
+            if constexpr (HasBit(Traits, CastEnum(Trait::k_Toggleable)))
+            {
+                Actor.add(flecs::CanToggle);
             }
             return Actor;
         }
@@ -221,7 +221,7 @@ namespace Scene
         {
             flecs::entity Actor;
 
-            if constexpr (Trait & Trait::k_Archetype)
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Archetype)))
             {
                 Actor = mWorld.entity(ID ? ID : k_MinRangeArchetypes + mArchetypes.Allocate());
             }
@@ -232,14 +232,16 @@ namespace Scene
 
             mWorld.make_alive(Actor);
 
-            if constexpr (Trait & Trait::k_Archetype)
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Archetype)))
             {
                 Actor.add(flecs::Prefab);
             }
-
-            if constexpr (Trait & Trait::k_Final)
+            else
             {
-                Actor.add(flecs::Final);
+                if constexpr (! HasBit(Trait, CastEnum(Trait::k_Inheritable)))
+                {
+                    Actor.add(flecs::Final);
+                }
             }
             return Actor;
         }

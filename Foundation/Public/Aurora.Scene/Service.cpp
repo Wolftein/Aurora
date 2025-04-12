@@ -87,7 +87,7 @@ namespace Scene
 
     Entity Service::LoadEntity(Ref<Reader> Reader)
     {
-        Entity Actor = Spawn<Trait::k_Final>();
+        Entity Actor = Spawn<Trait::k_Default>();
 
         // Read Entity's name
         if (CStr Name = Reader.ReadString8(); !Name.empty())
@@ -251,48 +251,6 @@ namespace Scene
             });
 
         // Register default component(s).
-        Register<Factory,    k_Final>("Serializer");
-        Register<Pivot,      k_Serializable>("Pivot");
-        Register<Color,      k_Serializable>("Color");
-        Register<Matrix4f,   k_Final>("Worldspace");
-        Register<Transformf, k_Serializable>("Localspace").With<Matrix4f>();
-
-        // Register default system(s).
-        Execute<>()
-            .kind(EcsPreUpdate)
-            .with<const Transformf>()
-            .with<const Matrix4f>().optional().parent().cascade()
-            .with<Matrix4f>().out()
-            .run([](Ref<flecs::iter> Iterator)
-            {
-                while (Iterator.next())
-                {
-                    if (Iterator.changed())
-                    {
-                        const auto LocalTransformTable  = Iterator.field<const Transformf>(0);
-                        const auto ParentTransform      = Iterator.field<const Matrix4f>(1);
-                        const auto WorldTransformTable  = Iterator.field<Matrix4f>(2);
-
-                        if (Iterator.is_set(1))
-                        {
-                            for (const UInt64 Index : Iterator)
-                            {
-                                WorldTransformTable[Index] = ParentTransform[0] * LocalTransformTable[Index].Compute();
-                            }
-                        }
-                        else
-                        {
-                            for (const UInt64 Index : Iterator)
-                            {
-                                WorldTransformTable[Index] = LocalTransformTable[Index].Compute();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Iterator.skip();
-                    }
-                }
-            });
+        Register<Factory>("Serializer");
     }
 }

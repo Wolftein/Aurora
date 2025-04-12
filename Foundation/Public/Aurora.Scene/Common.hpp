@@ -74,9 +74,6 @@ namespace Scene
         k_Toggleable   = 0b00001000,
 
         // -=(Undocumented)=-
-        k_Final        = 0b00010000,
-
-        // -=(Undocumented)=-
-        k_Archetype    = 0b00100000,
+        k_Archetype    = 0b00010000,
     };
 }

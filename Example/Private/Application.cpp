@@ -49,11 +49,53 @@ namespace Example
 
         const auto Font = Content->Load<Graphic::Font>("Resources://Font/Primary.arfont");
 
+        // Initialize the scene.
+        ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
+        Scene->Register<Pivot>("Pivot");
+        Scene->Register<Color>("Color");
+        Scene->Register<Matrix4f>("Worldspace");
+        Scene->Register<Transformf>("Localspace").With<Matrix4f>();
+
         // Initial test
         mTexts = NewUniquePtr<Scene::TEcsTextSystem>(* this);
 
-        // Initialize the scene.
-        ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
+        // Register default system(s).
+        Scene->Execute<>()
+            .kind(EcsPreUpdate)
+            .with<const Transformf>()
+            .with<const Matrix4f>().optional().parent().cascade()
+            .with<Matrix4f>().out()
+            .run([](Ref<flecs::iter> Iterator)
+                 {
+                     while (Iterator.next())
+                     {
+                         if (Iterator.changed())
+                         {
+                             const auto LocalTransformTable  = Iterator.field<const Transformf>(0);
+                             const auto ParentTransform      = Iterator.field<const Matrix4f>(1);
+                             const auto WorldTransformTable  = Iterator.field<Matrix4f>(2);
+
+                             if (Iterator.is_set(1))
+                             {
+                                 for (const UInt64 Index : Iterator)
+                                 {
+                                     WorldTransformTable[Index] = ParentTransform[0] * LocalTransformTable[Index].Compute();
+                                 }
+                             }
+                             else
+                             {
+                                 for (const UInt64 Index : Iterator)
+                                 {
+                                     WorldTransformTable[Index] = LocalTransformTable[Index].Compute();
+                                 }
+                             }
+                         }
+                         else
+                         {
+                             Iterator.skip();
+                         }
+                     }
+                 });
 
         Scene->Register<TestComponent, Scene::k_Serializable>("TestComponent");
 
