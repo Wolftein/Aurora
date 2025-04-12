@@ -251,28 +251,48 @@ namespace Scene
             });
 
         // Register default component(s).
-        using TransformDirty = Tag<Hash("Worldspace_Dirty")>;
-        Register<TransformDirty, k_Toggleable>("Worldspace_Dirty");
-
         Register<Factory,    k_Final>("Serializer");
-        Register<Pivot,      k_Inheritable | k_Serializable>("Pivot");
-        Register<Color,      k_Inheritable | k_Serializable>("Color");
-        Register<Matrix4f,   k_Default>("Worldspace");
-        Register<Transformf, k_Serializable>("Localspace").With<TransformDirty>();
+        Register<Pivot,      k_Serializable>("Pivot");
+        Register<Color,      k_Serializable>("Color");
+        Register<Matrix4f,   k_Final>("Worldspace");
+        Register<Transformf, k_Serializable>("Localspace").With<Matrix4f>();
 
         // Register default system(s).
-        React<>("_Default::UpdateTransformDirty").with<Transformf>().event(EcsOnSet)
-                .each(Entity::ToggleComponentInHierarchy<TransformDirty, true>);
+        Execute<>()
+            .kind(EcsPreUpdate)
+            .with<const Transformf>()
+            .with<const Matrix4f>().optional().parent().cascade()
+            .with<Matrix4f>().out()
+            .run([](Ref<flecs::iter> Iterator)
+            {
+                while (Iterator.next())
+                {
+                    if (Iterator.changed())
+                    {
+                        const auto LocalTransformTable  = Iterator.field<const Transformf>(0);
+                        const auto ParentTransform      = Iterator.field<const Matrix4f>(1);
+                        const auto WorldTransformTable  = Iterator.field<Matrix4f>(2);
 
-        Execute<const Transformf, ConstPtr<Matrix4f>>()
-                .term_at(1)
-                    .cascade()
-                .with<TransformDirty>()
-                .write<Matrix4f>()
-                .each([](Entity Actor, ConstRef<Transformf> Local, ConstPtr<Matrix4f> Parent)
-                      {
-                          Actor.Attach<Matrix4f>(Parent ? (* Parent) * Local.Compute() : Local.Compute());
-                          Actor.Disable<TransformDirty>();
-                      });
+                        if (Iterator.is_set(1))
+                        {
+                            for (const UInt64 Index : Iterator)
+                            {
+                                WorldTransformTable[Index] = ParentTransform[0] * LocalTransformTable[Index].Compute();
+                            }
+                        }
+                        else
+                        {
+                            for (const UInt64 Index : Iterator)
+                            {
+                                WorldTransformTable[Index] = LocalTransformTable[Index].Compute();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Iterator.skip();
+                    }
+                }
+            });
     }
 }

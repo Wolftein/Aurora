@@ -150,6 +150,17 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename Function, typename ...Arguments>
+        void Defer(Any<Function> Callback, Any<Arguments>... Parameters)
+        {
+            mWorld.defer_begin();
+            {
+                Callback(std::forward<Arguments>(Parameters)...);
+            }
+            mWorld.defer_end();
+        }
+
+        // -=(Undocumented)=-
         template<typename ...Components>
         auto React(CStr Name = "")
         {
