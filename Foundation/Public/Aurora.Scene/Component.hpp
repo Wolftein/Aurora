@@ -89,12 +89,6 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        auto Attach(Component Component)
-        {
-            return mHandle.ensure(Component.GetID());
-        }
-
-        // -=(Undocumented)=-
         template<typename First>
         void Attach(Component Component)
         {
@@ -122,20 +116,20 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<Trait Trait>
-        void Attach()
+        template<UInt32 Trait>
+        Ref<Component> Attach()
         {
-            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Sparse)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Sparse)))
             {
                 Attach(flecs::OnInstantiate, flecs::Sparse);
             }
 
-            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Serializable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Serializable)))
             {
                 Attach<Factory>(Factory::Create<Base>());
             }
 
-            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Inheritable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Inheritable)))
             {
                 Attach(flecs::OnInstantiate, flecs::Inherit);
             }
@@ -144,36 +138,26 @@ namespace Scene
                 Attach(flecs::Final);
             }
 
-            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Toggleable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Toggleable)))
             {
                 Attach(flecs::CanToggle);
             }
+            return * this;
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        void With()
+        Ref<Component> With()
         {
             mHandle.add(EcsWith, mHandle.world().template component<Type>());
+            return * this;
         }
 
         // -=(Undocumented)=-
-        void With(Component Component)
+        Ref<Component> With(Component Component)
         {
             mHandle.add(EcsWith, Component.GetHandle());
-        }
-
-        // -=(Undocumented)=-
-        template<typename Type>
-        void Depends()
-        {
-            mHandle.add(EcsPhase).add(EcsDependsOn, mHandle.world().template component<Type>());
-        }
-
-        // -=(Undocumented)=-
-        void Depends(Component Component)
-        {
-            mHandle.add(EcsPhase).add(EcsDependsOn, Component.GetHandle());
+            return * this;
         }
 
         // -=(Undocumented)=-
@@ -276,20 +260,20 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<Trait Trait>
-        void Detach()
+        template<UInt32 Trait>
+        Ref<Component> Detach()
         {
-            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Sparse)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Sparse)))
             {
                 Detach(flecs::OnInstantiate, flecs::Sparse);
             }
 
-            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Serializable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Serializable)))
             {
                 Detach<Factory>();
             }
 
-            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Inheritable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Inheritable)))
             {
                 Detach(flecs::OnInstantiate, flecs::Inherit);
             }
@@ -298,10 +282,11 @@ namespace Scene
                 Detach(flecs::Final);
             }
 
-            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Toggleable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::k_Toggleable)))
             {
                 Detach(flecs::CanToggle);
             }
+            return * this;
         }
 
         // -=(Undocumented)=-
@@ -421,9 +406,10 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        void SetName(CStr Name)
+        Ref<Component> SetName(CStr Name)
         {
             mHandle.set_name(Name.data());
+            return * this;
         }
 
         // -=(Undocumented)=-
@@ -435,23 +421,26 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Function>
-        void OnAdd(Any<Function> Callback)
+        Ref<Component> OnAdd(Any<Function> Callback)
         {
             mHandle.on_add(Callback);
+            return * this;
         }
 
         // -=(Undocumented)=-
         template<typename Function>
-        void OnSet(Any<Function> Callback)
+        Ref<Component> OnSet(Any<Function> Callback)
         {
             mHandle.on_set(Callback);
+            return * this;
         }
 
         // -=(Undocumented)=-
         template<typename Function>
-        void OnRemove(Any<Function> Callback)
+        Ref<Component> OnRemove(Any<Function> Callback)
         {
             mHandle.on_remove(Callback);
+            return * this;
         }
 
         // -=(Undocumented)=-

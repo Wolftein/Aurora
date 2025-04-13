@@ -40,7 +40,7 @@ namespace Example
 
         // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
-        Scene->Component<Pivot>();
+        Scene->Component<Pivot>().Attach<Scene::Trait::k_Serializable>();
         Scene->Component<Color>();
         Scene->Component<Matrix4f>();
         Scene->Component<Transformf>().With<Matrix4f>();
