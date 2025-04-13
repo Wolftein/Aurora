@@ -59,21 +59,15 @@ namespace Scene
     enum Trait : UInt32
     {
         // -=(Undocumented)=-
-        k_Default      = 0b00000000,
+        Sparse       = 0b00000001,
 
         // -=(Undocumented)=-
-        k_Sparse       = 0b00000001,
+        Serializable = 0b00000010,
 
         // -=(Undocumented)=-
-        k_Serializable = 0b00000010,
+        Inheritable  = 0b00000100,
 
         // -=(Undocumented)=-
-        k_Inheritable  = 0b00000100,
-
-        // -=(Undocumented)=-
-        k_Toggleable   = 0b00001000,
-
-        // -=(Undocumented)=-
-        k_Archetype    = 0b00010000,
+        Toggleable   = 0b00001000,
     };
 }

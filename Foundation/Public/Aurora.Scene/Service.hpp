@@ -78,10 +78,10 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<UInt32 Trait = Trait::k_Default>
+        template<Bool Archetype = false>
         Entity Spawn()
         {
-            return Allocate<Trait>();
+            return Allocate<Archetype>();
         }
 
         // -=(Undocumented)=-
@@ -179,12 +179,12 @@ namespace Scene
         void RegisterDefaultComponentsAndSystems();
 
         // -=(Undocumented)=-
-        template<UInt32 Trait>
+        template<Bool Archetype>
         Entity Allocate(UInt64 ID = 0)
         {
             flecs::entity Actor;
 
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Archetype)))
+            if constexpr (Archetype)
             {
                 Actor = mWorld.entity(ID ? ID : k_MinRangeArchetypes + mArchetypes.Allocate());
             }
@@ -195,16 +195,13 @@ namespace Scene
 
             mWorld.make_alive(Actor);
 
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Archetype)))
+            if constexpr (Archetype)
             {
                 Actor.add(flecs::Prefab);
             }
             else
             {
-                if constexpr (! HasBit(Trait, CastEnum(Trait::k_Inheritable)))
-                {
-                    Actor.add(flecs::Final);
-                }
+                Actor.add(flecs::Final);
             }
             return Actor;
         }

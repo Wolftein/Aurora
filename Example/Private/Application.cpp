@@ -40,15 +40,15 @@ namespace Example
 
         // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
-        Scene->Component<Pivot>().Attach<Scene::Trait::k_Serializable>();
+        Scene->Component<Pivot>().Attach<Scene::Trait::Serializable>();
         Scene->Component<Color>();
-        Scene->Component<Matrix4f>();
+        Scene->Component<Matrix4f>().Attach<Scene::Trait::Inheritable | Scene::Trait::Sparse>();
         Scene->Component<Transformf>().With<Matrix4f>();
 
         // Initial test
         mTexts = NewUniquePtr<Scene::TEcsTextSystem>(* this);
 
-        auto MyArchetype = Scene->Spawn<Scene::k_Archetype>();
+        auto MyArchetype = Scene->Spawn<true>();
         MyArchetype.SetName("Wacho");
         MyArchetype.Attach(Color(0, 1, 0, 1));
         MyArchetype.Attach(Pivot());

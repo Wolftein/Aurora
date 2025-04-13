@@ -50,7 +50,7 @@ namespace Scene
 
         for (UInt32 Element = 1, Limit = mArchetypes.GetSize(); Element <= Limit; ++Element)
         {
-            Entity Archetype = Allocate<Trait::k_Archetype>(k_MinRangeArchetypes + Reader.ReadInt<UInt64>());
+            Entity Archetype = Allocate<true>(k_MinRangeArchetypes + Reader.ReadInt<UInt64>());
             Archetype.SetName(Reader.ReadString8());
 
             if (const UInt64 Base = Reader.ReadInt<UInt64>(); Base)
@@ -88,7 +88,7 @@ namespace Scene
 
     Entity Service::LoadEntity(Ref<Reader> Reader)
     {
-        Entity Actor = Spawn<Trait::k_Default>();
+        Entity Actor = Allocate<false>();
 
         // Read Entity's name
         if (CStr Name = Reader.ReadString8(); !Name.empty())

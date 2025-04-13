@@ -119,26 +119,26 @@ namespace Scene
         template<UInt32 Trait>
         Ref<Component> Attach()
         {
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Sparse)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::Sparse)))
             {
-                Attach(flecs::OnInstantiate, flecs::Sparse);
+                mHandle.add(flecs::OnInstantiate, flecs::Sparse);
             }
 
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Serializable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::Serializable)))
             {
                 Attach<Factory>(Factory::Create<Base>());
             }
 
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Inheritable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::Inheritable)))
             {
-                Attach(flecs::OnInstantiate, flecs::Inherit);
+                mHandle.add(flecs::OnInstantiate, flecs::Inherit);
             }
             else
             {
                 Attach(flecs::Final);
             }
 
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Toggleable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::Toggleable)))
             {
                 Attach(flecs::CanToggle);
             }
@@ -263,17 +263,17 @@ namespace Scene
         template<UInt32 Trait>
         Ref<Component> Detach()
         {
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Sparse)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::Sparse)))
             {
                 Detach(flecs::OnInstantiate, flecs::Sparse);
             }
 
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Serializable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::Serializable)))
             {
                 Detach<Factory>();
             }
 
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Inheritable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::Inheritable)))
             {
                 Detach(flecs::OnInstantiate, flecs::Inherit);
             }
@@ -282,7 +282,7 @@ namespace Scene
                 Detach(flecs::Final);
             }
 
-            if constexpr (HasBit(Trait, CastEnum(Trait::k_Toggleable)))
+            if constexpr (HasBit(Trait, CastEnum(Trait::Toggleable)))
             {
                 Detach(flecs::CanToggle);
             }
