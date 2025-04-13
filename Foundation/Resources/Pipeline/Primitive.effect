@@ -5,10 +5,10 @@
     AlphaSrcFactor  = "SrcAlpha"
     AlphaDstFactor  = "OneMinusSrcAlpha"
 
-[Properties.Depth]  # Disable Depth Write
+[Properties.Depth]  # Enable Depth Write / Depth Testing
 
-    Mask            = 0
-    Condition       = "Always"
+    Mask            = 1
+    Condition       = "LessEqual"
 
 [Properties.Layout]
 
