@@ -13,6 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Common.hpp"
+#include "Factory.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -117,6 +118,35 @@ namespace Scene
             else
             {
                 mHandle.template set<Type>(Move(Component));
+            }
+        }
+
+        // -=(Undocumented)=-
+        template<Trait Trait>
+        void Attach()
+        {
+            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Sparse)))
+            {
+                Attach(flecs::OnInstantiate, flecs::Sparse);
+            }
+
+            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Serializable)))
+            {
+                Attach<Factory>(Factory::Create<Base>());
+            }
+
+            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Inheritable)))
+            {
+                Attach(flecs::OnInstantiate, flecs::Inherit);
+            }
+            else
+            {
+                Attach(flecs::Final);
+            }
+
+            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Toggleable)))
+            {
+                Attach(flecs::CanToggle);
             }
         }
 
@@ -243,6 +273,35 @@ namespace Scene
         void Detach(Component First, Component Second)
         {
             mHandle.remove(First.GetID(), Second.GetID());
+        }
+
+        // -=(Undocumented)=-
+        template<Trait Trait>
+        void Detach()
+        {
+            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Sparse)))
+            {
+                Detach(flecs::OnInstantiate, flecs::Sparse);
+            }
+
+            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Serializable)))
+            {
+                Detach<Factory>();
+            }
+
+            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Inheritable)))
+            {
+                Detach(flecs::OnInstantiate, flecs::Inherit);
+            }
+            else
+            {
+                Detach(flecs::Final);
+            }
+
+            if constexpr (HasBit(CastEnum(Trait), CastEnum(Trait::k_Toggleable)))
+            {
+                Detach(flecs::CanToggle);
+            }
         }
 
         // -=(Undocumented)=-

@@ -53,8 +53,8 @@ namespace Scene
             mPipeline2 = Resources->Load<Graphic::Pipeline>("Resources://Pipeline/Sprite.effect");
 
             ConstSPtr<Scene::Service> Scene = Context.GetSubsystem<Scene::Service>();
-            Scene->Register<TEcsText>();
-            Scene->Register<TEcsSprite>();
+            Scene->Component<TEcsText>();
+            Scene->Component<TEcsSprite>();
 
             mQuery = Scene->Match<Query>("QueryText").build();
             mQuery2 = Scene->Match<Query2>("QuerySprite").build();

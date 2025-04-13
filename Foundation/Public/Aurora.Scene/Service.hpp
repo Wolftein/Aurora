@@ -14,7 +14,6 @@
 
 #include "Component.hpp"
 #include "Entity.hpp"
-#include "Factory.hpp"
 #include "Observer.hpp"
 #include "Query.hpp"
 
@@ -100,13 +99,6 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<typename Type>
-        auto GetComponent()
-        {
-            return Component<Type>(mWorld.component<Type>());
-        }
-
-        // -=(Undocumented)=-
         template<typename Function>
         void GetArchetypes(Any<Function> Callback)
         {
@@ -121,35 +113,6 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<typename Type, UInt32 Traits = k_Default>
-        Component<Type> Register(CStr ID = flecs::_::symbol_name<Type>())
-        {
-            flecs::component<Type> Actor = mWorld.component<Type>(ID.data());
-
-            if constexpr (HasBit(Traits, CastEnum(Trait::k_Sparse)))
-            {
-                Actor.add(flecs::OnInstantiate, flecs::Sparse);
-            }
-            if constexpr (HasBit(Traits, CastEnum(Trait::k_Serializable)))
-            {
-                Actor.template set<Factory>(Factory::Create<Type>());
-            }
-            if constexpr (HasBit(Traits, CastEnum(Trait::k_Inheritable)))
-            {
-                Actor.add(flecs::OnInstantiate, flecs::Inherit);
-            }
-            else
-            {
-                Actor.add(flecs::Final);
-            }
-            if constexpr (HasBit(Traits, CastEnum(Trait::k_Toggleable)))
-            {
-                Actor.add(flecs::CanToggle);
-            }
-            return Actor;
-        }
-
-        // -=(Undocumented)=-
         template<typename Function, typename ...Arguments>
         void Defer(Any<Function> Callback, Any<Arguments>... Parameters)
         {
@@ -158,6 +121,13 @@ namespace Scene
                 Callback(std::forward<Arguments>(Parameters)...);
             }
             mWorld.defer_end();
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        auto Component()
+        {
+            return Scene::Component<Type>(mWorld.component<Type>());
         }
 
         // -=(Undocumented)=-
@@ -175,13 +145,6 @@ namespace Scene
             {
                 return mWorld.template query_builder<decltype(Arguments)...>(Name.data());
             }, typename Query::Types { });
-        }
-
-        // -=(Undocumented)=-
-        template<typename ...Components>
-        auto Execute()
-        {
-            return mWorld.template system<Components...>();
         }
 
     public:

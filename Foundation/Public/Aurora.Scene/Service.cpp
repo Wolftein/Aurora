@@ -37,7 +37,8 @@ namespace Scene
 
     void Service::OnTick(ConstRef<Time> Time)
     {
-        mWorld.progress(Time.GetDelta());
+        mWorld.frame_begin(Time.GetDelta());
+        mWorld.frame_end();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -251,6 +252,6 @@ namespace Scene
             });
 
         // Register default component(s).
-        Register<Factory>("Serializer");
+        Component<Factory>().SetName("Serializer");
     }
 }

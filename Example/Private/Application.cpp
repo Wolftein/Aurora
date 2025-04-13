@@ -30,17 +30,6 @@ namespace Example
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    struct TestComponent {
-        SStr NAME;
-
-        // -=(Undocumented)=-
-        template<typename Type>
-        void OnSerialize(Stream<Type> Archive)
-        {
-            Archive.SerializeString8(NAME);
-        }
-    };
-
     Bool Application::OnInitialize()
     {
         //
@@ -51,64 +40,18 @@ namespace Example
 
         // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
-        Scene->Register<Pivot>("Pivot");
-        Scene->Register<Color>("Color");
-        Scene->Register<Matrix4f>("Worldspace");
-        Scene->Register<Transformf>("Localspace").With<Matrix4f>();
+        Scene->Component<Pivot>();
+        Scene->Component<Color>();
+        Scene->Component<Matrix4f>();
+        Scene->Component<Transformf>().With<Matrix4f>();
 
         // Initial test
         mTexts = NewUniquePtr<Scene::TEcsTextSystem>(* this);
 
-        // Register default system(s).
-        Scene->Execute<>()
-            .kind(EcsPreUpdate)
-            .with<const Transformf>()
-            .with<const Matrix4f>().optional().parent().cascade()
-            .with<Matrix4f>().out()
-            .run([](Ref<flecs::iter> Iterator)
-                 {
-                     while (Iterator.next())
-                     {
-                         if (Iterator.changed())
-                         {
-                             const auto LocalTransformTable  = Iterator.field<const Transformf>(0);
-                             const auto ParentTransform      = Iterator.field<const Matrix4f>(1);
-                             const auto WorldTransformTable  = Iterator.field<Matrix4f>(2);
-
-                             if (Iterator.is_set(1))
-                             {
-                                 for (const UInt64 Index : Iterator)
-                                 {
-                                     WorldTransformTable[Index] = ParentTransform[0] * LocalTransformTable[Index].Compute();
-                                 }
-                             }
-                             else
-                             {
-                                 for (const UInt64 Index : Iterator)
-                                 {
-                                     WorldTransformTable[Index] = LocalTransformTable[Index].Compute();
-                                 }
-                             }
-                         }
-                         else
-                         {
-                             Iterator.skip();
-                         }
-                     }
-                 });
-
-        Scene->Register<TestComponent, Scene::k_Serializable>("TestComponent");
-
         auto MyArchetype = Scene->Spawn<Scene::k_Archetype>();
         MyArchetype.SetName("Wacho");
-        MyArchetype.Attach(TestComponent { "Whatsup!" });
         MyArchetype.Attach(Color(0, 1, 0, 1));
         MyArchetype.Attach(Pivot());
-
-        Math::Ease(Easing::InCirc, 1.0f);
-        Scene->GetArchetypes([](Scene::Entity Handle) {
-            Log::Info("{}", Handle.GetName());
-        });
 
         GrandMaster = Scene->Spawn();
         GrandMaster.SetArchetype(MyArchetype);
@@ -189,6 +132,47 @@ namespace Example
                 .Modify<& Transformf::SetRotation>(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
         MyCacheLocalscape2
             .Modify<& Transformf::SetRotation>(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
+
+
+        // Register default system(s).
+        using Query = Scene::Query<>;
+        GetSubsystem<Scene::Service>()->Match<Query>("OnTransformUpdateQuery")
+            .with<const Transformf>()
+            .with<const Matrix4f>().optional().parent().cascade()
+            .with<Matrix4f>().out()
+            .build()
+            .run([](Ref<flecs::iter> Iterator)
+                 {
+                     while (Iterator.next())
+                     {
+                         if (Iterator.changed())
+                         {
+                             const auto LocalTransformTable  = Iterator.field<const Transformf>(0);
+                             const auto ParentTransform      = Iterator.field<const Matrix4f>(1);
+                             const auto WorldTransformTable  = Iterator.field<Matrix4f>(2);
+
+                             if (Iterator.is_set(1))
+                             {
+                                 for (const UInt64 Index : Iterator)
+                                 {
+                                     WorldTransformTable[Index] = ParentTransform[0] * LocalTransformTable[Index].Compute();
+                                 }
+                             }
+                             else
+                             {
+                                 for (const UInt64 Index : Iterator)
+                                 {
+                                     WorldTransformTable[Index] = LocalTransformTable[Index].Compute();
+                                 }
+                             }
+                         }
+                         else
+                         {
+                             Iterator.skip();
+                         }
+                     }
+                 });
+
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
