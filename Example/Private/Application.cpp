@@ -40,10 +40,10 @@ namespace Example
 
         // Initialize the scene.
         ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
-        Scene->Component<Pivot>().Attach<Scene::Trait::Serializable>();
-        Scene->Component<Color>();
-        Scene->Component<Matrix4f>().Attach<Scene::Trait::Inheritable | Scene::Trait::Sparse>();
-        Scene->Component<Transformf>().With<Matrix4f>();
+        Scene->Register<Pivot>().Attach<Scene::Trait::Serializable>();
+        Scene->Register<Color>();
+        Scene->Register<Matrix4f>().Attach<Scene::Trait::Inheritable | Scene::Trait::Sparse>();
+        Scene->Register<Transformf>().With<Matrix4f>();
 
         // Initial test
         mTexts = NewUniquePtr<Scene::TEcsTextSystem>(* this);

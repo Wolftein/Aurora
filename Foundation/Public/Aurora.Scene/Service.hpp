@@ -99,6 +99,13 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename Type>
+        auto GetComponent()
+        {
+            return Scene::Component<Type>(mWorld.component<Type>());
+        }
+
+        // -=(Undocumented)=-
         template<typename Function>
         void GetArchetypes(Any<Function> Callback)
         {
@@ -125,9 +132,9 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        auto Component()
+        auto Register(CStr ID = flecs::_::symbol_name<Type>())
         {
-            return Scene::Component<Type>(mWorld.component<Type>());
+            return Scene::Component<Type>(mWorld.component<Type>(ID.data()));
         }
 
         // -=(Undocumented)=-

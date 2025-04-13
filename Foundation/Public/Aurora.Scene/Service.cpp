@@ -252,6 +252,6 @@ namespace Scene
             });
 
         // Register default component(s).
-        Component<Factory>().SetName("Serializer");
+        Register<Factory>("Serializer");
     }
 }
