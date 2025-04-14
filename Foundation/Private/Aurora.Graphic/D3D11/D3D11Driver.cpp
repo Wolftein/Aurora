@@ -156,65 +156,67 @@ namespace Graphic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+    template<UInt Data>
     static auto As(TextureFormat Value)
     {
-        constexpr static DXGI_FORMAT k_Mapping[] = {
-            DXGI_FORMAT_BC1_UNORM,            // TextureFormat::BC1UIntNorm
-            DXGI_FORMAT_BC1_UNORM_SRGB,       // TextureFormat::BC1UIntNorm_sRGB
-            DXGI_FORMAT_BC2_UNORM,            // TextureFormat::BC2UIntNorm
-            DXGI_FORMAT_BC2_UNORM_SRGB,       // TextureFormat::BC2UIntNorm_sRGB
-            DXGI_FORMAT_BC3_UNORM,            // TextureFormat::BC3UIntNorm
-            DXGI_FORMAT_BC3_UNORM_SRGB,       // TextureFormat::BC3UIntNorm_sRGB
-            DXGI_FORMAT_BC4_UNORM,            // TextureFormat::BC4UIntNorm
-            DXGI_FORMAT_BC5_UNORM,            // TextureFormat::BC5UIntNorm
-            DXGI_FORMAT_R8_SINT,              // TextureFormat::R8SInt
-            DXGI_FORMAT_R8_SNORM,             // TextureFormat::R8SIntNorm
-            DXGI_FORMAT_R8_UINT,              // TextureFormat::R8UInt
-            DXGI_FORMAT_R8_UNORM,             // TextureFormat::R8UIntNorm
-            DXGI_FORMAT_R16_SINT,             // TextureFormat::R16SInt
-            DXGI_FORMAT_R16_SNORM,            // TextureFormat::R16SIntNorm
-            DXGI_FORMAT_R16_UINT,             // TextureFormat::R16UInt
-            DXGI_FORMAT_R16_UNORM,            // TextureFormat::R16UIntNorm
-            DXGI_FORMAT_R16_FLOAT,            // TextureFormat::R16Float
-            DXGI_FORMAT_R32_SINT,             // TextureFormat::R32SInt
-            DXGI_FORMAT_R32_UINT,             // TextureFormat::R32UInt
-            DXGI_FORMAT_R32_FLOAT,            // TextureFormat::R32Float
-            DXGI_FORMAT_R8G8_SINT,            // TextureFormat::RG8SInt
-            DXGI_FORMAT_R8G8_SNORM,           // TextureFormat::RG8SIntNorm
-            DXGI_FORMAT_R8G8_UINT,            // TextureFormat::RG8UInt
-            DXGI_FORMAT_R8G8_UNORM,           // TextureFormat::RG8UIntNorm
-            DXGI_FORMAT_R16G16_SINT,          // TextureFormat::RG16SInt
-            DXGI_FORMAT_R16G16_SNORM,         // TextureFormat::RG16SIntNorm
-            DXGI_FORMAT_R16G16_UINT,          // TextureFormat::RG16UInt
-            DXGI_FORMAT_R16G16_UNORM,         // TextureFormat::RG16UIntNorm
-            DXGI_FORMAT_R16G16_FLOAT,         // TextureFormat::RG16Float
-            DXGI_FORMAT_R32G32_SINT,          // TextureFormat::RG32SInt
-            DXGI_FORMAT_R32G32_UINT,          // TextureFormat::RG32UInt
-            DXGI_FORMAT_R32G32_FLOAT,         // TextureFormat::RG32Float
-            DXGI_FORMAT_R32G32B32_SINT,       // TextureFormat::RGB32SInt
-            DXGI_FORMAT_R32G32B32_UINT,       // TextureFormat::RGB32UInt
-            DXGI_FORMAT_R32G32B32_FLOAT,      // TextureFormat::RGB32Float
-            DXGI_FORMAT_R8G8B8A8_SINT,        // TextureFormat::RGBA8SInt
-            DXGI_FORMAT_R8G8B8A8_SNORM,       // TextureFormat::RGBA8SIntNorm
-            DXGI_FORMAT_R8G8B8A8_UINT,        // TextureFormat::RGBA8UInt
-            DXGI_FORMAT_R8G8B8A8_UNORM,       // TextureFormat::RGBA8UIntNorm
-            DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,  // TextureFormat::RGBA8UIntNorm_sRGB
-            DXGI_FORMAT_B8G8R8A8_UNORM,       // TextureFormat::BGRA8UIntNorm
-            DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,  // TextureFormat::BGRA8UIntNorm_sRGB
-            DXGI_FORMAT_R16G16B16A16_SINT,    // TextureFormat::RGBA16SInt
-            DXGI_FORMAT_R16G16B16A16_SNORM,   // TextureFormat::RGBA16SIntNorm
-            DXGI_FORMAT_R16G16B16A16_UINT,    // TextureFormat::RGBA16UInt
-            DXGI_FORMAT_R16G16B16A16_UNORM,   // TextureFormat::RGBA16UIntNorm
-            DXGI_FORMAT_R16G16B16A16_FLOAT,   // TextureFormat::RGBA16Float
-            DXGI_FORMAT_R32G32B32A32_SINT,    // TextureFormat::RGBA32SInt
-            DXGI_FORMAT_R32G32B32A32_UINT,    // TextureFormat::RGBA32UInt
-            DXGI_FORMAT_R32G32B32A32_FLOAT,   // TextureFormat::RGBA32Float
-            DXGI_FORMAT_D32_FLOAT,            // TextureFormat::D32Float
-            DXGI_FORMAT_D16_UNORM,            // TextureFormat::D16X0UIntNorm
-            DXGI_FORMAT_D24_UNORM_S8_UINT,    // TextureFormat::D24S8UIntNorm
-            DXGI_FORMAT_D32_FLOAT_S8X24_UINT, // TextureFormat::D32S8UIntNorm
-        };
-        return k_Mapping[CastEnum(Value)];
+                   // FORMAT                            // SRV                                 // DSV
+        constexpr static std::tuple<DXGI_FORMAT, DXGI_FORMAT, DXGI_FORMAT> k_Mapping[] = {
+            { DXGI_FORMAT_BC1_UNORM,            DXGI_FORMAT_BC1_UNORM,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BC1UIntNorm
+            { DXGI_FORMAT_BC1_UNORM_SRGB,       DXGI_FORMAT_BC1_UNORM_SRGB,             DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BC1UIntNorm_sRGB
+            { DXGI_FORMAT_BC2_UNORM,            DXGI_FORMAT_BC2_UNORM,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BC2UIntNorm
+            { DXGI_FORMAT_BC2_UNORM_SRGB,       DXGI_FORMAT_BC2_UNORM_SRGB,             DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BC2UIntNorm_sRGB
+            { DXGI_FORMAT_BC3_UNORM,            DXGI_FORMAT_BC3_UNORM,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BC3UIntNorm
+            { DXGI_FORMAT_BC3_UNORM_SRGB,       DXGI_FORMAT_BC3_UNORM_SRGB,             DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BC3UIntNorm_sRGB
+            { DXGI_FORMAT_BC4_UNORM,            DXGI_FORMAT_BC4_UNORM,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BC4UIntNorm
+            { DXGI_FORMAT_BC5_UNORM,            DXGI_FORMAT_BC5_UNORM,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BC5UIntNorm
+            { DXGI_FORMAT_R8_SINT,              DXGI_FORMAT_R8_SINT,                    DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R8SInt
+            { DXGI_FORMAT_R8_SNORM,             DXGI_FORMAT_R8_SNORM,                   DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R8SIntNorm
+            { DXGI_FORMAT_R8_UINT,              DXGI_FORMAT_R8_UINT,                    DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R8UInt
+            { DXGI_FORMAT_R8_UNORM,             DXGI_FORMAT_R8_UNORM,                   DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R8UIntNorm
+            { DXGI_FORMAT_R16_SINT,             DXGI_FORMAT_R16_SINT,                   DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R16SInt
+            { DXGI_FORMAT_R16_SNORM,            DXGI_FORMAT_R16_SNORM,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R16SIntNorm
+            { DXGI_FORMAT_R16_UINT,             DXGI_FORMAT_R16_UINT,                   DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R16UInt
+            { DXGI_FORMAT_R16_UNORM,            DXGI_FORMAT_R16_UNORM,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R16UIntNorm
+            { DXGI_FORMAT_R16_FLOAT,            DXGI_FORMAT_R16_FLOAT,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R16Float
+            { DXGI_FORMAT_R32_SINT,             DXGI_FORMAT_R32_SINT,                   DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R32SInt
+            { DXGI_FORMAT_R32_UINT,             DXGI_FORMAT_R32_UINT,                   DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R32UInt
+            { DXGI_FORMAT_R32_FLOAT,            DXGI_FORMAT_R32_FLOAT,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::R32Float
+            { DXGI_FORMAT_R8G8_SINT,            DXGI_FORMAT_R8G8_SINT,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG8SInt
+            { DXGI_FORMAT_R8G8_SNORM,           DXGI_FORMAT_R8G8_SNORM,                 DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG8SIntNorm
+            { DXGI_FORMAT_R8G8_UINT,            DXGI_FORMAT_R8G8_UINT,                  DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG8UInt
+            { DXGI_FORMAT_R8G8_UNORM,           DXGI_FORMAT_R8G8_UNORM,                 DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG8UIntNorm
+            { DXGI_FORMAT_R16G16_SINT,          DXGI_FORMAT_R16G16_SINT,                DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG16SInt
+            { DXGI_FORMAT_R16G16_SNORM,         DXGI_FORMAT_R16G16_SNORM,               DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG16SIntNorm
+            { DXGI_FORMAT_R16G16_UINT,          DXGI_FORMAT_R16G16_UINT,                DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG16UInt
+            { DXGI_FORMAT_R16G16_UNORM,         DXGI_FORMAT_R16G16_UNORM,               DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG16UIntNorm
+            { DXGI_FORMAT_R16G16_FLOAT,         DXGI_FORMAT_R16G16_FLOAT,               DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG16Float
+            { DXGI_FORMAT_R32G32_SINT,          DXGI_FORMAT_R32G32_SINT,                DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG32SInt
+            { DXGI_FORMAT_R32G32_UINT,          DXGI_FORMAT_R32G32_UINT,                DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG32UInt
+            { DXGI_FORMAT_R32G32_FLOAT,         DXGI_FORMAT_R32G32_FLOAT,               DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RG32Float
+            { DXGI_FORMAT_R32G32B32_SINT,       DXGI_FORMAT_R32G32B32_SINT,             DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGB32SInt
+            { DXGI_FORMAT_R32G32B32_UINT,       DXGI_FORMAT_R32G32B32_UINT,             DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGB32UInt
+            { DXGI_FORMAT_R32G32B32_FLOAT,      DXGI_FORMAT_R32G32B32_FLOAT,            DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGB32Float
+            { DXGI_FORMAT_R8G8B8A8_SINT,        DXGI_FORMAT_R8G8B8A8_SINT,              DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA8SInt
+            { DXGI_FORMAT_R8G8B8A8_SNORM,       DXGI_FORMAT_R8G8B8A8_SNORM,             DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA8SIntNorm
+            { DXGI_FORMAT_R8G8B8A8_UINT,        DXGI_FORMAT_R8G8B8A8_UINT,              DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA8UInt
+            { DXGI_FORMAT_R8G8B8A8_UNORM,       DXGI_FORMAT_R8G8B8A8_UNORM,             DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA8UIntNorm
+            { DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,  DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,        DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA8UIntNorm_sRGB
+            { DXGI_FORMAT_B8G8R8A8_UNORM,       DXGI_FORMAT_B8G8R8A8_UNORM,             DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BGRA8UIntNorm
+            { DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,  DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,        DXGI_FORMAT_UNKNOWN              }, // TextureFormat::BGRA8UIntNorm_sRGB
+            { DXGI_FORMAT_R16G16B16A16_SINT,    DXGI_FORMAT_R16G16B16A16_SINT,          DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA16SInt
+            { DXGI_FORMAT_R16G16B16A16_SNORM,   DXGI_FORMAT_R16G16B16A16_SNORM,         DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA16SIntNorm
+            { DXGI_FORMAT_R16G16B16A16_UINT,    DXGI_FORMAT_R16G16B16A16_UINT,          DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA16UInt
+            { DXGI_FORMAT_R16G16B16A16_UNORM,   DXGI_FORMAT_R16G16B16A16_UNORM,         DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA16UIntNorm
+            { DXGI_FORMAT_R16G16B16A16_FLOAT,   DXGI_FORMAT_R16G16B16A16_FLOAT,         DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA16Float
+            { DXGI_FORMAT_R32G32B32A32_SINT,    DXGI_FORMAT_R32G32B32A32_SINT,          DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA32SInt
+            { DXGI_FORMAT_R32G32B32A32_UINT,    DXGI_FORMAT_R32G32B32A32_UINT,          DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA32UInt
+            { DXGI_FORMAT_R32G32B32A32_FLOAT,   DXGI_FORMAT_R32G32B32A32_FLOAT,         DXGI_FORMAT_UNKNOWN              }, // TextureFormat::RGBA32Float
+            { DXGI_FORMAT_R32_TYPELESS,         DXGI_FORMAT_R32_FLOAT,                  DXGI_FORMAT_D32_FLOAT            }, // TextureFormat::D32Float
+            { DXGI_FORMAT_R16_TYPELESS,         DXGI_FORMAT_R16_UNORM,                  DXGI_FORMAT_D16_UNORM            }, // TextureFormat::D16X0UIntNorm
+            { DXGI_FORMAT_R24G8_TYPELESS,       DXGI_FORMAT_R24_UNORM_X8_TYPELESS,      DXGI_FORMAT_D24_UNORM_S8_UINT    }, // TextureFormat::D24S8UIntNorm
+            { DXGI_FORMAT_R32G8X24_TYPELESS,    DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS,   DXGI_FORMAT_D32_FLOAT_S8X24_UINT }, // TextureFormat::D32S8UIntNorm
+         };
+        return std::get<Data>(k_Mapping[CastEnum(Value)]);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -633,7 +635,8 @@ namespace Graphic
             Attachment.Object = mTextures[Colors[Slot].Texture].Object;
             Attachment.Level  = Colors[Slot].Level;
 
-            const CD3D11_RENDER_TARGET_VIEW_DESC Description(D3D11_RTV_DIMENSION_TEXTURE2D, DXGI_FORMAT_UNKNOWN, Attachment.Level);
+            const DXGI_FORMAT Format = As<1>(mTextures[Colors[Slot].Texture].Format);
+            const CD3D11_RENDER_TARGET_VIEW_DESC Description(D3D11_RTV_DIMENSION_TEXTURE2D, Format, Attachment.Level);
             CheckIfFail(mDevice->CreateRenderTargetView(
                     Attachment.Object.Get(), & Description, Attachment.Resource.GetAddressOf()));
         }
@@ -645,7 +648,8 @@ namespace Graphic
             Attachment.Object = mTextures[Resolves[Slot].Texture].Object;
             Attachment.Level  = Resolves[Slot].Level;
 
-            const CD3D11_RENDER_TARGET_VIEW_DESC Description(D3D11_RTV_DIMENSION_TEXTURE2DMS, DXGI_FORMAT_UNKNOWN, Attachment.Level);
+            const DXGI_FORMAT Format = As<2>(mTextures[Colors[Slot].Texture].Format);
+            const CD3D11_RENDER_TARGET_VIEW_DESC Description(D3D11_RTV_DIMENSION_TEXTURE2DMS, Format, Attachment.Level);
             CheckIfFail(mDevice->CreateRenderTargetView(
                     Attachment.Object.Get(), & Description, Attachment.Resource.GetAddressOf()));
         }
@@ -779,7 +783,7 @@ namespace Graphic
 
     void D3D11Driver::CreateTexture(Object ID, TextureFormat Format, TextureLayout Layout, UInt16 Width, UInt16 Height, UInt8 Level, UInt8 Samples, CPtr<const UInt8> Data)
     {
-        CD3D11_TEXTURE2D_DESC Description(As(Format), Width, Height, 1, Level);
+        CD3D11_TEXTURE2D_DESC Description(As<0>(Format), Width, Height, 1, Level);
         Description.Usage      = Data.empty() ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
         Description.BindFlags  = Layout != TextureLayout::Destination ? D3D11_BIND_SHADER_RESOURCE : 0;
         Description.MiscFlags  = Level < 1 ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
@@ -805,12 +809,14 @@ namespace Graphic
         const ConstPtr<D3D11_SUBRESOURCE_DATA> Memory = Fill(Data.data(), Level, Width, Height, Format);
         CheckIfFail(mDevice->CreateTexture2D(& Description, Memory, mTextures[ID].Object.GetAddressOf()));
 
+        mTextures[ID].Format = Format;
+
         if (Layout != TextureLayout::Destination)
         {
             const D3D11_SRV_DIMENSION Type
                 = Samples > 1 ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
 
-            const CD3D11_SHADER_RESOURCE_VIEW_DESC Descriptor(Type, As(Format), 0, Level);
+            const CD3D11_SHADER_RESOURCE_VIEW_DESC Descriptor(Type, As<1>(Format), 0, Level);
             CheckIfFail(mDevice->CreateShaderResourceView(
                 mTextures[ID].Object.Get(), AddressOf(Descriptor), mTextures[ID].Resource.GetAddressOf()));
         }

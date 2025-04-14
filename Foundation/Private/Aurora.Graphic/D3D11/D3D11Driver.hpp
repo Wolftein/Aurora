@@ -143,6 +143,7 @@ namespace Graphic
         {
             ComPtr<ID3D11Texture2D>          Object;
             ComPtr<ID3D11ShaderResourceView> Resource;
+            TextureFormat                    Format;
         };
 
     private:
