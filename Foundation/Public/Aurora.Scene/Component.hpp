@@ -126,7 +126,7 @@ namespace Scene
 
             if constexpr (HasBit(Trait, CastEnum(Trait::Serializable)))
             {
-                Attach<Factory>(Factory::Create<Base>());
+                mHandle.template set<Factory>(Factory::Create<Base>());
             }
 
             if constexpr (HasBit(Trait, CastEnum(Trait::Inheritable)))
@@ -135,12 +135,12 @@ namespace Scene
             }
             else
             {
-                Attach(flecs::Final);
+                mHandle.add(flecs::Final);
             }
 
             if constexpr (HasBit(Trait, CastEnum(Trait::Toggleable)))
             {
-                Attach(flecs::CanToggle);
+                mHandle.add(flecs::CanToggle);
             }
             return * this;
         }
