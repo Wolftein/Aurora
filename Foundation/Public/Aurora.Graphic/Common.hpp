@@ -262,7 +262,6 @@ namespace Graphic
         RGBA32Float,
         D32Float,
         D16X0UIntNorm,
-        D24X0UIntNorm,
         D24S8UIntNorm,
         D32S8UIntNorm,
     };

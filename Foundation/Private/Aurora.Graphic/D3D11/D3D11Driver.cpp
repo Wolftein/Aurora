@@ -648,7 +648,7 @@ namespace Graphic
             Attachment.Object = mTextures[Resolves[Slot].Texture].Object;
             Attachment.Level  = Resolves[Slot].Level;
 
-            const DXGI_FORMAT Format = As<2>(mTextures[Colors[Slot].Texture].Format);
+            const DXGI_FORMAT Format = As<1>(mTextures[Colors[Slot].Texture].Format);
             const CD3D11_RENDER_TARGET_VIEW_DESC Description(D3D11_RTV_DIMENSION_TEXTURE2DMS, Format, Attachment.Level);
             CheckIfFail(mDevice->CreateRenderTargetView(
                     Attachment.Object.Get(), & Description, Attachment.Resource.GetAddressOf()));
@@ -658,8 +658,10 @@ namespace Graphic
         if (Auxiliary.Texture > 0)
         {
             const Ptr<ID3D11Texture2D> Attachment = mTextures[Auxiliary.Texture].Object.Get();
+
+            const DXGI_FORMAT Format = As<2>(mTextures[Auxiliary.Texture].Format);
             const CD3D11_DEPTH_STENCIL_VIEW_DESC Description(
-                    D3D11_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_UNKNOWN, Auxiliary.Level);
+                    D3D11_DSV_DIMENSION_TEXTURE2D, Format, Auxiliary.Level);
             CheckIfFail(mDevice->CreateDepthStencilView(Attachment, & Description, Pass.Auxiliary.GetAddressOf()));
         }
     }
@@ -795,7 +797,6 @@ namespace Graphic
             {
             case TextureFormat::D32Float:
             case TextureFormat::D16X0UIntNorm:
-            case TextureFormat::D24X0UIntNorm:
             case TextureFormat::D24S8UIntNorm:
             case TextureFormat::D32S8UIntNorm:
                 Description.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
