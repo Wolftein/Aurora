@@ -219,6 +219,20 @@ inline namespace Core
 
     // -=(Undocumented)=-
     template<typename Type>
+    constexpr Type ToggleBit(Type Field, Type Value, Bool Enable)
+    {
+        if (Enable)
+        {
+            return SetBit(Field, Value);
+        }
+        else
+        {
+            return ClearBit(Field, Value);
+        }
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
     constexpr CStr Name()
     {
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
