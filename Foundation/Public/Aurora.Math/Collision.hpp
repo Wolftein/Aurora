@@ -24,6 +24,13 @@ inline namespace Math
 {
     // -=(Undocumented)=-
     template<typename Base>
+    static constexpr Bool Intersects(ConstRef<Math::Circle<Base>> Circle, ConstRef<Math::Circle<Base>> Other, Ptr<Math::Manifold<Base>> Manifold)
+    {
+        return Circle.Intersects(Other, Manifold);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Base>
     static constexpr Bool Intersects(ConstRef<Math::Circle<Base>> Circle, ConstRef<Math::Rect<Base>> Rectangle, Ptr<Math::Manifold<Base>> Manifold)
     {
         ConstRef<Vector2<Base>> Center = Circle.GetCenter();
@@ -78,6 +85,13 @@ inline namespace Math
             return true;
         }
         return false;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Base>
+    static constexpr Bool Intersects(ConstRef<Math::Rect<Base>> Rectangle, ConstRef<Math::Rect<Base>> Other, Ptr<Math::Manifold<Base>> Manifold)
+    {
+        return Rectangle.Intersects(Other, Manifold);
     }
 
     // -=(Undocumented)=-
@@ -184,6 +198,13 @@ inline namespace Math
             return true;
         }
         return false;
+    }
+
+    // -=(Undocumented)=-
+    template<typename Base>
+    static constexpr Bool Intersects(ConstRef<Math::Edge<Base>> Edge, ConstRef<Math::Edge<Base>> Other, Ptr<Math::Manifold<Base>> Manifold)
+    {
+        return Edge.Intersects(Other, Manifold);
     }
 
     // -=(Undocumented)=-

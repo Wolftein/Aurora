@@ -97,7 +97,7 @@ inline namespace Math
 
                 Manifold->SetPenetration(Radius - Distance);
                 Manifold->SetNormal(Normal);
-                Manifold->AddPoint(Vector3<Base>(mCenter + Normal * mRadius, 0));
+                Manifold->AddPoint(mCenter + Normal * mRadius);
             }
             return true;
         }

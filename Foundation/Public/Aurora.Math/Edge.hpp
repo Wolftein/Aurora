@@ -124,7 +124,7 @@ inline namespace Math
 
                         Manifold->SetPenetration(k_Epsilon<Base>);
                         Manifold->SetNormal(Vector2<Base>::Normalize(Normal));
-                        Manifold->AddPoint(mPointA + (A3 / (A3 - A4)) * Direction);
+                        Manifold->AddPoint(mPointA + Direction * (A3 / (A3 - A4)));
                     }
                     return true;
                 }

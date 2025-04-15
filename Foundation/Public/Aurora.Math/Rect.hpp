@@ -206,12 +206,12 @@ inline namespace Math
                 if (OverlapX < OverlapY)
                 {
                     Manifold->SetPenetration(OverlapX);
-                    Manifold->SetNormal(Vector2<Base>((GetCenter().x < Other.GetCenter().x) ? -1 : 1, 0));
+                    Manifold->SetNormal(Vector2<Base>((GetCenter().GetX() < Other.GetCenter().GetX()) ? -1 : 1, 0));
                 }
                 else
                 {
                     Manifold->SetPenetration(OverlapY);
-                    Manifold->SetNormal(Vector2<Base>(0, (GetCenter().y < Other.GetCenter().y) ? -1 : 1));
+                    Manifold->SetNormal(Vector2<Base>(0, (GetCenter().GetY() < Other.GetCenter().GetY()) ? -1 : 1));
                 }
 
                 if       (AlmostZero(OverlapX))
