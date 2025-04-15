@@ -72,7 +72,7 @@ inline namespace Math
             const Type Difference = Abs(First - Second);
 
             return Difference <= k_Epsilon<Type>
-                || Difference <= ((Abs(First) < Abs(Second) ? Abs(Second) : Abs(First)) * k_Epsilon<Type>;
+                || Difference <= ((Abs(First) < Abs(Second) ? Abs(Second) : Abs(First)) * k_Epsilon<Type>);
         }
         else
         {
