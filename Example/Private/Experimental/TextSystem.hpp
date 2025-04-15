@@ -13,6 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include <Aurora.Math/Pivot.hpp>
+#include <Aurora.Math/Color.hpp>
 #include <Aurora.Render/Renderer.hpp>
 #include <Aurora.Content/Service.hpp>
 #include <Aurora.Scene/Service.hpp>

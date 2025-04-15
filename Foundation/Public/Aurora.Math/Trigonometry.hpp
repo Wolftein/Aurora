@@ -26,6 +26,10 @@ inline namespace Math
 
     // -=(Undocumented)=-
     template<typename Type>
+    static constexpr Type k_Epsilon = std::numeric_limits<Type>::epsilon();
+
+    // -=(Undocumented)=-
+    template<typename Type>
     static constexpr Type DegreesToRadians(Type Degrees)
     {
         return Degrees * (k_PI<Type> / 180);
@@ -36,6 +40,44 @@ inline namespace Math
     static constexpr Type RadiansToDegrees(Type Radians)
     {
         return Radians * (180 / k_PI<Type>);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    static constexpr Type Abs(Type Value)
+    {
+        return std::abs(Value);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    static constexpr Bool AlmostZero(Type First)
+    {
+        if constexpr (std::is_floating_point_v<Type>)
+        {
+            return Abs(First) <= k_Epsilon<Type>;
+        }
+        else
+        {
+            return First == 0;
+        }
+    }
+
+    // -=(Undocumented)=-
+    template<typename Type>
+    static constexpr Bool AlmostEqual(Type First, Type Second)
+    {
+        if constexpr (std::is_floating_point_v<Type>)
+        {
+            const Type Difference = Abs(First - Second);
+
+            return Difference <= k_Epsilon<Type>
+                || Difference <= ((Abs(First) < Abs(Second) ? Abs(Second) : Abs(First)) * k_Epsilon<Type>;
+        }
+        else
+        {
+            return First == Second;
+        }
     }
 
     // -=(Undocumented)=-

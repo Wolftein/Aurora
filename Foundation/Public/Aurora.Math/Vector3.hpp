@@ -62,7 +62,7 @@ inline namespace Math
         // -=(Undocumented)=-
         Bool IsZero() const
         {
-            return mX == 0 && mY == 0 && mZ == 0;
+            return AlmostZero(mX) && AlmostZero(mY) && AlmostZero(mZ);
         }
 
         // -=(Undocumented)=-
@@ -110,21 +110,19 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Real32 GetAngle(ConstRef<Vector3<Base>> Other) const
+        Base GetAngle(ConstRef<Vector3<Base>> Other) const
         {
-            const Real32 Divisor = GetLength() * Other.GetLength();
+            const Base Divisor = GetLength() * Other.GetLength();
 
             if (Divisor != 0)
             {
-                const Real32 Cosine = Dot(Other) / Divisor;
-
-                return (Cosine <= 1.0f ? InvCosine(Cosine) : 0.0f);
+                return InvCosine(Clamp(Dot(Other) / Divisor, -1.0, +1.0));
             }
-            return 0.0f;
+            return 0.0;
         }
 
         // -=(Undocumented)=-
-        Real32 GetDistance(ConstRef<Vector3<Base>> Other) const
+        Base GetDistance(ConstRef<Vector3<Base>> Other) const
         {
             const Vector3<Base> Result = (* this) - Other;
 
@@ -132,19 +130,19 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Real32 GetLength() const
+        Base GetLength() const
         {
             return Sqrt(GetLengthSquared());
         }
 
         // -=(Undocumented)=-
-        Real32 GetLengthSquared() const
+        Base GetLengthSquared() const
         {
             return (mX * mX + mY * mY + mZ * mZ);
         }
 
         // -=(Undocumented)=-
-        Real32 Dot(ConstRef<Vector3<Base>> Other) const
+        Base Dot(ConstRef<Vector3<Base>> Other) const
         {
             return (mX * Other.mX) + (mY * Other.mY) + (mZ * Other.mZ);
         }
@@ -296,7 +294,15 @@ inline namespace Math
         // -=(Undocumented)=-
         constexpr Bool operator==(ConstRef<Vector3<Base>> Vector) const
         {
-            return mX == Vector.mX && mY == Vector.mY && mZ == Vector.mZ;
+            return AlmostEqual(mX, Vector.mX)
+                && AlmostEqual(mY, Vector.mY)
+                && AlmostEqual(mZ, Vector.mZ);
+        }
+
+        // -=(Undocumented)=-
+        constexpr Bool operator!=(ConstRef<Vector3<Base>> Other) const
+        {
+            return !(*this == Other);
         }
 
         // -=(Undocumented)=-
@@ -313,11 +319,11 @@ inline namespace Math
         // -=(Undocumented)=-
         static Vector3<Base> Normalize(ConstRef<Vector3<Base>> Vector)
         {
-            const Real32 Length = Vector.GetLength();
+            const Base Length = Vector.GetLength();
 
-            if (Length > 0)
+            if (Length > k_Epsilon<Base>)
             {
-                return Vector * (1.0f / Length);
+                return Vector * (1.0 / Length);
             }
             return Vector;
         }
@@ -335,19 +341,13 @@ inline namespace Math
         // -=(Undocumented)=-
         static Vector3<Base> Min(ConstRef<Vector3<Base>> P0, ConstRef<Vector3<Base>> P1)
         {
-            const Base X = P0.GetX() < P1.GetX() ? P0.GetX() : P1.GetX();
-            const Base Y = P0.GetY() < P1.GetY() ? P0.GetY() : P1.GetY();
-            const Base Z = P0.GetZ() < P1.GetZ() ? P0.GetZ() : P1.GetZ();
-            return Vector3<Base>(X, Y, Z);
+            return Vector3<Base>(Core::Min(P0.mX, P1.mX), Core::Min(P0.mY, P1.mY), Core::Min(P0.mZ, P1.mZ));
         }
 
         // -=(Undocumented)=-
         static Vector3<Base> Max(ConstRef<Vector3<Base>> P0, ConstRef<Vector3<Base>> P1)
         {
-            const Base X = P0.GetX() < P1.GetX() ? P1.GetX() : P0.GetX();
-            const Base Y = P0.GetY() < P1.GetY() ? P1.GetY() : P0.GetY();
-            const Base Z = P0.GetZ() < P1.GetZ() ? P1.GetZ() : P0.GetZ();
-            return Vector3<Base>(X, Y, Z);
+            return Vector3<Base>(Core::Max(P0.mX, P1.mX), Core::Max(P0.mY, P1.mY), Core::Max(P0.mZ, P1.mZ));
         }
 
         // -=(Undocumented)=-

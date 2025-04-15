@@ -72,13 +72,13 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Real32 GetLength() const
+        Base GetLength() const
         {
             return Sqrt(GetLengthSquared());
         }
 
         // -=(Undocumented)=-
-        Real32 GetLengthSquared() const
+        Base GetLengthSquared() const
         {
             return Dot(* this);
         }
@@ -102,31 +102,31 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Real32 Dot(ConstRef<Quaternion<Base>> Other) const
+        Base Dot(ConstRef<Quaternion<Base>> Other) const
         {
             return mReal * Other.mReal + mImaginary.Dot(Other.mImaginary);
         }
 
         // -=(Undocumented)=-
-        Quaternion<Base> operator+(ConstRef<Quaternion<Base>> Other) const
+        constexpr Quaternion<Base> operator+(ConstRef<Quaternion<Base>> Other) const
         {
             return Quaternion<Base>(mImaginary + Other.mImaginary, mReal + Other.mReal);
         }
 
         // -=(Undocumented)=-
-        Quaternion<Base> operator-() const
+        constexpr Quaternion<Base> operator-() const
         {
             return Quaternion<Base>(-mImaginary, -mReal);
         }
 
         // -=(Undocumented)=-
-        Quaternion<Base> operator-(ConstRef<Quaternion<Base>> Other) const
+        constexpr Quaternion<Base> operator-(ConstRef<Quaternion<Base>> Other) const
         {
             return Quaternion<Base>(mImaginary - Other.mImaginary, mReal - Other.mReal);
         }
 
         // -=(Undocumented)=-
-        Quaternion<Base> operator*(ConstRef<Quaternion<Base>> Other) const
+        constexpr Quaternion<Base> operator*(ConstRef<Quaternion<Base>> Other) const
         {
             const Vector3<Base> Imaginary
                 = Other.mImaginary * mReal + mImaginary * Other.mReal + Vector3<Base>::Cross(mImaginary, Other.mImaginary);
@@ -134,7 +134,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Quaternion<Base>> operator+=(ConstRef<Quaternion<Base>> Other)
+        constexpr Ref<Quaternion<Base>> operator+=(ConstRef<Quaternion<Base>> Other)
         {
             mImaginary += Other.mImaginary;
             mReal      += Other.mReal;
@@ -142,7 +142,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Quaternion<Base>> operator-=(ConstRef<Quaternion<Base>> Other)
+        constexpr Ref<Quaternion<Base>> operator-=(ConstRef<Quaternion<Base>> Other)
         {
             mImaginary -= Other.mImaginary;
             mReal      -= Other.mReal;
@@ -150,7 +150,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Quaternion<Base>> operator*=(ConstRef<Quaternion<Base>> Other)
+        constexpr Ref<Quaternion<Base>> operator*=(ConstRef<Quaternion<Base>> Other)
         {
             mImaginary = Other.mImaginary * mReal + mImaginary * Other.mReal + Vector3<Base>::Cross(mImaginary, Other.mImaginary);
             mReal      = Other.mReal * mReal - mImaginary.Dot(Other.mImaginary);
@@ -280,7 +280,7 @@ inline namespace Math
         // -=(Undocumented)=-
         static Quaternion<Base> Lerp(ConstRef<Quaternion<Base>> Start, ConstRef<Quaternion<Base>> End, Real32 Percentage)
         {
-            const Real32 Dot = Start.Dot(End);
+            const Base Dot = Start.Dot(End);
             return (Start + ((Dot < 0.0f ? -End : End) - Start) * Percentage);
         }
 
@@ -306,7 +306,4 @@ inline namespace Math
 
     // -=(Undocumented)=-
     using Quaternionf = Quaternion<Real32>;
-
-    // -=(Undocumented)=-
-    using Quaternioni = Quaternion<UInt32>;
 }

@@ -67,7 +67,7 @@ inline namespace Math
         // -=(Undocumented)=-
         Bool IsZero() const
         {
-            return mX1 == 0 && mY1 == 0 && mX2 == 0 && mY2 == 0;
+            return AlmostZero(mX1) && AlmostZero(mY1) && AlmostZero(mX2) && AlmostZero(mY2);
         }
 
         // -=(Undocumented)=-
@@ -166,7 +166,7 @@ inline namespace Math
         // -=(Undocumented)=-
         Vector2<Base> GetCenter() const
         {
-            return Vector2<Base>(mX1 + GetWidth() * 0.5f, mY1 + GetHeight() * 0.5f);
+            return Vector2<Base>(mX1 + GetWidth() * 0.5, mY1 + GetHeight() * 0.5);
         }
 
         // -=(Undocumented)=-
@@ -176,9 +176,12 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Bool Contains(Base X, Base Y) const
+        Bool Contains(ConstRef<Vector2<Base>> Position) const
         {
-            return X >= mX1 && X < mX2 &&  Y >= mY1 && Y < mY2;
+            return Position.GetX() >= mX1
+                && Position.GetX() < mX2
+                && Position.GetY() >= mY1
+                && Position.GetY() < mY2;
         }
 
         // -=(Undocumented)=-
@@ -188,83 +191,86 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Bool operator==(ConstRef<Rect<Base>> Other) const
+        constexpr Bool operator==(ConstRef<Rect<Base>> Other) const
         {
-            return mX1 == Other.mX1 && mY1 == Other.mY1 && mX2 == Other.mX2 && mY2 == Other.mY2;
+            return AlmostEqual(mX1, Other.mX1)
+                && AlmostEqual(mX2, Other.mX2)
+                && AlmostEqual(mY1, Other.mY1)
+                && AlmostEqual(mY2, Other.mY2);
         }
 
         // -=(Undocumented)=-
-        Bool operator!=(ConstRef<Rect<Base>> Other) const
+        constexpr Bool operator!=(ConstRef<Rect<Base>> Other) const
         {
-            return mX1 != Other.mX1 || mY1 != Other.mY1 || mX2 != Other.mX2 || mY2 != Other.mY2;
+            return !(*this == Other);
         }
 
         // -=(Undocumented)=-
-        Rect<Base> operator+(ConstRef<Rect<Base>> Other) const
+        constexpr Rect<Base> operator+(ConstRef<Rect<Base>> Other) const
         {
             return Rect<Base>(mX1 + Other.mX1, mY1 + Other.mY1, mX2 + Other.mX2, mY2 + Other.mY2);
         }
 
         // -=(Undocumented)=-
-        Rect<Base> operator+(Base Scalar) const
+        constexpr Rect<Base> operator+(Base Scalar) const
         {
             return Rect<Base>(mX1 + Scalar, mY1 + Scalar, mX2 + Scalar, mY2 + Scalar);
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        Rect<Base> operator+(ConstRef<Vector2<Type>> Vector) const
+        constexpr Rect<Base> operator+(ConstRef<Vector2<Type>> Vector) const
         {
             return Rect<Base>(mX1 + Vector.GetX(), mY1 + Vector.GetY(), mX2 + Vector.GetX(), mY2 + Vector.GetY());
         }
 
         // -=(Undocumented)=-
-        Rect<Base> operator-(ConstRef<Rect<Base>> Other) const
+        constexpr Rect<Base> operator-(ConstRef<Rect<Base>> Other) const
         {
             return Rect<Base>(mX1 - Other.mX1, mY1 - Other.mY1, mX2 - Other.mX2, mY2 - Other.mY2);
         }
 
         // -=(Undocumented)=-
-        Rect<Base> operator-(Base Scalar) const
+        constexpr Rect<Base> operator-(Base Scalar) const
         {
             return Rect<Base>(mX1 - Scalar, mY1 - Scalar, mX2 - Scalar, mY2 - Scalar);
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        Rect<Base> operator-(ConstRef<Vector2<Type>> Vector) const
+        constexpr Rect<Base> operator-(ConstRef<Vector2<Type>> Vector) const
         {
             return Rect<Base>(mX1 - Vector.GetX(), mY1 - Vector.GetY(), mX2 - Vector.GetX(), mY2 - Vector.GetY());
         }
 
         // -=(Undocumented)=-
-        Rect<Base> operator*(Base Scalar) const
+        constexpr Rect<Base> operator*(Base Scalar) const
         {
             return Rect<Base>(mX1 * Scalar, mY1 * Scalar, mX2 * Scalar, mY2 * Scalar);
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        Rect<Base> operator*(ConstRef<Vector2<Type>> Vector) const
+        constexpr Rect<Base> operator*(ConstRef<Vector2<Type>> Vector) const
         {
             return Rect<Base>(mX1 * Vector.GetX(), mY1 * Vector.GetY(), mX2 * Vector.GetX(), mY2 * Vector.GetY());
         }
 
         // -=(Undocumented)=-
-        Rect<Base> operator/(Base Scalar) const
+        constexpr Rect<Base> operator/(Base Scalar) const
         {
             return Rect<Base>(mX1 / Scalar, mY1 / Scalar, mX2 / Scalar, mY2 / Scalar);
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        Rect<Base> operator/(ConstRef<Vector2<Type>> Vector) const
+        constexpr Rect<Base> operator/(ConstRef<Vector2<Type>> Vector) const
         {
             return Rect<Base>(mX1 / Vector.GetX(), mY1 / Vector.GetY(), mX2 / Vector.GetX(), mY2 / Vector.GetY());
         }
 
         // -=(Undocumented)=-
-        Ref<Rect<Base>> operator+=(ConstRef<Rect<Base>> Other)
+        constexpr Ref<Rect<Base>> operator+=(ConstRef<Rect<Base>> Other)
         {
             mX1 += Other.mX1;
             mY1 += Other.mY1;
@@ -274,7 +280,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Rect<Base>> operator+=(Base Scalar)
+        constexpr Ref<Rect<Base>> operator+=(Base Scalar)
         {
             mX1 += Scalar;
             mY1 += Scalar;
@@ -285,7 +291,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Type>
-        Ref<Rect<Base>> operator+=(Vector2<Type> Vector)
+        constexpr Ref<Rect<Base>> operator+=(Vector2<Type> Vector)
         {
             mX1 += Vector.GetX();
             mY1 += Vector.GetY();
@@ -296,7 +302,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Rect<Base>> operator-=(ConstRef<Rect<Base>> Other)
+        constexpr Ref<Rect<Base>> operator-=(ConstRef<Rect<Base>> Other)
         {
             mX1 -= Other.mX1;
             mY1 -= Other.mY1;
@@ -306,7 +312,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Rect<Base>> operator-=(Base Scalar)
+        constexpr Ref<Rect<Base>> operator-=(Base Scalar)
         {
             mX1 -= Scalar;
             mY1 -= Scalar;
@@ -317,7 +323,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Type>
-        Ref<Rect<Base>> operator-=(ConstRef<Vector2<Type>> Vector)
+        constexpr Ref<Rect<Base>> operator-=(ConstRef<Vector2<Type>> Vector)
         {
             mX1 -= Vector.GetX();
             mY1 -= Vector.GetY();
@@ -328,7 +334,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Rect<Base>> operator*=(Base Scalar)
+        constexpr Ref<Rect<Base>> operator*=(Base Scalar)
         {
             mX1 *= Scalar;
             mY1 *= Scalar;
@@ -340,7 +346,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Type>
-        Ref<Rect<Base>> operator*=(ConstRef<Vector2<Type>> Vector)
+        constexpr Ref<Rect<Base>> operator*=(ConstRef<Vector2<Type>> Vector)
         {
             mX1 *= Vector.GetX();
             mY1 *= Vector.GetY();
@@ -351,7 +357,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Ref<Rect<Base>> operator/=(Base Scalar)
+        constexpr Ref<Rect<Base>> operator/=(Base Scalar)
         {
             mX1 /= Scalar;
             mY1 /= Scalar;
@@ -363,7 +369,7 @@ inline namespace Math
 
         // -=(Undocumented)=-
         template<typename Type>
-        Ref<Rect<Base>> operator/=(ConstRef<Vector2<Type>> Vector)
+        constexpr Ref<Rect<Base>> operator/=(ConstRef<Vector2<Type>> Vector)
         {
             mX1 /= Vector.GetX();
             mY1 /= Vector.GetY();
@@ -388,11 +394,9 @@ inline namespace Math
         // -=(Undocumented)=-
         static Rect<Base> Round(ConstRef<Rect<Base>> Rectangle)
         {
-            const Base X1 = Floor(Rectangle.mX1);
-            const Base Y1 = Floor(Rectangle.mY1);
-            const Base X2 = Ceil(Rectangle.mX2);
-            const Base Y2 = Ceil(Rectangle.mY2);
-            return Rect<Base>(X1, Y1, X2, Y2);
+            return Rect<Base>(
+                Floor(Rectangle.mX1), Floor(Rectangle.mY1),
+                 Ceil(Rectangle.mX2),  Ceil(Rectangle.mY2));
         }
 
         // -=(Undocumented)=-
@@ -413,21 +417,21 @@ inline namespace Math
         // -=(Undocumented)=-
         static Rect<Base> Min(ConstRef<Rect<Base>> Lhs, ConstRef<Rect<Base>> Rhs)
         {
-            const Base X1 = Lhs.mX1 < Rhs.mX1 ? Lhs.mX1 : Rhs.mX1;
-            const Base Y1 = Lhs.mY1 < Rhs.mY1 ? Lhs.mY1 : Rhs.mY1;
-            const Base X2 = Lhs.mX2 < Rhs.mX2 ? Lhs.mX2 : Rhs.mX2;
-            const Base Y2 = Lhs.mY2 < Rhs.mY2 ? Lhs.mY2 : Rhs.mY2;
-            return Rect<Base>(X1, Y1, X2, Y2);
+            return Vector4<Base>(
+                Core::Min(Lhs.mX1, Rhs.mX1),
+                Core::Min(Lhs.mY1, Rhs.mY1),
+                Core::Min(Lhs.mX2, Rhs.mX2),
+                Core::Min(Lhs.mY2, Rhs.mY2));
         }
 
         // -=(Undocumented)=-
         static Rect<Base> Max(ConstRef<Rect<Base>> Lhs, ConstRef<Rect<Base>> Rhs)
         {
-            const Base X1 = Lhs.mX1 < Rhs.mX1 ? Rhs.mX1 : Lhs.mX1;
-            const Base Y1 = Lhs.mY1 < Rhs.mY1 ? Rhs.mY1 : Lhs.mY1;
-            const Base X2 = Lhs.mX2 < Rhs.mX2 ? Rhs.mX2 : Lhs.mX2;
-            const Base Y2 = Lhs.mY2 < Rhs.mY2 ? Rhs.mY2 : Lhs.mY2;
-            return Rect<Base>(X1, Y1, X2, Y2);
+            return Vector4<Base>(
+                Core::Max(Lhs.mX1, Rhs.mX1),
+                Core::Max(Lhs.mY1, Rhs.mY1),
+                Core::Max(Lhs.mX2, Rhs.mX2),
+                Core::Max(Lhs.mY2, Rhs.mY2));
         }
 
         // -=(Undocumented)=-
