@@ -417,7 +417,7 @@ inline namespace Math
         // -=(Undocumented)=-
         static Rect<Base> Min(ConstRef<Rect<Base>> Lhs, ConstRef<Rect<Base>> Rhs)
         {
-            return Vector4<Base>(
+            return Rect<Base>(
                 Core::Min(Lhs.mX1, Rhs.mX1),
                 Core::Min(Lhs.mY1, Rhs.mY1),
                 Core::Min(Lhs.mX2, Rhs.mX2),
@@ -427,13 +427,13 @@ inline namespace Math
         // -=(Undocumented)=-
         static Rect<Base> Max(ConstRef<Rect<Base>> Lhs, ConstRef<Rect<Base>> Rhs)
         {
-            return Vector4<Base>(
+            return Rect<Base>(
                 Core::Max(Lhs.mX1, Rhs.mX1),
                 Core::Max(Lhs.mY1, Rhs.mY1),
                 Core::Max(Lhs.mX2, Rhs.mX2),
                 Core::Max(Lhs.mY2, Rhs.mY2));
         }
-
+        
         // -=(Undocumented)=-
         static Rect<Base> Lerp(ConstRef<Rect<Base>> Start, ConstRef<Rect<Base>> End, Real32 Percentage)
         {
