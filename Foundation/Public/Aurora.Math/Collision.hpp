@@ -30,7 +30,7 @@ inline namespace Math
         const Base RadiusPow2 = Circle.GetRadius() * Circle.GetRadius();
 
         if ((Edge.GetPointA() - Circle.GetCenter()).GetLengthSquared() <= RadiusPow2
-         || (Edge.GetPointB() - Circle.GetCenter()).GetLengthSquared() <= RadiusPow2)
+            || (Edge.GetPointB() - Circle.GetCenter()).GetLengthSquared() <= RadiusPow2)
         {
             return true;
         }
@@ -38,7 +38,7 @@ inline namespace Math
         const Vector2<Base> AB = Edge.GetPointB() - Edge.GetPointA();
         const Vector2<Base> AC = Circle.GetCenter() - Edge.GetPointA();
 
-        const Base T = Core::Clamp(AC.Dot(AB) / AB.LengthSquared(), Base(0), Base(1));
+        const Base T = Core::Clamp(AC.Dot(AB) / AB.GetLengthSquared(), Base(0), Base(1));
         const Vector2<Base> Closest = Edge.GetPointA() + AB * T;
 
         const Vector2<Base> Delta = Circle.GetCenter() - Closest;
@@ -54,15 +54,15 @@ inline namespace Math
             return true;
         }
 
-        const Vector2<Base> TL = Rectangle.GetTopLeft();
-        const Vector2<Base> TR = Rectangle.GetTopRight();
-        const Vector2<Base> BL = Rectangle.GetBottomLeft();
-        const Vector2<Base> BR = Rectangle.GetBottomRight();
+        const Vector2<Base> TL = Vector2<Base>(Rectangle.GetTop(), Rectangle.GetLeft());
+        const Vector2<Base> TR = Vector2<Base>(Rectangle.GetTop(), Rectangle.GetRight());
+        const Vector2<Base> BL = Vector2<Base>(Rectangle.GetBottom(), Rectangle.GetLeft());
+        const Vector2<Base> BR = Vector2<Base>(Rectangle.GetBottom(), Rectangle.GetRight());
 
-        return Math::Intersects(Edge, Math::Edge<Base>(TL, TR))
-            || Math::Intersects(Edge, Math::Edge<Base>(TR, BR))
-            || Math::Intersects(Edge, Math::Edge<Base>(BR, BL))
-            || Math::Intersects(Edge, Math::Edge<Base>(BL, TL));
+        return Edge.Intersects(Math::Edge<Base>(TL, TR))
+            || Edge.Intersects(Math::Edge<Base>(TR, BR))
+            || Edge.Intersects(Math::Edge<Base>(BR, BL))
+            || Edge.Intersects(Math::Edge<Base>(BL, TL));
     }
 
     // -=(Undocumented)=-
