@@ -12,9 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Circle.hpp"
-#include "Edge.hpp"
-#include "Rect.hpp"
+#include "Shape.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -22,6 +20,7 @@
 
 inline namespace Math
 {
+
     // -=(Undocumented)=-
     template<typename Base>
     static constexpr Bool Intersects(ConstRef<Math::Circle<Base>> Circle, ConstRef<Math::Circle<Base>> Other, Ptr<Math::Manifold<Base>> Manifold)
@@ -219,5 +218,39 @@ inline namespace Math
     static constexpr Bool Intersects(ConstRef<Math::Edge<Base>> Edge, ConstRef<Math::Rect<Base>> Rectangle, Ptr<Math::Manifold<Base>> Manifold)
     {
         return Intersects<Base>(Rectangle, Edge, Manifold);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Base, typename Type, typename Other>
+    static constexpr Bool Intersects(ConstPtr<void> First, ConstPtr<void> Second, Ptr<Manifold<Base>> Manifold)
+    {
+        return Math::Intersects<Base>(* static_cast<ConstPtr<Type>>(First), * static_cast<ConstPtr<Other>>(Second), Manifold);
+    }
+
+    // -=(Undocumented)=-
+    template<typename Base>
+    static constexpr Bool Intersects(ConstRef<Math::Shape<Base>> Shape, ConstRef<Math::Shape<Base>> Other, Ptr<Math::Manifold<Base>> Manifold)
+    {
+        using Function = Bool(*)(ConstPtr<void>, ConstPtr<void>, Ptr<Math::Manifold<Base>>);
+
+        static constexpr Function k_Dispatch[3][3] =
+        {
+            {
+                Intersects<Base, Circle<Base>, Circle<Base>>,
+                Intersects<Base, Circle<Base>, Edge<Base>>,
+                Intersects<Base, Circle<Base>, Rect<Base>>,
+            },
+            {
+                Intersects<Base, Edge<Base>, Circle<Base>>,
+                Intersects<Base, Edge<Base>, Edge<Base>>,
+                Intersects<Base, Edge<Base>, Rect<Base>>,
+            },
+            {
+                Intersects<Base, Rect<Base>, Circle<Base>>,
+                Intersects<Base, Rect<Base>, Edge<Base>>,
+                Intersects<Base, Rect<Base>, Rect<Base>>,
+            },
+        };
+        return k_Dispatch[CastEnum(Shape.GetKind())][CastEnum(Other.GetKind())](&Shape, &Other, Manifold);
     }
 }
