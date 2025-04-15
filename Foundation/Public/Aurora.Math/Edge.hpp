@@ -105,7 +105,7 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Bool Intersects(ConstRef<Edge<Base>> Other) const
+        Bool Intersects(ConstRef<Edge<Base>> Other, Ptr<Manifold<Base>> Manifold) const
         {
             const Base A1 = Vector2<Base>::Cross(mPointA, mPointB, Other.mPointB);
             const Base A2 = Vector2<Base>::Cross(mPointA, mPointB, Other.mPointA);
@@ -117,6 +117,15 @@ inline namespace Math
 
                 if (A3 * A4 < 0.0)
                 {
+                    if (Manifold)
+                    {
+                        const Vector2<Base> Direction = (mPointB - mPointA);
+                        const Vector2<Base> Normal    = Vector2<Base>(Direction.GetY(), -Direction.GetX());
+
+                        Manifold->SetPenetration(k_Epsilon<Base>);
+                        Manifold->SetNormal(Vector2<Base>::Normalize(Normal));
+                        Manifold->AddPoint(mPointA + (A3 / (A3 - A4)) * Direction);
+                    }
                     return true;
                 }
             }

@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Manifold.hpp"
 #include "Matrix4.hpp"
 #include "Pivot.hpp"
 
@@ -78,10 +79,27 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Bool Intersects(ConstRef<Circle<Base>> Other) const
+        Bool Intersects(ConstRef<Circle<Base>> Other, Ptr<Manifold<Base>> Manifold) const
         {
-            const Base Radius = mRadius + Other.mRadius;
-            return (Other.mCenter - mCenter).GetLengthSquared() <= (Radius * Radius);
+            const Vector2<Base> Delta      = Other.mCenter - mCenter;
+            const Base          SqDistance = Delta.GetLengthSquared();
+            const Base          Radius     = mRadius + Other.mRadius;
+
+            if (SqDistance > Radius * Radius)
+            {
+                return false;
+            }
+
+            if (Manifold)
+            {
+                const Base Distance        = Sqrt(SqDistance);
+                const Vector2<Base> Normal = (Distance > k_Epsilon<Base>) ? Delta / Distance : Vector2<Base>(1, 0);
+
+                Manifold->SetPenetration(Radius - Distance);
+                Manifold->SetNormal(Normal);
+                Manifold->AddPoint(Vector3<Base>(mCenter + Normal * mRadius, 0));
+            }
+            return true;
         }
 
         // -=(Undocumented)=-
@@ -249,15 +267,15 @@ inline namespace Math
     public:
 
         // -=(Undocumented)=-
-        static Circle<Base> Min(ConstRef<Circle<Base>> Lhs, ConstRef<Circle<Base>> Rhs)
+        static Circle<Base> Min(ConstRef<Circle<Base>> Left, ConstRef<Circle<Base>> Right)
         {
-            return Circle<Base>(Vector2<Base>::Min(Lhs.mCenter, Rhs.mCenter), Core::Min(Lhs.mRadius, Rhs.mRadius));
+            return Circle<Base>(Vector2<Base>::Min(Left.mCenter, Right.mCenter), Core::Min(Left.mRadius, Right.mRadius));
         }
 
         // -=(Undocumented)=-
-        static Circle<Base> Max(ConstRef<Circle<Base>> Lhs, ConstRef<Circle<Base>> Rhs)
+        static Circle<Base> Max(ConstRef<Circle<Base>> Left, ConstRef<Circle<Base>> Right)
         {
-            return Circle<Base>(Vector2<Base>::Max(Lhs.mCenter, Rhs.mCenter), Core::Max(Lhs.mRadius, Rhs.mRadius));
+            return Circle<Base>(Vector2<Base>::Max(Left.mCenter, Right.mCenter), Core::Max(Left.mRadius, Right.mRadius));
         }
 
         // -=(Undocumented)=-

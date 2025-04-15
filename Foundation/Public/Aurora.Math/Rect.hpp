@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Manifold.hpp"
 #include "Matrix4.hpp"
 #include "Pivot.hpp"
 
@@ -179,15 +180,74 @@ inline namespace Math
         Bool Contains(ConstRef<Vector2<Base>> Position) const
         {
             return Position.GetX() >= mX1
-                && Position.GetX() < mX2
+                && Position.GetX() <= mX2
                 && Position.GetY() >= mY1
-                && Position.GetY() < mY2;
+                && Position.GetY() <= mY2;
         }
 
         // -=(Undocumented)=-
-        Bool Intersects(ConstRef<Rect<Base>> Other) const
+        Bool Intersects(ConstRef<Rect<Base>> Other, Ptr<Manifold<Base>> Manifold) const
         {
-            return mX1 < Other.mX2 && mX2 > Other.mX1 && mY1 < Other.mY2 && mY2 > Other.mY1;
+            const Base X1 = Core::Max(mX1, Other.mX1);
+            const Base Y1 = Core::Max(mY1, Other.mY1);
+            const Base X2 = Core::Min(mX2, Other.mX2);
+            const Base Y2 = Core::Min(mY2, Other.mY2);
+
+            if (X1 >= X2 || Y1 >= Y2)
+            {
+                return false;
+            }
+
+            if (Manifold)
+            {
+                const Base OverlapX = X2 - X1;
+                const Base OverlapY = Y2 - Y1;
+
+                if (OverlapX < OverlapY)
+                {
+                    Manifold->SetPenetration(OverlapX);
+                    Manifold->SetNormal(Vector2<Base>((GetCenter().x < Other.GetCenter().x) ? -1 : 1, 0));
+                }
+                else
+                {
+                    Manifold->SetPenetration(OverlapY);
+                    Manifold->SetNormal(Vector2<Base>(0, (GetCenter().y < Other.GetCenter().y) ? -1 : 1));
+                }
+
+                if       (AlmostZero(OverlapX))
+                {
+                    Manifold->AddPoint(Vector2<Base>(X1, (Y1 + Y2) * 0.5));
+                }
+                else if (AlmostZero(OverlapY))
+                {
+                    Manifold->AddPoint(Vector2<Base>((X1 + X2) * 0.5, Y1));
+                }
+                else
+                {
+                    if (X1 > mX1 && X1 > Other.mX1)
+                    {
+                        Manifold->AddPoint(Vector2<Base>(X1, (Y1 + Y2) * 0.5));
+                    }
+                    if (X2 < mX2 && X2 < Other.mX2)
+                    {
+                        Manifold->AddPoint(Vector2<Base>(X2, (Y1 + Y2) * 0.5));
+                    }
+                    if (Y1 > mY1 && Y1 > Other.mY1)
+                    {
+                        Manifold->AddPoint(Vector2<Base>((X1 + X2) * 0.5, Y1));
+                    }
+                    if (Y2 < mY2 && Y2 < Other.mY2)
+                    {
+                        Manifold->AddPoint(Vector2<Base>((X1 + X2) * 0.5, Y2));
+                    }
+
+                    if (! Manifold->IsCollided())
+                    {
+                        Manifold->AddPoint(Vector2<Base>((X1 + X2) * 0.5, (Y1 + Y2) * 0.5));
+                    }
+                }
+            }
+            return true;
         }
 
         // -=(Undocumented)=-
@@ -392,6 +452,25 @@ inline namespace Math
     public:
 
         // -=(Undocumented)=-
+        static Rect<Base> Normalize(ConstRef<Rect<Base>> Rectangle)
+        {
+            Base Left   = Rectangle.mX1;
+            Base Top    = Rectangle.mY1;
+            Base Right  = Rectangle.mX2;
+            Base Bottom = Rectangle.mY2;
+
+            if (Left > Right)
+            {
+                Swap(Left, Right);
+            }
+            if (Top > Bottom)
+            {
+                Swap(Top, Bottom);
+            }
+            return Rect<Base>(Left, Top, Right, Bottom);
+        }
+
+        // -=(Undocumented)=-
         static Rect<Base> Round(ConstRef<Rect<Base>> Rectangle)
         {
             return Rect<Base>(
@@ -400,12 +479,12 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static Rect<Base> Overlap(ConstRef<Rect<Base>> Lhs, ConstRef<Rect<Base>> Rhs)
+        static Rect<Base> Overlap(ConstRef<Rect<Base>> First, ConstRef<Rect<Base>> Second)
         {
-            const Base X1 = Core::Max(Lhs.mX1, Rhs.mX1);
-            const Base Y1 = Core::Max(Lhs.mY1, Rhs.mY1);
-            const Base X2 = Core::Min(Lhs.mX2, Rhs.mX2);
-            const Base Y2 = Core::Min(Lhs.mY2, Rhs.mY2);
+            const Base X1 = Core::Max(First.mX1, Second.mX1);
+            const Base Y1 = Core::Max(First.mY1, Second.mY1);
+            const Base X2 = Core::Min(First.mX2, Second.mX2);
+            const Base Y2 = Core::Min(First.mY2, Second.mY2);
 
             if (X1 < X2 && Y1 < Y2)
             {
@@ -415,25 +494,25 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        static Rect<Base> Min(ConstRef<Rect<Base>> Lhs, ConstRef<Rect<Base>> Rhs)
+        static Rect<Base> Min(ConstRef<Rect<Base>> First, ConstRef<Rect<Base>> Second)
         {
             return Rect<Base>(
-                Core::Min(Lhs.mX1, Rhs.mX1),
-                Core::Min(Lhs.mY1, Rhs.mY1),
-                Core::Min(Lhs.mX2, Rhs.mX2),
-                Core::Min(Lhs.mY2, Rhs.mY2));
+                Core::Min(First.mX1, Second.mX1),
+                Core::Min(First.mY1, Second.mY1),
+                Core::Min(First.mX2, Second.mX2),
+                Core::Min(First.mY2, Second.mY2));
         }
 
         // -=(Undocumented)=-
-        static Rect<Base> Max(ConstRef<Rect<Base>> Lhs, ConstRef<Rect<Base>> Rhs)
+        static Rect<Base> Max(ConstRef<Rect<Base>> First, ConstRef<Rect<Base>> Second)
         {
             return Rect<Base>(
-                Core::Max(Lhs.mX1, Rhs.mX1),
-                Core::Max(Lhs.mY1, Rhs.mY1),
-                Core::Max(Lhs.mX2, Rhs.mX2),
-                Core::Max(Lhs.mY2, Rhs.mY2));
+                Core::Max(First.mX1, Second.mX1),
+                Core::Max(First.mY1, Second.mY1),
+                Core::Max(First.mX2, Second.mX2),
+                Core::Max(First.mY2, Second.mY2));
         }
-        
+
         // -=(Undocumented)=-
         static Rect<Base> Lerp(ConstRef<Rect<Base>> Start, ConstRef<Rect<Base>> End, Real32 Percentage)
         {
