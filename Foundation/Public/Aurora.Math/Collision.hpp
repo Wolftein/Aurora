@@ -251,6 +251,9 @@ inline namespace Math
                 Intersects<Base, Rect<Base>, Rect<Base>>,
             },
         };
-        return k_Dispatch[CastEnum(Shape.GetKind())][CastEnum(Other.GetKind())](&Shape, &Other, Manifold);
+
+        constexpr UInt32 Row    = CastEnum(Shape.GetKind());
+        constexpr UInt32 Column = CastEnum(Other.GetKind());
+        return k_Dispatch[Row][Column](AddressOf(Shape), AddressOf(Other), Manifold);
     }
 }
