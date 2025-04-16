@@ -126,8 +126,8 @@ namespace Graphic
         const UInt32 ID = Font->GetMaterial()->GetID();
 
         // TODO: Automatically wrapping
-        Real32 CurrentX = Origin.GetX() + Origin.GetX();
-        Real32 CurrentY = Origin.GetY() + Origin.GetY();
+        Real32 CurrentX = Origin.GetX();
+        Real32 CurrentY = Origin.GetY();
 
         for (Char16 Previous = 0, Symbol = 0; Symbol < Text.size(); ++Symbol)
         {
@@ -174,8 +174,8 @@ namespace Graphic
         const UInt32 ID = Font->GetMaterial()->GetID();
 
         // TODO: Automatically wrapping
-        Real32 CurrentX = Origin.GetX() + Origin.GetX();
-        Real32 CurrentY = Origin.GetY() + Origin.GetY();
+        Real32 CurrentX = Origin.GetX();
+        Real32 CurrentY = Origin.GetY();
 
         for (Char16 Previous = 0, Symbol = 0; Symbol < Text.size(); ++Symbol)
         {
