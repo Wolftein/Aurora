@@ -60,10 +60,10 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        constexpr Shape(ConstRef<Edge<Base>> Edge)
-            : mKind { Kind::Edge }
+        constexpr Shape(ConstRef<Edge<Base>> Line)
+            : mKind { Kind::Line }
         {
-            mData.Edge = Edge;
+            mData.Line = Line;
         }
 
         // -=(Undocumented)=-
@@ -153,7 +153,7 @@ inline namespace Math
             Circle<Base> Circle;
 
             // -=(Undocumented)=-
-            Edge<Base>   Edge;
+            Edge<Base>   Line;
 
             // -=(Undocumented)=-
             Rect<Base>   Rectangle;
