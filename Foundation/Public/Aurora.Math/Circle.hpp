@@ -73,6 +73,12 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        Bool Contains(Base X, Base Y) const
+        {
+            return Contains(Vector2<Base>(X, Y));
+        }
+
+        // -=(Undocumented)=-
         Bool Contains(ConstRef<Vector2<Base>> Position) const
         {
             return (Position - mCenter).GetLengthSquared() <= (mRadius * mRadius);

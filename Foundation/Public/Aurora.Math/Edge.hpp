@@ -90,6 +90,12 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        Bool Contains(Base X, Base Y) const
+        {
+            return Contains(Vector2<Base>(X, Y));
+        }
+
+        // -=(Undocumented)=-
         Bool Contains(ConstRef<Vector2<Base>> Point) const
         {
             const Vector2<Base> AB = GetDirection();

@@ -177,12 +177,15 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        Bool Contains(Base X, Base Y) const
+        {
+            return X >= mX1 && X < mX2 && Y >= mY1 && Y < mY2;
+        }
+
+        // -=(Undocumented)=-
         Bool Contains(ConstRef<Vector2<Base>> Position) const
         {
-            return Position.GetX() >= mX1
-                && Position.GetX() <= mX2
-                && Position.GetY() >= mY1
-                && Position.GetY() <= mY2;
+            return Contains(Position.GetX(), Position.GetY());
         }
 
         // -=(Undocumented)=-
