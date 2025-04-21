@@ -117,32 +117,32 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
-        Bool Intersects(ConstRef<Shape<Base>> Other, Ptr<Math::Manifold<Base>> Manifold)
+        Bool Intersects(ConstRef<Shape<Base>> Other, Ptr<Math::Manifold<Base>> Manifold) const
         {
             using Function = Bool(*)(ConstPtr<void>, ConstPtr<void>, Ptr<Math::Manifold<Base>>);
 
             static constexpr Function k_Dispatch[3][3] =
             {
                 {
-                    Math::Intersects<Base, Circle<Base>, Circle<Base>>,
-                    Math::Intersects<Base, Circle<Base>, Edge<Base>>,
-                    Math::Intersects<Base, Circle<Base>, Rect<Base>>,
+                    Intersects<Base, Circle<Base>, Circle<Base>>,
+                    Intersects<Base, Circle<Base>, Edge<Base>>,
+                    Intersects<Base, Circle<Base>, Rect<Base>>,
                 },
                 {
-                    Math::Intersects<Base, Edge<Base>, Circle<Base>>,
-                    Math::Intersects<Base, Edge<Base>, Edge<Base>>,
-                    Math::Intersects<Base, Edge<Base>, Rect<Base>>,
+                    Intersects<Base, Edge<Base>, Circle<Base>>,
+                    Intersects<Base, Edge<Base>, Edge<Base>>,
+                    Intersects<Base, Edge<Base>, Rect<Base>>,
                 },
                 {
-                    Math::Intersects<Base, Rect<Base>, Circle<Base>>,
-                    Math::Intersects<Base, Rect<Base>, Edge<Base>>,
-                    Math::Intersects<Base, Rect<Base>, Rect<Base>>,
+                    Intersects<Base, Rect<Base>, Circle<Base>>,
+                    Intersects<Base, Rect<Base>, Edge<Base>>,
+                    Intersects<Base, Rect<Base>, Rect<Base>>,
                 },
            };
 
             const UInt32 Row    = CastEnum(GetKind());
             const UInt32 Column = CastEnum(Other.GetKind());
-            return k_Dispatch[Row][Column](AddressOf(Shape), AddressOf(Other), Manifold);
+            return k_Dispatch[Row][Column](this, AddressOf(Other), Manifold);
         }
 
         // -=(Undocumented)=-
@@ -162,6 +162,38 @@ inline namespace Math
             case Kind::Rectangle:
                 Archive.SerializeObject(mData.Rectangle);
                 break;
+            }
+        }
+
+    public:
+
+        // -=(Undocumented)=-
+        static Shape<Base> Transform(ConstRef<Shape<Base>> Object, Pivot Pivot)
+        {
+            switch(Object.GetKind())
+            {
+            case Kind::Circle:
+                return Shape<Base>(Circle<Base>::Transform(Object.GetData<Circle<Base>>(), Pivot));
+            case Kind::Rectangle:
+                return Shape<Base>(Rect<Base>::Transform(Object.GetData<Rect<Base>>(), Pivot));
+            default:
+                return Object;
+            }
+        }
+
+        // -=(Undocumented)=-
+        static Shape<Base> Transform(ConstRef<Shape<Base>> Object, ConstRef<Matrix4<Base>> Transform)
+        {
+            switch(Object.GetKind())
+            {
+            case Kind::Circle:
+                return Shape<Base>(Circle<Base>::Transform(Object.GetData<Circle<Base>>(), Transform));
+            case Kind::Line:
+                return Shape<Base>(Edge<Base>::Transform(Object.GetData<Edge<Base>>(), Transform));
+            case Kind::Rectangle:
+                return Shape<Base>(Rect<Base>::Transform(Object.GetData<Rect<Base>>(), Transform));
+            default:
+                return Object;
             }
         }
 
@@ -185,6 +217,13 @@ inline namespace Math
             // -=(Undocumented)=-
             Rect<Base>   Rectangle;
         };
+
+        // -=(Undocumented)=-
+        template<typename Base, typename Type, typename Other>
+        static constexpr Bool Intersects(ConstPtr<void> First, ConstPtr<void> Second, Ptr<Manifold<Base>> Manifold)
+        {
+            return Math::Intersects<Base>(* static_cast<ConstPtr<Type>>(First), * static_cast<ConstPtr<Other>>(Second), Manifold);
+        }
 
     private:
 

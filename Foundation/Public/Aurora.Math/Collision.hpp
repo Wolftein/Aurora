@@ -221,12 +221,4 @@ inline namespace Math
     {
         return Intersects<Base>(Rectangle, Edge, Manifold);
     }
-
-    // -=(Undocumented)=-
-    template<typename Base, typename Type, typename Other>
-    static constexpr Bool Intersects(ConstPtr<void> First, ConstPtr<void> Second, Ptr<Manifold<Base>> Manifold)
-    {
-        return Math::Intersects<Base>(* static_cast<ConstPtr<Type>>(First), * static_cast<ConstPtr<Other>>(Second), Manifold);
-    }
-
 }
