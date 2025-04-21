@@ -314,6 +314,32 @@ inline namespace Math
         }
 
         // -=(Undocumented)=-
+        static Edge<Base> Transform(ConstRef<Edge<Base>> Edge, Pivot Pivot)
+        {
+            static constexpr Vector2<Base> k_Multiplier[] = {
+                Vector2<Real32>( 0.0,  0.0),  // LeftTop
+                Vector2<Real32>( 0.0, -0.5),  // LeftMiddle
+                Vector2<Real32>( 0.0, -1.0),  // LeftBottom
+                Vector2<Real32>(-0.5,  0.0),  // CenterTop
+                Vector2<Real32>(-0.5, -0.5),  // CenterMiddle
+                Vector2<Real32>(-0.5, -1.0),  // CenterBottom
+                Vector2<Real32>(-1.0,  0.0),  // RightTop
+                Vector2<Real32>(-1.0, -0.5),  // RightMiddle
+                Vector2<Real32>(-1.0, -1.0),  // RightBottom
+            };
+
+
+            const Vector2<Base> Min(Core::Min(Edge.mPointA.GetX(), Edge.mPointB.GetX()),
+                                    Core::Min(Edge.mPointA.GetY(), Edge.mPointB.GetY()));
+            const Vector2<Base> Max(Core::Max(Edge.mPointA.GetX(), Edge.mPointB.GetX()),
+                                    Core::Max(Edge.mPointA.GetY(), Edge.mPointB.GetY()));
+
+            const Vector2<Base> Size    = Max - Min;
+            const Vector2<Base> Offset  = k_Multiplier[CastEnum(Pivot)] * Size;
+            return Math::Edge<Base>(Edge.GetPointA() + Offset, Edge.GetPointB() + Offset);
+        }
+
+        // -=(Undocumented)=-
         static Edge<Base> Transform(ConstRef<Edge<Base>> Edge, ConstRef<Matrix4<Base>> Transform)
         {
             return Math::Edge<Base>(Transform * Edge.GetPointA(), Transform * Edge.GetPointB());

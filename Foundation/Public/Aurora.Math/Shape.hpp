@@ -37,16 +37,13 @@ inline namespace Math
 
             // -=(Undocumented)=-
             Rectangle,
-
-            // -=(Undocumented)=-
-            None,
         };
 
     public:
 
         // -=(Undocumented)=-
         constexpr Shape()
-            : mKind { Kind::None }
+            : mKind { Kind::Rectangle }
         {
         }
 
@@ -137,7 +134,7 @@ inline namespace Math
                     Intersects<Base, Rect<Base>, Circle<Base>>,
                     Intersects<Base, Rect<Base>, Edge<Base>>,
                     Intersects<Base, Rect<Base>, Rect<Base>>,
-                },
+                }
            };
 
             const UInt32 Row    = CastEnum(GetKind());
@@ -162,6 +159,8 @@ inline namespace Math
             case Kind::Rectangle:
                 Archive.SerializeObject(mData.Rectangle);
                 break;
+            default:
+                break;
             }
         }
 
@@ -174,6 +173,8 @@ inline namespace Math
             {
             case Kind::Circle:
                 return Shape<Base>(Circle<Base>::Transform(Object.GetData<Circle<Base>>(), Pivot));
+            case Kind::Line:
+                return Shape<Base>(Edge<Base>::Transform(Object.GetData<Edge<Base>>(), Pivot));
             case Kind::Rectangle:
                 return Shape<Base>(Rect<Base>::Transform(Object.GetData<Rect<Base>>(), Pivot));
             default:
