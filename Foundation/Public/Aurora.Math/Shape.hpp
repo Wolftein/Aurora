@@ -12,9 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Circle.hpp"
-#include "Edge.hpp"
-#include "Rect.hpp"
+#include "Collision.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -116,6 +114,35 @@ inline namespace Math
         Kind GetKind() const
         {
             return mKind;
+        }
+
+        // -=(Undocumented)=-
+        Bool Intersects(ConstRef<Shape<Base>> Other, Ptr<Math::Manifold<Base>> Manifold)
+        {
+            using Function = Bool(*)(ConstPtr<void>, ConstPtr<void>, Ptr<Math::Manifold<Base>>);
+
+            static constexpr Function k_Dispatch[3][3] =
+            {
+                {
+                    Math::Intersects<Base, Circle<Base>, Circle<Base>>,
+                    Math::Intersects<Base, Circle<Base>, Edge<Base>>,
+                    Math::Intersects<Base, Circle<Base>, Rect<Base>>,
+                },
+                {
+                    Math::Intersects<Base, Edge<Base>, Circle<Base>>,
+                    Math::Intersects<Base, Edge<Base>, Edge<Base>>,
+                    Math::Intersects<Base, Edge<Base>, Rect<Base>>,
+                },
+                {
+                    Math::Intersects<Base, Rect<Base>, Circle<Base>>,
+                    Math::Intersects<Base, Rect<Base>, Edge<Base>>,
+                    Math::Intersects<Base, Rect<Base>, Rect<Base>>,
+                },
+           };
+
+            const UInt32 Row    = CastEnum(GetKind());
+            const UInt32 Column = CastEnum(Other.GetKind());
+            return k_Dispatch[Row][Column](AddressOf(Shape), AddressOf(Other), Manifold);
         }
 
         // -=(Undocumented)=-

@@ -12,7 +12,9 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Shape.hpp"
+#include "Circle.hpp"
+#include "Edge.hpp"
+#include "Rect.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -227,33 +229,4 @@ inline namespace Math
         return Math::Intersects<Base>(* static_cast<ConstPtr<Type>>(First), * static_cast<ConstPtr<Other>>(Second), Manifold);
     }
 
-    // -=(Undocumented)=-
-    template<typename Base>
-    static constexpr Bool Intersects(ConstRef<Math::Shape<Base>> Shape, ConstRef<Math::Shape<Base>> Other, Ptr<Math::Manifold<Base>> Manifold)
-    {
-        using Function = Bool(*)(ConstPtr<void>, ConstPtr<void>, Ptr<Math::Manifold<Base>>);
-
-        static constexpr Function k_Dispatch[3][3] =
-        {
-            {
-                Intersects<Base, Circle<Base>, Circle<Base>>,
-                Intersects<Base, Circle<Base>, Edge<Base>>,
-                Intersects<Base, Circle<Base>, Rect<Base>>,
-            },
-            {
-                Intersects<Base, Edge<Base>, Circle<Base>>,
-                Intersects<Base, Edge<Base>, Edge<Base>>,
-                Intersects<Base, Edge<Base>, Rect<Base>>,
-            },
-            {
-                Intersects<Base, Rect<Base>, Circle<Base>>,
-                Intersects<Base, Rect<Base>, Edge<Base>>,
-                Intersects<Base, Rect<Base>, Rect<Base>>,
-            },
-        };
-
-        constexpr UInt32 Row    = CastEnum(Shape.GetKind());
-        constexpr UInt32 Column = CastEnum(Other.GetKind());
-        return k_Dispatch[Row][Column](AddressOf(Shape), AddressOf(Other), Manifold);
-    }
 }
