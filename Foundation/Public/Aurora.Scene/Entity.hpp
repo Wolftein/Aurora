@@ -121,6 +121,20 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename Type, typename Relation>
+        void Attach(Any<Type> Component)
+        {
+            if constexpr (std::is_empty_v<Type>)
+            {
+                mHandle.add<Relation, Type>();
+            }
+            else
+            {
+                mHandle.set_second<Relation>(Move(Component));
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         auto Link() const
         {
@@ -138,6 +152,20 @@ namespace Scene
             else
             {
                 return mHandle.get_mut<Type>();
+            }
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type, typename Relation>
+        auto Find() const
+        {
+            if constexpr (std::is_const_v<Type>)
+            {
+                return mHandle.get_second<Relation, Type>();
+            }
+            else
+            {
+                return mHandle.get_mut_second<Relation, Type>();
             }
         }
 
