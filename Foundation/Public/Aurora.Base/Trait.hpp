@@ -190,44 +190,44 @@ inline namespace Core
     }
 
     // -=(Undocumented)=-
-    template<typename Type>
-    constexpr Bool HasBit(Type Field, Type Value)
+    template<typename Type, typename Value>
+    constexpr Bool HasBit(Type Field, Value Mask)
     {
-        return (Field & Value) == Value;
+        return (Field & Mask) == Mask;
     }
 
     // -=(Undocumented)=-
-    template<typename Type>
-    constexpr Type SetBit(Type Field, Type Value)
+    template<typename Type, typename Value>
+    constexpr Type SetBit(Type Field, Value Mask)
     {
-        return Field | Value;
+        return Field | Mask;
     }
 
     // -=(Undocumented)=-
-    template<typename Type, Type Mask, Type Shift>
-    constexpr Type SetBit(Type Field, Type Value)
+    template<typename Type, typename Value, Value Mask, Value Shift>
+    constexpr Type SetBit(Type Field, Value Bit)
     {
-        return Field & ~Mask | Value << Shift & Mask;
+        return Field & ~Mask | Bit << Shift & Mask;
     }
 
     // -=(Undocumented)=-
-    template<typename Type>
-    constexpr Type ClearBit(Type Field, Type Value)
+    template<typename Type, typename Value>
+    constexpr Type ClearBit(Type Field, Value Mask)
     {
-        return Field & ~Value;
+        return Field & ~Mask;
     }
 
     // -=(Undocumented)=-
-    template<typename Type>
-    constexpr Type ToggleBit(Type Field, Type Value, Bool Enable)
+    template<typename Type, typename Value>
+    constexpr Type ToggleBit(Type Field, Value Mask, Bool Enable)
     {
         if (Enable)
         {
-            return SetBit(Field, Value);
+            return SetBit(Field, Mask);
         }
         else
         {
-            return ClearBit(Field, Value);
+            return ClearBit(Field, Mask);
         }
     }
 
