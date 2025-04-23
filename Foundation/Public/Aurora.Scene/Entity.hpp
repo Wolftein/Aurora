@@ -38,6 +38,12 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        Entity(flecs::id Id)
+            : mHandle { Id.world(), Id.raw_id() }
+        {
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         Entity(Type Handle)
             : mHandle { Handle }
@@ -72,6 +78,12 @@ namespace Scene
         Bool IsNull() const
         {
             return mHandle == 0;
+        }
+
+        // -=(Undocumented)=-
+        Bool IsPair() const
+        {
+            return mHandle.is_pair();
         }
 
         // -=(Undocumented)=-
@@ -383,6 +395,13 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename Function>
+        void Iterate(Any<Function> Callback) const
+        {
+            mHandle.each(Callback);
+        }
+
+        // -=(Undocumented)=-
         void SetName(CStr Name)
         {
             mHandle.set_name(Name.data());
@@ -393,6 +412,18 @@ namespace Scene
         {
             const flecs::string_view Name = mHandle.name();
             return CStr(Name.c_str(), Name.size());
+        }
+
+        // -=(Undocumented)=-
+        Entity GetFirst() const
+        {
+            return mHandle.first();
+        }
+
+        // -=(Undocumented)=-
+        Entity GetSecond() const
+        {
+            return mHandle.second();
         }
 
         // -=(Undocumented)=-
