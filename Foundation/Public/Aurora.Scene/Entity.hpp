@@ -147,6 +147,18 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<Bool Notify = false>
+        void Ensure(Handle Component)
+        {
+            mHandle.ensure(Component);
+
+            if constexpr (Notify)
+            {
+                mHandle.modified(Component);
+            }
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         auto Link() const
         {
