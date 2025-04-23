@@ -166,6 +166,18 @@ inline namespace Core
     using Vector    = std::vector<Value>;
 
     // -=(Undocumented)=-
+    template<typename Type>
+    struct AnkerlHash
+    {
+        using is_avalanching = void;
+
+        [[nodiscard]] size_t operator()(ConstRef<Type> Value) const
+        {
+            return ankerl::unordered_dense::detail::wyhash::hash(& Value, sizeof(Value));
+        }
+    };
+
+    // -=(Undocumented)=-
     struct StringHash
     {
         using is_transparent = void;
