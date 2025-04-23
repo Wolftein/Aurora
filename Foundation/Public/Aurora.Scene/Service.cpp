@@ -167,13 +167,15 @@ namespace Scene
 
     void Service::LoadComponents(Ref<Reader> Reader, Entity Actor)
     {
-        const flecs::entity Entity = Actor.GetHandle();
-
         while (Reader.Peek<UInt32>() != k_Terminator)
         {
+            // Read Component's Pair
+            const SStr Pair(Reader.ReadString8());
+            const Entity First = Pair.empty() ? Entity() : mWorld.component(Pair.c_str());
+
             // Read Component's ID
             const SStr Name(Reader.ReadString8());
-            const flecs::untyped_component Component = mWorld.component(Name.c_str());
+            const Entity Second = mWorld.component(Name.c_str());
 
             // Read Component's Bundle
             CPtr<UInt8> Bundle = Reader.ReadBlock<UInt8>();
@@ -181,22 +183,40 @@ namespace Scene
             // Read Component's Data
             if (Core::Reader Data(Bundle); Data.GetAvailable() > 0)
             {
-                if (const ConstPtr<Factory> Serializer = Component.get_mut<Factory>())
+                if (const ConstPtr<Factory> Serializer = Second.Find<const Factory>())
                 {
-                    if (const Ptr<void> Memory = Entity.ensure(Component))
+                    if (First.IsValid())
                     {
-                        Serializer->Read(Data, Memory);
+                        if (const Ptr<void> Memory = Actor.Ensure(First, Second))
+                        {
+                            Serializer->Read(Data, Memory);
+                        }
+                        Actor.Notify(First, Second);
                     }
-                    Entity.modified(Component);
+                    else
+                    {
+                        if (const Ptr<void> Memory = Actor.Ensure(Second))
+                        {
+                            Serializer->Read(Data, Memory);
+                        }
+                        Actor.Notify(Second);
+                    }
                 }
                 else
                 {
-                    Log::Warn("World: Trying to load an invalid component '{}'", Component.name().c_str());
+                    Log::Warn("World: Trying to load an invalid component '{}'", Second.GetName());
                 }
             }
             else
             {
-                Entity.add(Component);
+                if (First.IsValid())
+                {
+                    Actor.Attach(First, Second);
+                }
+                else
+                {
+                    Actor.Attach(Second);
+                }
             }
         }
 
@@ -209,34 +229,44 @@ namespace Scene
 
     void Service::SaveComponents(Ref<Writer> Writer, Entity Actor)
     {
-        // TODO Cache query somewhere
-        const flecs::query Query = mWorld.query_builder()
-                .with<Factory>().src("$component")
-                .with("$component").src(Actor.GetHandle())
-                .build();
-
-        const auto OnIterate = [&](Ref<flecs::iter> Iterator)
+        // Write Components
+        const auto OnIterateComponent = [&](Entity Component)
         {
-            while (Iterator.next())
+            Entity First;
+            Entity Second;
+
+            if (Component.IsPair())
             {
-                const Entity Component = Iterator.src(0);
-                const Entity Actor     = Iterator.src(1);
+                First  = Component.GetFirst();
+                Second = Component.GetSecond();
+            }
+            else
+            {
+                Second = Component;
+            }
+
+            ConstPtr<Factory> Serializer = Second.Find<const Factory>();
+
+            if (Serializer && (First.IsNull() || First.Contains<Factory>()))
+            {
+                // Write Component's Pair
+                Writer.WriteString8(First.IsValid() ? First.GetName() : "");
 
                 // Write Component's ID
-                Writer.WriteString8(Component.GetName());
+                Writer.WriteString8(Second.GetName());
 
                 // Write Component's Data
                 Core::Writer Bundle;
-                Iterator.field<const Factory>(0)->Write(Bundle, Actor.Find(Component));
+                Serializer->Write(Bundle, Actor.Find(Second));
 
                 // Flush Component's Data
                 Writer.WriteBlock(Bundle.GetData());
             }
-
-            // Write terminator
-            Writer.WriteUInt32(k_Terminator);
         };
-        Query.run(OnIterate);
+        Actor.Iterate(OnIterateComponent);
+
+        // Write Terminator
+        Writer.WriteUInt32(k_Terminator);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -252,6 +282,6 @@ namespace Scene
             });
 
         // Register default component(s).
-        Register<Factory>("Serializer");
+        Register<Factory>("Factory");
     }
 }

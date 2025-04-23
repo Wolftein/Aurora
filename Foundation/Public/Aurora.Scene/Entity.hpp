@@ -100,9 +100,9 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        auto Attach(Entity Component)
+        void Attach(Entity Component)
         {
-            return mHandle.ensure(Component.GetID());
+            mHandle.add(Component.GetID());
         }
 
         // -=(Undocumented)=-
@@ -110,6 +110,13 @@ namespace Scene
         void Attach(Entity Component)
         {
             mHandle.add<First>(Component.GetID());
+        }
+
+        // -=(Undocumented)=-
+        template<typename First, typename Second>
+        void Attach()
+        {
+            mHandle.add<First, Second>();
         }
 
         // -=(Undocumented)=-
@@ -147,15 +154,15 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<Bool Notify = false>
-        void Ensure(Handle Component)
+        auto Ensure(Entity Component)
         {
-            mHandle.ensure(Component);
+            return mHandle.ensure(Component.GetHandle());
+        }
 
-            if constexpr (Notify)
-            {
-                mHandle.modified(Component);
-            }
+        // -=(Undocumented)=-
+        auto Ensure(Entity First, Entity Second)
+        {
+            return mHandle.ensure(First.GetHandle(), Second.GetHandle());
         }
 
         // -=(Undocumented)=-
@@ -251,6 +258,13 @@ namespace Scene
         Bool Contains(Entity Component) const
         {
             return mHandle.has(Component.GetID());
+        }
+
+        // -=(Undocumented)=-
+        template<typename First, typename Second>
+        Bool Contains() const
+        {
+            return mHandle.has<First, Second>();
         }
 
         // -=(Undocumented)=-
