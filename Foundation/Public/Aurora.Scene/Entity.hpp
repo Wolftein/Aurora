@@ -392,6 +392,12 @@ namespace Scene
     public:
 
         // -=(Undocumented)=-
+        static void Destroy(Scene::Entity Actor)
+        {
+            Actor.Destruct();
+        }
+
+        // -=(Undocumented)=-
         template<typename Component, Bool Enable>
         static void ToggleComponent(Scene::Entity Actor)
         {
