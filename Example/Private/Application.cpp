@@ -136,7 +136,7 @@ namespace Example
 
         // Register default system(s).
         using Query = Scene::Query<>;
-        GetSubsystem<Scene::Service>()->Match<Query>("OnTransformUpdateQuery")
+        GetSubsystem<Scene::Service>()->Match<>("OnTransformUpdateQuery")
             .with<const Transformf>()
             .with<const Matrix4f>().optional().parent().cascade()
             .with<Matrix4f>().out()

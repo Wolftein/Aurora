@@ -145,13 +145,10 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<typename Query>
+        template<typename ...Components>
         auto Match(CStr Name = "")
         {
-            return std::apply([&](auto... Arguments)
-            {
-                return mWorld.template query_builder<decltype(Arguments)...>(Name.data());
-            }, typename Query::Types { });
+            return mWorld.template query_builder<Components...>(Name.data());
         }
 
     public:

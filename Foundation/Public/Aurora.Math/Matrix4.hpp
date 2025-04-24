@@ -145,7 +145,7 @@ inline namespace Math
         Quaternion<Base> GetRotation() const
         {
             const Vector3<Base> Scale = GetScale();
-            
+
             const Base M00 = GetComponent(0)  / Scale.GetX();
             const Base M01 = GetComponent(1)  / Scale.GetY();
             const Base M02 = GetComponent(2)  / Scale.GetZ();
