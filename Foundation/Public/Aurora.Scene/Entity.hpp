@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Pair.hpp"
 #include "Proxy.hpp"
 #include "Tag.hpp"
 
@@ -140,16 +141,16 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
-        template<typename Type, typename Relation>
-        void Attach(Any<Type> Component)
+        template<typename First, typename Second>
+        void Attach(Any<Second> Component)
         {
-            if constexpr (std::is_empty_v<Type>)
+            if constexpr (std::is_empty_v<Second>)
             {
-                mHandle.add<Relation, Type>();
+                mHandle.add<First, Second>();
             }
             else
             {
-                mHandle.set_second<Relation>(Move(Component));
+                mHandle.set_second<First>(Move(Component));
             }
         }
 
