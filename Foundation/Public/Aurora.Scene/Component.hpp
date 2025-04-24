@@ -83,27 +83,30 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename Type>
-        void Attach()
+        Ref<Component> Attach()
         {
             mHandle.template add<Type>();
+            return (* this);
         }
 
         // -=(Undocumented)=-
         template<typename First>
-        void Attach(Component Component)
+        Ref<Component> Attach(Component Component)
         {
             mHandle.template add<First>(Component.GetID());
+            return (* this);
         }
 
         // -=(Undocumented)=-
-        void Attach(Component First, Component Second)
+        Ref<Component> Attach(Component First, Component Second)
         {
             mHandle.add(First.GetID(), Second.GetID());
+            return (* this);
         }
 
         // -=(Undocumented)=-
         template<typename Type>
-        void Attach(Any<Type> Component)
+        Ref<Component> Attach(Any<Type> Component)
         {
             if constexpr (std::is_empty_v<Type>)
             {
@@ -113,6 +116,7 @@ namespace Scene
             {
                 mHandle.template set<Type>(Move(Component));
             }
+            return (* this);
         }
 
         // -=(Undocumented)=-
@@ -142,7 +146,7 @@ namespace Scene
             {
                 mHandle.add(flecs::CanToggle);
             }
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
@@ -150,14 +154,14 @@ namespace Scene
         Ref<Component> With()
         {
             mHandle.add(EcsWith, mHandle.world().template component<Type>());
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
         Ref<Component> With(Component Component)
         {
             mHandle.add(EcsWith, Component.GetHandle());
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
@@ -286,7 +290,12 @@ namespace Scene
             {
                 Detach(flecs::CanToggle);
             }
-            return * this;
+
+            if constexpr (HasBit(Trait, CastEnum(Trait::Associative)))
+            {
+                Detach(flecs::PairIsTag);
+            }
+            return (* this);
         }
 
         // -=(Undocumented)=-
@@ -409,7 +418,7 @@ namespace Scene
         Ref<Component> SetName(CStr Name)
         {
             mHandle.set_name(Name.data());
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
@@ -424,7 +433,7 @@ namespace Scene
         Ref<Component> OnAdd(Any<Function> Callback)
         {
             mHandle.on_add(Callback);
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
@@ -432,7 +441,7 @@ namespace Scene
         Ref<Component> OnSet(Any<Function> Callback)
         {
             mHandle.on_set(Callback);
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-
@@ -440,7 +449,7 @@ namespace Scene
         Ref<Component> OnRemove(Any<Function> Callback)
         {
             mHandle.on_remove(Callback);
-            return * this;
+            return (* this);
         }
 
         // -=(Undocumented)=-

@@ -69,5 +69,8 @@ namespace Scene
 
         // -=(Undocumented)=-
         Toggleable   = 0b00001000,
+
+        // -=(Undocumented)=-
+        Associative  = 0b00010000,
     };
 }
