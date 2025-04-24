@@ -144,15 +144,17 @@ inline namespace Math
         // -=(Undocumented)=-
         Quaternion<Base> GetRotation() const
         {
-            const Base M00 = GetComponent(0);
-            const Base M01 = GetComponent(1);
-            const Base M02 = GetComponent(2);
-            const Base M10 = GetComponent(4);
-            const Base M11 = GetComponent(5);
-            const Base M12 = GetComponent(6);
-            const Base M20 = GetComponent(8);
-            const Base M21 = GetComponent(9);
-            const Base M22 = GetComponent(10);
+            const Vector3<Base> Scale = GetScale();
+            
+            const Base M00 = GetComponent(0)  / Scale.GetX();
+            const Base M01 = GetComponent(1)  / Scale.GetY();
+            const Base M02 = GetComponent(2)  / Scale.GetZ();
+            const Base M10 = GetComponent(4)  / Scale.GetX();
+            const Base M11 = GetComponent(5)  / Scale.GetY();
+            const Base M12 = GetComponent(6)  / Scale.GetZ();
+            const Base M20 = GetComponent(8)  / Scale.GetX();
+            const Base M21 = GetComponent(9)  / Scale.GetY();
+            const Base M22 = GetComponent(10) / Scale.GetZ();
 
             const Base Trace = M00 + M11 + M22;
 
