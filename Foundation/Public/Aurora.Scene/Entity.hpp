@@ -288,6 +288,13 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename First, typename Second>
+        void Detach()
+        {
+            mHandle.remove<First, Second>();
+        }
+
+        // -=(Undocumented)=-
         void Detach(Entity First, Entity Second)
         {
             mHandle.remove(First.GetID(), Second.GetID());
