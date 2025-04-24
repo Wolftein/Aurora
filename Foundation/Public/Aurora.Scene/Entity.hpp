@@ -483,6 +483,21 @@ namespace Scene
             Actor.Children(& ToggleComponentInHierarchy<Component, Enable>);
         }
 
+        // -=(Undocumented)=-
+        template<typename Component>
+        static void AddOrEnableComponentInHierarchy(Scene::Entity Actor)
+        {
+            if (Actor.Contains<Component>())
+            {
+                Actor.Enable<Component>();
+            }
+            else
+            {
+                Actor.Attach<Component>();
+            }
+            Actor.Children(& AddOrEnableComponentInHierarchy<Component>);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
