@@ -128,13 +128,70 @@ inline namespace Math
         // -=(Undocumented)=-
         Vector3<Base> GetScale() const
         {
-            return Vector3<Base>(GetComponent(0), GetComponent(5), GetComponent(10));
+            const Vector3<Base> XAxis(GetComponent(0), GetComponent(1), GetComponent(2));
+            const Vector3<Base> YAxis(GetComponent(4), GetComponent(5), GetComponent(6));
+            const Vector3<Base> ZAxis(GetComponent(8), GetComponent(9), GetComponent(10));
+
+            return Vector3<Base>(XAxis.GetLength(), YAxis.GetLength(), ZAxis.GetLength());
         }
 
         // -=(Undocumented)=-
         Vector3<Base> GetTranslation() const
         {
             return Vector3<Base>(GetComponent(12), GetComponent(13), GetComponent(14));
+        }
+
+        // -=(Undocumented)=-
+        Quaternion<Base> GetRotation() const
+        {
+            const Base M00 = GetComponent(0);
+            const Base M01 = GetComponent(1);
+            const Base M02 = GetComponent(2);
+            const Base M10 = GetComponent(4);
+            const Base M11 = GetComponent(5);
+            const Base M12 = GetComponent(6);
+            const Base M20 = GetComponent(8);
+            const Base M21 = GetComponent(9);
+            const Base M22 = GetComponent(10);
+
+            const Base Trace = M00 + M11 + M22;
+
+            if (Trace > 0.0)
+            {
+                const Base S = Sqrt(Trace + 1.0) * 2.0;
+                return Quaternion<Base>(
+                    (M21 - M12) / S,
+                    (M02 - M20) / S,
+                    (M10 - M01) / S,
+                    0.25 * S);
+            }
+            else if (M00 > M11 && M00 > M22)
+            {
+                const Base S = Sqrt(1.0 + M00 - M11 - M22) * 2.0;
+                return Quaternion<Base>(
+                    0.25 * S,
+                    (M01 + M10) / S,
+                    (M02 + M20) / S,
+                    (M21 - M12) / S);
+            }
+            else if (M11 > M22)
+            {
+                const Base S = Sqrt(1.0 + M11 - M00 - M22) * 2.0;
+                return Quaternion<Base>(
+                    (M01 + M10) / S,
+                    0.25 * S,
+                    (M12 + M21) / S,
+                    (M02 - M20) / S);
+            }
+            else
+            {
+                const Base S = Sqrt(1.0 + M22 - M00 - M11) * 2.0;
+                return Quaternion<Base>(
+                    (M02 + M20) / S,
+                    (M12 + M21) / S,
+                    0.25 * S,
+                    (M10 - M01) / S);
+            }
         }
 
         // -=(Undocumented)=-
