@@ -153,9 +153,12 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto System(CStr Name = "")
+        auto System(CStr Name = "", Entity Phase = EcsOnUpdate)
         {
-            return mWorld.template system<Components...>(Name.data());
+            auto Builder = mWorld.template system<Components...>(Name.data());
+            Builder.kind(Phase);
+
+            return Builder;
         }
 
     public:
