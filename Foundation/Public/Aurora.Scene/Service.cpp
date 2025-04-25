@@ -24,6 +24,8 @@ namespace Scene
     Service::Service(Ref<Context> Context)
         : AbstractSubsystem(Context)
     {
+        mWorld.set_threads(SDL_GetNumLogicalCPUCores());
+
         // Ensures that handles within this range are exclusively for entities created during runtime,
         // preventing conflicts with internal engine objects like component(s) or archetype(s).
         mWorld.set_entity_range(k_MinRangeDynamics, k_MaxRangeDynamics);
@@ -37,8 +39,7 @@ namespace Scene
 
     void Service::OnTick(ConstRef<Time> Time)
     {
-        mWorld.frame_begin(Time.GetDelta());
-        mWorld.frame_end();
+        mWorld.progress(Time.GetDelta());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -151,6 +151,13 @@ namespace Scene
             return mWorld.template query_builder<Components...>(Name.data());
         }
 
+        // -=(Undocumented)=-
+        template<typename ...Components>
+        auto System()
+        {
+            return mWorld.template system<Components...>();
+        }
+
     public:
 
         // -=(Undocumented)=-
