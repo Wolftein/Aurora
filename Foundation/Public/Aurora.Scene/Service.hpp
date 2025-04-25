@@ -153,9 +153,9 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
-        auto System()
+        auto System(CStr Name = "")
         {
-            return mWorld.template system<Components...>();
+            return mWorld.template system<Components...>(Name.data());
         }
 
     public:
