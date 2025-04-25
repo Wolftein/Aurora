@@ -139,6 +139,13 @@ namespace Scene
 
         // -=(Undocumented)=-
         template<typename ...Components>
+        auto Event()
+        {
+            return mWorld.template event<Components...>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename ...Components>
         auto React(CStr Name = "")
         {
             return mWorld.template observer<Components...>(Name.data());
