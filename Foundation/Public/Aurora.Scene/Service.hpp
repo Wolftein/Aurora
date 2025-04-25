@@ -156,7 +156,7 @@ namespace Scene
         auto System(CStr Name = "", Entity Phase = EcsOnUpdate)
         {
             auto Builder = mWorld.template system<Components...>(Name.data());
-            Builder.kind(Phase);
+            Builder.kind(Phase.GetHandle());
 
             return Builder;
         }
