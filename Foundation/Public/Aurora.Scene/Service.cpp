@@ -246,7 +246,7 @@ namespace Scene
                 Second = Component;
             }
 
-            ConstPtr<Factory> Serializer = Second.Find<const Factory>();
+            ConstPtr<Factory> Serializer = Second.IsValid() ? Second.Find<const Factory>() : nullptr;
 
             if (Serializer && (First.IsNull() || First.Contains<Factory>()))
             {
