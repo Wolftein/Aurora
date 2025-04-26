@@ -258,7 +258,7 @@ namespace Scene
 
                 // Write Component's Data
                 Core::Writer Bundle;
-                Serializer->Write(Bundle, Actor.Find(Second));
+                Serializer->Write(Bundle, Actor.Find(Component));
 
                 // Flush Component's Data
                 Writer.WriteBlock(Bundle.GetData());
