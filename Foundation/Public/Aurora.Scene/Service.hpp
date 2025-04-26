@@ -25,15 +25,15 @@ namespace Scene
 {
     // -=(Undocumented)=-
     // @TODO: 128Bit UUID instead of names.
-    class Service final : public AbstractSubsystem<Service>, public Tickable
+    class Service final : public AbstractSubsystem<Service>
     {
     public:
 
         // -=(Undocumented)=-
         explicit Service(Ref<Context> Context);
 
-        // \see Tickable::OnTick
-        void OnTick(ConstRef<Time> Time) override;
+        // -=(Undocumented)=-
+        void Progress(ConstRef<Time> Time);
 
         // -=(Undocumented)=-
         template<typename Type>
