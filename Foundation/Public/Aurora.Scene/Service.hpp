@@ -39,14 +39,14 @@ namespace Scene
         template<typename Type>
         void Attach(Any<Type> Component)
         {
-            if constexpr (std::is_empty_v<Type>)
-            {
-                mWorld.add<Type>();
-            }
-            else
-            {
-                mWorld.set<Type>(Move(Component));
-            }
+            mWorld.set<Type>(Move(Component));
+        }
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        void Attach()
+        {
+            mWorld.add<Type>();
         }
 
         // -=(Undocumented)=-
