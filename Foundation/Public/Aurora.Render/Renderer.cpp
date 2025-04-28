@@ -111,10 +111,10 @@ namespace Graphic
         Ref<Command> Command = Create(Type::Sprite, GetUniqueKey(Material->GetKind(), Type::Sprite, Depth, Material->GetID()));
         Command.Material = Material.get();
         Command.Tint     = Tint;
-        Command.Edges[0] = Transform * Vector3f(Origin.GetLeft(),  Origin.GetBottom(), 0.0f);
-        Command.Edges[1] = Transform * Vector3f(Origin.GetRight(), Origin.GetBottom(), 0.0f);
-        Command.Edges[2] = Transform * Vector3f(Origin.GetRight(), Origin.GetTop(),    0.0f);
-        Command.Edges[3] = Transform * Vector3f(Origin.GetLeft(),  Origin.GetTop(),    0.0f);
+        Command.Edges[0] = Transform * Vector3f(Origin.GetLeft(),  Origin.GetBottom(), Depth);
+        Command.Edges[1] = Transform * Vector3f(Origin.GetRight(), Origin.GetBottom(), Depth);
+        Command.Edges[2] = Transform * Vector3f(Origin.GetRight(), Origin.GetTop(),    Depth);
+        Command.Edges[3] = Transform * Vector3f(Origin.GetLeft(),  Origin.GetTop(),    Depth);
         Command.UV       = UV;
     }
 
