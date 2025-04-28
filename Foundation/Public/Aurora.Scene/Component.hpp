@@ -82,6 +82,12 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        Bool IsTag() const
+        {
+            return ecs_id_is_tag(mHandle.world(), mHandle.id());
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         Ref<Component> Attach()
         {

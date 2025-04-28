@@ -94,6 +94,12 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        Bool IsTag() const
+        {
+            return ecs_id_is_tag(mHandle.world(), mHandle.id());
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         void Attach()
         {
@@ -292,6 +298,13 @@ namespace Scene
         void Detach()
         {
             mHandle.remove<First, Second>();
+        }
+
+        // -=(Undocumented)=-
+        template<typename First>
+        void Detach(Entity Second)
+        {
+            mHandle.remove<First>(Second.GetID());
         }
 
         // -=(Undocumented)=-
