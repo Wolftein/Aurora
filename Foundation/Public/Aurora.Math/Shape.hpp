@@ -43,8 +43,8 @@ inline namespace Math
 
         // -=(Undocumented)=-
         constexpr Shape()
-            : mKind { Kind::Rectangle }
         {
+            SetData(Rectf());
         }
 
         // -=(Undocumented)=-
