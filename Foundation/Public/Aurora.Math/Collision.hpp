@@ -22,7 +22,6 @@
 
 inline namespace Math
 {
-
     // -=(Undocumented)=-
     template<typename Base>
     static constexpr Bool Intersects(ConstRef<Math::Circle<Base>> Circle, ConstRef<Math::Circle<Base>> Other, Ptr<Math::Manifold<Base>> Manifold)
@@ -39,7 +38,7 @@ inline namespace Math
             Core::Clamp(Center.GetX(), Rectangle.GetLeft(), Rectangle.GetRight()),
             Core::Clamp(Center.GetY(), Rectangle.GetTop(),  Rectangle.GetBottom()));
 
-        const Vector2<Base> Delta = Center - Closest;
+        const Vector2<Base> Delta = Closest - Center;
         const Base SqDistance     = Delta.GetLengthSquared();
         const Base SqRadius       = Circle.GetRadius() * Circle.GetRadius();
 
@@ -99,7 +98,13 @@ inline namespace Math
     template<typename Base>
     static constexpr Bool Intersects(ConstRef<Math::Rect<Base>> Rectangle, ConstRef<Math::Circle<Base>> Circle, Ptr<Math::Manifold<Base>> Manifold)
     {
-        return Intersects<Base>(Circle, Rectangle, Manifold);
+        const Bool Result = Intersects<Base>(Circle, Rectangle, Manifold);
+
+        if (Result && Manifold)
+        {
+            Manifold->SetNormal(-Manifold->GetNormal());
+        }
+        return Result;
     }
 
     // -=(Undocumented)=-
@@ -192,7 +197,7 @@ inline namespace Math
                     Normal = Vector2<Base>::Normalize(Rectangle.GetCenter() - Contact);
                 }
 
-                Manifold->SetPenetration(Delta.GetLength() * (T1 - T0));
+                Manifold->SetPenetration((T1 - T0) * Delta.Dot(Normal));
                 Manifold->SetNormal(Normal);
                 Manifold->AddPoint(Contact);
             }
@@ -212,13 +217,25 @@ inline namespace Math
     template<typename Base>
     static constexpr Bool Intersects(ConstRef<Math::Edge<Base>> Edge, ConstRef<Math::Circle<Base>> Circle, Ptr<Math::Manifold<Base>> Manifold)
     {
-        return Intersects<Base>(Circle, Edge, Manifold);
+        const Bool Result = Intersects<Base>(Circle, Edge, Manifold);
+
+        if (Result && Manifold)
+        {
+            Manifold->SetNormal(-Manifold->GetNormal());
+        }
+        return Result;
     }
 
     // -=(Undocumented)=-
     template<typename Base>
     static constexpr Bool Intersects(ConstRef<Math::Edge<Base>> Edge, ConstRef<Math::Rect<Base>> Rectangle, Ptr<Math::Manifold<Base>> Manifold)
     {
-        return Intersects<Base>(Rectangle, Edge, Manifold);
+        const Bool Result = Intersects<Base>(Rectangle, Edge, Manifold);
+
+        if (Result && Manifold)
+        {
+            Manifold->SetNormal(-Manifold->GetNormal());
+        }
+        return Result;
     }
 }
