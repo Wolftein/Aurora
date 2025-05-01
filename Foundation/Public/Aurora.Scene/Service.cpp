@@ -284,5 +284,15 @@ namespace Scene
 
         // Register default component(s).
         Register<Factory>("Factory");
+
+#ifdef   FLECS_REST_SERVICE
+
+        // Import \see flecs::stats for extended information.
+        mWorld.import<flecs::stats>();
+
+        // Import \see flecs::Rest for the rest service.
+        mWorld.set<flecs::Rest>({});
+
+#endif // FLECS_REST_SERVICE
     }
 }
