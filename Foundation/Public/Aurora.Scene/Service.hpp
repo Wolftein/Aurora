@@ -106,6 +106,14 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename First, typename Second>
+        auto GetComponent()
+        {
+            const auto Handle = mWorld.entity(mWorld.pair<First, Second>());
+            return Entity(Handle);
+        }
+
+        // -=(Undocumented)=-
         template<typename Function>
         void GetArchetypes(Any<Function> Callback)
         {
