@@ -43,7 +43,7 @@ namespace Scene
         // -=(Undocumented)=-
         Bool IsNull() const
         {
-            return mHandle == 0;
+            return mHandle.component() == 0;
         }
 
         // -=(Undocumented)=-

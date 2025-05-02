@@ -180,6 +180,13 @@ namespace Scene
         }
 
         // -=(Undocumented)=-
+        template<typename First, typename Second>
+        auto Link() const
+        {
+            return Scene::Proxy<Second>(mHandle.get_ref<First, Second>());
+        }
+
+        // -=(Undocumented)=-
         template<typename Type>
         auto Find() const
         {
