@@ -12,25 +12,28 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
+#include "Aurora.Content/Loader.hpp"
+#include "Aurora.Graphic/Texture.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-namespace Example
+
+namespace Content
 {
-    // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    /// \brief Represents the \ref Loader for PNG, BMP and JPG using STB.
+    class STBLoader final : public Loader
     {
     public:
 
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
+        /// \copydoc Loader::GetExtensions
+        ConstSpan<ConstText> GetExtensions() const override
+        {
+            static constexpr List<ConstText> EXTENSION_LIST = { "png", "bmp", "jpg", "jpeg" };
+            return EXTENSION_LIST;
+        }
 
-        // \see Kernel::OnTick
-        void OnTick(ConstRef<Time> Time) override;
-
-        // \see Kernel::OnTeardown
-        void OnTeardown() override;
+        /// \copydoc Loader::Load
+        Bool Load(Ref<Service> Service, Ref<Scope> Scope, AnyRef<Blob> Data) override;
     };
 }

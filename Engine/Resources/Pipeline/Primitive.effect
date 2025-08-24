@@ -1,0 +1,30 @@
+[Properties.Blend]  # Straight Alpha-Blending
+
+    SrcColor        = "SrcAlpha"
+    DstColor        = "OneMinusSrcAlpha"
+    SrcAlpha        = "SrcAlpha"
+    DstAlpha        = "OneMinusSrcAlpha"
+
+[Properties.Depth]  # Enable Depth Write / Depth Testing
+
+    Mask            = 1
+    Condition       = "LessEqual"
+
+[Properties.Layout]
+
+    Attributes      = [
+        ["POSITION",  "Float32x3",   0,  0],
+        ["COLOR",     "UIntNorm8x4", 0, 20],
+    ]
+
+    Primitive       = "TriangleList"
+
+[Program.Vertex]
+
+    Entry           = "vertex"
+    Filename        = "Engine://Pipeline/Primitive.shader"
+
+[Program.Fragment]
+
+    Entry           = "fragment"
+    Filename        = "Engine://Pipeline/Primitive.shader"

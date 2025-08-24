@@ -12,25 +12,26 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
+#include "Aurora.Content/Mount.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-namespace Example
+
+namespace Content
 {
-    // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    /// \brief Virtual filesystem mount backed by memory, using a compiled resource pack.
+    class EmbeddedMount final : public Mount
     {
     public:
 
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
+        /// \copydoc Mount::Read
+        Blob Read(ConstText Path) override;
 
-        // \see Kernel::OnTick
-        void OnTick(ConstRef<Time> Time) override;
+        /// \copydoc Mount::Write
+        void Write(ConstText Path, ConstSpan<Byte> Bytes) override;
 
-        // \see Kernel::OnTeardown
-        void OnTeardown() override;
+        /// \copydoc Mount::Delete
+        void Delete(ConstText Path) override;
     };
 }

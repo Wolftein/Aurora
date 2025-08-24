@@ -12,25 +12,20 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
+#include "Aurora.Audio/Codec.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-namespace Example
+
+namespace Audio
 {
-    // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    /// \brief Represents the \ref Codec for compressed MP3 audio streams.
+    class MP3Codec final : public Codec
     {
     public:
 
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
-
-        // \see Kernel::OnTick
-        void OnTick(ConstRef<Time> Time) override;
-
-        // \see Kernel::OnTeardown
-        void OnTeardown() override;
+        /// \copydoc Codec::Decode
+        Unique<Decoder> Decode(ConstRef<Blob> Data, ConstRef<Schema> Schema) override;
     };
 }

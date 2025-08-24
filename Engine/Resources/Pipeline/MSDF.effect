@@ -1,0 +1,42 @@
+[Properties.Blend]  # Pre-Multiplied Alpha Blend
+
+    SrcColor        = "One"
+    DstColor        = "OneMinusSrcAlpha"
+    SrcAlpha        = "One"
+    DstAlpha        = "OneMinusSrcAlpha"
+
+[Properties.Depth]  # Enable Depth Write / Depth Testing
+
+    Mask            = 1
+    Condition       = "LessEqual"
+
+[Properties.Layout]
+
+    Attributes      = [
+        ["POSITION",  "Float32x3",   0, 0  ],
+        ["TEXCOORD0", "Float32x2",   0, 12 ],
+        ["COLOR",     "UIntNorm8x4", 0, 20 ],
+        ["CUSTOM0",   "UInt8x4",     0, 24 ]
+    ]
+
+    Primitive       = "TriangleList"
+
+[Program.Textures]
+
+    Diffuse         = 0
+
+[Program.Vertex]
+
+    Entry           = "vertex"
+    Filename        = "Engine://Pipeline/MSDF.shader"
+    Defines  	    = [
+        "ENABLE_ALPHA_TEST"
+    ]
+
+[Program.Fragment]
+
+    Entry           = "fragment"
+    Filename        = "Engine://Pipeline/MSDF.shader"
+    Defines  	    = [
+        "ENABLE_ALPHA_TEST"
+    ]

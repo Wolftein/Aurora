@@ -12,25 +12,25 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
+#include "Aurora.Base/Enum.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-namespace Example
+
+inline namespace Math
 {
-    // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    /// \brief Enumerates pivot points for 2D/3D transforms.
+    enum class Pivot : UInt8
     {
-    public:
-
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
-
-        // \see Kernel::OnTick
-        void OnTick(ConstRef<Time> Time) override;
-
-        // \see Kernel::OnTeardown
-        void OnTeardown() override;
+        LeftTop,        ///< Top-left
+        LeftMiddle,     ///< Left-center
+        LeftBottom,     ///< Bottom-left
+        CenterTop,      ///< Top-center
+        CenterMiddle,   ///< Center
+        CenterBottom,   ///< Bottom-center
+        RightTop,       ///< Top-right
+        RightMiddle,    ///< Right-center
+        RightBottom,    ///< Bottom-right
     };
 }

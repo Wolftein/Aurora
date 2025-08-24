@@ -11,7 +11,10 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Application.hpp"
-#include <Aurora.Content/Locator/SystemLocator.hpp>
+#include "Aurora.Math/Matrix4x4.hpp"
+#include "Aurora.Math/Tween.hpp"
+#include "Aurora.Graphic/Experimental/Render2D.hpp"
+#include <Aurora.Content/Mount/DiskMount.hpp>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -19,185 +22,209 @@
 
 namespace Example
 {
-    Scene::Entity GrandMaster;
-    Scene::Entity Master;
-    Scene::Entity Child;
-    Scene::Entity Random;
-    Scene::Entity MySprite;
-    Scene::Proxy<Transformf> MyCacheLocalscape;
-    Scene::Proxy<Transformf> MyCacheLocalscape2;
+    Unique<Graphic::Render2D> Renderer;
+    Tracker<Graphic::Service>  Graphics;
+    Graphic::Camera Camera;
+    Tracker<Graphic::Material> Material;
+    Tracker<Graphic::Pipeline> Pipeline;
+
+    Tracker<Graphic::Font> Font;
+    Graphic::Object            VBO;
+    Graphic::Object            IBO;
+
+    struct Layout
+    {
+        Vector2 Position;
+        Vector2 Texture;
+    };
+
+    struct Instance
+    {
+        Vector2 Position;
+        Vector2 Size;
+        UInt32  Color;
+        Real32  Depth;
+    };
+
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     Bool Application::OnInitialize()
     {
-        //
-        ConstSPtr<Content::Service> Content = GetSubsystem<Content::Service>();
-        Content->AddLocator("Resources", NewPtr<Content::SystemLocator>("Resources"));
+        auto Content = GetService<Content::Service>();
+        Content->AddMount("Resources", Tracker<Content::DiskMount>::Create("Resources"));
 
-        const auto Font = Content->Load<Graphic::Font>("Resources://Font/Primary.arfont");
+        Material = Content->Load<Graphic::Material>("Resources://Entities.material");
+        Pipeline  = Content->Load<Graphic::Pipeline>("Resources://Sprite.effect");
+        Font  = Content->Load<Graphic::Font>("Resources://test.arfont");
 
-        // Initialize the scene.
-        ConstSPtr<Scene::Service> Scene = GetSubsystem<Scene::Service>();
-        Scene->Register<Pivot>().Attach<Scene::Trait::Serializable>();
-        Scene->Register<Color>();
-        Scene->Register<Matrix4f>().Attach<Scene::Trait::Inheritable | Scene::Trait::Sparse>();
-        Scene->Register<Transformf>().With<Matrix4f>();
+        Renderer = NewUniquePtr<Graphic::Render2D>(* this);
+        Graphics = GetService<Graphic::Service>();
 
-        // Initial test
-        mTexts = NewUniquePtr<Scene::TEcsTextSystem>(* this);
+        static constexpr std::initializer_list<Layout> VBO_DATA = {
+            { {0, 1}, {0, 1}},
+            { {1, 1}, {1, 1}},
+            { {1, 0}, {1, 0}},
+            { {0, 0}, {0, 0}}
+        };
+        VBO = Graphics->CreateBuffer(Graphic::Access::Device,
+                                     Graphic::Usage::Vertex,
+                                     Blob::FromImmutable(VBO_DATA));
 
-        auto MyArchetype = Scene->Spawn<true>();
-        MyArchetype.SetName("Wacho");
-        MyArchetype.Attach(Color(0, 1, 0, 1));
-        MyArchetype.Attach(Pivot());
 
-        GrandMaster = Scene->Spawn();
-        GrandMaster.SetArchetype(MyArchetype);
-        GrandMaster.SetName("Grand Master");
-        GrandMaster.Attach(Transformf(Vector3f(256, 256, 0)));
-        GrandMaster.Attach(Scene::TEcsText(Font, 32, L"[Fers]"));
+        static constexpr std::initializer_list<UInt16> IBO_DATA = {
+            0, 1, 2, 0, 2, 3
+        };
+        IBO = Graphics->CreateBuffer(Graphic::Access::Device,
+                                     Graphic::Usage::Index,
+                                     Blob::FromImmutable(IBO_DATA));
 
-        MyCacheLocalscape = GrandMaster.Link<Transformf>();
 
-        Master = Scene->Spawn();
-        Master.SetArchetype(MyArchetype);
-        Master.SetName("Master");
-        Master.SetParent(GrandMaster);
-        Master.Attach(Transformf(
-                Vector3f(0, 32, 0),
-                Vector3f(1),
-                Quaternionf::FromAngles(DegreesToRadians(90), Vector3f(0, 0, 1))));
-        Master.Attach(Pivot::CenterMiddle);
-        Master.Attach(Scene::TEcsText(Font, 32, L"[Es Puto]"));
-        Master.Attach(Color(1, 0, 0, 1));
-
-        Child = Scene->Spawn();
-        Child.SetParent(Master);
-        Child.SetName("Child");
-        Child.Attach(Transformf(
-                Vector3f(12, 24, 0),
-                Vector3f(1),
-                Quaternionf::FromAngles(DegreesToRadians(90), Vector3f(0, 0, 1))));
-        Child.Attach(Scene::TEcsText(Font, 12, L"[CHILD_OF_MASTER]"));
-        Child.Attach(Color(0, 0, 1, 1));
-
-        Random = Scene->Spawn();
-        Random.SetParent(GrandMaster);
-        Random.Attach(Transformf(
-                Vector3f(-100, -100, 0.5f),
-                Vector3f(4),
-                Quaternionf()));
-        Random.Attach(Scene::TEcsText(Font, 16, L"[Hello SIR!!!!!!]"));
-        Random.Attach(Color(0, 1, 1, 1));
-
-        MyCacheLocalscape2 = Random.Link<Transformf>();
-
-        ConstSPtr<Graphic::Material> Material = Content->Load<Graphic::Material>("Resources://Material/Test.material");
-
-        MySprite = Scene->Spawn();
-        MySprite.Attach(Transformf(Vector3f(633, 333, 0.7f), Vector3f(0.5), Quaternionf()));
-        MySprite.Attach(Scene::TEcsSprite(Material, Rectf(0, 0, 500, 400)));
-        MySprite.Attach(Pivot(Pivot::CenterMiddle));
-        MySprite.Attach(Color(0xFF0000FF));
-
-        // Initialize Camera.
-        mCamera.SetOrthographic(GetDevice().GetWidth(), GetDevice().GetHeight(), 0, 1);
-        mCamera.Compute();
+        Camera.SetOrthographic(1920, 1024, 0, 1);
+        Camera.Compute();
 
         return true;
     }
 
+    static constexpr UInt32 kMaxInstances = 10'000;
+
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    Graphic::Render2D::FontStyleSDF GetFontOutline()
+    {
+        Graphic::Render2D::FontStyleSDF EffectFont;
+        EffectFont.uInvThreshold =  1.0f - 0.5f;
+        EffectFont.uOutlineBias = 1.0f/4.0f;
+        EffectFont.uOutlineWidthAbsolute = 1.0f/3.0f;
+        EffectFont.uOutlineWidthRelative = 1.0f/20.0f;
+        EffectFont.uOutlineBlur = 0;
+        return EffectFont;
+    }
+
+    Graphic::Render2D::FontStyleSDF GetFontThick()
+    {
+        Graphic::Render2D::FontStyleSDF EffectFont;
+        EffectFont.uInvThreshold = 1.0f - 0.5f;
+        EffectFont.uOutlineBias = 0;
+        EffectFont.uOutlineWidthAbsolute = 1.0f/16.0f;
+        EffectFont.uOutlineWidthRelative = 1.0f/50.0f;
+        EffectFont.uOutlineBlur = 0;
+        return EffectFont;
+    }
+
+    Graphic::Render2D::FontStyleSDF GetFontThicker()
+    {
+        Graphic::Render2D::FontStyleSDF EffectFont;
+        EffectFont.uInvThreshold = 1.0f-0.6f;
+        EffectFont.uOutlineBias = 0;
+        EffectFont.uOutlineWidthAbsolute = 1.0f/16.0f;
+        EffectFont.uOutlineWidthRelative = 1.0f/7.0f;
+        EffectFont.uOutlineBlur = 0;
+        return EffectFont;
+    }
+
+    Graphic::Render2D::FontStyleSDF GetFontShadow()
+    {
+        Graphic::Render2D::FontStyleSDF EffectFont;
+        EffectFont.uInvThreshold = 1.0f-0.5f;
+        EffectFont.uOutlineBias = 0;
+        EffectFont.uOutlineWidthAbsolute = 1.0f/3.0f;
+        EffectFont.uOutlineWidthRelative = 1.0f/5.0f;
+        EffectFont.uOutlineBlur = 1;
+        return EffectFont;
+    }
+
+    Graphic::Render2D::FontStyleSDF GetFontShadow(Color Shadow)
+    {
+        Graphic::Render2D::FontStyleSDF EffectFont;
+        EffectFont.uInvThreshold = 1.0f-0.5f;
+        EffectFont.uOutlineBias = 0;
+        EffectFont.uOutlineWidthAbsolute = 1.0f/3.0f;
+        EffectFont.uOutlineWidthRelative = 1.0f/5.0f;
+        EffectFont.uOutlineBlur = 1;
+        EffectFont.uOuterColor = Shadow;
+        return EffectFont;
+    }
 
     void Application::OnTick(ConstRef<Time> Time)
     {
-        ConstSPtr<Graphic::Service> Graphics = GetSubsystem<Graphic::Service>();
+        Graphics->Prepare(Graphic::kDisplay, {0, 0, 1920, 1024}, Graphic::Clear::All, Color(0.65, 0.50, 0.65, 1), 1, 0);
 
-        Rectf Viewport(0, 0, GetDevice().GetWidth(), GetDevice().GetHeight());
-        Graphics->Prepare(Graphic::k_Default, Viewport, Graphic::Clear::All, Color(0, 0, 0, 0), 1, 0);
+        Renderer->SetGlobalParameters(ConstSpan<Matrix4x4>(& Camera.GetViewProjection(), 1));
+
+        /*
+        for (auto i = 0; i < kMaxInstances; ++i)
+        Renderer->DrawSprite({100, 100, 300, 300}, 0, {0, 0, 1, 1}, Color::PackRGBA32F(1, 0, 0), Material);
+        Renderer->DrawLine({0, 0}, {100, 100}, 0.0f, 0xFF0000FF, 5.0f);*/
+        /*
+        const Text Word = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+
+        float maxHeight = 1024.0f;
+        float currentY = 0.0f;
+
+        for (float fontSize = 32.0f; fontSize >= 6.0f; fontSize--)
         {
-            mTexts->Draw(mCamera);
-        }
-        Graphics->Commit(Graphic::k_Default, false);
-        Graphics->Flush();
+            float lineHeight = fontSize * 1.5f;
 
-        static Real32 Angles = 0;
-        Angles += 0.01f;
-        if (Angles >= 360.0f) { Angles -= 360.0f; }
+            if (currentY + lineHeight > maxHeight) {
+                break;
+            }
 
-        MyCacheLocalscape
-                .Modify<& Transformf::SetRotation>(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
-        MyCacheLocalscape2
-            .Modify<& Transformf::SetRotation>(Quaternionf::FromAngles(DegreesToRadians(Angles), Vector3f(0, 0, 1)));
+            Renderer->DrawFont({0.0f, currentY, 0.0f, 0.0f}, 0.0f, Format("{}px", fontSize), 20.0f, Color::PackRGBA32F(1, 1, 1), 0, Font);
+
+            Renderer->DrawFont(
+                {64.0f, currentY, 0.0f, 0.0f},
+                0.0f,
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890.,:;!@#$%^&*",
+                fontSize,
+                Color::PackRGBA32F(1, 1, 1),
+                0,
+                Font
+            );
+
+            currentY += lineHeight;
+        }*/
+
+        Renderer->SetFontStyle(GetFontOutline());
+        Renderer->DrawFont({ 100, 50, 0, 0}, 0.0f, "We met again, GoDKeR ~!", 8.0f, Color::PackRGBA32F(0, 0, 1), Font);
+        Renderer->DrawFont({ 100, 100, 0, 0}, 0.0f, "We met again, GoDKeR ~@", 12.0f, Color::PackRGBA32F(0, 0, 1), Font);
+        Renderer->DrawFont({ 100, 200, 0, 0}, 0.0f, "We met again, GoDKeR ~#", 24.0f, Color::PackRGBA32F(0, 0, 1), Font);
+        Renderer->DrawFont({ 100, 300, 0, 0}, 0.0f, "We met again, GoDKeR :D", 36.0f, Color::PackRGBA32F(0, 1, 0), Font);
+        Renderer->DrawFont({ 100, 400, 0, 0}, 0.0f, "We met again, GoDKeR :P", 48.0f, Color::PackRGBA32F(0, 1, 1), Font);
+        Renderer->DrawFont({ 100, 500, 0, 0}, 0.0f, Format("Delta: {}", Time.GetDelta()), 48.0f, Color::PackRGBA32F(1, 1, 1), Font);
 
 
-        // Register default system(s).
-        using Query = Scene::Query<>;
-        GetSubsystem<Scene::Service>()->Match<>("OnTransformUpdateQuery")
-            .with<const Transformf>()
-            .with<const Matrix4f>().optional().parent().cascade()
-            .with<Matrix4f>().out()
-            .build()
-            .run([](Ref<flecs::iter> Iterator)
-                 {
-                     while (Iterator.next())
-                     {
-                         if (Iterator.changed())
-                         {
-                             const auto LocalTransformTable  = Iterator.field<const Transformf>(0);
-                             const auto ParentTransform      = Iterator.field<const Matrix4f>(1);
-                             const auto WorldTransformTable  = Iterator.field<Matrix4f>(2);
+        Renderer->SetFontStyle(GetFontOutline());
+        Renderer->DrawFont({ 900, 50, 0, 0}, 0.0f, "GetFontOutline", 32.0f, Color::PackRGBA32F(0, 1, 1), Font);
 
-                             if (Iterator.is_set(1))
-                             {
-                                 for (const UInt64 Index : Iterator)
-                                 {
-                                     WorldTransformTable[Index] = ParentTransform[0] * LocalTransformTable[Index].Compute();
-                                 }
-                             }
-                             else
-                             {
-                                 for (const UInt64 Index : Iterator)
-                                 {
-                                     WorldTransformTable[Index] = LocalTransformTable[Index].Compute();
-                                 }
-                             }
-                         }
-                         else
-                         {
-                             Iterator.skip();
-                         }
-                     }
-                 });
+        Renderer->SetFontStyle(GetFontThick());
+        Renderer->DrawFont({ 900, 150, 0, 0}, 0.0f, "GetFontThick", 32.0f, Color::PackRGBA32F(0, 1, 1), Font);
 
+        Renderer->SetFontStyle(GetFontThicker());
+        Renderer->DrawFont({ 900, 250, 0, 0}, 0.0f, "GetFontThicker", 32.0f, Color::PackRGBA32F(0, 1, 1), Font);
+
+        Renderer->SetFontStyle(GetFontShadow());
+        Renderer->DrawFont({ 900, 350, 0, 0}, 0.0f, "GetFontShadow", 32.0f, Color::PackRGBA32F(0, 1, 1), Font);
+
+        Renderer->SetFontStyle(GetFontShadow(Color(1, 0, 0, 1)));
+        Renderer->DrawFont({ 900, 450, 0, 0}, 0.0f, "GetFontShadowWithColor", 32.0f, Color::PackRGBA32F(0, 1, 1), Font);
+
+
+
+
+        Renderer->Flush();
+
+        Graphics->Commit(Graphic::kDisplay);
+        Graphics->Finish(false);
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    void Application::OnDestroy()
+    void Application::OnTeardown()
     {
-        mTexts->DeleteQueries();
-    }
-
-    Bool Application::OnKeyDown(Input::Key Key)
-    {
-        return true;
-    }
-
-    Bool Application::OnMouseMove(Real32 X, Real32 Y, Real32 DeltaX, Real32 DeltaY)
-    {
-        MyCacheLocalscape->SetPosition(Vector2f { X, Y});
-        MyCacheLocalscape.Notify();
-        return true;
-    }
-
-    Bool Application::OnWindowResize(UInt32 Width, UInt32 Height)
-    {
-        return true;
     }
 }
 
@@ -207,18 +234,20 @@ namespace Example
 
 int main([[maybe_unused]] int Argc, [[maybe_unused]] Ptr<Char> Argv[])
 {
+    AURORA_PROFILE;
+
     Engine::Properties Properties;
     Properties.SetWindowTitle("Aurora Example");
     Properties.SetWindowWidth(1920);
     Properties.SetWindowHeight(1024);
-    Properties.SetWindowSamples(4);
+    Properties.SetWindowSamples(1);
     Properties.SetWindowFullscreen(false);
     Properties.SetWindowBorderless(false);
     Properties.SetVideoDriver("D3D11");
 
     // Initialize 'Aurora Engine' and enter main loop
-    UPtr<Example::Application> Application = NewUniquePtr<Example::Application>();
-    Application->Initialize(System<Subsystem>::Mode::Client, Properties);
+    Tracker<Example::Application> Application = Tracker<Example::Application>::Create();
+    Application->Initialize(Service::Host::Mode::Client, Properties);
     Application->Run();
 
     return 0;

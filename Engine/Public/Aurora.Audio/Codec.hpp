@@ -12,25 +12,27 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
+#include "Decoder.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-namespace Example
+
+namespace Audio
 {
-    // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    /// \brief Interface for decoding audio streams from raw data.
+    class Codec
     {
     public:
 
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
+        /// \brief Ensures derived class can be destroyed polymorphically.
+        virtual ~Codec() = default;
 
-        // \see Kernel::OnTick
-        void OnTick(ConstRef<Time> Time) override;
-
-        // \see Kernel::OnTeardown
-        void OnTeardown() override;
+        /// \brief Creates a decoder for the given encoded audio data.
+        ///
+        /// \param Data   Encoded audio stream data (compressed or uncompressed).
+        /// \param Schema Description of the audio format and layout.
+        /// \return Unique pointer to the created decoder instance.
+        virtual Unique<Decoder> Decode(ConstRef<Blob> Data, ConstRef<Schema> Schema) = 0;
     };
 }

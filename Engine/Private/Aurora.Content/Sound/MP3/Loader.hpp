@@ -12,25 +12,28 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
+#include "Aurora.Content/Loader.hpp"
+#include "Aurora.Audio/Sound.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-namespace Example
+
+namespace Content
 {
-    // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    /// \brief Represents the \ref Loader for compressed MP3 files.
+    class MP3Loader final : public Loader
     {
     public:
 
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
+        /// \copydoc Loader::GetExtensions
+        ConstSpan<ConstText> GetExtensions() const override
+        {
+            static constexpr List<ConstText> EXTENSION_LIST = { "mp3" };
+            return EXTENSION_LIST;
+        }
 
-        // \see Kernel::OnTick
-        void OnTick(ConstRef<Time> Time) override;
-
-        // \see Kernel::OnTeardown
-        void OnTeardown() override;
+        /// \copydoc Loader::Load
+        Bool Load(Ref<Service> Service, Ref<Scope> Scope, AnyRef<Blob> Data) override;
     };
 }

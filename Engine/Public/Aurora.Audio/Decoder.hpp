@@ -12,25 +12,36 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
+#include "Common.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-namespace Example
+
+namespace Audio
 {
-    // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
+    /// \brief Interface for reading decoded audio data.
+    class Decoder
     {
     public:
 
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
+        /// \brief Ensures derived class can be destroyed polymorphically.
+        virtual ~Decoder() = default;
 
-        // \see Kernel::OnTick
-        void OnTick(ConstRef<Time> Time) override;
+        /// \brief Gets the current playback position.
+        ///
+        /// \return The current frame position within the stream.
+        virtual UInt64 Tell() const = 0;
 
-        // \see Kernel::OnTeardown
-        void OnTeardown() override;
+        /// \brief Seeks to a specific playback position.
+        ///
+        /// \param Frame Frame index to seek to.
+        /// \return `true` if the seek operation was successful, `false` otherwise.
+        virtual Bool Seek(UInt64 Frame) = 0;
+
+        /// \brief Reads the next chunk of decoded audio data.
+        ///
+        /// \return A span containing the decoded audio bytes.
+        virtual ConstSpan<Byte> Read() = 0;
     };
 }

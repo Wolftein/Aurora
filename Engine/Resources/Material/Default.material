@@ -1,0 +1,9 @@
+Kind = "Normal"
+
+[Textures]
+
+Diffuse = { Path = "Engine://Material/Default.png", Sampler = "Default" }
+
+[Samplers]
+
+Default = { WrapModeU = "Repeat", WrapModeV = "Repeat", Filter = "MinMagMipPoint" }

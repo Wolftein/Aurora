@@ -12,25 +12,17 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include <Aurora.Engine/Kernel.hpp>
+#include "Primitive.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-namespace Example
+
+inline namespace Base
 {
-    // -=(Undocumented)=-
-    class Application final : public Engine::Kernel
-    {
-    public:
-
-        // \see Kernel::OnInitialize
-        Bool OnInitialize() override;
-
-        // \see Kernel::OnTick
-        void OnTick(ConstRef<Time> Time) override;
-
-        // \see Kernel::OnTeardown
-        void OnTeardown() override;
-    };
+    /// \brief Converts a UTF-16 encoded string to UTF-8.
+    /// 
+    /// \param Value The UTF-16 encoded string to convert.
+    /// \return A UTF-8 encoded string containing the converted text.
+    Text ConvertUTF16ToUTF8(std::wstring_view Value);
 }
