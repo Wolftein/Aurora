@@ -18,6 +18,8 @@
 
 inline namespace Base
 {
+/// \def AURORA_PROFILE_CALLSTACK_DEPTH
+/// \brief Maximum number of stack frames recorded in profiling.
 #define AURORA_PROFILE_CALLSTACK_DEPTH          15
 
 /// \def AURORA_PROFILE

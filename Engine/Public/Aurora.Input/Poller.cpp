@@ -329,7 +329,7 @@ namespace Input
                 break;
             case SDL_EVENT_TEXT_INPUT:
                 Result.Type                = Event::Type::KeyType;
-                Result.KeyType.Codepoint   = Event.text.text[0]; // @TODO: IME support
+                Result.KeyType.Codepoint   = Event.text.text[0]; // TODO: Support IME (Screen Keyboard)
                 break;
             case SDL_EVENT_MOUSE_MOTION:
                 Result.Type                = Event::Type::MouseMove;

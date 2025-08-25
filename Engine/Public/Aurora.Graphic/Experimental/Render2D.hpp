@@ -81,16 +81,16 @@ namespace Graphic
             {
                 UInt64 Seed = 0;
 
-                HashCombine(Seed, uRounded);
-                HashCombine(Seed, uInvThreshold);
-                HashCombine(Seed, uOutlineBias);
-                HashCombine(Seed, uOutlineWidthAbsolute);
-                HashCombine(Seed, uOutlineWidthRelative);
-                HashCombine(Seed, uOutlineBlur);
-                HashCombine(Seed, uOuterColor.GetRed());
-                HashCombine(Seed, uOuterColor.GetGreen());
-                HashCombine(Seed, uOuterColor.GetBlue());
-                HashCombine(Seed, uOuterColor.GetAlpha());
+                Base::Hash(Seed, uRounded);
+                Base::Hash(Seed, uInvThreshold);
+                Base::Hash(Seed, uOutlineBias);
+                Base::Hash(Seed, uOutlineWidthAbsolute);
+                Base::Hash(Seed, uOutlineWidthRelative);
+                Base::Hash(Seed, uOutlineBlur);
+                Base::Hash(Seed, uOuterColor.GetRed());
+                Base::Hash(Seed, uOuterColor.GetGreen());
+                Base::Hash(Seed, uOuterColor.GetBlue());
+                Base::Hash(Seed, uOuterColor.GetAlpha());
                 return Seed;
             }
         };

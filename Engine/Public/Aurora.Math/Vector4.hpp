@@ -571,6 +571,59 @@ inline namespace Math
             return Vector4(_mm_shuffle_ps(Vector.mRegister, Vector.mRegister, _MM_SHUFFLE(Z, Y, X, W)));
         }
 
+        /// \brief Rearranges the components between two vectors based on specified lane indices.
+        ///
+        /// \tparam Z The index (0–3) of the component to place in the Z position.
+        /// \tparam Y The index (0–3) of the component to place in the Y position.
+        /// \tparam X The index (0–3) of the component to place in the X position.
+        /// \tparam W The index (0–3) of the component to place in the W position.
+        /// \param Vec1 The first input vector.
+        /// \param Vec2 The second input vector.
+        /// \return A new vector with reordered components based on the specified indices.
+        template<UInt8 Z, UInt8 Y, UInt8 X, UInt8 W>
+        AURORA_INLINE static Vector4 Swizzle(ConstRef<Vector4> First, ConstRef<Vector4> Second)
+        {
+            return Vector4(_mm_shuffle_ps(First.mRegister, Second.mRegister, _MM_SHUFFLE(Z, Y, X, W)));
+        }
+
+        /// \brief Rearranges the components of a vector by duplicating the even-indexed elements (x and z).
+        ///
+        /// \param Vector The input vector (x, y, z, w).
+        /// \return A new vector with the pattern (x, x, z, z).
+        AURORA_INLINE static Vector4 Swizzle0022(ConstRef<Vector4> Vector)
+        {
+            return Vector4(_mm_moveldup_ps(Vector.mRegister));
+        }
+
+        /// \brief Rearranges the components of a vector by duplicating the odd-indexed elements (y and w).
+        ///
+        /// \param Vector The input vector (x, y, z, w).
+        /// \return A new vector with the pattern (y, y, w, w).
+        AURORA_INLINE static Vector4 Swizzle1133(ConstRef<Vector4> Vector)
+        {
+            return Vector4(_mm_movehdup_ps(Vector.mRegister));
+        }
+
+        /// \brief Combines the low halves (x, y) of two vectors into a new vector.
+        ///
+        /// \param Vec1 The first input vector (a0, a1, a2, a3).
+        /// \param Vec2 The second input vector (b0, b1, b2, b3).
+        /// \return A new vector with the pattern (a0, a1, b0, b1).
+        AURORA_INLINE static Vector4 Shuffle0101(ConstRef<Vector4> Vec1, ConstRef<Vector4> Vec2)
+        {
+            return Vector4(_mm_movelh_ps(Vec1.mRegister, Vec2.mRegister));
+        }
+
+        /// \brief Combines the high halves (z, w) of two vectors into a new vector.
+        ///
+        /// \param Vec1 The first input vector (a0, a1, a2, a3).
+        /// \param Vec2 The second input vector (b0, b1, b2, b3).
+        /// \return A new vector (a2, a3, b2, b3).
+        AURORA_INLINE static Vector4 Shuffle2323(ConstRef<Vector4> Vec1, ConstRef<Vector4> Vec2)
+        {
+            return Vector4(_mm_movehl_ps(Vec2.mRegister, Vec1.mRegister));
+        }
+
         /// \brief Replicates a single component of a vector across all four lanes.
         /// 
         /// \tparam Lane The index (0–3) of the component to replicate.

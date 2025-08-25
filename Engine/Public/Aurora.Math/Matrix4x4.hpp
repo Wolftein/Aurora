@@ -200,7 +200,13 @@ inline namespace Math
             return mColumns[3].GetXYZ();
         }
 
-        // TODO: Get Rotation
+        /// \brief Gets the rotation component of the transformation matrix as a quaternion.
+        ///
+        /// \return The quaternion representing the rotation.
+        AURORA_INLINE Quaternion GetRotation() const
+        {
+            return Quaternion::FromDirection(mColumns[2].GetXYZ(), mColumns[1].GetXYZ());
+        }
 
         /// \brief Adds another matrix to this matrix.
         ///
@@ -312,6 +318,27 @@ inline namespace Math
             return (* this);
         }
 
+        /// \brief Checks if this matrix is equal to another matrix.
+        ///
+        /// \param Matrix The matrix to compare to.
+        /// \return `true` if the matrices are equal, `false` otherwise.
+        AURORA_INLINE Bool operator==(ConstRef<Matrix4x4> Matrix) const
+        {
+            return mColumns[0] == Matrix.mColumns[0]
+                && mColumns[1] == Matrix.mColumns[1]
+                && mColumns[2] == Matrix.mColumns[2]
+                && mColumns[3] == Matrix.mColumns[3];
+        }
+
+        /// \brief Checks if this matrix is not equal to another matrix.
+        ///
+        /// \param Other The matrix to compare to.
+        /// \return `true` if the matrices are not equal, `false` otherwise.
+        AURORA_INLINE Bool operator!=(ConstRef<Matrix4x4> Matrix) const
+        {
+            return !(*this == Matrix);
+        }
+
         /// \brief Serializes the state of the object to or from the specified archive.
         ///
         /// \param Archive The archive to serialize the object with.
@@ -393,13 +420,38 @@ inline namespace Math
         {
             if constexpr (Affine)
             {
-                // TODO
+                const Real32 Len0 = Vector4::Dot3(Matrix.mColumns[0], Matrix.mColumns[0]);
+                const Real32 Len1 = Vector4::Dot3(Matrix.mColumns[1], Matrix.mColumns[1]);
+                const Real32 Len2 = Vector4::Dot3(Matrix.mColumns[2], Matrix.mColumns[2]);
+
+                const Vector4 Col0 = Matrix.mColumns[0] * (Len0 < kEpsilon<Real32> ? 1.0f : 1.0f / Len0);
+                const Vector4 Col1 = Matrix.mColumns[1] * (Len1 < kEpsilon<Real32> ? 1.0f : 1.0f / Len1);
+                const Vector4 Col2 = Matrix.mColumns[2] * (Len2 < kEpsilon<Real32> ? 1.0f : 1.0f / Len2);
+
+                Vector4 Row0 = Vector4::SplatX(Col0);
+                Row0 = Vector4::Blend<0b0010>(Row0, Vector4::SplatX(Col1));
+                Row0 = Vector4::Blend<0b0100>(Row0, Vector4::SplatX(Col2));
+                Row0 = Vector4::Blend<0b1000>(Row0, Vector4(0.0f));
+
+                Vector4 Row1 = Vector4::SplatY(Col0);
+                Row1 = Vector4::Blend<0b0010>(Row1, Vector4::SplatY(Col1));
+                Row1 = Vector4::Blend<0b0100>(Row1, Vector4::SplatY(Col2));
+                Row1 = Vector4::Blend<0b1000>(Row1, Vector4(0.0f));
+
+                Vector4 Row2 = Vector4::SplatZ(Col0);
+                Row2 = Vector4::Blend<0b0010>(Row2, Vector4::SplatZ(Col1));
+                Row2 = Vector4::Blend<0b0100>(Row2, Vector4::SplatZ(Col2));
+                Row2 = Vector4::Blend<0b1000>(Row2, Vector4(0.0f));
+
+                const Real32 TranslateX = -Vector4::Dot3(Col0, Matrix.mColumns[3]);
+                const Real32 TranslateY = -Vector4::Dot3(Col1, Matrix.mColumns[3]);
+                const Real32 TranslateZ = -Vector4::Dot3(Col2, Matrix.mColumns[3]);
+                return Matrix4x4(Row0, Row1, Row2, Vector4(TranslateX, TranslateY, TranslateZ, 1.0f));
             }
             else
             {
-                // TODO
+                // TODO: Implement it using SIMD.
             }
-            return {};
         }
 
         /// \brief Creates a perspective projection matrix.

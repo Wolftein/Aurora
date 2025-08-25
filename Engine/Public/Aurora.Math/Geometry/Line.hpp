@@ -183,7 +183,20 @@ inline namespace Math
         /// \return `true` if the line segments intersect, `false` otherwise.
         AURORA_INLINE constexpr Bool Intersects(ConstRef<Line> Other) const
         {
-            return false;   // TODO Implement Algorithm
+            const Real32 O1 = Vector2::Cross(mStart, mEnd, Other.mStart);
+            const Real32 O2 = Vector2::Cross(mStart, mEnd, Other.mEnd);
+            const Real32 O3 = Vector2::Cross(Other.mStart, Other.mEnd, mStart);
+            const Real32 O4 = Vector2::Cross(Other.mStart, Other.mEnd, mEnd);
+
+            if ((O1 * O2 < 0) && (O3 * O4 < 0))
+            {
+                return true;
+            }
+
+            return (Base::IsAlmostZero(O1) && Contains(Other.mStart)
+                ||  Base::IsAlmostZero(O2) && Contains(Other.mEnd)
+                ||  Base::IsAlmostZero(O3) && Other.Contains(mStart)
+                ||  Base::IsAlmostZero(O4) && Other.Contains(mEnd));
         }
 
         /// \brief Checks if this line is equal to another line.

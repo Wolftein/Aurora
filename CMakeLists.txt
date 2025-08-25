@@ -34,7 +34,5 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 ## Module
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-SET(AURORA_PROFILE_MODE ON CACHE BOOL "" FORCE)
-
 ADD_SUBDIRECTORY(Engine)
 ADD_SUBDIRECTORY(Example)

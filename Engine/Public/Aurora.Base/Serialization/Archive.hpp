@@ -271,6 +271,15 @@ inline namespace Core
             }
         }
 
+        /// \brief Serializes an object.
+        ///
+        /// \param Value Reference to the value.
+        template<typename Type>
+        void SerializeObject(Ref<Type> Value)
+        {
+            Value.OnSerialize(* this);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

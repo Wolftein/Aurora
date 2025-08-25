@@ -116,10 +116,6 @@ inline namespace Base
 
     /// \brief Alias for a general-purpose callable object.
     /// 
-    /// This type represents a type-erased function or lambda that can be stored,
-    /// copied, and invoked later. It supports capturing state and can be used
-    /// to pass callbacks or deferred execution blocks.
-    /// 
     /// \tparam Type The function signature (e.g., `void()` or `int(float, int)`).
     template<typename Type>
     using Function  = std::function<Type>;

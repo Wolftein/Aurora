@@ -384,6 +384,11 @@ namespace Graphic
             InPlaceDelete(* Instance);
         }
 
+        /// \brief Flushes the frame and submits its command buffer for execution.
+        ///
+        /// \param Abort `true` If `true`, cancels command execution and discards all recorded commands.
+        void FlushCommands(Bool Abort);
+
         /// \brief Returns the frame currently open for CPU recording (producer).
         ///
         /// \return Reference to the producer (CPU) frame.

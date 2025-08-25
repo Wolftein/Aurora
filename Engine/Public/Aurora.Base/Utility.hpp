@@ -110,8 +110,8 @@ inline namespace Base
     /// \param Seed   Reference to the current hash seed. Updated in-place.
     /// \param Value  The value to incorporate into the hash.
     /// \return Reference to the updated seed, for chaining.
-    template<typename Hash, typename Type>
-    constexpr decltype(auto) HashCombine(Ref<Hash> Seed, ConstRef<Type> Value)
+    template<typename Base, typename Type>
+    constexpr decltype(auto) Hash(Ref<Base> Seed, ConstRef<Type> Value)
     {
         std::hash<std::decay_t<decltype(Value)>> Hasher;
 

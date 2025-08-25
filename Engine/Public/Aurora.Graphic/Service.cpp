@@ -299,6 +299,14 @@ namespace Graphic
     {
         AURORA_PROFILE_SCOPE("Graphic::Service::Tick");
 
+        FlushCommands(Abort);
+    }
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    void Service::FlushCommands(Bool Abort)
+    {
         if (Abort)
         {
             GetProducerFrame().Stream.Clear();

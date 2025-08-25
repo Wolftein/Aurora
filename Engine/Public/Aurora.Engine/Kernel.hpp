@@ -44,8 +44,7 @@ namespace Engine
 
         /// \brief Initializes the kernel and core services.
         ///
-        /// This must be called before entering the main loop. It configures the environment
-        /// based on the provided mode and property set.
+        /// This must be called before entering the main loop. It configures the environment based on the configuration.
         ///
         /// \param Mode       Runtime mode (e.g., client, server).
         /// \param Properties Application configuration values.
