@@ -66,4 +66,11 @@ namespace Scene
         Singleton,     ///< Component is a singleton.
         Final,         ///< Component cannot be inherited (opposite of Inheritable).
     };
+
+    /// \brief Represents a relationship in the ECS of the form (Tag, Target).
+    ///
+    /// \tparam Tag    The relation's tag component.
+    /// \tparam Target The relation's target component.
+    template<typename Tag, typename Target>
+    using Pair = flecs::pair<Tag, Target>;
 }

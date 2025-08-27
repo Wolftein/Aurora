@@ -312,7 +312,7 @@ TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDE})
 ## Properties
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-TARGET_COMPILE_FEATURES(${PROJECT_NAME} PUBLIC cxx_std_23)
+TARGET_COMPILE_FEATURES(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 IF    (WIN32)
 

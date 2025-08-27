@@ -148,7 +148,7 @@ namespace Example
     void Application::OnTick(ConstRef<Time> Time)
     {
         AURORA_PROFILE;
-  
+
         static Real32 Angles = 0.0f;
         Angles += (128.0f * Time.GetDelta());
 
