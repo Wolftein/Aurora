@@ -588,6 +588,63 @@ namespace Scene
 
     private:
 
+        /// \brief Conditionally enables or disables a component on the specified entity.
+        ///
+        /// \tparam Component The type of component to toggle.
+        /// \tparam Enable    If `true`, the component will be enabled. If `false`, the component will be disabled.
+        /// \param Actor The target entity on which to toggle the component state.
+        template<typename Component, Bool Enable>
+        static void ToggleComponent(Entity Actor)
+        {
+            if constexpr(Enable)
+            {
+                Actor.template Enable<Component>();
+            }
+            else
+            {
+                Actor.template Disable<Component>();
+            }
+        }
+
+        /// \brief Recursively enables or disables a component on the specified entity and all its children.
+        ///
+        /// \tparam Component The type of component to toggle throughout the hierarchy.
+        /// \tparam Enable    If `true`, the component will be enabled. If `false`, the component will be disabled.
+        /// \param Actor The root entity of the hierarchy on which to start the operation.
+        template<typename Component, Bool Enable>
+        static void ToggleComponentInHierarchy(Entity Actor)
+        {
+            if constexpr(Enable)
+            {
+                Actor.template Enable<Component>();
+            }
+            else
+            {
+                Actor.template Disable<Component>();
+            }
+            Actor.Children(&ToggleComponentInHierarchy<Component, Enable>);
+        }
+
+        /// \brief Recursively ensures a component is present and enabled on the specified entity and all its children.
+        ///
+        /// \tparam Component The type of component to add or enable throughout the hierarchy.
+        /// \param Actor      The root entity of the hierarchy on which to start the operation.
+        template<typename Component>
+        static void AddOrEnableComponentInHierarchy(Entity Actor)
+        {
+            if (Actor.Contains<Component>())
+            {
+                Actor.Enable<Component>();
+            }
+            else
+            {
+                Actor.Attach<Component>();
+            }
+            Actor.Children(&AddOrEnableComponentInHierarchy<Component>);
+        }
+
+    private:
+
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

@@ -47,6 +47,16 @@ inline namespace Base
     template<typename Value>
     using List   = std::initializer_list<Value>;
 
+    /// \brief A high-performance unordered set container.
+    ///
+    /// \tparam Key       The type of elements to store in the set.
+    /// \tparam Hash      The hash function used for keys. Defaults to `ankerl::unordered_dense::hash<Key>`.
+    /// \tparam Predicate The equality comparison function for keys. Defaults to `std::equal_to<>`.
+    template<typename Key,
+             typename Hash = ankerl::unordered_dense::hash<Key>,
+             typename Predicate = std::equal_to<>>
+    using Set    = ankerl::unordered_dense::set<Key, Hash, Predicate>;
+
     /// \brief A high-performance associative container.
     /// 
     /// \tparam Key       The key type.

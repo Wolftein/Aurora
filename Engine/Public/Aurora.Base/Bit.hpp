@@ -23,7 +23,7 @@ inline namespace Bit
     /// \brief Checks whether all bits in the given mask are set in the field.
     /// 
     /// \param Field The field to check.
-    /// \param Mask  The bitmask to compare against.
+    /// \param Mask   The bitmask indicating which bits to compare.
     /// \return `true` if all bits in `Mask` are set in `Field`, `false` otherwise.
     template<typename Type, typename Value>
     constexpr Bool HasBit(Type Field, Value Mask)
@@ -33,7 +33,7 @@ inline namespace Bit
 
     /// \brief Sets one or more bits in the field.
     /// 
-    /// \param Field The original field value.
+    /// \param Field The original field value to modify.
     /// \param Mask  The bitmask indicating which bits to set.
     /// \return A new value with the specified bits set.
     template<typename Type, typename Value>
@@ -44,13 +44,25 @@ inline namespace Bit
 
     /// \brief Clears one or more bits in the field.
     /// 
-    /// \param Field The original field value.
+    /// \param Field The original field value to modify.
     /// \param Mask  The bitmask indicating which bits to clear.
     /// \return A new value with the specified bits cleared.
     template<typename Type, typename Value>
     constexpr Type ClearBit(Type Field, Value Mask)
     {
         return Field & ~Mask;
+    }
+
+    /// \brief Conditionally sets or clears bits in a field based on a boolean flag.
+    ///
+    /// \param Field  The original field value to modify.
+    /// \param Mask   The bitmask indicating which bits to set or clear.
+    /// \param Enable If `true`, the bits specified by the mask are set, otherwise are cleared.
+    /// \return A new value with the specified bits either set or cleared based on the condition.
+    template<typename Type, typename Value>
+    constexpr Type SetOrClearBit(Type Field, Value Mask, Bool Enable)
+    {
+        return (Enable ? SetBit(Field, Mask) : ClearBit(Field, Mask));
     }
 
     /// \brief Packs two 16-bit values into a 32-bit integer with endian-aware layout.

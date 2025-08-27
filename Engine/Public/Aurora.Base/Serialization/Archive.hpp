@@ -319,6 +319,18 @@ inline namespace Base
             }
         }
 
+        /// \brief Serializes an array.
+        ///
+        /// \param Array Reference to the array.
+        template<typename Type>
+        AURORA_INLINE void SerializeArray(Ref<Type> Array)
+        {
+            for (UInt32 Element = 0, Size = Array.size(); Element < Size; ++Element)
+            {
+                SerializeObject(Array[Element]);
+            }
+        }
+
         /// \brief Serializes a vector.
         ///
         /// \param Vector Reference to the vector.
