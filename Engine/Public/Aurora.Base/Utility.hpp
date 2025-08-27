@@ -13,6 +13,7 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 #include "Trait.hpp"
+#include <array>
 #include <format>
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -79,7 +80,7 @@ inline namespace Base
     /// \param Block   The string data to hash.
     /// \param Counter Initial hash value (defaults to FNV offset basis).
     /// \return The 64-bit FNV-1a hash.
-    constexpr decltype(auto) Hash(ConstText Block, UInt64 Counter = 14695981039346656037ull)
+    constexpr auto Hash(ConstText Block, UInt64 Counter = 14695981039346656037ull)
     {
         for (const Char Character : Block)
         {
@@ -96,7 +97,7 @@ inline namespace Base
     /// \tparam Type The type to compute the hash for.
     /// \return The 64-bit FNV-1a hash of the type's decorated name.
     template<typename Type>
-    constexpr decltype(auto) Hash()
+    constexpr auto Hash()
     {
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
         return Hash(__PRETTY_FUNCTION__);
@@ -111,7 +112,7 @@ inline namespace Base
     /// \param Value  The value to incorporate into the hash.
     /// \return Reference to the updated seed, for chaining.
     template<typename Base, typename Type>
-    constexpr decltype(auto) Hash(Ref<Base> Seed, ConstRef<Type> Value)
+    constexpr auto Hash(Ref<Base> Seed, ConstRef<Type> Value)
     {
         std::hash<std::decay_t<decltype(Value)>> Hasher;
 
@@ -125,7 +126,7 @@ inline namespace Base
     /// \param Tuple The tuple-like container to fetch from.
     /// \return A reference (or value, if rvalue) to the extracted element.
     template<typename Type, typename Container>
-    constexpr decltype(auto) Fetch(AnyRef<Container> Tuple)
+    constexpr auto Fetch(AnyRef<Container> Tuple)
     {
         return std::get<Type>(Forward<Container>(Tuple));
     }
@@ -136,7 +137,7 @@ inline namespace Base
     /// \param Tuple The tuple-like container to fetch from.
     /// \return A reference (or value, if rvalue) to the extracted element.
     template<UInt Type, typename Container>
-    constexpr decltype(auto) Fetch(AnyRef<Container> Tuple)
+    constexpr auto Fetch(AnyRef<Container> Tuple)
     {
         return std::get<Type>(Forward<Container>(Tuple));
     }
@@ -147,9 +148,14 @@ inline namespace Base
     /// \param Parameters The parameters to substitute into the format string.
     /// \return A formatted UTF-8 string.
     template<typename... Arguments>
-    constexpr decltype(auto) Format(ConstText Format, AnyRef<Arguments>... Parameters)
+    auto Format(ConstText Format, AnyRef<Arguments>... Parameters)
     {
-        return std::vformat(Format, std::make_format_args(Parameters...));
+        static thread_local std::array<Char, 2048> Buffer;
+
+        const auto Result = std::vformat_to(Buffer.begin(), Format, std::make_format_args(Parameters...));
+        (* Result) = '\0';
+
+        return ConstText(Buffer.data(), std::distance(Buffer.begin(), Result));
     }
 
     /// \brief Binds the first N arguments of a callable and returns a new invocable.
@@ -165,7 +171,7 @@ inline namespace Base
     /// \return A new callable object with the bound arguments.
     /// 
     template<typename Type, typename... Arguments>
-    constexpr decltype(auto) Capture(AnyRef<Type> Function, AnyRef<Arguments>... Parameters)
+    constexpr auto Capture(AnyRef<Type> Function, AnyRef<Arguments>... Parameters)
     {
         return std::bind_front(Forward<Type>(Function), Forward<Arguments>(Parameters)...);
     }
@@ -186,6 +192,22 @@ inline namespace Base
         return * new (static_cast<Ptr<Type>>(Memory)) Type(Forward<Arguments>(Parameters)...);
     }
 
+    /// \brief Constructs an object of type `Type` in-place at the specified memory location.
+    ///
+    /// performs a placement `new` using the provided memory address and constructor parameters.
+    /// It is intended for use with manual memory management systems such as custom allocators or object pools.
+    ///
+    /// \tparam Type The type of object to construct.
+    /// \tparam Arguments The types of the constructor arguments.
+    /// \param Memory     Reference to the memory where the object will be constructed.
+    /// \param Parameters The constructor arguments to forward.
+    /// \return A reference to the newly constructed object.
+    template<typename Type, typename... Arguments>
+    constexpr decltype(auto) InPlaceConstruct(Ref<Type> Memory, AnyRef<Arguments>... Parameters)
+    {
+       return * ::new (static_cast<Ptr<Type>>(&Memory)) Type(Forward<Arguments>(Parameters)...);
+    }
+
     /// \brief Destroys an object in-place if its type is non-trivially destructible.
     /// 
     /// explicitly calls the destructor of the given object, but only if the type
@@ -195,7 +217,7 @@ inline namespace Base
     /// \tparam Type The type of the object.
     /// \param Object Reference to the object to destroy.
     template<typename Type>
-    constexpr decltype(auto) InPlaceDelete(Ref<Type> Object) noexcept
+    constexpr void InPlaceDelete(Ref<Type> Object) noexcept
     {
         if constexpr (!std::is_trivially_destructible_v<Type>)
         {
@@ -208,7 +230,7 @@ inline namespace Base
     /// \param Arguments The arguments to forward to the constructor.
     /// \return A \c Unique pointer managing the newly constructed object.
     template<typename Type, typename... Args>
-    decltype(auto) NewUniquePtr(AnyRef<Args> ... Arguments)
+    auto NewUniquePtr(AnyRef<Args> ... Arguments)
     {
         return std::make_unique<Type>(Forward<Args>(Arguments)...);
     }
@@ -219,7 +241,7 @@ inline namespace Base
     /// \param  Offset    Input value to align.
     /// \return Aligned value, greater than or equal to \p Offset.
     template<UInt Alignment>
-    constexpr decltype(auto) Align(UInt Offset)
+    constexpr auto Align(UInt Offset)
     {
         constexpr Bool IsPow2 = (Alignment && ((Alignment & (Alignment - 1)) == 0));
 
@@ -238,7 +260,7 @@ inline namespace Base
     /// \param  Offset    Input value to align.
     /// \param  Alignment Alignment value in bytes.
     /// \return Aligned value, greater than or equal to \p Offset.
-    constexpr decltype(auto) Align(UInt Offset, UInt Alignment)
+    constexpr auto Align(UInt Offset, UInt Alignment)
     {
         return ((Offset + Alignment - 1) / Alignment) * Alignment;
     }
@@ -250,7 +272,7 @@ inline namespace Base
     /// \param Width Number of elements per row.
     /// \return The 1D index corresponding to (X, Y).
     template<typename Type>
-    constexpr decltype(auto) Flatten2D(Type X, Type Y, Type Width)
+    constexpr auto Flatten2D(Type X, Type Y, Type Width)
     {
         return Y * Width + X;
     }
@@ -264,7 +286,7 @@ inline namespace Base
     /// \param Height Number of rows per layer.
     /// \return The 1D index corresponding to (X, Y, Z).
     template<typename Type>
-    constexpr decltype(auto) Flatten3D(Type X, Type Y, Type Z, Type Width, Type Height)
+    constexpr auto Flatten3D(Type X, Type Y, Type Z, Type Width, Type Height)
     {
         return Z * (Width * Height) + Y * Width + X;
     }

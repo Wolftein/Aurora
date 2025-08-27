@@ -66,9 +66,9 @@ namespace Engine
         // Initializes the host and then enable the platform device.
         mActive = OnInitialize();
 
-        if (mDevice != nullptr)
+        if (mDevice.GetHandle() != nullptr)
         {
-            mDevice->SetVisible(mActive);
+            mDevice.SetVisible(mActive);
         }
     }
 
@@ -142,7 +142,7 @@ namespace Engine
 
         // Initializes device service.
         LOG_INFO("Kernel: Creating device ({}, {})", Properties.GetWindowWidth(), Properties.GetWindowHeight());
-        mDevice = NewUniquePtr<Device>(
+        InPlaceConstruct<Device>(mDevice,
             Properties.GetWindowHandle(),
             Properties.GetWindowTitle(),
             Properties.GetWindowWidth(),
@@ -151,7 +151,7 @@ namespace Engine
             Properties.IsWindowBorderless());
 
         // Initializes graphic service.
-        const Graphic::Backend Backend = Enum::Cast(Properties.GetVideoDriver(), Graphic::Backend::None);
+        const Graphic::Backend Backend = Enum::Cast(Properties.GetVideoDriver(), Graphic::Backend::D3D11);
 
         Graphic::Samples Samples = Graphic::Samples::X1;
         switch (Properties.GetWindowSamples())
@@ -176,7 +176,7 @@ namespace Engine
         LOG_INFO("Kernel: Creating graphics service");
         ConstTracker<Graphic::Service> Graphics = AddService<Graphic::Service>();
 
-        if (!Graphics->Initialize(Backend, mDevice->GetHandle(), mDevice->GetWidth(), mDevice->GetHeight(), Samples))
+        if (!Graphics->Initialize(Backend, mDevice.GetHandle(), mDevice.GetWidth(), mDevice.GetHeight(), Samples))
         {
             LOG_WARNING("Kernel: Failed to create graphics service.");
         }
@@ -206,6 +206,10 @@ namespace Engine
         // Initializes resources service.
         LOG_INFO("Kernel: Creating content service");
         AddService<Content::Service>();
+
+        // Initializes scene service.
+        LOG_INFO("Kernel: Creating scene service");
+        AddService<Scene::Service>();
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

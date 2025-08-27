@@ -37,7 +37,7 @@ inline namespace Math
         /// \param Green Value of the green channel (0.0 to 1.0).
         /// \param Blue  Value of the blue channel (0.0 to 1.0).
         /// \param Alpha Value of the alpha channel (0.0 to 1.0).
-        AURORA_INLINE constexpr Color(Real32 Red, Real32 Green, Real32 Blue, Real32 Alpha)
+        AURORA_INLINE constexpr Color(Real32 Red, Real32 Green, Real32 Blue, Real32 Alpha = 1.0f)
             : mComponents { Red, Green, Blue, Alpha }
         {
         }

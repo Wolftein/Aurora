@@ -20,6 +20,8 @@
 
 #include "Aurora.Input/Service.hpp"
 
+#include "Aurora.Scene/Service.hpp"
+
 #include "Device.hpp"
 
 #include "Properties.hpp"
@@ -58,6 +60,14 @@ namespace Engine
 
         /// \brief Signals the application to exit gracefully.
         void Exit();
+
+        /// \brief Gets the native window device.
+        ///
+        /// \return The native window device.
+        Ref<Device> GetDevice()
+        {
+            return mDevice;
+        }
 
     private:
 
@@ -123,8 +133,8 @@ namespace Engine
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Bool           mActive;
-        Time           mTime;
-        Unique<Device> mDevice;
+        Bool   mActive;
+        Time   mTime;
+        Device mDevice;
     };
 }

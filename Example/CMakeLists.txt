@@ -44,6 +44,8 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SOURCE})
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
 
+TARGET_LINK_OPTIONS(${PROJECT_NAME} PRIVATE /PROFILE)
+
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ## Includes
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

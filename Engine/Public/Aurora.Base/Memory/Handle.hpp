@@ -18,7 +18,7 @@
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Core
+inline namespace Base
 {
     /// \brief A lightweight, bounded handle allocator with support for recycling.
     /// 
@@ -117,6 +117,16 @@ inline namespace Core
         AURORA_INLINE UInt32 GetSize() const
         {
             return mHead - mPool.size();
+        }
+
+        /// \brief Serializes the state of the object to or from the specified archive.
+        ///
+        /// \param Archive The archive to serialize the object with.
+        template<typename Serializer>
+        AURORA_INLINE void OnSerialize(Serializer Archive)
+        {
+            Archive.SerializeVector(mPool);
+            Archive.SerializeInt(mHead);
         }
 
     private:

@@ -240,25 +240,25 @@ inline namespace Math
         /// \return A new matrix that is the product of the two matrices.
         AURORA_INLINE Matrix4x4 operator*(ConstRef<Matrix4x4> Other) const
         {
-            const Vector4 Col0 = Other.mColumns[0] * Vector4::SplatX(mColumns[0]) +
-                                 Other.mColumns[1] * Vector4::SplatY(mColumns[0]) +
-                                 Other.mColumns[2] * Vector4::SplatZ(mColumns[0]) +
-                                 Other.mColumns[3] * Vector4::SplatW(mColumns[0]);
+            const Vector4 Col0 = mColumns[0] * Vector4::SplatX(Other.mColumns[0]) +
+                                 mColumns[1] * Vector4::SplatY(Other.mColumns[0]) +
+                                 mColumns[2] * Vector4::SplatZ(Other.mColumns[0]) +
+                                 mColumns[3] * Vector4::SplatW(Other.mColumns[0]);
 
-            const Vector4 Col1 = Other.mColumns[0] * Vector4::SplatX(mColumns[1]) +
-                                 Other.mColumns[1] * Vector4::SplatY(mColumns[1]) +
-                                 Other.mColumns[2] * Vector4::SplatZ(mColumns[1]) +
-                                 Other.mColumns[3] * Vector4::SplatW(mColumns[1]);
+            const Vector4 Col1 = mColumns[0] * Vector4::SplatX(Other.mColumns[1]) +
+                                 mColumns[1] * Vector4::SplatY(Other.mColumns[1]) +
+                                 mColumns[2] * Vector4::SplatZ(Other.mColumns[1]) +
+                                 mColumns[3] * Vector4::SplatW(Other.mColumns[1]);
 
-            const Vector4 Col2 = Other.mColumns[0] * Vector4::SplatX(mColumns[2]) +
-                                 Other.mColumns[1] * Vector4::SplatY(mColumns[2]) +
-                                 Other.mColumns[2] * Vector4::SplatZ(mColumns[2]) +
-                                 Other.mColumns[3] * Vector4::SplatW(mColumns[2]);
+            const Vector4 Col2 = mColumns[0] * Vector4::SplatX(Other.mColumns[2]) +
+                                 mColumns[1] * Vector4::SplatY(Other.mColumns[2]) +
+                                 mColumns[2] * Vector4::SplatZ(Other.mColumns[2]) +
+                                 mColumns[3] * Vector4::SplatW(Other.mColumns[2]);
 
-            const Vector4 Col3 = Other.mColumns[0] * Vector4::SplatX(mColumns[3]) +
-                                 Other.mColumns[1] * Vector4::SplatY(mColumns[3]) +
-                                 Other.mColumns[2] * Vector4::SplatZ(mColumns[3]) +
-                                 Other.mColumns[3] * Vector4::SplatW(mColumns[3]);
+            const Vector4 Col3 = mColumns[0] * Vector4::SplatX(Other.mColumns[3]) +
+                                 mColumns[1] * Vector4::SplatY(Other.mColumns[3]) +
+                                 mColumns[2] * Vector4::SplatZ(Other.mColumns[3]) +
+                                 mColumns[3] * Vector4::SplatW(Other.mColumns[3]);
 
             return Matrix4x4(Col0, Col1, Col2, Col3);
         }
@@ -450,7 +450,7 @@ inline namespace Math
             }
             else
             {
-                // TODO: Implement it using SIMD.
+                return { }; // TODO: Implement it using SIMD.
             }
         }
 

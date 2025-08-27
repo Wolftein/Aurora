@@ -19,7 +19,7 @@
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Core
+inline namespace Base
 {
     /// \brief Generic serialization archive for reading or writing binary data.
     /// 
@@ -256,10 +256,26 @@ inline namespace Core
             }
         }
 
+        /// \brief Serializes a floating point value.
+        ///
+        /// \param Value Reference to the value.
+        template<typename Type>
+        AURORA_INLINE void SerializeReal(Ref<Type> Value)
+        {
+            if constexpr(IsEqual<Type, Real32>)
+            {
+                SerializeReal32(Value);
+            }
+            else
+            {
+                SerializeReal64(Value);
+            }
+        }
+
         /// \brief Serializes a text string.
         /// 
         /// \param Value Reference to the value.
-        AURORA_INLINE void SerializeString(Ref<Text> Value)
+        AURORA_INLINE void SerializeText(Ref<Text> Value)
         {
             if constexpr (IsReader)
             {
@@ -275,9 +291,53 @@ inline namespace Core
         ///
         /// \param Value Reference to the value.
         template<typename Type>
-        void SerializeObject(Ref<Type> Value)
+        AURORA_INLINE void SerializeObject(Ref<Type> Value)
         {
-            Value.OnSerialize(* this);
+            if constexpr(IsBool<Type>)
+            {
+                SerializeBool(Value);
+            }
+            else if constexpr(IsEnum<Type>)
+            {
+                SerializeEnum(Value);
+            }
+            else if constexpr(IsInteger<Type>)
+            {
+                SerializeInt(Value);
+            }
+            else if constexpr(IsReal<Type>)
+            {
+                SerializeReal(Value);
+            }
+            else if constexpr(IsText<Type>)
+            {
+                SerializeText(Value);
+            }
+            else
+            {
+                Value.OnSerialize(* this);
+            }
+        }
+
+        /// \brief Serializes a vector.
+        ///
+        /// \param Vector Reference to the vector.
+        template<typename Type>
+        AURORA_INLINE void SerializeVector(Ref<Type> Vector)
+        {
+            if constexpr (IsReader)
+            {
+                Vector.resize(mArchive.template ReadInt<UInt32>());
+            }
+            else
+            {
+                mArchive.template WriteInt<UInt32>(Vector.size());
+            }
+
+            for (UInt32 Element = 0, Size = Vector.size(); Element < Size; ++Element)
+            {
+                SerializeObject(Vector[Element]);
+            }
         }
 
     private:

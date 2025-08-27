@@ -32,7 +32,7 @@ namespace Content
 
     Blob DiskMount::Read(ConstText Path)
     {
-        if (const Ptr<SDL_IOStream> Stream = SDL_IOFromFile(Format("{}{}", mPath, Path).c_str(), "r+b"); Stream)
+        if (const Ptr<SDL_IOStream> Stream = SDL_IOFromFile(Format("{}{}", mPath, Path).data(), "r+b"); Stream)
         {
             Blob Result(SDL_GetIOSize(Stream));
 
@@ -49,7 +49,7 @@ namespace Content
 
     void DiskMount::Write(ConstText Path, ConstSpan<Byte> Bytes)
     {
-        if (const Ptr<SDL_IOStream> Stream = SDL_IOFromFile(Format("{}{}", mPath, Path).c_str(), "w+b"); Stream)
+        if (const Ptr<SDL_IOStream> Stream = SDL_IOFromFile(Format("{}{}", mPath, Path).data(), "w+b"); Stream)
         {
             SDL_WriteIO(Stream, Bytes.data(), Bytes.size());
             SDL_CloseIO(Stream);
@@ -61,7 +61,7 @@ namespace Content
 
     void DiskMount::Delete(ConstText Path)
     {
-        SDL_RemovePath(Format("{}{}", mPath, Path).c_str());
+        SDL_RemovePath(Format("{}{}", mPath, Path).data());
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

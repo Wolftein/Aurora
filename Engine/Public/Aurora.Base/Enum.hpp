@@ -26,7 +26,7 @@ namespace Enum
     /// \param Value The enum value.
     /// \return The string representation of the enum value.
     template<typename Type>
-    constexpr decltype(auto) GetName(Type Value)
+    constexpr auto GetName(Type Value)
     {
         return enchantum::to_string(Value);
     }
@@ -35,7 +35,7 @@ namespace Enum
     /// 
     /// \return A constexpr array of all enum values.
     template<typename Enum>
-    constexpr decltype(auto) GetValues()
+    constexpr auto GetValues()
     {
         return enchantum::values<Enum>;
     }
@@ -45,7 +45,7 @@ namespace Enum
     /// \param Value The enum value.
     /// \return The integral representation of the enum.
     template<typename Enum>
-    constexpr decltype(auto) Cast(Enum Value)
+    constexpr auto Cast(Enum Value)
     {
         return static_cast<__underlying_type(Enum)>(Value);
     }
@@ -55,21 +55,21 @@ namespace Enum
     /// \param Name    The string representation of the enum.
     /// \param Default The fallback enum value if no match is found.
     /// \return The matched enum value or the provided default.
+
     template<typename Enum>
-    constexpr decltype(auto) Cast(ConstText Name, Enum Default)
+    constexpr Enum Cast(ConstText Name, Enum Default)
     {
-        std::optional<Enum> Value = enchantum::cast<Enum>(Name, [](Char X, Char Y)
+        return enchantum::cast<Enum>(Name, [](Char X, Char Y)
         {
             return std::tolower(X) == std::tolower(Y);
-        });
-        return Value.has_value() ? Value.value() : Default;
+        }).value_or(Default);
     }
 
     /// \brief Gets the number of enumerators defined in the enum.
     /// 
     /// \return The number of enum values.
     template<typename Enum>
-    constexpr decltype(auto) Count()
+    constexpr UInt Count()
     {
         return enchantum::count<Enum>;
     }

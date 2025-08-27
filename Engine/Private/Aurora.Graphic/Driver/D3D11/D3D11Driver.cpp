@@ -466,9 +466,6 @@ namespace Graphic
             ComPtr<ID3D11DeviceContext> DeviceImmediate;
 
             UInt Flags = D3D11_CREATE_DEVICE_SINGLETHREADED | D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-#ifdef    _DEBUG
-            Flags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif // _DEBUG
 
             constexpr D3D_FEATURE_LEVEL Direct3DFeatureLevels[] = {
                 D3D_FEATURE_LEVEL_11_1,

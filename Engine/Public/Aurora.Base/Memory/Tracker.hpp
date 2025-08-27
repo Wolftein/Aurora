@@ -19,7 +19,7 @@
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Type
+inline namespace Base
 {
     /// \brief Intrusive smart pointer for managing the lifetime of `Trackable` objects.
     /// 

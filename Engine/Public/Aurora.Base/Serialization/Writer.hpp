@@ -94,14 +94,15 @@ inline namespace Base
             mOffset = 0u;
         }
 
-        /// \brief Reserves a region of memory from the buffer.
+        /// \brief Reserve a byte range from the buffer with alignment.
         ///
-        /// \param Length  Size of the region in bytes.
-        /// \param Padding Number of padding bytes to insert before the region.
+        /// \param Length Size of the region in bytes.
+        /// \param Stride Alignment in bytes to satisfy before the reservation.
         /// \return Pointer to the start of the reserved region.
         template<typename Type>
-        AURORA_INLINE Ptr<Type> Reserve(UInt32 Length, UInt32 Padding)
+        AURORA_INLINE Ptr<Type> Reserve(UInt32 Length, UInt32 Stride)
         {
+            const UInt Padding = Align(mOffset, Stride) - mOffset;
             Ensure(Padding + Length);
 
             mOffset += Padding + Length;
@@ -253,7 +254,7 @@ inline namespace Base
 
         /// \brief Writes a string prefixed with its character count.
         ///
-        /// \param Value String to write.
+        /// \param Value The string to write.
         AURORA_INLINE void WriteText(ConstText Value)
         {
             WriteInt(Value.size());
@@ -280,6 +281,20 @@ inline namespace Base
             InPlaceCreate<Type>(mBuffer.data() + mOffset, Forward<Arguments>(Parameters)...);
 
             mOffset += sizeof(Type);
+        }
+
+        /// \brief Writes a contiguous block of trivially copyable elements into the buffer.
+        ///
+        /// \param Value The view of elements to write.
+        template<typename Type>
+        AURORA_INLINE void WriteBlock(Span<Type> Value)
+        {
+            WriteInt<UInt32>(Value.size());
+
+            if (!Value.empty())
+            {
+                Write<ConstPtr<Type>>(Value.data(), Value.size_bytes());
+            }
         }
 
     private:

@@ -12,49 +12,70 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Primitive.hpp"
+#include "Common.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Base
+namespace Scene
 {
-    /// \brief Represents simulation time data.
-    class Time final
+    // -=(Undocumented)=-
+    template<typename ...Components>
+    class Query final
     {
     public:
 
-        /// \brief Default constructor.
-        AURORA_INLINE Time()
-            : mAbsolute { 0 },
-              mDelta    { 0 }
+        // -=(Undocumented)=-
+        using Handle = flecs::query<Components...>;
+
+    public:
+
+        // -=(Undocumented)=-
+        Query() = default;
+
+        // -=(Undocumented)=-
+        template<typename Type>
+        Query(Type Handle)
+            : mHandle { Handle }
         {
         }
 
-        /// \brief Updates the absolute time and computes the delta since last update.
-        /// 
-        /// \param Absolute The new absolute time, in seconds.
-        AURORA_INLINE void SetAbsolute(Real32 Absolute)
+        // -=(Undocumented)=-
+        ~Query()
         {
-            mDelta    = Absolute - mAbsolute;
-            mAbsolute = Absolute;
+            Destruct();
         }
 
-        /// \brief Retrieves the last set absolute time.
-        /// 
-        /// \return The absolute time in seconds.
-        AURORA_INLINE Real64 GetAbsolute() const
+        // -=(Undocumented)=-
+        void Destruct()
         {
-            return mAbsolute;
+            if (mHandle)
+            {
+                mHandle.destruct();
+                mHandle = Handle();
+            }
         }
 
-        /// \brief Retrieves the time difference since the last call to \ref SetAbsolute.
-        /// 
-        /// \return The delta time in seconds.
-        AURORA_INLINE Real64 GetDelta() const
+        // -=(Undocumented)=-
+        template<typename Function>
+        void Each(AnyRef<Function> Callback)
         {
-            return mDelta;
+            mHandle.each(Callback);
+        }
+
+        // -=(Undocumented)=-
+        template<typename Function>
+        void Run(AnyRef<Function> Callback)
+        {
+            mHandle.run(Callback);
+        }
+
+        // -=(Undocumented)=-
+        Ref<Query> operator=(ConstRef<Query> Other)
+        {
+            Swap(mHandle, Other.mHandle);
+            return * this;
         }
 
     private:
@@ -62,7 +83,6 @@ inline namespace Base
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Real64 mAbsolute;
-        Real64 mDelta;
+        mutable Handle mHandle;
     };
 }

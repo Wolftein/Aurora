@@ -294,6 +294,17 @@ inline namespace Base
             return Read<ConstPtr<Type>, alignof(Type)>(sizeof(Type));
         }
 
+        /// \brief Reads a contiguous block of trivially copyable elements from the buffer.
+        ///
+        /// \return A view of the contiguous block.
+        template<typename Type>
+        AURORA_INLINE ConstSpan<Type> ReadBlock()
+        {
+            const auto Size = ReadInt<UInt32>();
+            const auto Data = Read<ConstPtr<Type>>(Size * sizeof(Type));
+            return ConstSpan<Type>(Data, Size);
+        }
+
     private:
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

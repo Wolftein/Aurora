@@ -25,6 +25,9 @@ namespace Engine
     {
     public:
 
+        /// \brief Default constructor.
+        Device();
+
         /// \brief Constructs a window with the given parameters.
         ///
         /// \param Handle     Platform-specific window handle (e.g., HWND on Windows, X11 Window on Linux).

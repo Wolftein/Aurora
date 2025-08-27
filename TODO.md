@@ -18,4 +18,8 @@ Math: Implement Matrix4x4::Inverse for general matrices using SIMD.
 
 Network: Implement it from scratch with proper abstraction.
 
-Scene: Implement it form scratch with proper abstraction (ECS Flecs).
+Scene: Builder Pattern For Query/System.
+
+Scene: Abstraction of Pair, Query, System.
+
+Scene: Feature rich Tag system (Name, Category, Etc).

@@ -12,49 +12,40 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Primitive.hpp"
+#include "Aurora.Graphic/Font.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-inline namespace Base
+namespace Example
 {
-    /// \brief Represents simulation time data.
-    class Time final
+    class TextComponent final
     {
     public:
 
-        /// \brief Default constructor.
-        AURORA_INLINE Time()
-            : mAbsolute { 0 },
-              mDelta    { 0 }
+        TextComponent() = default;
+
+        TextComponent(ConstTracker<Graphic::Font> Font, Real32 Size, ConstText Word)
+            : mFont { Font },
+              mSize { Size },
+              mWord { Word }
         {
         }
 
-        /// \brief Updates the absolute time and computes the delta since last update.
-        /// 
-        /// \param Absolute The new absolute time, in seconds.
-        AURORA_INLINE void SetAbsolute(Real32 Absolute)
+        ConstTracker<Graphic::Font> GetFont() const
         {
-            mDelta    = Absolute - mAbsolute;
-            mAbsolute = Absolute;
+            return mFont;
         }
 
-        /// \brief Retrieves the last set absolute time.
-        /// 
-        /// \return The absolute time in seconds.
-        AURORA_INLINE Real64 GetAbsolute() const
+        Real32 GetSize() const
         {
-            return mAbsolute;
+            return mSize;
         }
 
-        /// \brief Retrieves the time difference since the last call to \ref SetAbsolute.
-        /// 
-        /// \return The delta time in seconds.
-        AURORA_INLINE Real64 GetDelta() const
+        ConstText GetWord() const
         {
-            return mDelta;
+            return mWord;
         }
 
     private:
@@ -62,7 +53,8 @@ inline namespace Base
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Real64 mAbsolute;
-        Real64 mDelta;
+        Tracker<Graphic::Font> mFont;
+        Real32                 mSize;
+        Text                   mWord;
     };
 }

@@ -251,20 +251,11 @@ namespace Graphic
             /// Handle to the GPU buffer associated with this arena.
             Object    GpuBuffer = 0;
 
-            /// Handle to the CPU staging buffer.
-            Object    CpuBuffer = 0;
-
-            /// Pointer to the mapped CPU memory of the staging buffer.
-            Ptr<Byte> CpuMemory = nullptr;
-
             /// Total capacity of the CPU buffer in bytes.
             UInt32    CpuLength = 0;
 
-            /// Current allocation offset within the CPU buffer.
-            UInt32    CpuOffset = 0;
-
             /// Buffer used to extend the buffer with new data.
-            Writer    CpuScratch;
+            Writer    CpuBuffer;
         };
 
         /// \brief Per–frame container for all GPU submission data.
@@ -439,29 +430,9 @@ namespace Graphic
         template<typename Format>
         AURORA_INLINE auto AllocateFrame(Ref<InFlightArena> Arena, UInt32 Length, UInt32 Stride)
         {
-            const UInt32 Bytes  = Length * Stride;
-            UInt32 Offset = Align(Arena.CpuOffset, Stride);
-
-            if (Offset + Bytes < Arena.CpuLength)
-            {
-                Arena.CpuOffset = Offset + Bytes;
-
-                const Ptr<Format> Address = reinterpret_cast<Ptr<Format>>(&Arena.CpuMemory[Offset]);
-                return Tuple(Address, Stream(Arena.GpuBuffer, Stride, Offset));
-            }
-            else
-            {
-                if (Arena.CpuScratch.GetCapacity() == 0)
-                {
-                    Arena.CpuScratch.Ensure(Arena.CpuLength);
-                }
-
-                const UInt32 ScratchOffset     = Align(Arena.CpuLength + Arena.CpuScratch.GetOffset(), Stride);
-                const UInt32 ScratchBaseOffset = ScratchOffset - Arena.CpuLength - Arena.CpuScratch.GetOffset();
-
-                const Ptr<Format> Address = Arena.CpuScratch.Reserve<Format>(Bytes, ScratchBaseOffset);
-                return Tuple(Address, Stream(Arena.GpuBuffer, Stride, ScratchOffset));
-            }
+            const UInt32      Offset  = Align(Arena.CpuBuffer.GetOffset(), Stride);
+            const Ptr<Format> Address = Arena.CpuBuffer.Reserve<Format>(Length * Stride, Stride);
+            return Tuple(Address, Stream(Arena.GpuBuffer, Stride, Offset));
         }
 
     private:
@@ -475,7 +446,6 @@ namespace Graphic
         Flag                             mBusy;     // TODO: Implement Spinlock (Uncapped) / Wait (Capped)
         UInt32                           mProducer = 0;
         UInt32                           mConsumer = 1;
-
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

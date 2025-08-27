@@ -480,11 +480,9 @@ namespace Graphic
         static auto CreateInFlightBuffer = [&](Ref<InFlightArena> Arena, Usage Usage, UInt32 Length)
         {
             Arena.GpuBuffer = mBuffers.Allocate();
-            Arena.CpuBuffer = mBuffers.Allocate();
             Arena.CpuLength = Length;
+            Arena.CpuBuffer.Ensure(Length);
             mDriver->CreateBuffer(Arena.GpuBuffer, Access::Dual, Usage, Length, ConstSpan<Byte>());
-            mDriver->CreateBuffer(Arena.CpuBuffer, Access::Host, Usage, Length, ConstSpan<Byte>());
-            Arena.CpuMemory = mDriver->MapBuffer(Arena.CpuBuffer, 0, Length, false);
         };
 
         CreateInFlightBuffer(Frame.Heap[Enum::Cast(Usage::Vertex)],  Usage::Vertex,  kDefaultTransientVertexCapacity);
@@ -499,39 +497,20 @@ namespace Graphic
     {
         for (Ref<InFlightArena> Arena : Frame.Heap)
         {
-            const UInt32 CpuOffsetBase = Exchange(Arena.CpuOffset, 0);
-            const UInt32 CpuOffsetMore = Arena.CpuScratch.GetOffset();
-
-            // If new data was appended, grow the GPU buffer and upload the additional contents
-            // from the CPU scratch region.
-            if (CpuOffsetMore > 0)
+            if (ConstSpan<Byte> Data = Arena.CpuBuffer.GetData(); !Data.empty())
             {
-                mDriver->ResizeBuffer(Arena.GpuBuffer, Arena.CpuLength + Arena.CpuScratch.GetCapacity());
-                mDriver->UpdateBuffer(Arena.GpuBuffer, Arena.CpuLength, false, Arena.CpuScratch.GetData());
-            }
+                // If new data was appended, grow the GPU buffer and upload the additional contents
+                // from the CPU scratch region.
+                if (Data.size_bytes() > Arena.CpuLength)
+                {
+                    Arena.CpuLength = Data.size_bytes();
 
-            // If the base CPU staging region contains data, unmap it and copy its contents into the GPU buffer.
-            if (CpuOffsetBase > 0)
-            {
-                mDriver->UnmapBuffer(Arena.CpuBuffer);
-                mDriver->CopyBuffer(Arena.GpuBuffer, 0, Arena.CpuBuffer, 0, CpuOffsetBase);
-            }
+                    mDriver->ResizeBuffer(Arena.GpuBuffer, Arena.CpuLength);
+                }
 
-            // If new data was appended, reset the appender, extend the logical CPU buffer length,
-            // resize the staging buffer, and remap it for the next frame’s writes.
-            if (CpuOffsetMore > 0)
-            {
-                Arena.CpuLength += Arena.CpuScratch.GetCapacity();
-                Arena.CpuScratch = Writer();
+                mDriver->UpdateBuffer(Arena.GpuBuffer, 0, false, Data);
 
-                mDriver->ResizeBuffer(Arena.CpuBuffer, Arena.CpuLength);
-
-                Arena.CpuMemory = mDriver->MapBuffer(Arena.CpuBuffer, 0, Arena.CpuLength, false);
-            }
-
-            if (CpuOffsetBase > 0 && CpuOffsetMore == 0)
-            {
-                Arena.CpuMemory = mDriver->MapBuffer(Arena.CpuBuffer, 0, Arena.CpuLength, false);
+                Arena.CpuBuffer.Clear();
             }
         }
     }
