@@ -178,7 +178,10 @@ inline namespace Base
             std::memcpy(mPointer + Offset, Source, Size);
         }
 
-        /// \brief Move assignment operator.
+        /// \brief Transfers ownership of resources from another object.
+        ///
+        /// \param Other The source object to move resources from.
+        /// \return A reference to this object after the ownership transfer.
         AURORA_INLINE Ref<Blob> operator=(AnyRef<Blob> Other) noexcept
         {
             if (this != &Other)

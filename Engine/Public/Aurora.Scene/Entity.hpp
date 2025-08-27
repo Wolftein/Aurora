@@ -586,7 +586,7 @@ namespace Scene
             return !(*this == Other);
         }
 
-    private:
+    public:
 
         /// \brief Conditionally enables or disables a component on the specified entity.
         ///

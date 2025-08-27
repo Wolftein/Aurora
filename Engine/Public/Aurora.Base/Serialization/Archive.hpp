@@ -279,11 +279,11 @@ inline namespace Base
         {
             if constexpr (IsReader)
             {
-                Value = mArchive.ReadString();
+                Value = mArchive.ReadText();
             }
             else
             {
-                mArchive.WriteString(Value);
+                mArchive.WriteText(Value);
             }
         }
 

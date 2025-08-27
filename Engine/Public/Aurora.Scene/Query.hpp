@@ -32,13 +32,13 @@ namespace Scene
     public:
 
         /// \brief Constructs an empty, invalid query.
-        Query() = default;
+        AURORA_INLINE Query() = default;
 
         /// \brief Constructs a query from a query handle.
         ///
         /// \param Handle The query handle.
         template<typename Type>
-        Query(Type Handle)
+        AURORA_INLINE Query(Type Handle)
             : mHandle { Handle }
         {
         }
@@ -46,19 +46,19 @@ namespace Scene
         /// \brief Move constructor.
         ///
         /// \param Other The query object to move resources from.
-        Query(AnyRef<Query> Other) noexcept
+        AURORA_INLINE Query(AnyRef<Query> Other) noexcept
             : mHandle { Exchange(Other.mHandle, Handle()) }
         {
         }
 
         /// \brief Ensures the underlying query resources are properly released.
-        ~Query()
+        AURORA_INLINE ~Query()
         {
             Destruct();
         }
 
         /// \brief Explicitly releases the underlying query resources.
-        void Destruct()
+        AURORA_INLINE void Destruct()
         {
             if (mHandle)
             {
@@ -71,7 +71,7 @@ namespace Scene
         ///
         /// \param Callback The function to invoke.
         template<typename Function>
-        void Each(AnyRef<Function> Callback)
+        AURORA_INLINE void Each(AnyRef<Function> Callback)
         {
             mHandle.each(Callback);
         }
@@ -80,10 +80,26 @@ namespace Scene
         ///
         /// \param Callback The function to invoke.
         template<typename Function>
-        void Run(AnyRef<Function> Callback)
+        AURORA_INLINE void Run(AnyRef<Function> Callback)
         {
             mHandle.run(Callback);
         }
+
+        /// \brief Transfers ownership of resources from another object.
+        ///
+        /// \param Other The source object to move resources from.
+        /// \return A reference to this object after the ownership transfer.
+        AURORA_INLINE Ref<Query> operator=(AnyRef<Query> Other)
+        {
+            if (this != &Other)
+            {
+                mHandle = Exchange(Other.mHandle, Handle());
+            }
+            return (* this);
+        }
+
+        /// \brief Deleted copy assignment operator.
+        AURORA_INLINE Ref<Query> operator=(ConstRef<Query>) = delete;
 
     private:
 
