@@ -168,7 +168,7 @@ namespace Scene
         template<typename Tag, typename Component>
         AURORA_INLINE void Attach(AnyRef<Component> Data)
         {
-            mHandle.template set_second<Component>(Move(Data));
+            mHandle.template set_second<Tag>(Move(Data));
         }
 
         /// \brief Ensures a component is present.
