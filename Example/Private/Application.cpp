@@ -26,7 +26,7 @@ namespace Example
     Unique<Graphic::Render2D> AppRenderer;
     Tracker<Graphic::Font>    Font;
 
-    Scene::Query<const TextComponent, const Matrix4x4, ConstPtr<Color>, ConstPtr<Pivot>> TextQuery;
+    Scene::Query<const TextComponent, const Matrix4x4, ConstPtr<Graphic::Color>, ConstPtr<Pivot>> TextQuery;
     Scene::Query<> TransformQuery;
     Scene::Entity GrandMasterEntity;
 
@@ -45,7 +45,7 @@ namespace Example
 
         // Initialize the scene.
         ConstTracker<Scene::Service> Scene = GetService<Scene::Service>();
-        Scene->RegisterComponent<Color>();
+        Scene->RegisterComponent<Graphic::Color>();
         Scene->RegisterComponent<Pivot>();
         Scene->RegisterComponent<Matrix4x4>();
         Scene->RegisterComponent<Transform>().With<Matrix4x4>();
@@ -59,18 +59,18 @@ namespace Example
         GrandMasterEntity = Scene->CreateEntity<false>();
         GrandMasterEntity.Attach(Transform(Vector3(256, 256, 0)));
         GrandMasterEntity.Attach(TextComponent(Font, 32.0f, "[Lord Fernando]"));
-        GrandMasterEntity.Attach(Color(1, 0, 0, 1));
+        GrandMasterEntity.Attach(Graphic::Color(1, 0, 0, 1));
         GrandMasterEntity.Attach(Pivot::CenterMiddle);
 
         auto MasterEntity = Scene->CreateEntity<false>();
         MasterEntity.Attach(Transform(Vector3(128, 0, 0)));
         MasterEntity.Attach(TextComponent(Font, 32.0f, "[ES PETE]"));
-        MasterEntity.Attach(Color(0, 1, 0, 1));
+        MasterEntity.Attach(Graphic::Color(0, 1, 0, 1));
         MasterEntity.Attach(Pivot::LeftMiddle);
         MasterEntity.SetParent(GrandMasterEntity);
 
 
-        TextQuery = Scene->CreateQuery<const TextComponent, const Matrix4x4, ConstPtr<Color>, ConstPtr<Pivot>>().build();
+        TextQuery = Scene->CreateQuery<const TextComponent, const Matrix4x4, ConstPtr<Graphic::Color>, ConstPtr<Pivot>>().build();
 
         TransformQuery = Scene->CreateQuery<>("OnTransformUpdateQuery")
             .with<const Transform>()
@@ -130,7 +130,7 @@ namespace Example
         return EffectFont;
     }
 
-     Graphic::Render2D::FontStyleSDF GetFontShadow(Color Shadow)
+     Graphic::Render2D::FontStyleSDF GetFontShadow(Graphic::Color Shadow)
     {
         Graphic::Render2D::FontStyleSDF EffectFont;
         EffectFont.uInvThreshold = 1.0f-0.5f;
@@ -195,7 +195,7 @@ namespace Example
         ConstTracker<Graphic::Service> Graphics = GetService<Graphic::Service>();
 
         Graphic::Viewport Viewport(0, 0, GetDevice().GetWidth(), GetDevice().GetHeight());
-        Graphics->Prepare(Graphic::kDisplay, Viewport, Graphic::Clear::All, Color(0.65f, 0.50f, 0.55f), 1, 0);
+        Graphics->Prepare(Graphic::kDisplay, Viewport, Graphic::Clear::All, Graphic::Color(0.65f, 0.50f, 0.55f), 1, 0);
         {
             AppRenderer->SetGlobalParameters(ConstSpan<Matrix4x4>(&AppCamera.GetViewProjection(), 1));
 
@@ -204,13 +204,13 @@ namespace Example
 
                 auto Text = Format("Time: {}", Time.GetAbsolute());
                 auto Where = Font->Layout(Text, 24.0f, Pivot::LeftTop);
-                AppRenderer->DrawFont(Where,0.0f, Text, 24.0f, Color::PackRGBA32F(0, 0, 1), Font);
+                AppRenderer->DrawFont(Where,0.0f, Text, 24.0f, Graphic::Color::PackRGBA32F(0, 0, 1), Font);
 
                 {
                     AURORA_PROFILE_SCOPE("TextQuery");
-                    TextQuery.Each([&](ConstRef<TextComponent> Text, ConstRef<Matrix4x4> Matrix, ConstPtr<Color> Tint, ConstPtr<Pivot> Pivot)
+                    TextQuery.Each([&](ConstRef<TextComponent> Text, ConstRef<Matrix4x4> Matrix, ConstPtr<Graphic::Color> Tint, ConstPtr<Pivot> Pivot)
                                    {
-                                       auto Color  = (Tint ? Tint->PackRGBA32F(Tint->GetRed(), Tint->GetGreen(), Tint->GetBlue(), Tint->GetAlpha()) : 0xFFFFFFFF);
+                                       auto Color  = (Tint ? Graphic::Color::PackRGBA32F(Tint->GetRed(), Tint->GetGreen(), Tint->GetBlue(), Tint->GetAlpha()) : 0xFFFFFFFF);
                                        auto Anchor = (Pivot ? *Pivot : Math::Pivot::LeftTop);
                                        auto Origin = Text.GetFont()->Layout(Text.GetWord(), Text.GetSize(), Anchor);
                                        AppRenderer->DrawFont(Matrix, Origin, 0.0f, Text.GetWord(), Text.GetSize(), Color, Text.GetFont());

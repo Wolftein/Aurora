@@ -12,7 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-#include "Aurora.Base/Trait.hpp"
+#include "Aurora.Base/Utility.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
@@ -27,4 +27,7 @@ namespace Scene
         /// \brief The unique compile-time identifier for this tag.
         static constexpr UInt64 kID = ID;
     };
+
+    /// \brief Tag component to exclude entities from serialization.
+    using Transient = Tag<Hash("Transient")>;
 }

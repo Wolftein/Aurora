@@ -158,6 +158,11 @@ namespace Scene
 
     void Service::SaveEntity(Ref<Writer> Writer, Entity Actor)
     {
+        if (Actor.Contains<Transient>())
+        {
+            return;
+        }
+
         /// Write entity name and display name.
         Writer.WriteText(Actor.GetName());
         Writer.WriteText(Actor.GetDisplayName());
@@ -175,6 +180,11 @@ namespace Scene
 
     void Service::SaveEntityHierarchy(Ref<Writer> Writer, Entity Actor)
     {
+        if (Actor.Contains<Transient>())
+        {
+            return;
+        }
+
         /// Write the entity and its components.
         SaveEntity(Writer, Actor);
 
@@ -315,10 +325,9 @@ namespace Scene
             mArchetypes.Free(Actor.GetID() - kMinRangeArchetypes);
         });
 
-        /// Registers Factory component for entity creation and management.
+        /// Registers the engine's default set of components with the ECS.
+        RegisterComponent<Transient>("Transient");
         RegisterComponent<Factory>("Factory");
-
-        /// Registers Time component for tracking game time.
         RegisterComponent<Time>("Time").SetTrait(Trait::Singleton);
     }
 }

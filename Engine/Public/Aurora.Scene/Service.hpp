@@ -15,6 +15,7 @@
 #include "Component.hpp"
 #include "Entity.hpp"
 #include "Query.hpp"
+#include "Tag.hpp"
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // [   CODE   ]
