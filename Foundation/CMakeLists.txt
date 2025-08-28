@@ -78,15 +78,17 @@ LIST(APPEND PROJECT_DEPENDENCIES "SDL3-static")
 ## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 SET(XNASONG            OFF                                CACHE BOOL   "" FORCE)
-SET(BUILD_SHARED_LIBS, OFF                                CACHE BOOL   "" FORCE)
-SET(BUILD_SDL3         ON                                 CACHE BOOL   "" FORCE)
+SET(BUILD_SHARED_LIBS  OFF                                CACHE BOOL   "" FORCE)
 SET(SDL3_INCLUDE_DIRS  ${external_sdl_SOURCE_DIR}/include CACHE STRING "" FORCE)
 SET(SDL3_LIBRARIES     "SDL3-static"                      CACHE STRING "" FORCE)
 
 FetchContent_Declare(External_FAudio
-        GIT_REPOSITORY https://github.com/Wolftein/FAudio
+        GIT_REPOSITORY https://github.com/FNA-XNA/FAudio
         EXCLUDE_FROM_ALL)
 FetchContent_MakeAvailable(External_FAudio)
+
+INSTALL(TARGETS SDL3-static  EXPORT FAudio-targets-static)
+INSTALL(TARGETS SDL3_Headers EXPORT FAudio-targets-static)
 
 LIST(APPEND PROJECT_DEPENDENCIES "FAudio-static")
 
