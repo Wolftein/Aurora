@@ -524,7 +524,7 @@ namespace Scene
         /// \param Name The new name.
         AURORA_INLINE void SetName(ConstText Name)
         {
-            mHandle.set_name(Name.data());
+            mHandle.set_name(Text(Name).c_str()); // TODO: Remove heap allocation (Flecs Limitation)
         }
 
         /// \brief Gets the name of this entity.
@@ -541,7 +541,7 @@ namespace Scene
         /// \param Name The new display name.
         AURORA_INLINE void SetDisplayName(ConstText Name)
         {
-            mHandle.set_doc_name(Name.data());
+            mHandle.set_doc_name(Text(Name).c_str()); // TODO: Remove heap allocation (Flecs Limitation)
         }
 
         /// \brief Gets the display name of this entity.

@@ -62,8 +62,10 @@ namespace Scene
             Entity Archetype = Allocate<true>(kMinRangeArchetypes + Reader.ReadInt<UInt32>());
 
             /// Read and set archetype name.
-            const Text Name(Reader.ReadText()); // TODO: Remove heap allocation (Flecs Limitation)
-            Archetype.SetName(Name);
+            if (ConstText Name = Reader.ReadText(); !Name.empty())
+            {
+                Archetype.SetName(Name);
+            }
 
             /// Read and set base archetype reference if present.
             if (const UInt32 Base = Reader.ReadInt<UInt32>(); Base)
