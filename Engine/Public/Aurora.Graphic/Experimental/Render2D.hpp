@@ -115,7 +115,10 @@ namespace Graphic
         }
 
         // -=(Undocumented)=-
-        void SetPipeline(Type Type, ConstTracker<Pipeline> Pipeline);
+        void SetPipeline(Type Type, ConstTracker<Pipeline> Pipeline)
+        {
+            mPipelines[Enum::Cast(Type)] = Pipeline;
+        }
 
         // -=(Undocumented)=-
         void SetFontStyle(ConstRef<FontStyleSDF> Style);
