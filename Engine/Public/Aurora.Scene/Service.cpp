@@ -315,7 +315,10 @@ namespace Scene
             mArchetypes.Free(Actor.GetID() - kMinRangeArchetypes);
         });
 
-        /// Register default component for entity factories.
+        /// Registers Factory component for entity creation and management.
         RegisterComponent<Factory>("Factory");
+
+        /// Registers Time component for tracking game time.
+        RegisterComponent<Time>("Time").SetTrait(Trait::Singleton);
     }
 }

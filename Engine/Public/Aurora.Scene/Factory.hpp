@@ -83,7 +83,7 @@ namespace Scene
         template<typename Type>
         AURORA_INLINE static void OnComponentRead(Archive<Reader> Archive, Ptr<void> Component)
         {
-            if constexpr (not std::is_empty_v<Type>)
+            if constexpr(CanSerialize<Type, Base::Archive<Reader>>)
             {
                 static_cast<Ptr<Type>>(Component)->OnSerialize(Archive);
             }
@@ -96,7 +96,7 @@ namespace Scene
         template<typename Type>
         AURORA_INLINE static void OnComponentWrite(Archive<Writer> Archive, Ptr<void> Component)
         {
-            if constexpr (not std::is_empty_v<Type>)
+            if constexpr(CanSerialize<Type, Base::Archive<Writer>>)
             {
                 static_cast<Ptr<Type>>(Component)->OnSerialize(Archive);
             }

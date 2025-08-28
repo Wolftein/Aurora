@@ -478,18 +478,20 @@ namespace Scene
         ///
         /// \param Traits The trait flags to apply to the component.
         template<typename... Arguments>
-        AURORA_INLINE void SetTrait(Arguments... Traits)
+        AURORA_INLINE Component SetTrait(Arguments... Traits)
         {
             (InsertTrait(Traits), ...);
+            return (* this);
         }
 
         /// \brief Removes multiple behavioral traits from the component definition.
         ///
         /// \param Traits The trait flags to remove to the component.
         template<typename... Arguments>
-        AURORA_INLINE void UnsetTrait(Arguments... Traits)
+        AURORA_INLINE Component UnsetTrait(Arguments... Traits)
         {
             (RemoveTrait(Traits), ...);
+            return (* this);
         }
 
         /// \brief Iterates over this component’s children.

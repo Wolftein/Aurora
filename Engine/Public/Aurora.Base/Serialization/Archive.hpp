@@ -21,6 +21,13 @@
 
 inline namespace Base
 {
+    /// \brief Concept that defines the serialization interface for types.
+    template<typename Type, typename Serializer>
+    concept CanSerialize = requires(Ref<Type> Object, Serializer Archive)
+    {
+        Object.OnSerialize(Archive);
+    };
+
     /// \brief Generic serialization archive for reading or writing binary data.
     /// 
     /// provides a unified interface for serializing data to or from a binary stream,
@@ -313,7 +320,7 @@ inline namespace Base
             {
                 SerializeText(Value);
             }
-            else
+            else if constexpr(CanSerialize<Type, Archive<T>>)
             {
                 Value.OnSerialize(* this);
             }
