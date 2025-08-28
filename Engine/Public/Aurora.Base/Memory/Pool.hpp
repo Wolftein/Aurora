@@ -35,7 +35,7 @@ inline namespace Base
         {
             const UInt32 Handle = mAllocator.Allocate();
 
-            if (Handle != decltype(mPool)::kInvalid)
+            if (Handle)
             {
                 InPlaceConstruct<Type>(mPool[Handle - 1], Forward<Arguments>(Parameters)...);
             }
