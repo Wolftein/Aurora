@@ -46,7 +46,7 @@ float4 fragment(ps_Input Input) : SV_Target
     float4 Texel = ColorTexture.Sample(ColorSampler, Input.Texture);
 
 #ifdef    ENABLE_ALPHA_TEST
-    clip(Texel.a);
+    clip(Texel.a - 0.001);
 #endif // ENABLE_ALPHA_TEST
 
     return Input.Color * Texel;

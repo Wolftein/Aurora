@@ -113,7 +113,7 @@ float4 fragment(ps_Input Input) : SV_Target
     float4 Result = (InnerColor * InnerOpacity) + (OuterColor * (OuterOpacity - InnerOpacity));
 
 #ifdef    ENABLE_ALPHA_TEST
-    clip(Result.a - 0.001f);
+    clip(Result.a - 0.001);
 #endif // ENABLE_ALPHA_TEST
 
     return Result;
