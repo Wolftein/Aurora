@@ -549,7 +549,8 @@ namespace Scene
         /// \return The entity’s display name.
         AURORA_INLINE ConstText GetDisplayName() const
         {
-            return ConstText(mHandle.doc_name());
+            const ConstPtr<Char> Name = mHandle.doc_name();
+            return ConstText(Name ? Name : "");
         }
 
         /// \brief Gets the first element of a pair relation.
