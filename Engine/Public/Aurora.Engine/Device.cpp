@@ -54,15 +54,12 @@ namespace Engine
 #endif  // SDL_PLATFORM_WIN32
 
         mHandle = SDL_CreateWindowWithProperties(Config);
-        if (! mHandle)
-        {
-            LOG_ERROR("Failed to create device: '{}'", SDL_GetError());
-        }
 
 #ifdef     SDL_PLATFORM_WIN32
-
-        SDL_StartTextInput(mHandle);
-
+        if (mHandle)
+        {
+            SDL_StartTextInput(mHandle);
+        }
 #endif  // SDL_PLATFORM_WIN32
     }
 

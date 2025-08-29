@@ -12,6 +12,7 @@
 // [  HEADER  ]
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+#include "Aurora.Base/Enum.hpp"
 #include "Aurora.Math/Matrix4x4.hpp"
 #include "Aurora.Math/Pivot.hpp"
 

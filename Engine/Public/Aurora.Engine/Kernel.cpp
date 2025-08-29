@@ -150,6 +150,11 @@ namespace Engine
             Properties.IsWindowFullscreen(),
             Properties.IsWindowBorderless());
 
+        if (mDevice.GetHandle() == nullptr)
+        {
+            LOG_ERROR("Failed to create device: '{}'", SDL_GetError());
+        }
+
         // Initializes graphic service.
         const Graphic::Backend Backend = Enum::Cast(Properties.GetVideoDriver(), Graphic::Backend::D3D11);
 
