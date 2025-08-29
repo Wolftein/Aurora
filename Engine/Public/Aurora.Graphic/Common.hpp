@@ -42,7 +42,7 @@ namespace Graphic
         kMaxBuffers     = 0x1000,
 
         /// Maximum number of frames that can be processed concurrently.
-        kMaxFrames      = 0x0002,
+        kMaxFrames      = 0x0003,
 
         /// Maximum number of vertex fetch bindings.
         kMaxFetches     = 0x0008,

@@ -1241,7 +1241,7 @@ namespace Graphic
         const UINT Flags = (mProperties.Tearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
 
         DXGI_SWAP_CHAIN_DESC Description { };
-        Description.BufferCount       = 2;
+        Description.BufferCount       = kMaxFrames;
         Description.BufferUsage       = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         Description.Flags             = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | Flags;
         Description.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;

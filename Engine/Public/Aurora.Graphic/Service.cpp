@@ -313,14 +313,14 @@ namespace Graphic
         }
 
         // Wait until the GPU thread signals that the current frame has finished processing.
-        mBusy.wait(true);
+        mBusy.wait(true, std::memory_order_acquire);
 
         // Rotate the frame queue so that the next frame becomes writable for the CPU while the previous one
         // moves into the GPU submission pipeline.
         Swap(mProducer, mConsumer);
 
         // Mark the service as busy again and notify the GPU thread that a new frame is ready for processing.
-        mBusy.test_and_set(std::memory_order_acq_rel);
+        mBusy.test_and_set(std::memory_order_release);
         mBusy.notify_one();
     }
 
@@ -336,7 +336,7 @@ namespace Graphic
             AURORA_PROFILE_SCOPE("Graphic::Service::Process");
 
             // Put the thread to sleep until the flag indicates there is more work to process.
-            mBusy.wait(false);
+            mBusy.wait(false, std::memory_order_acquire);
 
             // Finalize the most recently recorded frame by uploading its transient resources to the GPU.
             Ref<InFlightFrame> Frame = mFrames[mConsumer];

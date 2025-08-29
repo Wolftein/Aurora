@@ -245,6 +245,9 @@ namespace Graphic
 
     private:
 
+        /// Maximum number of in-flight frames that can be processed concurrently.
+        static constexpr UInt kConcurrency = 2;
+
         /// \brief Transient memory arena used by a single in-flight frame.
         struct InFlightArena final
         {
@@ -440,20 +443,20 @@ namespace Graphic
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Unique<Driver>                   mDriver;
-        Thread                           mWorker;
-        Array<InFlightFrame, kMaxFrames> mFrames;   // TODO: Implement Triple Buffer
-        Flag                             mBusy;     // TODO: Implement Spinlock (Uncapped) / Wait (Capped)
-        UInt32                           mProducer = 0;
-        UInt32                           mConsumer = 1;
+        Unique<Driver>                     mDriver;
+        Thread                             mWorker;
+        Array<InFlightFrame, kConcurrency> mFrames;
+        Flag                               mBusy;     // TODO: Hybrid spinlock implementation?
+        UInt32                             mProducer = 0;
+        UInt32                             mConsumer = 1;
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Handle<kMaxBuffers>              mBuffers;
-        Handle<kMaxMaterials>            mMaterials;
-        Handle<kMaxPasses>               mPasses;
-        Handle<kMaxPipelines>            mPipelines;
-        Handle<kMaxTextures>             mTextures;
+        Handle<kMaxBuffers>                mBuffers;
+        Handle<kMaxMaterials>              mMaterials;
+        Handle<kMaxPasses>                 mPasses;
+        Handle<kMaxPipelines>              mPipelines;
+        Handle<kMaxTextures>               mTextures;
     };
 }
