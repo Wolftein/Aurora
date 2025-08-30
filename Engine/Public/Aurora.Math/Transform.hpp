@@ -160,7 +160,7 @@ inline namespace Math
             return mScale;
         }
 
-        /// \brief Sets the rotation for the transform using a quaternion.
+        /// \brief Sets the rotation for the transform.
         /// 
         /// \param Rotation The quaternion representing the rotation.
         /// \return A reference to this transform, modified by the new rotation.

@@ -27,8 +27,12 @@ inline namespace Math
         friend class Matrix4x4;
 
     public:
-        /// \brief Default (zero) quaternion.
-        AURORA_INLINE Quaternion() = default;
+
+        /// \brief Default quaternion.
+        AURORA_INLINE Quaternion()
+            : mData { 0.0f, 0.0f, 0.0f, 1.0f }
+        {
+        }
 
         /// \brief All components set to the same value.
         ///
