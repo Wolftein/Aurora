@@ -95,7 +95,7 @@ inline namespace Math
         /// \return `true` if matrix is orthogonal, `false` otherwise.
         AURORA_INLINE Bool IsOrthogonal() const
         {
-            return (* this * Transpose(* this)).IsIdentity();
+            return (Transpose(*this) * (* this)).IsIdentity();
         }
 
         /// \brief Gets the trace of the matrix (sum of diagonal elements).
@@ -456,21 +456,21 @@ inline namespace Math
 
         /// \brief Creates a perspective projection matrix.
         ///
-        /// \param Eyes   The field of view angle in radians.
+        /// \param FovY   The field of view angle in radians.
         /// \param Aspect The aspect ratio (width/height).
         /// \param ZNear  The near plane distance.
         /// \param ZFar   The far plane distance.
         /// \return A perspective projection matrix.
-        static Matrix4x4 CreatePerspective(Real32 Eyes, Real32 Aspect, Real32 ZNear, Real32 ZFar)
+        static Matrix4x4 CreatePerspective(Real32 FovY, Real32 Aspect, Real32 ZNear, Real32 ZFar)
         {
-            const Real32 ScaleY = 1.0f / Tan(0.5f * Eyes);
+            const Real32 ScaleY = 1.0f / Tan(0.5f * FovY);
             const Real32 ScaleX = ScaleY / Aspect;
-            const Real32 ScaleZ = ZFar / (ZFar - ZNear);
 
-            return Matrix4x4(ScaleX, 0.0f,   0.0f,           0.0f,
-                             0.0f,   ScaleY, 0.0f,           0.0f,
-                             0.0f,   0.0f,   ScaleZ,         1.0f,
-                             0.0f,   0.0f,  -ScaleZ * ZNear, 0.0f);
+            return Matrix4x4(
+                ScaleX, 0.0f,   0.0f,                              0.0f,
+                0.0f,   ScaleY, 0.0f,                              0.0f,
+                0.0f,   0.0f,   ZFar / (ZNear - ZFar),            -1.0f,
+                0.0f,   0.0f,  (ZFar * ZNear) / (ZNear - ZFar),    0.0f);
         }
 
         /// \brief Creates an orthographic projection matrix.
@@ -488,10 +488,11 @@ inline namespace Math
             const Real32 InvHeight = 1.0f / (Top - Bottom);
             const Real32 InvDepth  = 1.0f / (ZFar - ZNear);
 
-            return Matrix4x4(2.0f * InvWidth,           0.0f,                        0.0f,              0.0f,
-                             0.0f,                      2.0f * InvHeight,            0.0f,              0.0f,
-                             0.0f,                      0.0f,                        -InvDepth,         0.0f,
-                            -(Right + Left) * InvWidth, -(Top + Bottom) * InvHeight, -ZNear * InvDepth, 1.0f);
+            return Matrix4x4(
+                2.0f * InvWidth,            0.0f,                        0.0f,              0.0f,
+                0.0f,                       2.0f * InvHeight,            0.0f,              0.0f,
+                0.0f,                       0.0f,                        InvDepth,          0.0f,
+                -(Right + Left) * InvWidth, -(Top + Bottom) * InvHeight, -ZNear * InvDepth, 1.0f);
         }
 
         /// \brief Creates a view matrix for camera positioning.
@@ -502,16 +503,15 @@ inline namespace Math
         /// \return A look-at transformation matrix.
         static Matrix4x4 CreateLook(ConstRef<Vector3> Eye, ConstRef<Vector3> Focus, ConstRef<Vector3> Up)
         {
-            const Vector3 vForward = Vector3::Normalize(Focus - Eye);
+            const Vector3 vForward = Vector3::Normalize(Eye - Focus);
             const Vector3 vRight   = Vector3::Normalize(Vector3::Cross(Up, vForward));
             const Vector3 vUp      = Vector3::Cross(vForward, vRight);
-            const Vector3 vEye     = -Eye;
 
             return Matrix4x4(
                 vRight.GetX(), vUp.GetX(), vForward.GetX(), 0.0f,
                 vRight.GetY(), vUp.GetY(), vForward.GetY(), 0.0f,
                 vRight.GetZ(), vUp.GetZ(), vForward.GetZ(), 0.0f,
-                Vector3::Dot(vRight, vEye), Vector3::Dot(vUp, vEye), Vector3::Dot(vForward, vEye), 1.0f);
+                -Vector3::Dot(vRight, Eye), -Vector3::Dot(vUp, Eye), -Vector3::Dot(vForward, Eye), 1.0f);
         }
 
         /// \brief Creates a translation matrix from a 2D vector.
@@ -611,10 +611,11 @@ inline namespace Math
         AURORA_INLINE static Matrix4x4 FromTransform(ConstRef<Vector3> Translation, ConstRef<Vector3> Scale, ConstRef<Quaternion> Rotation)
         {
             Matrix4x4 Result = FromRotation(Rotation);
+
             Result.mColumns[0] *= Scale.GetX();
             Result.mColumns[1] *= Scale.GetY();
             Result.mColumns[2] *= Scale.GetZ();
-            Result.mColumns[3]  = Vector4(Translation.GetX(), Translation.GetY(), Translation.GetZ(), 1.0f);
+            Result.mColumns[3].Set(Translation.GetX(), Translation.GetY(), Translation.GetZ(), 1.0f);
             return Result;
         }
 

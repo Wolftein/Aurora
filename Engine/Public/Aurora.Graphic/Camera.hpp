@@ -158,7 +158,12 @@ namespace Graphic
         /// \param Up    Upward direction for orientation.
         AURORA_INLINE void SetLook(ConstRef<Vector3> Eye, ConstRef<Vector3> Focus, ConstRef<Vector3> Up)
         {
-            mView = Matrix4x4::CreateLook(Eye, Focus, Up);
+            const Matrix4x4 Model = Matrix4x4::Inverse<true>(Matrix4x4::CreateLook(Eye, Focus, Up));
+
+            mTransform.SetTranslation(Model.GetTranslation());
+            mTransform.SetScale(Model.GetScale());
+            mTransform.SetRotation(Model.GetRotation());
+
             mDirty = SetBit(mDirty, kDirtyBitTransformation);
         }
 
@@ -314,6 +319,15 @@ namespace Graphic
         AURORA_INLINE void SetRotation(ConstRef<Vector3> Eye, ConstRef<Vector3> Focus, ConstRef<Vector3> Up)
         {
             mTransform.SetRotation(Quaternion::FromDirection(Focus - Eye, Up));
+            mDirty = SetBit(mDirty, kDirtyBitTransformation);
+        }
+
+        /// \brief Sets the camera rotation from a quaternion rotation.
+        ///
+        /// \param Rotation A unit quaternion representing the desired orientation.
+        AURORA_INLINE void SetRotation(ConstRef<Quaternion> Rotation)
+        {
+            mTransform.SetRotation(Rotation);
             mDirty = SetBit(mDirty, kDirtyBitTransformation);
         }
 

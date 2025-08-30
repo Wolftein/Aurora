@@ -229,10 +229,10 @@ inline namespace Math
             return Quaternion(mData + Other.mData);
         }
 
-        /// \brief Adds a scalar to both components of this quaternion.
+        /// \brief Adds a scalar to all components of this quaternion.
         /// 
         /// \param Scalar The scalar to add.
-        /// \return A new quaternion with the scalar added to both components.
+        /// \return A new quaternion with the scalar added to all components.
         AURORA_INLINE Quaternion operator+(Real32 Scalar) const
         {
             return Quaternion(mData + Scalar);
@@ -270,13 +270,15 @@ inline namespace Math
         /// \return A reference to the updated quaternion.
         AURORA_INLINE Quaternion operator*(ConstRef<Quaternion> Other) const
         {
-            const Vector4 AV(GetX(), GetY(), GetZ(), 0.0f);
-            const Vector4 BV(Other.GetX(), Other.GetY(), Other.GetZ(), 0.0f);
+            const Vector4 V1 = Vector4::Blend<0b1000>(mData, Vector4::Zero());
+            const Vector4 V2 = Vector4::Blend<0b1000>(Other.mData, Vector4::Zero());
+            const Vector4 W1 = Vector4::SplatW(mData);
+            const Vector4 W2 = Vector4::SplatW(Other.mData);
 
-            const Vector4 XYZ = Vector4(GetW()) * BV + Vector4(Other.GetW()) * AV + Vector4::Cross(AV, BV);
-            const Real32  W   = GetW() * Other.GetW() - Vector4::Dot3(AV, BV);
+            const Vector4 XYZ = W1 * V2 + W2 * V1 + Vector4::Cross(V1, V2);
+            const Vector4 W   = W1 * W2 - Vector4(Vector4::Dot3(V1, V2));
 
-            return Quaternion(Vector4::Blend<0b1000>(XYZ, Vector4(0.0f, 0.0f, 0.0f, W)));
+            return Quaternion(Vector4::Blend<0b1000>(XYZ, W * Vector4::UnitW()));
         }
 
         /// \brief Multiplies all components of this quaternion by a scalar.
@@ -352,13 +354,15 @@ inline namespace Math
         /// \return A reference to the updated quaternion.
         AURORA_INLINE Ref<Quaternion> operator*=(ConstRef<Quaternion> Other)
         {
-            const Vector4 AV(GetX(), GetY(), GetZ(), 0.0f);
-            const Vector4 BV(Other.GetX(), Other.GetY(), Other.GetZ(), 0.0f);
+            const Vector4 V1 = Vector4::Blend<0b1000>(mData, Vector4::Zero());
+            const Vector4 V2 = Vector4::Blend<0b1000>(Other.mData, Vector4::Zero());
+            const Vector4 W1 = Vector4::SplatW(mData);
+            const Vector4 W2 = Vector4::SplatW(Other.mData);
 
-            const Vector4 XYZ = Vector4(GetW()) * BV + Vector4(Other.GetW()) * AV + Vector4::Cross(AV, BV);
-            const Real32  W   = GetW() * Other.GetW() - Vector4::Dot3(AV, BV);
+            const Vector4 XYZ = W1 * V2 + W2 * V1 + Vector4::Cross(V1, V2);
+            const Vector4 W   = W1 * W2 - Vector4(Vector4::Dot3(V1, V2));
 
-            mData = Vector4::Blend<0b1000>(XYZ, Vector4(0.0f, 0.0f, 0.0f, W));
+            mData =Vector4::Blend<0b1000>(XYZ, W * Vector4::UnitW());
             return (* this);
         }
 
@@ -479,18 +483,17 @@ inline namespace Math
             const Real32 HalfYaw   = Angles.GetY() * 0.5f;
             const Real32 HalfRoll  = Angles.GetZ() * 0.5f;
 
-            const Real32 SinPitch = Sin(HalfPitch);
-            const Real32 CosPitch = Cos(HalfPitch);
-            const Real32 SinYaw   = Sin(HalfYaw);
-            const Real32 CosYaw   = Cos(HalfYaw);
-            const Real32 SinRoll  = Sin(HalfRoll);
-            const Real32 CosRoll  = Cos(HalfRoll);
+            const Real32 CX = Cos(HalfPitch);
+            const Real32 SX = Sin(HalfPitch);
+            const Real32 CY = Cos(HalfYaw);
+            const Real32 SY = Sin(HalfYaw);
+            const Real32 CZ = Cos(HalfRoll);
+            const Real32 SZ = Sin(HalfRoll);
 
-            return Quaternion(
-                CosRoll * SinPitch * CosYaw + SinRoll * CosPitch * SinYaw,
-                CosRoll * CosPitch * SinYaw - SinRoll * SinPitch * CosYaw,
-                SinRoll * CosPitch * CosYaw - CosRoll * SinPitch * SinYaw,
-                CosRoll * CosPitch * CosYaw + SinRoll * SinPitch * SinYaw);
+            return Quaternion(SX * CY * CZ + CX * SY * SZ,
+                              CX * SY * CZ - SX * CY * SZ,
+                              CX * CY * SZ + SX * SY * CZ,
+                              CX * CY * CZ - SX * SY * SZ);
         }
 
         /// @brief Generates a quaternion from the given direction and up vectors.

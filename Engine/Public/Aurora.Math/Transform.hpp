@@ -226,37 +226,35 @@ inline namespace Math
             return (* this);
         }
 
-        /// \brief Rotates the transform by the specified quaternion.
-        /// 
+        /// \brief Rotates the transform in world space by the specified quaternion.
+        ///
         /// \param Rotation The quaternion representing the rotation to apply.
         /// \return A reference to this transform, modified by the rotation.
         AURORA_INLINE Ref<Transform> Rotate(ConstRef<Quaternion> Rotation)
         {
-            mRotation = mRotation * Rotation;
+            mRotation = Rotation * mRotation;
             return (* this);
         }
 
-        /// \brief Rotates the transform by pitch and yaw (using Euler angles).
+        /// \brief Rotates the transform in world space  by pitch and yaw (using Euler angles).
         /// 
         /// \param Angles The 2D vector containing pitch and yaw (X = pitch, Y = yaw).
         /// \return A reference to this transform, modified by the rotation.
         AURORA_INLINE Ref<Transform> Rotate(ConstRef<Vector2> Angles)
         {
-            mRotation = mRotation * Quaternion::FromEulerAngles(Vector3(Angles.GetX(), Angles.GetY(), 0.0f));
-            return (* this);
+            return Rotate(Quaternion::FromEulerAngles(Vector3(Angles.GetX(), Angles.GetY(), 0.0f)));
         }
 
-        /// \brief Rotates the transform by using Euler angles.
+        /// \brief Rotates the transform in world space by using Euler angles.
         /// 
         /// \param Angles The 3D vector containing Euler angles for rotation.
         /// \return A reference to this transform, modified by the rotation.
         AURORA_INLINE Ref<Transform> Rotate(ConstRef<Vector3> Angles)
         {
-            mRotation = mRotation * Quaternion::FromEulerAngles(Angles);
-            return (*this);
+            return Rotate(Quaternion::FromEulerAngles(Angles));
         }
 
-        /// \brief Rotates the transform around a specified axis by a given angle.
+        /// \brief Rotates the transform in world space around a specified axis by a given angle.
         /// 
         /// \param Angle The rotation angle in radians.
         /// \param Axis  The axis around which to rotate (representing the direction of the axis).
@@ -264,8 +262,7 @@ inline namespace Math
         /// \return A reference to this transform, modified by the rotation.
         AURORA_INLINE Ref<Transform> Rotate(Real32 Angle, ConstRef<Vector3> Axis)
         {
-            mRotation = mRotation * Quaternion::FromAngles(Angle, Axis);
-            return (*this);
+            return Rotate(Quaternion::FromAngles(Angle, Axis));
         }
 
         /// \brief Serializes the state of the object to or from the specified archive.
