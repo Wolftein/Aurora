@@ -417,7 +417,7 @@ inline namespace Math
         /// \return `true` if all components are approximately equal, `false` otherwise.
         AURORA_INLINE constexpr Bool operator==(ConstRef<AnyVector2> Vector) const
         {
-            return IsAlmostEqual(mX, Vector.mX) && IsAlmostEqual(mY, Vector.mY);
+            return IsAlmostEqual(Vector.mX, Vector.mY);
         }
 
         /// \brief Checks if this vector is not equal to another vector.

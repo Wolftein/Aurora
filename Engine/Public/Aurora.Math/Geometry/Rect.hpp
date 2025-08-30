@@ -309,7 +309,10 @@ inline namespace Math
         /// \return `true` if all coordinates are approximately equal, `false` otherwise.
         AURORA_INLINE constexpr Bool operator==(ConstRef<AnyRect> Other) const
         {
-            return IsAlmostEqual(* this, Other);
+            return Base::IsAlmostEqual(mX1, Other.mX1) &&
+                   Base::IsAlmostEqual(mY1, Other.mY1) &&
+                   Base::IsAlmostEqual(mX2, Other.mX2) &&
+                   Base::IsAlmostEqual(mY2, Other.mY2);
         }
 
         /// \brief Checks if this rectangle is not equal to another rectangle.
