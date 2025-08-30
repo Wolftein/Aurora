@@ -27,8 +27,8 @@ inline namespace Math
 
         /// \brief Initializes the line to points (0.0f, 0.0f) and (0.0f, 0.0f).
         AURORA_INLINE constexpr Line()
-            : mStart { 0.0f, 0.0f },
-              mEnd   { 0.0f, 0.0f }
+            : mStart { Vector2::Zero() },
+              mEnd   { Vector2::Zero() }
         {
         }
 

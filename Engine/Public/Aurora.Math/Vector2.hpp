@@ -20,15 +20,14 @@
 
 inline namespace Math
 {
-    /// \brief Represents a 2D vector with floating point components (x, y).
-    class Vector2 final
+    /// \brief Represents a generic vector with (x, y) components.
+    template<typename Type>
+    class AnyVector2 final
     {
     public:
 
-        /// \brief Default constructor.
-        ///
-        /// Initializes the vector to (0.0f, 0.0f).
-        AURORA_INLINE constexpr Vector2()
+        /// \brief Constructor initializing all components zero.
+        AURORA_INLINE constexpr AnyVector2()
             : mX { 0 },
               mY { 0 }
         {
@@ -37,7 +36,7 @@ inline namespace Math
         /// \brief Constructor initializing all components to the same value.
         ///
         /// \param Scalar The scalar value used to initialize all components.
-        AURORA_INLINE constexpr explicit Vector2(Real32 Scalar)
+        AURORA_INLINE constexpr explicit AnyVector2(Type Scalar)
             : mX { Scalar },
               mY { Scalar }
         {
@@ -47,7 +46,7 @@ inline namespace Math
         ///
         /// \param X The x-component of the vector.
         /// \param Y The y-component of the vector.
-        AURORA_INLINE constexpr Vector2(Real32 X, Real32 Y)
+        AURORA_INLINE constexpr AnyVector2(Type X, Type Y)
             : mX { X },
               mY { Y }
         {
@@ -56,7 +55,7 @@ inline namespace Math
         /// \brief Copy constructor.
         ///
         /// \param Other The vector to copy.
-        AURORA_INLINE constexpr Vector2(ConstRef<Vector2> Other)
+        AURORA_INLINE constexpr AnyVector2(ConstRef<AnyVector2> Other)
             : mX { Other.GetX() },
               mY { Other.GetY() }
         {
@@ -75,7 +74,7 @@ inline namespace Math
         /// \param X Value to compare with the X component.
         /// \param Y Value to compare with the Y component.
         /// \return `true` if all components are approximately equal, `false` otherwise.
-        AURORA_INLINE constexpr Bool IsAlmostEqual(Real32 X, Real32 Y) const
+        AURORA_INLINE constexpr Bool IsAlmostEqual(Type X, Type Y) const
         {
             return Base::IsAlmostEqual(mX, X) && Base::IsAlmostEqual(mY, Y);
         }
@@ -84,15 +83,16 @@ inline namespace Math
         ///
         /// \return `true` if the vector is normalized, `false` otherwise.
         AURORA_INLINE constexpr Bool IsNormalized() const
+            requires (IsReal<Type>)
         {
-            return Base::IsAlmostEqual(GetLengthSquared(), 1.0f);
+            return Base::IsAlmostEqual(GetLengthSquared(), Type(1));
         }
 
         /// \brief Checks if all components are approximately equal within a tolerance.
         ///
         /// \param Tolerance Maximum allowed difference between components.
         /// \return `true` if all components are within \p Tolerance of each other, `false` otherwise.
-        AURORA_INLINE constexpr Bool IsUniform(Real32 Tolerance = kEpsilon<Real32>) const
+        AURORA_INLINE constexpr Bool IsUniform(Type Tolerance = kEpsilon<Type>) const
         {
             return (Abs(GetX() - GetY()) <= Tolerance);
         }
@@ -102,25 +102,43 @@ inline namespace Math
         /// \param X New x value.
         /// \param Y New y value.
         /// \return A reference to this vector after the update.
-        AURORA_INLINE constexpr Ref<Vector2> Set(Real32 X, Real32 Y)
+        AURORA_INLINE constexpr Ref<AnyVector2> Set(Type X, Type Y)
         {
             mX = X;
             mY = Y;
             return (*this);
         }
 
+        /// \brief Sets the x-component of the vector.
+        ///
+        /// \param X The new x-component.
+        AURORA_INLINE constexpr Ref<AnyVector2> SetX(Type X)
+        {
+            mX = X;
+            return (*this);
+        }
+
         /// \brief Gets the x-component of the vector.
         ///
         /// \return The x-component.
-        AURORA_INLINE constexpr Real32 GetX() const
+        AURORA_INLINE constexpr Type GetX() const
         {
             return mX;
+        }
+
+        /// \brief Sets the y-component of the vector.
+        ///
+        /// \param Y The new y-component.
+        AURORA_INLINE constexpr Ref<AnyVector2> SetY(Type Y)
+        {
+            mY = Y;
+            return (*this);
         }
 
         /// \brief Gets the y-component of the vector.
         ///
         /// \return The y-component.
-        AURORA_INLINE constexpr Real32 GetY() const
+        AURORA_INLINE constexpr Type GetY() const
         {
             return mY;
         }
@@ -128,7 +146,8 @@ inline namespace Math
         /// \brief Calculates the length (magnitude) of the vector.
         ///
         /// \return The length of the vector.
-        AURORA_INLINE constexpr Real32 GetLength() const
+        AURORA_INLINE constexpr Type GetLength() const
+            requires (IsReal<Type>)
         {
             return Sqrt(GetLengthSquared());
         }
@@ -136,25 +155,47 @@ inline namespace Math
         /// \brief Calculates the squared length of the vector.
         ///
         /// \return The squared length of the vector (no square root).
-        AURORA_INLINE constexpr Real32 GetLengthSquared() const
+        AURORA_INLINE constexpr Type GetLengthSquared() const
         {
             return (mX * mX + mY * mY);
         }
 
-        /// \brief Calculates the distance between this vector and another vector.
+        /// \brief Calculates the euclidean distance between this vector and another vector.
         ///
         /// \param Vector The vector to calculate the distance to.
         /// \return The distance between the two vectors.
-        AURORA_INLINE constexpr Real32 GetDistance(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr Type GetDistance(ConstRef<AnyVector2> Vector) const
+            requires (IsReal<Type>)
         {
-            return (*this - Vector).GetLength();
+            const AnyVector2 Difference = (* this) - Vector;
+            return Difference.GetLength();
+        }
+
+        /// \brief Calculates the manhattan distance between this vector and another vector.
+        ///
+        /// \param Vector The vector to calculate the distance to.
+        /// \return The distance between the two vectors.
+        AURORA_INLINE constexpr Type GetDistanceManhattan(ConstRef<AnyVector2> Vector) const
+        {
+            const AnyVector2 Difference = (* this) - Vector;
+            return Abs(Difference.GetX()) + Abs(Difference.GetY());
+        }
+
+        /// \brief Calculates the Chebyshev distance between this vector and another vector.
+        ///
+        /// \param Vector The vector to calculate the distance to.
+        /// \return The distance between the two vectors.
+        AURORA_INLINE constexpr Type GetDistanceChebyshev(ConstRef<AnyVector2> Vector) const
+        {
+            const AnyVector2 Difference = (*this) - Vector;
+            return Max(Abs(Difference.GetX()), Abs(Difference.GetY()));
         }
 
         /// \brief Calculates the squared distance between this vector and another vector.
         ///
         /// \param Vector The vector to calculate the squared distance to.
         /// \return The squared distance between the two vectors.
-        AURORA_INLINE constexpr Real32 GetDistanceSquared(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr Type GetDistanceSquared(ConstRef<AnyVector2> Vector) const
         {
             return (*this - Vector).GetLengthSquared();
         }
@@ -162,7 +203,8 @@ inline namespace Math
         /// \brief Calculates the angle of the vector relative to the x-axis.
         ///
         /// \return The angle in radians (range [-π, π]).
-        AURORA_INLINE constexpr Real32 GetAngle() const
+        AURORA_INLINE constexpr Type GetAngle() const
+            requires (IsReal<Type>)
         {
             return InvTan(mY, mX);
         }
@@ -171,99 +213,100 @@ inline namespace Math
         ///
         /// \param Other The other vector to compare with.
         /// \return Angle in radians between the two vectors (range [0, π]).
-        AURORA_INLINE constexpr Real32 GetAngle(ConstRef<Vector2> Other) const
+        AURORA_INLINE constexpr Type GetAngle(ConstRef<AnyVector2> Other) const
+            requires (IsReal<Type>)
         {
-            if (const Real32 Length = GetLength() * Other.GetLength(); Length > kEpsilon<Real32>)
+            if (const Type Length = GetLength() * Other.GetLength(); Length > kEpsilon<Type>)
             {
                 return InvCos(Dot(* this, Other) / Length);
             }
-            return 0.0f;
+            return Type(0);
         }
 
         /// \brief Adds another vector to this vector.
         ///
         /// \param Vector The vector to add.
         /// \return A new vector that is the sum of this vector and the input vector.
-        AURORA_INLINE constexpr Vector2 operator+(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr AnyVector2 operator+(ConstRef<AnyVector2> Vector) const
         {
-            return Vector2(mX + Vector.mX, mY + Vector.mY);
+            return AnyVector2(mX + Vector.mX, mY + Vector.mY);
         }
 
         /// \brief Adds a scalar to all components of this vector.
         ///
         /// \param Scalar The scalar to add.
         /// \return A new vector with the scalar added to all components.
-        AURORA_INLINE constexpr Vector2 operator+(Real32 Scalar) const
+        AURORA_INLINE constexpr AnyVector2 operator+(Type Scalar) const
         {
-            return Vector2(mX + Scalar, mY + Scalar);
+            return AnyVector2(mX + Scalar, mY + Scalar);
         }
 
         /// \brief Negates the vector.
         ///
         /// \return A new vector that is the negation of this vector.
-        AURORA_INLINE constexpr Vector2 operator-() const
+        AURORA_INLINE constexpr AnyVector2 operator-() const
         {
-            return Vector2(-mX, -mY);
+            return AnyVector2(-mX, -mY);
         }
 
         /// \brief Subtracts another vector from this vector.
         ///
         /// \param Vector The vector to subtract.
         /// \return A new vector that is the difference of the two vectors.
-        AURORA_INLINE constexpr Vector2 operator-(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr AnyVector2 operator-(ConstRef<AnyVector2> Vector) const
         {
-            return Vector2(mX - Vector.mX, mY - Vector.mY);
+            return AnyVector2(mX - Vector.mX, mY - Vector.mY);
         }
 
         /// \brief Subtracts a scalar from all components of this vector.
         ///
         /// \param Scalar The scalar to subtract.
         /// \return A new vector with the scalar subtracted from all components.
-        AURORA_INLINE constexpr Vector2 operator-(Real32 Scalar) const
+        AURORA_INLINE constexpr AnyVector2 operator-(Type Scalar) const
         {
-            return Vector2(mX - Scalar, mY - Scalar);
+            return AnyVector2(mX - Scalar, mY - Scalar);
         }
 
         /// \brief Multiplies all components of this vector by another vector.
         ///
         /// \param Vector The vector to multiply by.
         /// \return A new vector that is the product of the two vectors.
-        AURORA_INLINE constexpr Vector2 operator*(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr AnyVector2 operator*(ConstRef<AnyVector2> Vector) const
         {
-            return Vector2(mX * Vector.mX, mY * Vector.mY);
+            return AnyVector2(mX * Vector.mX, mY * Vector.mY);
         }
 
         /// \brief Multiplies all components of this vector by a scalar.
         ///
         /// \param Scalar The scalar to multiply by.
         /// \return A new vector with the scalar multiplied by all components.
-        AURORA_INLINE constexpr Vector2 operator*(Real32 Scalar) const
+        AURORA_INLINE constexpr AnyVector2 operator*(Type Scalar) const
         {
-            return Vector2(mX * Scalar, mY * Scalar);
+            return AnyVector2(mX * Scalar, mY * Scalar);
         }
 
         /// \brief Divides all components of this vector by another vector.
         ///
         /// \param Vector The vector to divide by.
         /// \return A new vector that is the quotient of the two vectors.
-        AURORA_INLINE constexpr Vector2 operator/(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr AnyVector2 operator/(ConstRef<AnyVector2> Vector) const
         {
-            return Vector2(mX / Vector.mX, mY / Vector.mY);
+            return AnyVector2(mX / Vector.mX, mY / Vector.mY);
         }
 
         /// \brief Divides all components of this vector by a scalar.
         ///
         /// \param Scalar The scalar to divide by.
         /// \return A new vector with the scalar divided into all components.
-        AURORA_INLINE constexpr Vector2 operator/(Real32 Scalar) const
+        AURORA_INLINE constexpr AnyVector2 operator/(Type Scalar) const
         {
-            return Vector2(mX / Scalar, mY / Scalar);
+            return AnyVector2(mX / Scalar, mY / Scalar);
         }
 
         /// \brief Pre-increments all components of the vector.
         ///
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator++()
+        AURORA_INLINE constexpr Ref<AnyVector2> operator++()
         {
             ++mX;
             ++mY;
@@ -273,7 +316,7 @@ inline namespace Math
         /// \brief Pre-decrements all components of the vector.
         ///
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator--()
+        AURORA_INLINE constexpr Ref<AnyVector2> operator--()
         {
             --mX;
             --mY;
@@ -284,7 +327,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to add.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator+=(ConstRef<Vector2> Vector)
+        AURORA_INLINE constexpr Ref<AnyVector2> operator+=(ConstRef<AnyVector2> Vector)
         {
             mX += Vector.mX;
             mY += Vector.mY;
@@ -295,7 +338,7 @@ inline namespace Math
         ///
         /// \param Scalar The scalar value to add.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator+=(Real32 Scalar)
+        AURORA_INLINE constexpr Ref<AnyVector2> operator+=(Type Scalar)
         {
             mX += Scalar;
             mY += Scalar;
@@ -306,7 +349,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to subtract.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator-=(ConstRef<Vector2> Vector)
+        AURORA_INLINE constexpr Ref<AnyVector2> operator-=(ConstRef<AnyVector2> Vector)
         {
             mX -= Vector.mX;
             mY -= Vector.mY;
@@ -317,7 +360,7 @@ inline namespace Math
         ///
         /// \param Scalar The scalar value to subtract.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator-=(Real32 Scalar)
+        AURORA_INLINE constexpr Ref<AnyVector2> operator-=(Type Scalar)
         {
             mX -= Scalar;
             mY -= Scalar;
@@ -328,7 +371,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to multiply.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator*=(ConstRef<Vector2> Vector)
+        AURORA_INLINE constexpr Ref<AnyVector2> operator*=(ConstRef<AnyVector2> Vector)
         {
             mX *= Vector.mX;
             mY *= Vector.mY;
@@ -339,7 +382,7 @@ inline namespace Math
         ///
         /// \param Scalar The scalar value to multiply.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator*=(Real32 Scalar)
+        AURORA_INLINE constexpr Ref<AnyVector2> operator*=(Type Scalar)
         {
             mX *= Scalar;
             mY *= Scalar;
@@ -350,7 +393,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to divide by.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator/=(ConstRef<Vector2> Vector)
+        AURORA_INLINE constexpr Ref<AnyVector2> operator/=(ConstRef<AnyVector2> Vector)
         {
             mX /= Vector.mX;
             mY /= Vector.mY;
@@ -361,7 +404,7 @@ inline namespace Math
         ///
         /// \param Scalar The scalar value to divide by.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector2> operator/=(Real32 Scalar)
+        AURORA_INLINE constexpr Ref<AnyVector2> operator/=(Type Scalar)
         {
             mX /= Scalar;
             mY /= Scalar;
@@ -372,7 +415,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare to.
         /// \return `true` if all components are approximately equal, `false` otherwise.
-        AURORA_INLINE constexpr Bool operator==(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr Bool operator==(ConstRef<AnyVector2> Vector) const
         {
             return IsAlmostEqual(mX, Vector.mX) && IsAlmostEqual(mY, Vector.mY);
         }
@@ -381,7 +424,7 @@ inline namespace Math
         ///
         /// \param Other The vector to compare to.
         /// \return `true` if the vectors are not equal, `false` otherwise.
-        AURORA_INLINE constexpr Bool operator!=(ConstRef<Vector2> Other) const
+        AURORA_INLINE constexpr Bool operator!=(ConstRef<AnyVector2> Other) const
         {
             return !(*this == Other);
         }
@@ -390,7 +433,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare against.
         /// \return `true` if all components of this vector are less than the other vector’s components, otherwise `false`.
-        AURORA_INLINE constexpr Bool operator<(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr Bool operator<(ConstRef<AnyVector2> Vector) const
         {
             return mX < Vector.mX && mY < Vector.mY;
         }
@@ -399,7 +442,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare against.
         /// \return `true` if all components of this vector are less than or equal to the other vector’s components, otherwise `false`.
-        AURORA_INLINE constexpr Bool operator<=(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr Bool operator<=(ConstRef<AnyVector2> Vector) const
         {
             return mX <= Vector.mX && mY <= Vector.mY;
         }
@@ -408,7 +451,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare against.
         /// \return `true` if all components of this vector are greater than the other vector’s components, otherwise `false`.
-        AURORA_INLINE constexpr Bool operator>(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr Bool operator>(ConstRef<AnyVector2> Vector) const
         {
             return mX > Vector.mX && mY > Vector.mY;
         }
@@ -417,7 +460,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare against.
         /// \return `true` if all components of this vector are greater than or equal to the other vector’s components, otherwise `false`.
-        AURORA_INLINE constexpr Bool operator>=(ConstRef<Vector2> Vector) const
+        AURORA_INLINE constexpr Bool operator>=(ConstRef<AnyVector2> Vector) const
         {
             return mX >= Vector.mX && mY >= Vector.mY;
         }
@@ -428,51 +471,51 @@ inline namespace Math
         template<typename Serializer>
         AURORA_INLINE void OnSerialize(Serializer Archive)
         {
-            Archive.SerializeReal32(mX);
-            Archive.SerializeReal32(mY);
+            Archive.SerializeObject(mX);
+            Archive.SerializeObject(mY);
         }
 
     public:
 
-        /// \brief Returns the zero vector (0.0f, 0.0f).
+        /// \brief Returns the zero vector (0, 0).
         ///
         /// \return The zero vector.
-        AURORA_INLINE constexpr static Vector2 Zero()
+        AURORA_INLINE constexpr static AnyVector2 Zero()
         {
-            return Vector2();
+            return AnyVector2();
         }
 
-        /// \brief Returns the one vector (1.0f, 1.0f).
+        /// \brief Returns the one vector (1, 1).
         ///
         /// \return The one vector.
-        AURORA_INLINE constexpr static Vector2 One()
+        AURORA_INLINE constexpr static AnyVector2 One()
         {
-            return Vector2(1.0f, 1.0f);
+            return AnyVector2(Type(1), Type(1));
         }
 
-        /// \brief Returns the unit vector along the X-axis (1.0f, 0.0f).
+        /// \brief Returns the unit vector along the X-axis (1, 0).
         ///
         /// \return The unit vector along the X-axis.
-        AURORA_INLINE constexpr static Vector2 UnitX()
+        AURORA_INLINE constexpr static AnyVector2 UnitX()
         {
-            return Vector2(1.0f, 0.0f);
+            return AnyVector2(Type(1), Type(0));
         }
 
-        /// \brief Returns the unit vector along the Y-axis (0.0f, 1.0f).
+        /// \brief Returns the unit vector along the Y-axis (0, 1).
         ///
         /// \return The unit vector along the Y-axis.
-        AURORA_INLINE constexpr static Vector2 UnitY()
+        AURORA_INLINE constexpr static AnyVector2 UnitY()
         {
-            return Vector2(0.0f, 1.0f);
+            return AnyVector2(Type(0), Type(1));
         }
 
         /// \brief Returns a vector perpendicular to the given vector.
         ///
         /// \param Vector The vector to compute the perpendicular of.
         /// \return A vector perpendicular to the input vector.
-        AURORA_INLINE constexpr static Vector2 Perpendicular(ConstRef<Vector2> Vector)
+        AURORA_INLINE constexpr static AnyVector2 Perpendicular(ConstRef<AnyVector2> Vector)
         {
-            return Vector2(-Vector.GetY(), Vector.GetX());
+            return AnyVector2(-Vector.GetY(), Vector.GetX());
         }
 
         /// \brief Projects the source vector onto the target vector.
@@ -480,7 +523,8 @@ inline namespace Math
         /// \param Source The vector to be projected.
         /// \param Target The vector onto which the source is projected.
         /// \return The projection of source onto target.
-        AURORA_INLINE constexpr static Vector2 Project(ConstRef<Vector2> Source, ConstRef<Vector2> Target)
+        AURORA_INLINE constexpr static AnyVector2 Project(ConstRef<AnyVector2> Source, ConstRef<AnyVector2> Target)
+            requires (IsReal<Type>)
         {
             return Target * (Dot(Source, Target) / Dot(Target, Target));
         }
@@ -489,11 +533,12 @@ inline namespace Math
         ///
         /// \param Vector The vector to normalize.
         /// \return A normalized vector, or the original if its length is too small.
-        AURORA_INLINE constexpr static Vector2 Normalize(ConstRef<Vector2> Vector)
+        AURORA_INLINE constexpr static AnyVector2 Normalize(ConstRef<AnyVector2> Vector)
+            requires (IsReal<Type>)
         {
-            if (const Real32 Length = Vector.GetLength(); Length > kEpsilon<Real32>)
+            if (const Type Length = Vector.GetLength(); Length > kEpsilon<Type>)
             {
-                return Vector * (1.0f / Length);
+                return Vector * (Type(1) / Length);
             }
             return Vector;
         }
@@ -503,9 +548,10 @@ inline namespace Math
         /// \param Incident The incoming vector to reflect.
         /// \param Normal   The surface normal to reflect across (should be normalized).
         /// \return The reflected vector.
-        AURORA_INLINE constexpr static Vector2 Reflect(ConstRef<Vector2> Incident, ConstRef<Vector2> Normal)
+        AURORA_INLINE constexpr static AnyVector2 Reflect(ConstRef<AnyVector2> Incident, ConstRef<AnyVector2> Normal)
+            requires (IsReal<Type>)
         {
-            return Incident - Normal * (2.0f * Dot(Incident, Normal));
+            return Incident - Normal * (Type(2) * Dot(Incident, Normal));
         }
 
         /// \brief Rotates a vector by a given angle in radians.
@@ -513,11 +559,12 @@ inline namespace Math
         /// \param Vector The vector to rotate.
         /// \param Angles The angle in radians to rotate by (counter-clockwise).
         /// \return A new rotated vector.
-        AURORA_INLINE constexpr static Vector2 Rotate(ConstRef<Vector2> Vector, Real32 Angles)
+        AURORA_INLINE constexpr static AnyVector2 Rotate(ConstRef<AnyVector2> Vector, Type Angles)
+            requires (IsReal<Type>)
         {
-            const Real32 C = Cos(Angles);
-            const Real32 S = Sin(Angles);
-            return Vector2(Vector.GetX() * C - Vector.GetY() * S, Vector.GetX() * S + Vector.GetY() * C);
+            const Type C = Cos(Angles);
+            const Type S = Sin(Angles);
+            return AnyVector2(Vector.GetX() * C - Vector.GetY() * S, Vector.GetX() * S + Vector.GetY() * C);
         }
 
         /// \brief Computes the dot product of two vectors.
@@ -525,7 +572,7 @@ inline namespace Math
         /// \param P0 The first vector.
         /// \param P1 The second vector.
         /// \return The dot product of the two vectors.
-        AURORA_INLINE constexpr static Real32 Dot(ConstRef<Vector2> P0, ConstRef<Vector2> P1)
+        AURORA_INLINE constexpr static Type Dot(ConstRef<AnyVector2> P0, ConstRef<AnyVector2> P1)
         {
             return (P0.GetX() * P1.GetX()) + (P0.GetY() * P1.GetY());
         }
@@ -535,7 +582,7 @@ inline namespace Math
         /// \param P0 The first vector.
         /// \param P1 The second vector.
         /// \return The scalar cross product of the two vectors.
-        AURORA_INLINE constexpr static Real32 Cross(ConstRef<Vector2> P0, ConstRef<Vector2> P1)
+        AURORA_INLINE constexpr static Type Cross(ConstRef<AnyVector2> P0, ConstRef<AnyVector2> P1)
         {
             return P0.GetX() * P1.GetY() - P0.GetY() * P1.GetX();
         }
@@ -548,7 +595,7 @@ inline namespace Math
         /// \param P1 The second vector.
         /// \param P2 The third vector.
         /// \return The scalar triple product value.
-        AURORA_INLINE constexpr static Real32 Cross(ConstRef<Vector2> P0, ConstRef<Vector2> P1, ConstRef<Vector2> P2)
+        AURORA_INLINE constexpr static Type Cross(ConstRef<AnyVector2> P0, ConstRef<AnyVector2> P1, ConstRef<AnyVector2> P2)
         {
             return (P0.GetX() - P2.GetX()) * (P1.GetY() - P2.GetY()) - (P0.GetY() - P2.GetY()) * (P1.GetX() - P2.GetX());
         }
@@ -558,9 +605,9 @@ inline namespace Math
         /// \param P0 The first vector.
         /// \param P1 The second vector.
         /// \return A vector with the component-wise minimum values.
-        AURORA_INLINE constexpr static Vector2 Min(ConstRef<Vector2> P0, ConstRef<Vector2> P1)
+        AURORA_INLINE constexpr static AnyVector2 Min(ConstRef<AnyVector2> P0, ConstRef<AnyVector2> P1)
         {
-            return Vector2(Base::Min(P0.mX, P1.mX), Base::Min(P0.mY, P1.mY));
+            return AnyVector2(Base::Min(P0.mX, P1.mX), Base::Min(P0.mY, P1.mY));
         }
 
         /// \brief Returns the component-wise maximum of two vectors.
@@ -568,27 +615,29 @@ inline namespace Math
         /// \param P0 The first vector.
         /// \param P1 The second vector.
         /// \return A vector with the component-wise maximum values.
-        AURORA_INLINE constexpr static Vector2 Max(ConstRef<Vector2> P0, ConstRef<Vector2> P1)
+        AURORA_INLINE constexpr static AnyVector2 Max(ConstRef<AnyVector2> P0, ConstRef<AnyVector2> P1)
         {
-            return Vector2(Base::Max(P0.mX, P1.mX), Base::Max(P0.mY, P1.mY));
+            return AnyVector2(Base::Max(P0.mX, P1.mX), Base::Max(P0.mY, P1.mY));
         }
 
         /// \brief Floors each component of the given vector.
         ///
         /// \param Vector The vector to floor.
         /// \return A vector with floored components.
-        AURORA_INLINE constexpr static Vector2 Floor(ConstRef<Vector2> Vector)
+        AURORA_INLINE constexpr static AnyVector2 Floor(ConstRef<AnyVector2> Vector)
+            requires (IsReal<Type>)
         {
-            return Vector2(Base::Floor(Vector.mX), Base::Floor(Vector.mY));
+            return AnyVector2(Base::Floor(Vector.mX), Base::Floor(Vector.mY));
         }
 
         /// \brief Ceils each component of the given vector.
         ///
         /// \param Vector The vector to ceil.
         /// \return A vector with ceiled components.
-        AURORA_INLINE constexpr static Vector2 Ceil(ConstRef<Vector2> Vector)
+        AURORA_INLINE constexpr static AnyVector2 Ceil(ConstRef<AnyVector2> Vector)
+            requires (IsReal<Type>)
         {
-            return Vector2(Base::Ceil(Vector.mX), Base::Ceil(Vector.mY));
+            return AnyVector2(Base::Ceil(Vector.mX), Base::Ceil(Vector.mY));
         }
 
         /// \brief Linearly interpolates between two vectors.
@@ -597,7 +646,8 @@ inline namespace Math
         /// \param End        The ending vector.
         /// \param Percentage The interpolation percentage (range between 0 and 1).
         /// \return A vector interpolated between the start and end vectors.
-        AURORA_INLINE constexpr static Vector2 Lerp(ConstRef<Vector2> Start, ConstRef<Vector2> End, Real32 Percentage)
+        AURORA_INLINE constexpr static AnyVector2 Lerp(ConstRef<AnyVector2> Start, ConstRef<AnyVector2> End, Type Percentage)
+            requires (IsReal<Type>)
         {
             return Start + (End - Start) * Percentage;
         }
@@ -607,7 +657,13 @@ inline namespace Math
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Real32 mX;
-        Real32 mY;
+        Type mX;
+        Type mY;
     };
+
+    /// \brief Represents a vector with (x, y) floating-point components.
+    using Vector2    = AnyVector2<Real32>;
+
+    /// \brief Represents a vector with (x, y) signed integer components.
+    using IntVector2 = AnyVector2<SInt32>;
 }

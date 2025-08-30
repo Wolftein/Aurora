@@ -20,15 +20,14 @@
 
 inline namespace Math
 {
-    /// \brief Represents a 3D vector with floating point components (x, y, z).
-    class Vector3 final
+    /// \brief Represents a generic vector with (x, y, z) components.
+    template<typename Type>
+    class AnyVector3 final
     {
     public:
 
-        /// \brief Default constructor.
-        ///
-        /// Initializes the vector to (0.0f, 0.0f, 0.0f).
-        AURORA_INLINE constexpr Vector3()
+        /// \brief Constructor initializing all components zero.
+        AURORA_INLINE constexpr AnyVector3()
             : mX { 0 },
               mY { 0 },
               mZ { 0 }
@@ -38,7 +37,7 @@ inline namespace Math
         /// \brief Constructor initializing all components to the same value.
         ///
         /// \param Scalar The scalar value used to initialize all components.
-        AURORA_INLINE constexpr explicit Vector3(Real32 Scalar)
+        AURORA_INLINE constexpr explicit AnyVector3(Type Scalar)
             : mX { Scalar },
               mY { Scalar },
               mZ { Scalar }
@@ -50,7 +49,7 @@ inline namespace Math
         /// \param X The x-component of the vector.
         /// \param Y The y-component of the vector.
         /// \param Z The z-component of the vector.
-        AURORA_INLINE constexpr Vector3(Real32 X, Real32 Y, Real32 Z)
+        AURORA_INLINE constexpr AnyVector3(Type X, Type Y, Type Z)
             : mX { X },
               mY { Y },
               mZ { Z }
@@ -60,7 +59,7 @@ inline namespace Math
         /// \brief Copy constructor.
         ///
         /// \param Other The vector to copy.
-        AURORA_INLINE constexpr Vector3(ConstRef<Vector3> Other)
+        AURORA_INLINE constexpr AnyVector3(ConstRef<AnyVector3> Other)
             : mX { Other.GetX() },
               mY { Other.GetY() },
               mZ { Other.GetZ() }
@@ -81,7 +80,7 @@ inline namespace Math
         /// \param Y Value to compare with the Y component.
         /// \param Z Value to compare with the Z component.
         /// \return `true` if all components are approximately equal, `false` otherwise.
-        AURORA_INLINE constexpr Bool IsAlmostEqual(Real32 X, Real32 Y, Real32 Z) const
+        AURORA_INLINE constexpr Bool IsAlmostEqual(Type X, Type Y, Type Z) const
         {
             return Base::IsAlmostEqual(mX, X) && Base::IsAlmostEqual(mY, Y) && Base::IsAlmostEqual(mZ, Z);
         }
@@ -90,15 +89,16 @@ inline namespace Math
         ///
         /// \return `true` if the vector is normalized, `false` otherwise.
         AURORA_INLINE constexpr Bool IsNormalized() const
+            requires(IsReal<Type>)
         {
-            return Base::IsAlmostEqual(GetLengthSquared(), 1.0f);
+            return Base::IsAlmostEqual(GetLengthSquared(), Type(1));
         }
 
         /// \brief Checks if all components are approximately equal within a tolerance.
         ///
         /// \param Tolerance Maximum allowed difference between components.
         /// \return `true` if all components are within \p Tolerance of each other, `false` otherwise.
-        AURORA_INLINE constexpr Bool IsUniform(Real32 Tolerance = kEpsilon<Real32>) const
+        AURORA_INLINE constexpr Bool IsUniform(Type Tolerance = kEpsilon<Type>) const
         {
             return (Abs(GetX() - GetY()) <= Tolerance) &&
                    (Abs(GetY() - GetZ()) <= Tolerance);
@@ -110,7 +110,7 @@ inline namespace Math
         /// \param Y New y value.
         /// \param Z New z value.
         /// \return A reference to this vector after the update.
-        AURORA_INLINE constexpr Ref<Vector3> Set(Real32 X, Real32 Y, Real32 Z)
+        AURORA_INLINE constexpr Ref<AnyVector3> Set(Type X, Type Y, Type Z)
         {
             mX = X;
             mY = Y;
@@ -118,26 +118,53 @@ inline namespace Math
             return (* this);
         }
 
+        /// \brief Sets the x-component of the vector.
+        ///
+        /// \param X The new x-component.
+        AURORA_INLINE constexpr Ref<AnyVector3> SetX(Type X)
+        {
+            mX = X;
+            return (*this);
+        }
+
         /// \brief Gets the x-component of the vector.
         ///
         /// \return The x-component.
-        AURORA_INLINE constexpr Real32 GetX() const
+        AURORA_INLINE constexpr Type GetX() const
         {
             return mX;
+        }
+
+        /// \brief Sets the y-component of the vector.
+        ///
+        /// \param Y The new y-component.
+        AURORA_INLINE constexpr Ref<AnyVector3> SetY(Type Y)
+        {
+            mY = Y;
+            return (*this);
         }
 
         /// \brief Gets the y-component of the vector.
         ///
         /// \return The y-component.
-        AURORA_INLINE constexpr Real32 GetY() const
+        AURORA_INLINE constexpr Type GetY() const
         {
             return mY;
+        }
+
+        /// \brief Sets the z-component of the vector.
+        ///
+        /// \param Z The new z-component.
+        AURORA_INLINE constexpr Ref<AnyVector3> SetZ(Type Z)
+        {
+            mZ = Z;
+            return (*this);
         }
 
         /// \brief Gets the z-component of the vector.
         ///
         /// \return The z-component.
-        AURORA_INLINE constexpr Real32 GetZ() const
+        AURORA_INLINE constexpr Type GetZ() const
         {
             return mZ;
         }
@@ -145,7 +172,8 @@ inline namespace Math
         /// \brief Calculates the length (magnitude) of the vector.
         ///
         /// \return The length of the vector.
-        AURORA_INLINE constexpr Real32 GetLength() const
+        AURORA_INLINE constexpr Type GetLength() const
+            requires(IsReal<Type>)
         {
             return Sqrt(GetLengthSquared());
         }
@@ -153,7 +181,7 @@ inline namespace Math
         /// \brief Calculates the squared length of the vector.
         ///
         /// \return The squared length of the vector (no square root).
-        AURORA_INLINE constexpr Real32 GetLengthSquared() const
+        AURORA_INLINE constexpr Type GetLengthSquared() const
         {
             return (mX * mX + mY * mY + mZ * mZ);
         }
@@ -162,7 +190,8 @@ inline namespace Math
         ///
         /// \param Vector The vector to calculate the distance to.
         /// \return The distance between the two vectors.
-        AURORA_INLINE constexpr Real32 GetDistance(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr Type GetDistance(ConstRef<AnyVector3> Vector) const
+            requires(IsReal<Type>)
         {
             return (* this - Vector).GetLength();
         }
@@ -171,7 +200,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to calculate the squared distance to.
         /// \return The squared distance between the two vectors.
-        AURORA_INLINE constexpr Real32 GetDistanceSquared(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr Type GetDistanceSquared(ConstRef<AnyVector3> Vector) const
         {
             return (* this - Vector).GetLengthSquared();
         }
@@ -180,99 +209,100 @@ inline namespace Math
         ///
         /// \param Other The other vector to compare with.
         /// \return Angle in radians between the two vectors (range [0, π]).
-        AURORA_INLINE constexpr Real32 GetAngle(ConstRef<Vector3> Other) const
+        AURORA_INLINE constexpr Type GetAngle(ConstRef<AnyVector3> Other) const
+            requires(IsReal<Type>)
         {
-            if (const Real32 Length = GetLength() * Other.GetLength(); Length > kEpsilon<Real32>)
+            if (const Type Length = GetLength() * Other.GetLength(); Length > kEpsilon<Type>)
             {
                 return InvCos(Dot(* this, Other) / Length);
             }
-            return 0.0f;
+            return Type(0);
         }
 
         /// \brief Adds another vector to this vector.
         ///
         /// \param Vector The vector to add.
         /// \return A new vector that is the sum of this vector and the input vector.
-        AURORA_INLINE constexpr Vector3 operator+(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr AnyVector3 operator+(ConstRef<AnyVector3> Vector) const
         {
-            return Vector3(mX + Vector.mX, mY + Vector.mY, mZ + Vector.mZ);
+            return AnyVector3(mX + Vector.mX, mY + Vector.mY, mZ + Vector.mZ);
         }
 
         /// \brief Adds a scalar to all components of this vector.
         ///
         /// \param Scalar The scalar to add.
         /// \return A new vector with the scalar added to all components.
-        AURORA_INLINE constexpr Vector3 operator+(Real32 Scalar) const
+        AURORA_INLINE constexpr AnyVector3 operator+(Type Scalar) const
         {
-            return Vector3(mX + Scalar, mY + Scalar, mZ + Scalar);
+            return AnyVector3(mX + Scalar, mY + Scalar, mZ + Scalar);
         }
 
         /// \brief Negates the vector.
         ///
         /// \return A new vector that is the negation of this vector.
-        AURORA_INLINE constexpr Vector3 operator-() const
+        AURORA_INLINE constexpr AnyVector3 operator-() const
         {
-            return Vector3(-mX, -mY, -mZ);
+            return AnyVector3(-mX, -mY, -mZ);
         }
 
         /// \brief Subtracts another vector from this vector.
         ///
         /// \param Vector The vector to subtract.
         /// \return A new vector that is the difference of the two vectors.
-        AURORA_INLINE constexpr Vector3 operator-(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr AnyVector3 operator-(ConstRef<AnyVector3> Vector) const
         {
-            return Vector3(mX - Vector.mX, mY - Vector.mY, mZ - Vector.mZ);
+            return AnyVector3(mX - Vector.mX, mY - Vector.mY, mZ - Vector.mZ);
         }
 
         /// \brief Subtracts a scalar from all components of this vector.
         ///
         /// \param Scalar The scalar to subtract.
         /// \return A new vector with the scalar subtracted from all components.
-        AURORA_INLINE constexpr Vector3 operator-(Real32 Scalar) const
+        AURORA_INLINE constexpr AnyVector3 operator-(Type Scalar) const
         {
-            return Vector3(mX - Scalar, mY - Scalar, mZ - Scalar);
+            return AnyVector3(mX - Scalar, mY - Scalar, mZ - Scalar);
         }
 
         /// \brief Multiplies all components of this vector by another vector.
         ///
         /// \param Vector The vector to multiply by.
         /// \return A new vector that is the product of the two vectors.
-        AURORA_INLINE constexpr Vector3 operator*(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr AnyVector3 operator*(ConstRef<AnyVector3> Vector) const
         {
-            return Vector3(mX * Vector.mX, mY * Vector.mY, mZ * Vector.mZ);
+            return AnyVector3(mX * Vector.mX, mY * Vector.mY, mZ * Vector.mZ);
         }
 
         /// \brief Multiplies all components of this vector by a scalar.
         ///
         /// \param Scalar The scalar to multiply by.
         /// \return A new vector with the scalar multiplied by all components.
-        AURORA_INLINE constexpr Vector3 operator*(Real32 Scalar) const
+        AURORA_INLINE constexpr AnyVector3 operator*(Type Scalar) const
         {
-            return Vector3(mX * Scalar, mY * Scalar, mZ * Scalar);
+            return AnyVector3(mX * Scalar, mY * Scalar, mZ * Scalar);
         }
 
         /// \brief Divides all components of this vector by another vector.
         ///
         /// \param Vector The vector to divide by.
         /// \return A new vector that is the quotient of the two vectors.
-        AURORA_INLINE constexpr Vector3 operator/(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr AnyVector3 operator/(ConstRef<AnyVector3> Vector) const
         {
-            return Vector3(mX / Vector.mX, mY / Vector.mY, mZ / Vector.mZ);
+            return AnyVector3(mX / Vector.mX, mY / Vector.mY, mZ / Vector.mZ);
         }
 
         /// \brief Divides all components of this vector by a scalar.
         ///
         /// \param Scalar The scalar to divide by.
         /// \return A new vector with the scalar divided into all components.
-        AURORA_INLINE constexpr Vector3 operator/(Real32 Scalar) const
+        AURORA_INLINE constexpr AnyVector3 operator/(Type Scalar) const
         {
-            return Vector3(mX / Scalar, mY / Scalar, mZ / Scalar);
+            return AnyVector3(mX / Scalar, mY / Scalar, mZ / Scalar);
         }
 
         /// \brief Pre-increments all components of the vector.
         ///
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator++()
+        AURORA_INLINE constexpr Ref<AnyVector3> operator++()
         {
             ++mX;
             ++mY;
@@ -283,7 +313,7 @@ inline namespace Math
         /// \brief Pre-decrements all components of the vector.
         ///
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator--()
+        AURORA_INLINE constexpr Ref<AnyVector3> operator--()
         {
             --mX;
             --mY;
@@ -295,7 +325,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to add.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator+=(ConstRef<Vector3> Vector)
+        AURORA_INLINE constexpr Ref<AnyVector3> operator+=(ConstRef<AnyVector3> Vector)
         {
             mX += Vector.mX;
             mY += Vector.mY;
@@ -307,7 +337,7 @@ inline namespace Math
         ///
         /// \param Scalar The scalar value to add.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator+=(Real32 Scalar)
+        AURORA_INLINE constexpr Ref<AnyVector3> operator+=(Type Scalar)
         {
             mX += Scalar;
             mY += Scalar;
@@ -319,7 +349,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to subtract.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator-=(ConstRef<Vector3> Vector)
+        AURORA_INLINE constexpr Ref<AnyVector3> operator-=(ConstRef<AnyVector3> Vector)
         {
             mX -= Vector.mX;
             mY -= Vector.mY;
@@ -331,7 +361,7 @@ inline namespace Math
         ///
         /// \param Scalar The scalar value to subtract.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator-=(Real32 Scalar)
+        AURORA_INLINE constexpr Ref<AnyVector3> operator-=(Type Scalar)
         {
             mX -= Scalar;
             mY -= Scalar;
@@ -343,7 +373,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to multiply.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator*=(ConstRef<Vector3> Vector)
+        AURORA_INLINE constexpr Ref<AnyVector3> operator*=(ConstRef<AnyVector3> Vector)
         {
             mX *= Vector.mX;
             mY *= Vector.mY;
@@ -355,7 +385,7 @@ inline namespace Math
         ///
         /// \param Scalar The scalar value to multiply.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator*=(Real32 Scalar)
+        AURORA_INLINE constexpr Ref<AnyVector3> operator*=(Type Scalar)
         {
             mX *= Scalar;
             mY *= Scalar;
@@ -367,7 +397,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to divide by.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator/=(ConstRef<Vector3> Vector)
+        AURORA_INLINE constexpr Ref<AnyVector3> operator/=(ConstRef<AnyVector3> Vector)
         {
             mX /= Vector.mX;
             mY /= Vector.mY;
@@ -379,7 +409,7 @@ inline namespace Math
         ///
         /// \param Scalar The scalar value to divide by.
         /// \return A reference to the updated vector.
-        AURORA_INLINE constexpr Ref<Vector3> operator/=(Real32 Scalar)
+        AURORA_INLINE constexpr Ref<AnyVector3> operator/=(Type Scalar)
         {
             mX /= Scalar;
             mY /= Scalar;
@@ -391,7 +421,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare to.
         /// \return `true` if all components are approximately equal, `false` otherwise.
-        AURORA_INLINE constexpr Bool operator==(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr Bool operator==(ConstRef<AnyVector3> Vector) const
         {
             return IsAlmostEqual(Vector.mX, Vector.mY, Vector.mZ);
         }
@@ -400,7 +430,7 @@ inline namespace Math
         ///
         /// \param Other The vector to compare to.
         /// \return `true` if the vectors are not equal, `false` otherwise.
-        AURORA_INLINE constexpr Bool operator!=(ConstRef<Vector3> Other) const
+        AURORA_INLINE constexpr Bool operator!=(ConstRef<AnyVector3> Other) const
         {
             return !(*this == Other);
         }
@@ -409,7 +439,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare against.
         /// \return `true` if all components of this vector are less than the other vector’s components, otherwise `false`.
-        AURORA_INLINE constexpr Bool operator<(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr Bool operator<(ConstRef<AnyVector3> Vector) const
         {
             return mX < Vector.mX && mY < Vector.mY && mZ < Vector.mZ;
         }
@@ -418,7 +448,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare against.
         /// \return `true` if all components of this vector are less than or equal to the other vector’s components, otherwise `false`.
-        AURORA_INLINE constexpr Bool operator<=(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr Bool operator<=(ConstRef<AnyVector3> Vector) const
         {
             return mX <= Vector.mX && mY <= Vector.mY && mZ <= Vector.mZ;
         }
@@ -427,7 +457,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare against.
         /// \return `true` if all components of this vector are greater than the other vector’s components, otherwise `false`.
-        AURORA_INLINE constexpr Bool operator>(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr Bool operator>(ConstRef<AnyVector3> Vector) const
         {
             return mX > Vector.mX && mY > Vector.mY && mZ > Vector.mZ;
         }
@@ -436,7 +466,7 @@ inline namespace Math
         ///
         /// \param Vector The vector to compare against.
         /// \return `true` if all components of this vector are greater than or equal to the other vector’s components, otherwise `false`.
-        AURORA_INLINE constexpr Bool operator>=(ConstRef<Vector3> Vector) const
+        AURORA_INLINE constexpr Bool operator>=(ConstRef<AnyVector3> Vector) const
         {
             return mX >= Vector.mX && mY >= Vector.mY && mZ >= Vector.mZ;
         }
@@ -447,62 +477,63 @@ inline namespace Math
         template<typename Serializer>
         AURORA_INLINE void OnSerialize(Serializer Archive)
         {
-            Archive.SerializeReal32(mX);
-            Archive.SerializeReal32(mY);
-            Archive.SerializeReal32(mZ);
+            Archive.SerializeObject(mX);
+            Archive.SerializeObject(mY);
+            Archive.SerializeObject(mZ);
         }
 
     public:
 
-        /// \brief Returns the zero vector (0.0f, 0.0f, 0.0f).
+        /// \brief Returns the zero vector (Type(0), Type(0), Type(0)).
         ///
         /// \return The zero vector.
-        AURORA_INLINE constexpr static Vector3 Zero()
+        AURORA_INLINE constexpr static AnyVector3 Zero()
         {
-            return Vector3();
+            return AnyVector3();
         }
 
-        /// \brief Returns the one vector (1.0f, 1.0f, 1.0f).
+        /// \brief Returns the one vector (1, 1, 1).
         ///
         /// \return The one vector.
-        AURORA_INLINE constexpr static Vector3 One()
+        AURORA_INLINE constexpr static AnyVector3 One()
         {
-            return Vector3(1.0f, 1.0f, 1.0f);
+            return AnyVector3(Type(1), Type(1), Type(1));
         }
 
-        /// \brief Returns the unit vector along the X-axis (1.0f, 0.0f, 0.0f).
+        /// \brief Returns the unit vector along the X-axis (1, 0, 0).
         ///
         /// \return The unit vector along the X-axis.
-        AURORA_INLINE constexpr static Vector3 UnitX()
+        AURORA_INLINE constexpr static AnyVector3 UnitX()
         {
-            return Vector3(1.0f, 0.0f, 0.0f);
+            return AnyVector3(Type(1), Type(0), Type(0));
         }
 
-        /// \brief Returns the unit vector along the Y-axis (0.0f, 1.0f, 0.0f).
+        /// \brief Returns the unit vector along the Y-axis (0, 1, 0).
         ///
         /// \return The unit vector along the Y-axis.
-        AURORA_INLINE constexpr static Vector3 UnitY()
+        AURORA_INLINE constexpr static AnyVector3 UnitY()
         {
-            return Vector3(0.0f, 1.0f, 0.0f);
+            return AnyVector3(Type(0), Type(1), Type(0));
         }
 
-        /// \brief Returns the unit vector along the Z-axis (0.0f, 0.0f, 1.0f).
+        /// \brief Returns the unit vector along the Z-axis (0, 0, 1).
         ///
         /// \return The unit vector along the Z-axis.
-        AURORA_INLINE constexpr static Vector3 UnitZ()
+        AURORA_INLINE constexpr static AnyVector3 UnitZ()
         {
-            return Vector3(0.0f, 0.0f, 1.0f);
+            return AnyVector3(Type(0), Type(0), Type(1));
         }
 
         /// \brief Normalizes the given vector.
         ///
         /// \param Vector The vector to normalize.
         /// \return A normalized vector, or the original if its length is too small.
-        AURORA_INLINE constexpr static Vector3 Normalize(ConstRef<Vector3> Vector)
+        AURORA_INLINE constexpr static AnyVector3 Normalize(ConstRef<AnyVector3> Vector)
+            requires(IsReal<Type>)
         {
-            if (const Real32 Length = Vector.GetLength(); Length > kEpsilon<Real32>)
+            if (const Type Length = Vector.GetLength(); Length > kEpsilon<Type>)
             {
-                return Vector * (1.0f / Length);
+                return Vector * (Type(1) / Length);
             }
             return Vector;
         }
@@ -512,7 +543,8 @@ inline namespace Math
         /// \param Source The vector to be projected.
         /// \param Target The vector onto which the source is projected.
         /// \return The projection of source onto target.
-        AURORA_INLINE constexpr static Vector3 Project(ConstRef<Vector3> Source, ConstRef<Vector3> Target)
+        AURORA_INLINE constexpr static AnyVector3 Project(ConstRef<AnyVector3> Source, ConstRef<AnyVector3> Target)
+            requires(IsReal<Type>)
         {
             return Target * (Dot(Source, Target) / Dot(Target, Target));
         }
@@ -522,9 +554,9 @@ inline namespace Math
         /// \param Incident The incoming vector to reflect.
         /// \param Normal   The surface normal to reflect across (should be normalized).
         /// \return The reflected vector.
-        AURORA_INLINE constexpr static Vector3 Reflect(ConstRef<Vector3> Incident, ConstRef<Vector3> Normal)
+        AURORA_INLINE constexpr static AnyVector3 Reflect(ConstRef<AnyVector3> Incident, ConstRef<AnyVector3> Normal)
         {
-            return Incident - Normal * (2.0f * Dot(Incident, Normal));
+            return Incident - Normal * (Type(2) * Dot(Incident, Normal));
         }
 
         /// \brief Computes the dot product of two vectors.
@@ -532,7 +564,7 @@ inline namespace Math
         /// \param P0 The first vector.
         /// \param P1 The second vector.
         /// \return The dot product of the two vectors.
-        AURORA_INLINE constexpr static Real32 Dot(ConstRef<Vector3> P0, ConstRef<Vector3> P1)
+        AURORA_INLINE constexpr static Type Dot(ConstRef<AnyVector3> P0, ConstRef<AnyVector3> P1)
         {
             return (P0.GetX() * P1.GetX()) + (P0.GetY() * P1.GetY()) + (P0.GetZ() * P1.GetZ());
         }
@@ -542,13 +574,13 @@ inline namespace Math
         /// \param P0 The first vector.
         /// \param P1 The second vector.
         /// \return The cross product of the two vectors.
-        AURORA_INLINE constexpr static Vector3 Cross(ConstRef<Vector3> P0, ConstRef<Vector3> P1)
+        AURORA_INLINE constexpr static AnyVector3 Cross(ConstRef<AnyVector3> P0, ConstRef<AnyVector3> P1)
         {
-            const Real32 X = P0.GetY() * P1.GetZ() - P0.GetZ() * P1.GetY();
-            const Real32 Y = P0.GetZ() * P1.GetX() - P0.GetX() * P1.GetZ();
-            const Real32 Z = P0.GetX() * P1.GetY() - P0.GetY() * P1.GetX();
+            const Type X = P0.GetY() * P1.GetZ() - P0.GetZ() * P1.GetY();
+            const Type Y = P0.GetZ() * P1.GetX() - P0.GetX() * P1.GetZ();
+            const Type Z = P0.GetX() * P1.GetY() - P0.GetY() * P1.GetX();
 
-            return Vector3(X, Y, Z);
+            return AnyVector3(X, Y, Z);
         }
 
         /// \brief Returns the component-wise minimum of two vectors.
@@ -556,9 +588,9 @@ inline namespace Math
         /// \param P0 The first vector.
         /// \param P1 The second vector.
         /// \return A vector with the component-wise minimum values.
-        AURORA_INLINE constexpr static Vector3 Min(ConstRef<Vector3> P0, ConstRef<Vector3> P1)
+        AURORA_INLINE constexpr static AnyVector3 Min(ConstRef<AnyVector3> P0, ConstRef<AnyVector3> P1)
         {
-            return Vector3(Base::Min(P0.mX, P1.mX), Base::Min(P0.mY, P1.mY), Base::Min(P0.mZ, P1.mZ));
+            return AnyVector3(Base::Min(P0.mX, P1.mX), Base::Min(P0.mY, P1.mY), Base::Min(P0.mZ, P1.mZ));
         }
 
         /// \brief Returns the component-wise maximum of two vectors.
@@ -566,27 +598,29 @@ inline namespace Math
         /// \param P0 The first vector.
         /// \param P1 The second vector.
         /// \return A vector with the component-wise maximum values.
-        AURORA_INLINE constexpr static Vector3 Max(ConstRef<Vector3> P0, ConstRef<Vector3> P1)
+        AURORA_INLINE constexpr static AnyVector3 Max(ConstRef<AnyVector3> P0, ConstRef<AnyVector3> P1)
         {
-            return Vector3(Base::Max(P0.mX, P1.mX), Base::Max(P0.mY, P1.mY), Base::Max(P0.mZ, P1.mZ));
+            return AnyVector3(Base::Max(P0.mX, P1.mX), Base::Max(P0.mY, P1.mY), Base::Max(P0.mZ, P1.mZ));
         }
 
         /// \brief Floors each component of the given vector.
         ///
         /// \param Vector The vector to floor.
         /// \return A vector with floored components.
-        AURORA_INLINE constexpr static Vector3 Floor(ConstRef<Vector3> Vector)
+        AURORA_INLINE constexpr static AnyVector3 Floor(ConstRef<AnyVector3> Vector)
+            requires(IsReal<Type>)
         {
-            return Vector3(Base::Floor(Vector.mX), Base::Floor(Vector.mY), Base::Floor(Vector.mZ));
+            return AnyVector3(Base::Floor(Vector.mX), Base::Floor(Vector.mY), Base::Floor(Vector.mZ));
         }
 
         /// \brief Ceils each component of the given vector.
         ///
         /// \param Vector The vector to ceil.
         /// \return A vector with ceiled components.
-        AURORA_INLINE constexpr static Vector3 Ceil(ConstRef<Vector3> Vector)
+        AURORA_INLINE constexpr static AnyVector3 Ceil(ConstRef<AnyVector3> Vector)
+            requires(IsReal<Type>)
         {
-            return Vector3(Base::Ceil(Vector.mX), Base::Ceil(Vector.mY), Base::Ceil(Vector.mZ));
+            return AnyVector3(Base::Ceil(Vector.mX), Base::Ceil(Vector.mY), Base::Ceil(Vector.mZ));
         }
 
         /// \brief Linearly interpolates between two vectors.
@@ -595,7 +629,8 @@ inline namespace Math
         /// \param End        The ending vector.
         /// \param Percentage The interpolation percentage (range between 0 and 1).
         /// \return A vector interpolated between the start and end vectors.
-        AURORA_INLINE constexpr static Vector3 Lerp(ConstRef<Vector3> Start, ConstRef<Vector3> End, Real32 Percentage)
+        AURORA_INLINE constexpr static AnyVector3 Lerp(ConstRef<AnyVector3> Start, ConstRef<AnyVector3> End, Type Percentage)
+            requires(IsReal<Type>)
         {
             return Start + (End - Start) * Percentage;
         }
@@ -605,8 +640,14 @@ inline namespace Math
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        Real32 mX;
-        Real32 mY;
-        Real32 mZ;
+        Type mX;
+        Type mY;
+        Type mZ;
     };
+
+    /// \brief Represents a vector with (x, y, z) floating-point components.
+    using Vector3    = AnyVector3<Real32>;
+
+    /// \brief Represents a vector with (x, y, z) signed integer components.
+    using IntVector3 = AnyVector3<SInt32>;
 }
