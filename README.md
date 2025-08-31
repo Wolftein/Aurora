@@ -1,1 +1,1 @@
-Simple and efficient C++ Game Engine.
+Aurora has move to https://github.com/Zyphryon/Engine
